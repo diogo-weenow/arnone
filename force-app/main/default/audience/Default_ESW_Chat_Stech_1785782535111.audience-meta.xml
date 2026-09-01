@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Audience xmlns="http://soap.sforce.com/2006/04/metadata">
+    <audienceName>Padrão</audienceName>
+    <container>ESW_Chat_Stech_1785782535111</container>
+    <criteria/>
+    <formulaFilterType>AllCriteriaMatch</formulaFilterType>
+    <isDefaultAudience>true</isDefaultAudience>
+</Audience>

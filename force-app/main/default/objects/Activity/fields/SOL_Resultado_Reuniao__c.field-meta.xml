@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Resultado_Reuniao__c</fullName>
+    <description>Desfecho da reunião comercial da Arnone Soluções. Agendada leva o lead a SQL; Não compareceu e Cancelada abrem reagendamento ou desqualificação. O histórico da agenda fica no próprio Event, e o lead guarda só o estado consolidado.</description>
+    <label>Resultado da reunião</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Agendada</fullName>
+                <default>false</default>
+                <label>Agendada</label>
+            </value>
+            <value>
+                <fullName>Realizada</fullName>
+                <default>false</default>
+                <label>Realizada</label>
+            </value>
+            <value>
+                <fullName>Não compareceu</fullName>
+                <default>false</default>
+                <label>Não compareceu</label>
+            </value>
+            <value>
+                <fullName>Cancelada</fullName>
+                <default>false</default>
+                <label>Cancelada</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

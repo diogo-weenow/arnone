@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Exige_Justificativa__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Se marcado, a justificativa da urgência é obrigatória no formulário.</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Exige justificativa</label>
+    <type>Checkbox</type>
+</CustomField>

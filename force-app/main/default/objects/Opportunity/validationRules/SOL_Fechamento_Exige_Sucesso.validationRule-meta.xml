@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Fechamento_Exige_Sucesso</fullName>
+    <active>true</active>
+    <description>Aguardando retorno mantém a Oportunidade em Negociação, conforme o escopo do documento. Sem sucesso não fecha como Ganho: encaminha para Perdido.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SOL&apos;,
+  OR(
+    ISPICKVAL(StageName, &apos;Fechamento&apos;),
+    ISPICKVAL(StageName, &apos;Ganho&apos;)
+  ),
+  NOT(ISPICKVAL(SOL_Resultado_Apresentacao__c, &apos;Sucesso&apos;))
+)</errorConditionFormula>
+    <errorDisplayField>SOL_Resultado_Apresentacao__c</errorDisplayField>
+    <errorMessage>Só é possível avançar para Fechamento ou Ganho com a apresentação registrada como &quot;Sucesso&quot;. Enquanto o cliente não responde, o resultado é &quot;Aguardando retorno&quot; e a Oportunidade permanece em Negociação; se ele recusou, leve para Perdido.</errorMessage>
+</ValidationRule>

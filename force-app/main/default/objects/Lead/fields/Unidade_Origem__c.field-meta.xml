@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Unidade_Origem__c</fullName>
+    <description>Unidade de destino informada pelo formulário de captação (Web-to-Lead) — usada pelo flow Lead_BeforeCreate_DefinirUnidade para definir o record type (A2.7).</description>
+    <label>Unidade de Origem</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetName>VS_Unidades</valueSetName>
+    </valueSet>
+</CustomField>

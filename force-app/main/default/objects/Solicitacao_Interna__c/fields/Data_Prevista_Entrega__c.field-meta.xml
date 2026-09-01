@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Data_Prevista_Entrega__c</fullName>
+    <description>Data combinada com o fornecedor. Informada na cotação por quem comprou, não pelo Financeiro — ele a consulta.</description>
+    <label>Entrega prevista</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Date</type>
+</CustomField>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Resultado_Apresentacao__c</fullName>
+    <description>A resposta do cliente. Aguardando retorno mantém a Oportunidade em Negociação, e existe para separar a espera do cliente de um diagnóstico em andamento ou de uma perda. Sucesso libera o Fechamento; Sem sucesso encaminha para Perdido.</description>
+    <label>Resultado da apresentação</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Sucesso</fullName>
+                <default>false</default>
+                <label>Sucesso</label>
+            </value>
+            <value>
+                <fullName>Sem sucesso</fullName>
+                <default>false</default>
+                <label>Sem sucesso</label>
+            </value>
+            <value>
+                <fullName>Aguardando retorno</fullName>
+                <default>false</default>
+                <label>Aguardando retorno</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

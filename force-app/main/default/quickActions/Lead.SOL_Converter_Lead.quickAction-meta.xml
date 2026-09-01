@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Ação guiada de conversão do lead da Arnone Soluções (CLICKUP-9350). Confere os pré-requisitos, oferece a Conta já cadastrada com o mesmo CNPJ e cria Conta, Contato e Oportunidade ligados entre si. Roda o flow SOL_Converter_Lead.</description>
+    <flowDefinition>SOL_Converter_Lead</flowDefinition>
+    <label>Converter lead</label>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <type>Flow</type>
+</QuickAction>

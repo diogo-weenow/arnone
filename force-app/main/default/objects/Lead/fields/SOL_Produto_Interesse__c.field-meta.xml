@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Produto_Interesse__c</fullName>
+    <description>Produto que o lead procura: Recuperação Tributária ou ART 360. Pode ficar em branco na captação e ser completado pelo SDR. É a origem do Produto de negócio da Oportunidade na conversão.</description>
+    <label>Produto de interesse</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Recuperação Tributária</fullName>
+                <default>false</default>
+                <label>Recuperação Tributária</label>
+            </value>
+            <value>
+                <fullName>ART 360</fullName>
+                <default>false</default>
+                <label>ART 360</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

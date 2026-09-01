@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Link_Anexo__c</fullName>
+    <description>Link do SharePoint com a proposta. É o que o gestor abre para decidir.</description>
+    <label>Proposta (link)</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Url</type>
+</CustomField>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Ganho_Exige_Termos_Financeiros</fullName>
+    <active>true</active>
+    <description>Cenário 3 do card: aceitação registrada exige percentual de comissão e valor do serviço preenchidos antes do Ganho. Sem eles a Oportunidade fecha sem dizer quanto a Arnone recebe.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SOL&apos;,
+  ISPICKVAL(SOL_Produto_Negocio__c, &apos;Recuperação Tributária&apos;),
+  ISPICKVAL(StageName, &apos;Ganho&apos;),
+  OR(
+    BLANKVALUE(SOL_Percentual_Comissao__c, 0) &lt;= 0,
+    BLANKVALUE(SOL_Valor_Servico__c, 0) &lt;= 0
+  )
+)</errorConditionFormula>
+    <errorDisplayField>SOL_Percentual_Comissao__c</errorDisplayField>
+    <errorMessage>Informe o percentual de comissão e o valor do serviço antes de fechar como Ganho. São eles que dizem quanto a Arnone recebe neste negócio.</errorMessage>
+</ValidationRule>

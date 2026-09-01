@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__appPage",
+  "title" : "main",
+  "contentBody" : {
+    "currentThemeId" : "Marketing_Landing_Page_LWR",
+    "headMarkup" : "\r\n<link rel=\"stylesheet\" href=\"{ basePath }/assets/styles/slds/salesforce-lightning-design-system-part1.css?{ versionKey }\"/>\n<link rel=\"stylesheet\" href=\"{ basePath }/assets/styles/slds/salesforce-lightning-design-system-part2.css?{ versionKey }\"/>\n<link rel=\"stylesheet\" href=\"{ basePath }/assets/styles/slds/salesforce-lightning-design-system-part3.css?{ versionKey }\"/>\n<link rel=\"stylesheet\" href=\"{ basePath }/assets/styles/slds/salesforce-lightning-design-system-part4.css?{ versionKey }\"/>\r\n\n<link rel=\"stylesheet\" href=\"{ styles/styles.css }\" />",
+    "isLockerServiceEnabled" : true,
+    "isRelaxedCSPLevel" : false,
+    "templateName" : "marketing-landing-template"
+  },
+  "urlName" : "main"
+}

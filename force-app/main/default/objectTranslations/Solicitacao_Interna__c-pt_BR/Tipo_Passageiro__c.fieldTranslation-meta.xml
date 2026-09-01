@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Quem viaja --></label>
+    <name>Tipo_Passageiro__c</name>
+    <picklistValues>
+        <masterLabel>ambos</masterLabel>
+        <translation><!-- ambos --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>colaborador</masterLabel>
+        <translation><!-- colaborador --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>terceiro</masterLabel>
+        <translation><!-- terceiro --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

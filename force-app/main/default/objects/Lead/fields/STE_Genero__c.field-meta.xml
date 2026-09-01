@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Genero__c</fullName>
+    <description>Classificação de gênero do candidato, coletada na qualificação (US 04, regra 4.3). Exclusivo do funil Stech Telecom.</description>
+    <label>Gênero</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Feminino</fullName>
+                <default>false</default>
+                <label>Feminino</label>
+            </value>
+            <value>
+                <fullName>Masculino</fullName>
+                <default>false</default>
+                <label>Masculino</label>
+            </value>
+            <value>
+                <fullName>Não binário</fullName>
+                <default>false</default>
+                <label>Não binário</label>
+            </value>
+            <value>
+                <fullName>Prefiro não informar</fullName>
+                <default>false</default>
+                <label>Prefiro não informar</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Escolhido__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Marca o orçamento vencedor. Redundante com o Fornecedor escolhido do pai, de propósito: aqui identifica a linha, lá serve a relatório sem subconsulta.</description>
+    <label>Escolhido</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

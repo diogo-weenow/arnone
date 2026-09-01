@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Justificativa_Escolha__c</fullName>
+    <description>Por que este orçamento foi escolhido. Fica na trilha de auditoria: nem sempre vence o mais barato, e a razão precisa estar escrita.</description>
+    <label>Justificativa da escolha</label>
+    <length>2000</length>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>4</visibleLines>
+</CustomField>

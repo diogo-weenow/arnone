@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Lead_Exige_CNPJ</fullName>
+    <active>true</active>
+    <description>O CNPJ identifica a empresa e e por ele que a conversao acha Conta existente. O guarda olha record type E unidade de origem porque o record type e definido depois da criacao, pelo Lead_AfterCreate_DefinirUnidade.</description>
+    <errorConditionFormula>AND(
+  OR(
+    $RecordType.DeveloperName = &apos;SOL&apos;,
+    ISPICKVAL(Unidade_Origem__c, &apos;SOL&apos;)
+  ),
+  ISBLANK(CNPJ__c)
+)</errorConditionFormula>
+    <errorDisplayField>CNPJ__c</errorDisplayField>
+    <errorMessage>Informe o CNPJ. Ele é o identificador da empresa na Arnone Soluções e o que evita cadastro duplicado na conversão.</errorMessage>
+</ValidationRule>

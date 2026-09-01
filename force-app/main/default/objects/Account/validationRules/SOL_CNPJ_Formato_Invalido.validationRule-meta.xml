@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_CNPJ_Formato_Invalido</fullName>
+    <active>true</active>
+    <description>Arnone Soluções: exige o CNPJ no formato 00.000.000/0001-00 quando preenchido. Restrita ao record type SOL para não afetar CNPJ__c de outras BUs.</description>
+    <errorConditionFormula>AND(
+  RecordType.DeveloperName = &quot;SOL&quot;,
+  NOT(ISBLANK(CNPJ__c)),
+  NOT(REGEX(CNPJ__c, &quot;\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}&quot;))
+)</errorConditionFormula>
+    <errorDisplayField>CNPJ__c</errorDisplayField>
+    <errorMessage>CNPJ deve estar no formato 00.000.000/0001-00.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Queue xmlns="http://soap.sforce.com/2006/04/metadata">
+    <doesIncludeBosses>false</doesIncludeBosses>
+    <doesSendEmailToMembers>false</doesSendEmailToMembers>
+    <name>Fila Instituto STech</name>
+    <queueMembers>
+        <users>
+            <user>joao.silva.weenow@weenow.com.br</user>
+            <user>lpinto@grupoarnone.demo</user>
+            <user>omar.faruk@weenow.devarnone</user>
+        </users>
+    </queueMembers>
+    <queueRoutingConfig>Roteamento_Mensagens</queueRoutingConfig>
+    <queueSobject>
+        <sobjectType>MessagingSession</sobjectType>
+    </queueSobject>
+</Queue>

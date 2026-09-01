@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Dashboard xmlns="http://soap.sforce.com/2006/04/metadata">
+    <backgroundEndColor>#FFFFFF</backgroundEndColor>
+    <backgroundFadeDirection>Diagonal</backgroundFadeDirection>
+    <backgroundStartColor>#FFFFFF</backgroundStartColor>
+    <dashboardGridLayout>
+        <dashboardGridComponents>
+            <colSpan>4</colSpan>
+            <columnIndex>0</columnIndex>
+            <dashboardComponent>
+                <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+                <componentType>Metric</componentType>
+                <decimalPrecision>0</decimalPrecision>
+                <displayUnits>Auto</displayUnits>
+                <footer>Ano fiscal corrente</footer>
+                <groupingSortProperties/>
+                <header>Receita Ganha</header>
+                <indicatorBreakpoint1>50000.0</indicatorBreakpoint1>
+                <indicatorBreakpoint2>150000.0</indicatorBreakpoint2>
+                <indicatorHighColor>#04844B</indicatorHighColor>
+                <indicatorLowColor>#C23934</indicatorLowColor>
+                <indicatorMiddleColor>#FFB75D</indicatorMiddleColor>
+                <report>Arnone_Comercial/Receita_Ganha_por_Mes</report>
+                <showRange>false</showRange>
+            </dashboardComponent>
+            <rowIndex>0</rowIndex>
+            <rowSpan>2</rowSpan>
+        </dashboardGridComponents>
+        <dashboardGridComponents>
+            <colSpan>4</colSpan>
+            <columnIndex>4</columnIndex>
+            <dashboardComponent>
+                <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+                <componentType>Metric</componentType>
+                <decimalPrecision>0</decimalPrecision>
+                <displayUnits>Auto</displayUnits>
+                <footer>Oportunidades abertas das 5 unidades</footer>
+                <groupingSortProperties/>
+                <header>Pipeline Aberto</header>
+                <indicatorBreakpoint1>150000.0</indicatorBreakpoint1>
+                <indicatorBreakpoint2>350000.0</indicatorBreakpoint2>
+                <indicatorHighColor>#04844B</indicatorHighColor>
+                <indicatorLowColor>#C23934</indicatorLowColor>
+                <indicatorMiddleColor>#FFB75D</indicatorMiddleColor>
+                <report>Arnone_Comercial/Pipeline_por_Unidade_e_Fase</report>
+                <showRange>false</showRange>
+            </dashboardComponent>
+            <rowIndex>0</rowIndex>
+            <rowSpan>2</rowSpan>
+        </dashboardGridComponents>
+        <dashboardGridComponents>
+            <colSpan>4</colSpan>
+            <columnIndex>8</columnIndex>
+            <dashboardComponent>
+                <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+                <componentType>Metric</componentType>
+                <decimalPrecision>0</decimalPrecision>
+                <displayUnits>Auto</displayUnits>
+                <footer>Leads em captação e qualificação</footer>
+                <groupingSortProperties/>
+                <header>Leads Ativos</header>
+                <indicatorBreakpoint1>5.0</indicatorBreakpoint1>
+                <indicatorBreakpoint2>10.0</indicatorBreakpoint2>
+                <indicatorHighColor>#04844B</indicatorHighColor>
+                <indicatorLowColor>#C23934</indicatorLowColor>
+                <indicatorMiddleColor>#FFB75D</indicatorMiddleColor>
+                <report>Arnone_Comercial/Leads_por_Unidade_e_Status</report>
+                <showRange>false</showRange>
+            </dashboardComponent>
+            <rowIndex>0</rowIndex>
+            <rowSpan>2</rowSpan>
+        </dashboardGridComponents>
+        <dashboardGridComponents>
+            <colSpan>4</colSpan>
+            <columnIndex>0</columnIndex>
+            <dashboardComponent>
+                <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+                <chartAxisRange>Auto</chartAxisRange>
+                <componentType>Donut</componentType>
+                <displayUnits>Auto</displayUnits>
+                <drillEnabled>false</drillEnabled>
+                <drillToDetailEnabled>false</drillToDetailEnabled>
+                <enableHover>false</enableHover>
+                <expandOthers>false</expandOthers>
+                <groupingSortProperties/>
+                <header>Pipeline por Unidade</header>
+                <legendPosition>Bottom</legendPosition>
+                <report>Arnone_Comercial/Pipeline_por_Unidade_e_Fase</report>
+                <showPercentage>true</showPercentage>
+                <showTotal>true</showTotal>
+                <showValues>false</showValues>
+                <sortBy>RowValueDescending</sortBy>
+                <sortLegendValues>false</sortLegendValues>
+                <title>Participação de cada BU</title>
+                <useReportChart>false</useReportChart>
+            </dashboardComponent>
+            <rowIndex>2</rowIndex>
+            <rowSpan>4</rowSpan>
+        </dashboardGridComponents>
+        <dashboardGridComponents>
+            <colSpan>4</colSpan>
+            <columnIndex>4</columnIndex>
+            <dashboardComponent>
+                <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+                <chartAxisRange>Auto</chartAxisRange>
+                <componentType>Funnel</componentType>
+                <displayUnits>Auto</displayUnits>
+                <drillEnabled>false</drillEnabled>
+                <drillToDetailEnabled>false</drillToDetailEnabled>
+                <enableHover>false</enableHover>
+                <expandOthers>false</expandOthers>
+                <groupingSortProperties/>
+                <header>Funil Consolidado</header>
+                <legendPosition>Bottom</legendPosition>
+                <report>Arnone_Comercial/Pipeline_por_Unidade_e_Fase</report>
+                <showPercentage>false</showPercentage>
+                <showValues>false</showValues>
+                <sortBy>RowLabelAscending</sortBy>
+                <sortLegendValues>false</sortLegendValues>
+                <title>Valor por fase do funil</title>
+                <useReportChart>false</useReportChart>
+            </dashboardComponent>
+            <rowIndex>2</rowIndex>
+            <rowSpan>4</rowSpan>
+        </dashboardGridComponents>
+        <dashboardGridComponents>
+            <colSpan>4</colSpan>
+            <columnIndex>8</columnIndex>
+            <dashboardComponent>
+                <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+                <chartAxisRange>Auto</chartAxisRange>
+                <componentType>BarGrouped</componentType>
+                <displayUnits>Auto</displayUnits>
+                <drillEnabled>false</drillEnabled>
+                <drillToDetailEnabled>false</drillToDetailEnabled>
+                <enableHover>false</enableHover>
+                <expandOthers>false</expandOthers>
+                <groupingSortProperties/>
+                <header>Ganho x Perdido</header>
+                <legendPosition>Bottom</legendPosition>
+                <report>Arnone_Comercial/Fechadas_Ganho_x_Perdido</report>
+                <showPercentage>false</showPercentage>
+                <showValues>false</showValues>
+                <sortBy>RowLabelAscending</sortBy>
+                <sortLegendValues>false</sortLegendValues>
+                <title>Resultado por unidade</title>
+                <useReportChart>false</useReportChart>
+            </dashboardComponent>
+            <rowIndex>2</rowIndex>
+            <rowSpan>4</rowSpan>
+        </dashboardGridComponents>
+        <dashboardGridComponents>
+            <colSpan>6</colSpan>
+            <columnIndex>0</columnIndex>
+            <dashboardComponent>
+                <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+                <chartAxisRange>Auto</chartAxisRange>
+                <componentType>ColumnStacked</componentType>
+                <displayUnits>Auto</displayUnits>
+                <drillEnabled>false</drillEnabled>
+                <drillToDetailEnabled>false</drillToDetailEnabled>
+                <enableHover>false</enableHover>
+                <expandOthers>false</expandOthers>
+                <groupingSortProperties/>
+                <header>Captação de Leads</header>
+                <legendPosition>Bottom</legendPosition>
+                <report>Arnone_Comercial/Leads_por_Unidade_e_Status</report>
+                <showPercentage>false</showPercentage>
+                <showValues>false</showValues>
+                <sortBy>RowLabelAscending</sortBy>
+                <sortLegendValues>false</sortLegendValues>
+                <title>Leads por unidade e status</title>
+                <useReportChart>false</useReportChart>
+            </dashboardComponent>
+            <rowIndex>6</rowIndex>
+            <rowSpan>4</rowSpan>
+        </dashboardGridComponents>
+        <dashboardGridComponents>
+            <colSpan>6</colSpan>
+            <columnIndex>6</columnIndex>
+            <dashboardComponent>
+                <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+                <chartAxisRange>Auto</chartAxisRange>
+                <componentType>Line</componentType>
+                <displayUnits>Auto</displayUnits>
+                <drillEnabled>false</drillEnabled>
+                <drillToDetailEnabled>false</drillToDetailEnabled>
+                <enableHover>false</enableHover>
+                <expandOthers>false</expandOthers>
+                <groupingSortProperties/>
+                <header>Evolução da Receita</header>
+                <legendPosition>Bottom</legendPosition>
+                <report>Arnone_Comercial/Receita_Ganha_por_Mes</report>
+                <showPercentage>false</showPercentage>
+                <showValues>false</showValues>
+                <sortBy>RowLabelAscending</sortBy>
+                <sortLegendValues>false</sortLegendValues>
+                <title>Receita ganha por mês</title>
+                <useReportChart>false</useReportChart>
+            </dashboardComponent>
+            <rowIndex>6</rowIndex>
+            <rowSpan>4</rowSpan>
+        </dashboardGridComponents>
+        <numberOfColumns>12</numberOfColumns>
+        <rowHeight>60</rowHeight>
+    </dashboardGridLayout>
+    <dashboardType>SpecifiedUser</dashboardType>
+    <description>Painel executivo das 5 unidades: KPIs de receita, pipeline e captação, funil consolidado, win rate e evolução mensal (A2.8).</description>
+    <isGridLayout>true</isGridLayout>
+    <owner>joao.silva.weenow@weenow.com.br</owner>
+    <runningUser>joao.silva.weenow@weenow.com.br</runningUser>
+    <textColor>#000000</textColor>
+    <title>Painel Comercial Arnone</title>
+    <titleColor>#1F1D1A</titleColor>
+    <titleSize>14</titleSize>
+</Dashboard>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Itens_Contratados__c</fullName>
+    <description>Lista dos produtos ou serviços objeto da contratação, um por linha. Vai no dossiê enviado ao Jurídico — o objeto do contrato é texto corrido demais para conferir escopo item a item.</description>
+    <label>Produtos ou serviços contratados</label>
+    <length>5000</length>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>4</visibleLines>
+</CustomField>

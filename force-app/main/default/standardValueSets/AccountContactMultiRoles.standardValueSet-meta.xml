@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StandardValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sorted>false</sorted>
+    <standardValue>
+        <fullName>Decisor</fullName>
+        <default>false</default>
+        <label>Decisor</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Influenciador</fullName>
+        <default>false</default>
+        <label>Influenciador</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Financeiro</fullName>
+        <default>false</default>
+        <label>Financeiro</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Jurídico</fullName>
+        <default>false</default>
+        <label>Jurídico</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Operacional</fullName>
+        <default>false</default>
+        <label>Operacional</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Patrocinador Executivo</fullName>
+        <default>false</default>
+        <label>Patrocinador Executivo</label>
+    </standardValue>
+</StandardValueSet>

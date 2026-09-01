@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Classificacao_Fila__c</fullName>
+    <description>Fila em que o candidato estava no momento da conversão (Quente, Morna ou Fria). Preservada para análise de origem.</description>
+    <label>Classificação da fila</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Quente</fullName>
+                <default>false</default>
+                <label>Quente</label>
+            </value>
+            <value>
+                <fullName>Morna</fullName>
+                <default>false</default>
+                <label>Morna</label>
+            </value>
+            <value>
+                <fullName>Fria</fullName>
+                <default>false</default>
+                <label>Fria</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

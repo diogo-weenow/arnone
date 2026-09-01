@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Antecedentes_Em_Atraso__c</fullName>
+    <description>Sinaliza que o prazo de 2 dias úteis foi ultrapassado sem registro do resultado (US 06, Cenário 03). Verdadeiro enquanto Pendente na etapa de Antecedentes após o prazo.</description>
+    <formula>AND(ISPICKVAL(STE_Resultado_Antecedentes__c,&quot;Pendente&quot;), ISPICKVAL(StageName,&quot;Verificação de Antecedentes&quot;), NOT(ISBLANK(STE_Prazo_Antecedentes__c)), TODAY() &gt; STE_Prazo_Antecedentes__c)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Antecedentes em atraso</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

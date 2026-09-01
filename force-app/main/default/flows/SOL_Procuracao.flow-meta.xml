@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Este lead não é da Arnone Soluções. Em vez de só avisar, o estado fica registrado no dado — quem olhar o lead depois vê que a etapa foi dispensada, não esquecida.</description>
+        <name>Marcar_Nao_Aplicavel</name>
+        <label>Marcar como não aplicável</label>
+        <locationX>440</locationX>
+        <locationY>396</locationY>
+        <assignmentItems>
+            <assignToReference>Buscar_Lead.SOL_Status_Procuracao__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Não aplicável</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Gravar_Lead</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Recebida a procuração, o lead fica apto para a conversão — que é o card CLICKUP-9350. Aqui nada é convertido.</description>
+        <name>Registrar_Recebimento</name>
+        <label>Registrar o recebimento</label>
+        <locationX>50</locationX>
+        <locationY>756</locationY>
+        <assignmentItems>
+            <assignToReference>Buscar_Lead.SOL_Status_Procuracao__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Recebida</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>Buscar_Lead.SOL_Data_Recebimento_Procuracao__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>Buscar_Lead.Status</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Apto para Conversão</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Gravar_Lead</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Registrar_Solicitacao</name>
+        <label>Registrar a solicitação</label>
+        <locationX>176</locationX>
+        <locationY>612</locationY>
+        <assignmentItems>
+            <assignToReference>Buscar_Lead.SOL_Status_Procuracao__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Solicitada</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>Buscar_Lead.SOL_Data_Solicitacao_Procuracao__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>Buscar_Lead.Status</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Procuração Solicitada</stringValue>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Gravar_Lead</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <name>Etapa_Da_Procuracao</name>
+        <label>Em que ponto está a procuração?</label>
+        <locationX>176</locationX>
+        <locationY>396</locationY>
+        <defaultConnector>
+            <targetReference>Tela_Solicitar</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Ainda não solicitada</defaultConnectorLabel>
+        <rules>
+            <name>Ja_recebida</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Buscar_Lead.SOL_Status_Procuracao__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Recebida</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Tela_Ja_Recebida</targetReference>
+            </connector>
+            <label>Já recebida</label>
+        </rules>
+        <rules>
+            <name>Solicitada_aguardando</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Buscar_Lead.SOL_Status_Procuracao__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Solicitada</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Buscar_Arquivos</targetReference>
+            </connector>
+            <label>Solicitada, aguardando o documento</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Guardrail do documento: a ação só age em lead da Arnone Soluções. Desde 25/08/2026 a procuração vale para todos os produtos da unidade — antes só Recuperação Tributária passava por aqui, e ART 360 era liberado por checkbox.</description>
+        <name>Exige_Procuracao</name>
+        <label>Este lead exige procuração?</label>
+        <locationX>176</locationX>
+        <locationY>288</locationY>
+        <defaultConnector>
+            <targetReference>Tela_Nao_Aplicavel</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Não — lead de outra unidade</defaultConnectorLabel>
+        <rules>
+            <name>Sim_lead_da_unidade</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Buscar_Lead.RecordType.DeveloperName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>SOL</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Etapa_Da_Procuracao</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Exigência do card: o recebimento só é registrado com pelo menos um arquivo no lead. Sem isso a data diria que o documento chegou, sem documento nenhum para provar.</description>
+        <name>Tem_Arquivo</name>
+        <label>O documento foi anexado?</label>
+        <locationX>50</locationX>
+        <locationY>612</locationY>
+        <defaultConnector>
+            <targetReference>Tela_Sem_Arquivo</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Não</defaultConnectorLabel>
+        <rules>
+            <name>Sim_tem_arquivo</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Buscar_Arquivos</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Tela_Receber</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <description>CLICKUP-9349 — ação guiada da procuração para acesso ao e-CAC. Solicita, acompanha e registra o recebimento, exigindo o arquivo anexado ao lead. Obrigatória para todos os produtos da unidade desde 25/08/2026 — antes só Recuperação Tributária passava por ela. O lead permanece lead: a conversão é o CLICKUP-9350.</description>
+    <environments>Default</environments>
+    <interviewLabel>SOL_Procuracao {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL — Procuração para o e-CAC</label>
+    <processType>Flow</processType>
+    <recordLookups>
+        <name>Buscar_Arquivos</name>
+        <label>Procurar arquivo anexado ao lead</label>
+        <locationX>50</locationX>
+        <locationY>504</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Tem_Arquivo</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>LinkedEntityId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>recordId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>ContentDocumentLink</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <name>Buscar_Lead</name>
+        <label>Buscar o lead</label>
+        <locationX>176</locationX>
+        <locationY>180</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Exige_Procuracao</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>recordId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Lead</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <name>Gravar_Lead</name>
+        <label>Gravar o lead</label>
+        <locationX>176</locationX>
+        <locationY>900</locationY>
+        <connector>
+            <targetReference>Tela_Confirmado</targetReference>
+        </connector>
+        <inputReference>Buscar_Lead</inputReference>
+    </recordUpdates>
+    <screens>
+        <name>Tela_Confirmado</name>
+        <label>Pronto</label>
+        <locationX>176</locationX>
+        <locationY>1008</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>Texto_Confirmado</name>
+            <fieldText>&lt;p&gt;Registrado.&lt;/p&gt;&lt;p&gt;Situação da procuração: &lt;b&gt;{!Buscar_Lead.SOL_Status_Procuracao__c}&lt;/b&gt; · situação do lead: &lt;b&gt;{!Buscar_Lead.Status}&lt;/b&gt;.&lt;/p&gt;&lt;p&gt;Atualize a página para ver os campos.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <name>Tela_Ja_Recebida</name>
+        <label>Procuração já recebida</label>
+        <locationX>308</locationX>
+        <locationY>504</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>Texto_Ja_Recebida</name>
+            <fieldText>&lt;p&gt;A procuração deste lead já foi recebida em &lt;b&gt;{!Buscar_Lead.SOL_Data_Recebimento_Procuracao__c}&lt;/b&gt;.&lt;/p&gt;&lt;p&gt;Não há nada a registrar aqui. O próximo passo é a conversão em Conta, Contato e Oportunidade.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <name>Tela_Nao_Aplicavel</name>
+        <label>Procuração não se aplica</label>
+        <locationX>440</locationX>
+        <locationY>288</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>false</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Marcar_Nao_Aplicavel</targetReference>
+        </connector>
+        <fields>
+            <name>Texto_Nao_Aplicavel</name>
+            <fieldText>&lt;p&gt;Este lead não é da Arnone Soluções.&lt;/p&gt;&lt;p&gt;A procuração para acesso ao e-CAC é etapa desta unidade, e vale para todos os produtos dela. Leads de outras unidades não passam por aqui.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <nextOrFinishButtonLabel>Marcar como não aplicável</nextOrFinishButtonLabel>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <name>Tela_Receber</name>
+        <label>Registrar o recebimento</label>
+        <locationX>50</locationX>
+        <locationY>684</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>false</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Registrar_Recebimento</targetReference>
+        </connector>
+        <fields>
+            <name>Texto_Receber</name>
+            <fieldText>&lt;p&gt;Há documento anexado a este lead.&lt;/p&gt;&lt;p&gt;Confirme que é a &lt;b&gt;procuração assinada&lt;/b&gt;. Ao confirmar, a data de recebimento é registrada e o lead passa para &lt;b&gt;Apto para Conversão&lt;/b&gt;.&lt;/p&gt;&lt;p&gt;O lead continua lead: a Conta, o Contato e a Oportunidade são criados na conversão, em ação separada.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <nextOrFinishButtonLabel>Confirmar recebimento</nextOrFinishButtonLabel>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <name>Tela_Sem_Arquivo</name>
+        <label>Falta o documento</label>
+        <locationX>176</locationX>
+        <locationY>720</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>Texto_Sem_Arquivo</name>
+            <fieldText>&lt;p&gt;Não há arquivo anexado a este lead.&lt;/p&gt;&lt;p&gt;A procuração foi solicitada em &lt;b&gt;{!Buscar_Lead.SOL_Data_Solicitacao_Procuracao__c}&lt;/b&gt; e ainda não consta o documento.&lt;/p&gt;&lt;p&gt;Anexe o arquivo em &lt;b&gt;Arquivos&lt;/b&gt;, no próprio lead, e acione esta ação de novo. O recebimento não é registrado sem documento.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <name>Tela_Solicitar</name>
+        <label>Solicitar a procuração</label>
+        <locationX>176</locationX>
+        <locationY>504</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>false</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Registrar_Solicitacao</targetReference>
+        </connector>
+        <fields>
+            <name>Texto_Solicitar</name>
+            <fieldText>&lt;p&gt;Registrar a solicitação da procuração para &lt;b&gt;{!Buscar_Lead.Name}&lt;/b&gt;.&lt;/p&gt;&lt;p&gt;A procuração dá acesso ao e-CAC para consultar valores a recuperar ou débitos do cliente.&lt;/p&gt;&lt;p&gt;Ao confirmar, o lead passa para &lt;b&gt;Procuração Solicitada&lt;/b&gt; e a data de hoje é registrada. Ele continua como lead enquanto o documento não chega.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <nextOrFinishButtonLabel>Registrar solicitação</nextOrFinishButtonLabel>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Buscar_Lead</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>Id do lead, preenchido pela ação rápida na tela do registro.</description>
+        <name>recordId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

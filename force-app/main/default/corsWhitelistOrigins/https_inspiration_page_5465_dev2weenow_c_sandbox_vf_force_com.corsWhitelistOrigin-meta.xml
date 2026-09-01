@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CorsWhitelistOrigin xmlns="http://soap.sforce.com/2006/04/metadata">
+    <urlPattern>https://inspiration-page-5465--dev2weenow--c.sandbox.vf.force.com</urlPattern>
+</CorsWhitelistOrigin>

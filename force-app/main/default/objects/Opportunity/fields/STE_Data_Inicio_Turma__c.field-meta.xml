@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Data_Inicio_Turma__c</fullName>
+    <description>Data de início da turma confirmada na Pré-Matrícula (US 09). Base da cadência de lembrete pré-aula (US 10).</description>
+    <label>Data de início da turma</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

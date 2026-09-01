@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Lead_CNPJ_Com_14_Digitos</fullName>
+    <active>true</active>
+    <description>CNPJ pela metade nao casa com a Conta existente e gera a duplicata que a regra queria evitar. Conta digitos ignorando pontuacao. Nao valida digito verificador: o objetivo aqui e barrar numero truncado.</description>
+    <errorConditionFormula>AND(
+  OR(
+    $RecordType.DeveloperName = &apos;SOL&apos;,
+    ISPICKVAL(Unidade_Origem__c, &apos;SOL&apos;)
+  ),
+  NOT(ISBLANK(CNPJ__c)),
+  LEN(
+    SUBSTITUTE(
+      SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(CNPJ__c, &apos;.&apos;, &apos;&apos;), &apos;/&apos;, &apos;&apos;),
+      &apos;-&apos;, &apos;&apos;),
+      &apos; &apos;, &apos;&apos;
+    )
+  ) &lt;&gt; 14
+)</errorConditionFormula>
+    <errorDisplayField>CNPJ__c</errorDisplayField>
+    <errorMessage>O CNPJ precisa ter 14 dígitos. Pode informar com ou sem pontuação.</errorMessage>
+</ValidationRule>

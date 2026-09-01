@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Configurar canais do Messaging: criar canal, cadastrar numero de WhatsApp e apontar roteamento. ATRIBUIR SO A ADMINISTRADOR: a plataforma exige junto Personalizar aplicativo e Exibir configuracao. Existe porque Configurar o Messaging nao vem no perfil.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Atendimento — Configuração de canais</label>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>ConfigureLiveMessage</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>CustomizeApplication</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>ManageCustomPermissions</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>ViewRoles</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>ViewSetup</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>ViewSetupAuditTrail</name>
+    </userPermissions>
+</PermissionSet>

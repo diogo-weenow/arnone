@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description>Guardrail do documento de arquitetura: nenhuma automação da BU roda sem confirmar o record type. WhoId pode apontar para Contato ou lead de outra unidade — nesses casos a busca não encontra um lead SOL e o flow para aqui.</description>
+        <name>E_Lead_Da_Unidade</name>
+        <label>É lead da Arnone Soluções?</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <defaultConnectorLabel>Não</defaultConnectorLabel>
+        <rules>
+            <name>Sim</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Buscar_Lead</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Buscar_Lead.RecordType.DeveloperName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>SOL</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Atualizar_Data_Compromisso</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <description>Mantém SOL_Data_Compromisso__c no lead da Arnone Soluções com a data do compromisso (Event) mais recente vinculado a ele pelo WhoId. Este campo alimenta a regra de validação SOL_Recuperacao_Exige_Compromisso, que exige um compromisso registrado antes de sair de &quot;Recebido - MQL&quot; em Recuperação Tributária.</description>
+    <environments>Default</environments>
+    <formulas>
+        <name>Data_Evento</name>
+        <dataType>Date</dataType>
+        <expression>DATEVALUE({!$Record.StartDateTime})</expression>
+    </formulas>
+    <interviewLabel>SOL_Atualizar_Data_Compromisso {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL — Atualizar data do compromisso no lead</label>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>WhoId é polimórfico: pode apontar para Lead ou Contato. Buscar em Lead resolve os dois casos — quando é contato, não vem registro e o flow encerra.</description>
+        <name>Buscar_Lead</name>
+        <label>Buscar o lead do compromisso</label>
+        <locationX>176</locationX>
+        <locationY>168</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>E_Lead_Da_Unidade</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.WhoId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Lead</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <name>Atualizar_Data_Compromisso</name>
+        <label>Atualizar a data do compromisso no lead</label>
+        <locationX>50</locationX>
+        <locationY>384</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Buscar_Lead.Id</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>SOL_Data_Compromisso__c</field>
+            <value>
+                <elementReference>Data_Evento</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Lead</object>
+    </recordUpdates>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Buscar_Lead</targetReference>
+        </connector>
+        <filterFormula>NOT(ISBLANK({!$Record.WhoId}))</filterFormula>
+        <object>Event</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

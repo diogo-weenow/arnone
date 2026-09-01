@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Negociacao_Parada__c</fullName>
+    <description>Liga sozinho quando uma Oportunidade da Arnone Soluções passa 15 dias em Negociação. É o gatilho do alerta ao coordenador para redistribuir o atendimento.</description>
+    <formula>AND(
+  $RecordType.DeveloperName = &apos;SOL&apos;,
+  ISPICKVAL(StageName, &apos;Negociação&apos;),
+  NOT(ISBLANK(SOL_Data_Entrada_Negociacao__c)),
+  FLOOR(NOW() - SOL_Data_Entrada_Negociacao__c) &gt;= 15
+)</formula>
+    <label>Negociação parada</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

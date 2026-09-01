@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Botão de conversão manual do candidato do funil Stech Telecom (US 05, premissa 5). Roda o flow STE_Converter_Lead.</description>
+    <flowDefinition>STE_Converter_Lead</flowDefinition>
+    <label>Converter (Stech Telecom)</label>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <type>Flow</type>
+</QuickAction>

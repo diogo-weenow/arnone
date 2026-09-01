@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Data_Envio_CNH__c</fullName>
+    <description>Momento em que a CNH foi recebida. Base para auditoria do prazo de qualificação.</description>
+    <label>Data de envio da CNH</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>DateTime</type>
+</CustomField>

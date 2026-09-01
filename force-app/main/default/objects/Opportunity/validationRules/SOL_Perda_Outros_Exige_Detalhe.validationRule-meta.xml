@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Perda_Outros_Exige_Detalhe</fullName>
+    <active>true</active>
+    <description>Outros é a categoria que absorve tudo o que a lista não previu. Sem o detalhe escrito, ela vira o motivo mais usado e o menos informativo.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SOL&apos;,
+  ISPICKVAL(SOL_Motivo_Perda__c, &apos;Outros&apos;),
+  ISBLANK(SOL_Detalhe_Perda__c)
+)</errorConditionFormula>
+    <errorDisplayField>SOL_Detalhe_Perda__c</errorDisplayField>
+    <errorMessage>Descreva o motivo no campo de detalhe da perda. &quot;Outros&quot; sem explicação não diz nada a quem for ler o relatório depois.</errorMessage>
+</ValidationRule>

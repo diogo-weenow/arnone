@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Cadencia_Completa</fullName>
+    <active>true</active>
+    <description>US 10 — bloqueia o avanço manual da Oportunidade para fora da Pré-Matrícula (exceto Perdido) enquanto a cadência de lembrete pré-aula não estiver concluída (as 4 tarefas). Só se aplica ao funil Stech Telecom.</description>
+    <errorConditionFormula>AND(
+  RecordType.DeveloperName = &quot;STE_Telecom&quot;,
+  ISCHANGED(StageName),
+  ISPICKVAL(PRIORVALUE(StageName), &quot;Pré-Matrícula&quot;),
+  NOT(ISPICKVAL(StageName, &quot;Perdido&quot;)),
+  STE_Cadencia_Criada__c,
+  NOT(STE_Cadencia_Concluida__c)
+)</errorConditionFormula>
+    <errorMessage>Conclua as 4 tarefas da cadência de lembrete pré-aula antes de avançar a matrícula. — Cadência pré-aula (US 10).</errorMessage>
+</ValidationRule>

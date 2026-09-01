@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Motivo_Perda_Obrigatorio</fullName>
+    <active>true</active>
+    <description>Exige o preenchimento de Motivo da perda (STech) ao fechar a Oportunidade como Perdido, no funil Stech Telecom (record type STE_Telecom).</description>
+    <errorConditionFormula>AND(
+  RecordType.DeveloperName = &quot;STE_Telecom&quot;,
+  ISPICKVAL(StageName, &quot;Perdido&quot;),
+  ISPICKVAL(STE_Motivo_Perda__c, &quot;&quot;)
+)</errorConditionFormula>
+    <errorDisplayField>STE_Motivo_Perda__c</errorDisplayField>
+    <errorMessage>Para fechar como Perdido é preciso preencher o Motivo da perda (STech).</errorMessage>
+</ValidationRule>

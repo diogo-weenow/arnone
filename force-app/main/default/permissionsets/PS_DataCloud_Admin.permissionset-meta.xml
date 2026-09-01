@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Administração do Data Cloud: acesso ao Setup, plataforma e exploradores de dados/perfis (A1.1/F1).</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Data Cloud — Admin</label>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>AccessCdpDataExplorer</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>AccessCdpProfileExplorer</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>AccessCustomerDataCloudSetup</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>AccessGeniePlatform</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>CdpConnectionManagementUser</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>CdpPerUserConnectionManagement</name>
+    </userPermissions>
+</PermissionSet>

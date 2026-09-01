@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Ganho_ART_Exige_Catalogo</fullName>
+    <active>true</active>
+    <description>ART 360 é vendido por catálogo: o documento exige Price Book e ao menos um produto antes do ganho. Sem isso a Oportunidade fecha sem dizer o que foi vendido nem por quanto.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SOL&apos;,
+  ISPICKVAL(SOL_Produto_Negocio__c, &apos;ART 360&apos;),
+  ISPICKVAL(StageName, &apos;Ganho&apos;),
+  OR(
+    ISBLANK(Pricebook2Id),
+    BLANKVALUE(SOL_Quantidade_Produtos__c, 0) &lt;= 0
+  )
+)</errorConditionFormula>
+    <errorDisplayField>SOL_Quantidade_Produtos__c</errorDisplayField>
+    <errorMessage>ART 360 é vendido por catálogo: selecione o Price Book e adicione ao menos um produto à Oportunidade antes de fechar como Ganho.</errorMessage>
+</ValidationRule>

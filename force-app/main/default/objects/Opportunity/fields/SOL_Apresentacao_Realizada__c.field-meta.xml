@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Apresentacao_Realizada__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Marca que o consultor apresentou a proposta ao cliente. Vale para os dois produtos, ainda que o conteúdo apresentado seja diferente: em Recuperação Tributária é o valor apurado no e-CAC, em ART 360 é a proposta comercial.</description>
+    <label>Apresentação realizada</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

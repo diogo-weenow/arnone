@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Thread_Ts__c</fullName>
+    <description>Identificador da thread-mãe no Slack, usado para atualizar o card de resumo.</description>
+    <externalId>false</externalId>
+    <label>Thread (ts)</label>
+    <length>40</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

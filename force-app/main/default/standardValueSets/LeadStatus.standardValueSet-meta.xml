@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StandardValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sorted>false</sorted>
+    <standardValue>
+        <fullName>Recebido - MQL</fullName>
+        <default>false</default>
+        <label>Recebido - MQL</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Captação - Contato</fullName>
+        <default>false</default>
+        <label>Captação - Contato</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Reunião Agendada - SQL</fullName>
+        <default>false</default>
+        <label>Reunião Agendada - SQL</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Procuração Solicitada</fullName>
+        <default>false</default>
+        <label>Procuração Solicitada</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Apto para Conversão</fullName>
+        <default>false</default>
+        <label>Apto para Conversão</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Novo</fullName>
+        <default>true</default>
+        <label>Novo</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Em Qualificação</fullName>
+        <default>false</default>
+        <label>Em Qualificação</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Nutrição</fullName>
+        <default>false</default>
+        <label>Nutrição</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Qualificado</fullName>
+        <default>false</default>
+        <label>Qualificado</label>
+        <converted>true</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Desqualificado</fullName>
+        <default>false</default>
+        <label>Desqualificado</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Validação</fullName>
+        <default>false</default>
+        <label>Validação</label>
+        <converted>false</converted>
+    </standardValue>
+</StandardValueSet>

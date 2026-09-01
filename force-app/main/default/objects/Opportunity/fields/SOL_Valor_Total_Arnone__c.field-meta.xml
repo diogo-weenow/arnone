@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Valor_Total_Arnone__c</fullName>
+    <description>O que a Arnone fatura no negócio: comissão de êxito mais taxa de serviço. É este valor, e não o valor recuperado pelo cliente, que alimenta o Amount da Oportunidade em Recuperação Tributária.</description>
+    <formula>SOL_Valor_Comissao__c + SOL_Valor_Servico__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Total Arnone (comissão + serviço)</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <type>Currency</type>
+</CustomField>

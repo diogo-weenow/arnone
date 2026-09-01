@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value>Solicitação Interna</value>
+    </caseValues>
+    <caseValues>
+        <plural>true</plural>
+        <value>Solicitações Internas</value>
+    </caseValues>
+    <gender>Neuter</gender>
+    <layouts>
+        <layout>Layout de Solicitação Interna</layout>
+        <sections>
+            <label><!-- Compras e cotação --></label>
+            <section>Compras e cotação</section>
+        </sections>
+        <sections>
+            <label><!-- Contrato e jurídico --></label>
+            <section>Contrato e jurídico</section>
+        </sections>
+        <sections>
+            <label><!-- Identificação --></label>
+            <section>Identificação</section>
+        </sections>
+        <sections>
+            <label><!-- Pagamento e financeiro --></label>
+            <section>Pagamento e financeiro</section>
+        </sections>
+        <sections>
+            <label><!-- Rastreio no Slack --></label>
+            <section>Rastreio no Slack</section>
+        </sections>
+        <sections>
+            <label><!-- Sistema --></label>
+            <section>Sistema</section>
+        </sections>
+        <sections>
+            <label><!-- Valor e alçada --></label>
+            <section>Valor e alçada</section>
+        </sections>
+        <sections>
+            <label><!-- Viagem --></label>
+            <section>Viagem</section>
+        </sections>
+    </layouts>
+</CustomObjectTranslation>

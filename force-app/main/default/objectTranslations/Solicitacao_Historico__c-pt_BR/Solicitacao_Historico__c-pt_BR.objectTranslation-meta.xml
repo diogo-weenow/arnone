@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseValues>
+        <plural>false</plural>
+        <value>Histórico da Solicitação</value>
+    </caseValues>
+    <caseValues>
+        <plural>true</plural>
+        <value>Históricos da Solicitação</value>
+    </caseValues>
+    <gender>Neuter</gender>
+    <layouts>
+        <layout>Layout de Histórico da Solicitação</layout>
+        <sections>
+            <label><!-- Passo da trilha --></label>
+            <section>Passo da trilha</section>
+        </sections>
+    </layouts>
+</CustomObjectTranslation>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AssignmentRules xmlns="http://soap.sforce.com/2006/04/metadata">
+    <assignmentRule>
+        <fullName>Distribuicao_Por_Unidade</fullName>
+        <active>true</active>
+        <ruleEntry>
+            <assignedTo>Fila_Leads_ADV</assignedTo>
+            <assignedToType>Queue</assignedToType>
+            <booleanFilter>1 OR 2</booleanFilter>
+            <criteriaItems>
+                <field>Lead.RecordTypeId</field>
+                <operation>equals</operation>
+                <value>Arnone Advogados</value>
+            </criteriaItems>
+            <criteriaItems>
+                <field>Lead.Unidade_Origem__c</field>
+                <operation>equals</operation>
+                <value>ADV</value>
+            </criteriaItems>
+        </ruleEntry>
+        <ruleEntry>
+            <assignedTo>Fila_Leads_SOL</assignedTo>
+            <assignedToType>Queue</assignedToType>
+            <booleanFilter>1 OR 2</booleanFilter>
+            <criteriaItems>
+                <field>Lead.RecordTypeId</field>
+                <operation>equals</operation>
+                <value>Arnone Soluções</value>
+            </criteriaItems>
+            <criteriaItems>
+                <field>Lead.Unidade_Origem__c</field>
+                <operation>equals</operation>
+                <value>SOL</value>
+            </criteriaItems>
+        </ruleEntry>
+        <ruleEntry>
+            <assignedTo>Fila_Leads_SCO</assignedTo>
+            <assignedToType>Queue</assignedToType>
+            <booleanFilter>1 OR 2</booleanFilter>
+            <criteriaItems>
+                <field>Lead.RecordTypeId</field>
+                <operation>equals</operation>
+                <value>S.Company</value>
+            </criteriaItems>
+            <criteriaItems>
+                <field>Lead.Unidade_Origem__c</field>
+                <operation>equals</operation>
+                <value>SCO</value>
+            </criteriaItems>
+        </ruleEntry>
+        <ruleEntry>
+            <assignedTo>Fila_Leads_ESG</assignedTo>
+            <assignedToType>Queue</assignedToType>
+            <booleanFilter>1 OR 2</booleanFilter>
+            <criteriaItems>
+                <field>Lead.RecordTypeId</field>
+                <operation>equals</operation>
+                <value>Instituto Global ESG</value>
+            </criteriaItems>
+            <criteriaItems>
+                <field>Lead.Unidade_Origem__c</field>
+                <operation>equals</operation>
+                <value>ESG</value>
+            </criteriaItems>
+        </ruleEntry>
+        <ruleEntry>
+            <assignedTo>Fila_Leads_STE</assignedTo>
+            <assignedToType>Queue</assignedToType>
+            <booleanFilter>1 OR 2</booleanFilter>
+            <criteriaItems>
+                <field>Lead.RecordTypeId</field>
+                <operation>equals</operation>
+                <value>Instituto STech</value>
+            </criteriaItems>
+            <criteriaItems>
+                <field>Lead.Unidade_Origem__c</field>
+                <operation>equals</operation>
+                <value>STE</value>
+            </criteriaItems>
+        </ruleEntry>
+        <ruleEntry>
+            <assignedTo>joao.silva.weenow@weenow.com.br</assignedTo>
+            <assignedToType>User</assignedToType>
+        </ruleEntry>
+    </assignmentRule>
+</AssignmentRules>

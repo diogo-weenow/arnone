@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Define, pela antecedência até a data de ida, a sinalização de prazo da viagem e se exige aprovação do CEO ou justificativa de urgência. Consumida por SolicitacaoRegras.</description>
+    <label>Farol de Viagem</label>
+    <pluralLabel>Faróis de Viagem</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

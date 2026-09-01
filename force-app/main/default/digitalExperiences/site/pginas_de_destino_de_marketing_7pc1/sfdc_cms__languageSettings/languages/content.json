@@ -1,0 +1,14 @@
+{
+  "type" : "sfdc_cms__languageSettings",
+  "title" : "LanguageContent",
+  "contentBody" : {
+    "defaultLocale" : "pt_BR",
+    "languages" : [ {
+      "isActive" : true,
+      "isAuthoringOnly" : false,
+      "label" : "Português (Brasil) (BR)",
+      "locale" : "pt_BR"
+    } ]
+  },
+  "urlName" : "languagecontent"
+}

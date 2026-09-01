@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>ADV</fullName>
+        <default>false</default>
+        <label>Arnone Advogados</label>
+    </customValue>
+    <customValue>
+        <fullName>SOL</fullName>
+        <default>false</default>
+        <label>Arnone Soluções</label>
+    </customValue>
+    <customValue>
+        <fullName>SCO</fullName>
+        <default>false</default>
+        <label>S.Company</label>
+    </customValue>
+    <customValue>
+        <fullName>ESG</fullName>
+        <default>false</default>
+        <label>Instituto Global ESG</label>
+    </customValue>
+    <customValue>
+        <fullName>STE</fullName>
+        <default>false</default>
+        <label>Instituto STech</label>
+    </customValue>
+    <description>Unidades de negócio do Grupo Arnone. Reutilizar em qualquer campo que precise de segmentação por BU.</description>
+    <masterLabel>Unidades Grupo Arnone</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

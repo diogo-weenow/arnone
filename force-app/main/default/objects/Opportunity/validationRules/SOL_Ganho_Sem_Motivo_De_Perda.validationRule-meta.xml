@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Ganho_Sem_Motivo_De_Perda</fullName>
+    <active>true</active>
+    <description>Motivo de perda preenchido numa Oportunidade ganha costuma ser sobra de uma tentativa anterior, e contamina o relatório de perdas com negócios fechados.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SOL&apos;,
+  ISPICKVAL(StageName, &apos;Ganho&apos;),
+  NOT(ISPICKVAL(SOL_Motivo_Perda__c, &apos;&apos;))
+)</errorConditionFormula>
+    <errorDisplayField>SOL_Motivo_Perda__c</errorDisplayField>
+    <errorMessage>Esta Oportunidade está sendo fechada como Ganho: limpe o motivo da perda antes de salvar.</errorMessage>
+</ValidationRule>

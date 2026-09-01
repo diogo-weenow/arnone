@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Estado --></label>
+    <name>Estado__c</name>
+    <picklistValues>
+        <masterLabel>APROVADA_GESTOR</masterLabel>
+        <translation><!-- APROVADA_GESTOR --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>CONCLUIDA</masterLabel>
+        <translation><!-- CONCLUIDA --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>CONTRATO_LIBERADO</masterLabel>
+        <translation><!-- CONTRATO_LIBERADO --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>DATA_PREVISTA_INFORMADA</masterLabel>
+        <translation><!-- DATA_PREVISTA_INFORMADA --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>EM_AJUSTE_CONTRATO</masterLabel>
+        <translation><!-- EM_AJUSTE_CONTRATO --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>EM_ANALISE_GESTOR</masterLabel>
+        <translation><!-- EM_ANALISE_GESTOR --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>EM_ANALISE_JURIDICA</masterLabel>
+        <translation><!-- EM_ANALISE_JURIDICA --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>EM_APROVACAO_CEO</masterLabel>
+        <translation><!-- EM_APROVACAO_CEO --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>EM_APROVACAO_ORCAMENTO</masterLabel>
+        <translation><!-- EM_APROVACAO_ORCAMENTO --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>EM_ASSINATURA</masterLabel>
+        <translation><!-- EM_ASSINATURA --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>EM_ASSINATURA_SOLICITANTE</masterLabel>
+        <translation><!-- EM_ASSINATURA_SOLICITANTE --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>EM_COMPRA</masterLabel>
+        <translation><!-- EM_COMPRA --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>EM_COTACAO</masterLabel>
+        <translation><!-- EM_COTACAO --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>EM_PROGRAMACAO_FINANCEIRA</masterLabel>
+        <translation><!-- EM_PROGRAMACAO_FINANCEIRA --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>ENCERRADA</masterLabel>
+        <translation><!-- ENCERRADA --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>ENVIADA</masterLabel>
+        <translation><!-- ENVIADA --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>ORCAMENTO_APROVADO</masterLabel>
+        <translation><!-- ORCAMENTO_APROVADO --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>ORCAMENTO_SELECIONADO</masterLabel>
+        <translation><!-- ORCAMENTO_SELECIONADO --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>RASCUNHO</masterLabel>
+        <translation><!-- RASCUNHO --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>REPROVADA_CEO</masterLabel>
+        <translation><!-- REPROVADA_CEO --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>REPROVADA_GESTOR</masterLabel>
+        <translation><!-- REPROVADA_GESTOR --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>RETORNO_AO_SOLICITANTE</masterLabel>
+        <translation><!-- RETORNO_AO_SOLICITANTE --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

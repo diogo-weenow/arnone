@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Resultado_Antecedentes__c</fullName>
+    <description>Resultado da checagem de antecedentes criminais registrado pelo analista (US 06). Aprovado avança para Saúde Ocupacional; Reprovado encerra a Oportunidade como Perdida.</description>
+    <label>Antecedentes</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Pendente</fullName>
+                <default>true</default>
+                <label>Pendente</label>
+            </value>
+            <value>
+                <fullName>Aprovado</fullName>
+                <default>false</default>
+                <label>Aprovado</label>
+            </value>
+            <value>
+                <fullName>Reprovado</fullName>
+                <default>false</default>
+                <label>Reprovado</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Solicitacao_Procuracao__c</fullName>
+    <description>Quando a procuração foi pedida ao cliente. Preenchida pela ação guiada, não à mão.</description>
+    <label>Data da solicitação da procuração</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

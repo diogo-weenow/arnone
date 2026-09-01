@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Status_Procuracao__c</fullName>
+    <description>Onde está a procuração para acesso ao e-CAC. O card aponta que essa espera pode ser longa e hoje não tem representação no funil — este campo é o que dá visibilidade a ela. Não aplicável é o valor de ART 360, que dispensa a procuração.</description>
+    <label>Status da procuração</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Não aplicável</fullName>
+                <default>false</default>
+                <label>Não aplicável</label>
+            </value>
+            <value>
+                <fullName>Solicitada</fullName>
+                <default>false</default>
+                <label>Solicitada</label>
+            </value>
+            <value>
+                <fullName>Recebida</fullName>
+                <default>false</default>
+                <label>Recebida</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

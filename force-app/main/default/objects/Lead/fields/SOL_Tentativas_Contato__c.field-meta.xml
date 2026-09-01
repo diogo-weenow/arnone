@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Tentativas_Contato__c</fullName>
+    <description>Quantas vezes já se tentou falar com o lead nesta captação. É o que mostra esforço antes de desqualificar: lead sem retorno com uma tentativa é diferente de lead sem retorno com cinco.</description>
+    <externalId>false</externalId>
+    <label>Número de tentativas de contato</label>
+    <precision>3</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

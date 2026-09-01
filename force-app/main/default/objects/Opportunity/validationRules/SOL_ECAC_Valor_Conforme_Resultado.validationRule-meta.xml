@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_ECAC_Valor_Conforme_Resultado</fullName>
+    <active>true</active>
+    <description>O resultado e o valor precisam contar a mesma história: valor a recuperar sem valor apurado, ou débito sem quantia, não dá para levar ao cliente.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SOL&apos;,
+  ISPICKVAL(SOL_Produto_Negocio__c, &apos;Recuperação Tributária&apos;),
+  OR(
+    AND(
+      ISPICKVAL(SOL_ECAC_Resultado__c, &apos;Valor a recuperar&apos;),
+      BLANKVALUE(SOL_Valor_Recuperavel__c, 0) &lt;= 0
+    ),
+    AND(
+      ISPICKVAL(SOL_ECAC_Resultado__c, &apos;Débito&apos;),
+      BLANKVALUE(SOL_Valor_Debito__c, 0) &lt;= 0
+    )
+  )
+)</errorConditionFormula>
+    <errorDisplayField>SOL_Valor_Recuperavel__c</errorDisplayField>
+    <errorMessage>Informe o valor correspondente ao resultado da consulta: valor a recuperar exige o valor a recuperar, e débito exige o valor do débito.</errorMessage>
+</ValidationRule>

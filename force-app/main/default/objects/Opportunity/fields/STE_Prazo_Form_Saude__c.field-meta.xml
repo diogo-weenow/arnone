@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Prazo_Form_Saude__c</fullName>
+    <description>Data-limite para envio do formulário de saúde: 2 dias úteis a partir da entrada na etapa Saúde Ocupacional (premissa US 07; ADR-0009, sem feriados).</description>
+    <formula>IF(ISBLANK(STE_Data_Entrada_Saude__c), null, DATEVALUE(STE_Data_Entrada_Saude__c) + CASE(MOD(DATEVALUE(STE_Data_Entrada_Saude__c) - DATE(1900,1,7),7), 4,4, 5,4, 6,3, 2))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Prazo do formulário de saúde</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

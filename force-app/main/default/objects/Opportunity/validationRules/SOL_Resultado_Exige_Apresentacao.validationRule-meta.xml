@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Resultado_Exige_Apresentacao</fullName>
+    <active>true</active>
+    <description>Resultado sem apresentação registrada significa uma resposta do cliente a uma proposta que, pelo sistema, nunca foi feita.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SOL&apos;,
+  NOT(ISPICKVAL(SOL_Resultado_Apresentacao__c, &apos;&apos;)),
+  NOT(SOL_Apresentacao_Realizada__c)
+)</errorConditionFormula>
+    <errorDisplayField>SOL_Resultado_Apresentacao__c</errorDisplayField>
+    <errorMessage>Marque a apresentação como realizada antes de registrar o resultado dela.</errorMessage>
+</ValidationRule>

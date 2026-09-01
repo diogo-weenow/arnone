@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Perdido_Exige_Motivo</fullName>
+    <active>true</active>
+    <description>Cenário 2 do card: toda perda sai com motivo padronizado. Sem a regra, o relatório de funil mostra quantas Oportunidades foram perdidas e nenhuma razão.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SOL&apos;,
+  ISPICKVAL(StageName, &apos;Perdido&apos;),
+  ISPICKVAL(SOL_Motivo_Perda__c, &apos;&apos;)
+)</errorConditionFormula>
+    <errorDisplayField>SOL_Motivo_Perda__c</errorDisplayField>
+    <errorMessage>Informe o motivo da perda antes de fechar a Oportunidade como Perdido. É esse campo que explica o número no relatório de funil.</errorMessage>
+</ValidationRule>

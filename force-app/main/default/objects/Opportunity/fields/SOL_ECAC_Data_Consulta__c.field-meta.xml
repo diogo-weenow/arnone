@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_ECAC_Data_Consulta__c</fullName>
+    <description>Quando a consulta foi feita. Situação fiscal muda com o tempo, então a data é o que diz se o valor apurado ainda vale para negociar.</description>
+    <label>Data da consulta ao e-CAC</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Orcamento_Recusado_Motivo__c</fullName>
+    <description>Por que o gestor recusou o orçamento apresentado. Sem isso, Compras refaz a cotação sem saber o que corrigir.</description>
+    <label>Motivo da recusa do orçamento</label>
+    <length>2000</length>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>4</visibleLines>
+</CustomField>

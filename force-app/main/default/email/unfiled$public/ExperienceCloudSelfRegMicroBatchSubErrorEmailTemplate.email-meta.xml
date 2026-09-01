@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Este modelo de email se aplica a solicitações de autorregistro processadas em lotes após o envio da solicitação. Um usuário recebe este email quando há um erro no processamento da solicitação de autorregistro.</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Experience Cloud: email de usuário com erro de envio do microlote de autorregistro</name>
+    <style>none</style>
+    <subject>Seu registro na {!Community_Name} falhou</subject>
+    <type>text</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

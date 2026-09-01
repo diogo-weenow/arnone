@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Chave_Externa__c</fullName>
+    <caseSensitive>false</caseSensitive>
+    <description>Número da solicitação mais o índice do orçamento (SOL-AAAA-0000-orc-2). Orçamento não tem identidade fora da solicitação que o contém.</description>
+    <externalId>true</externalId>
+    <label>Chave externa</label>
+    <length>40</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

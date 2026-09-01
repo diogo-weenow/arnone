@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Barra de utilitarios do console Arnone Atendimento com o widget Omni-Channel. O console tinha abas de atendimento e nenhuma barra, entao o widget nao existia no app onde a conversa e aberta.</description>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>runtime_service_omnichannel:omniWidget</componentName>
+                <identifier>runtime_service_omnichannel_omniWidget</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>utilityItems</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <name>backgroundComponents</name>
+        <type>Background</type>
+    </flexiPageRegions>
+    <masterLabel>Barra Arnone Atendimento</masterLabel>
+    <template>
+        <name>one:utilityBarTemplateDesktop</name>
+        <properties>
+            <name>isLeftAligned</name>
+            <value>true</value>
+        </properties>
+    </template>
+    <type>UtilityBar</type>
+</FlexiPage>

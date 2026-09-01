@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Forma de pagamento --></label>
+    <name>Forma_Pagamento__c</name>
+    <picklistValues>
+        <masterLabel>Boleto</masterLabel>
+        <translation><!-- Boleto --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Cartão corporativo</masterLabel>
+        <translation><!-- Cartão corporativo --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Outro</masterLabel>
+        <translation><!-- Outro --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>PIX</masterLabel>
+        <translation><!-- PIX --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Transferência (TED)</masterLabel>
+        <translation><!-- Transferência (TED) --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

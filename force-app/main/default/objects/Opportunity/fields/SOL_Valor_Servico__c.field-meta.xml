@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Valor_Servico__c</fullName>
+    <description>Taxa de serviço cobrada além do percentual de êxito, em Recuperação Tributária. Preenchimento manual: o card é explícito quanto a este produto não ter catálogo de preços.</description>
+    <label>Valor do serviço</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <type>Currency</type>
+</CustomField>

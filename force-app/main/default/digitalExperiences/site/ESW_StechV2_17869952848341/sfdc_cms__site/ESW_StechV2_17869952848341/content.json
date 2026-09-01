@@ -1,0 +1,9 @@
+{
+  "type" : "sfdc_cms__site",
+  "title" : "ESW_StechV2_1786995284834",
+  "contentBody" : {
+    "authenticationType" : "AUTHENTICATED_WITH_PUBLIC_ACCESS_ENABLED",
+    "geoBotsAllowed" : false
+  },
+  "urlName" : "esw-stechv2-1786995284834"
+}

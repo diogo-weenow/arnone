@@ -1,0 +1,9 @@
+Olá, {!User.FirstName},
+
+            Recebemos uma solicitação para alterar o endereço de email para o nome de usuário {!User.Username}. Verifique se as seguintes alterações estão corretas:
+ 
+            Endereço de email anterior: {!ChgEmailVer.OldEmail}
+Novo endereço de email: {!ChgEmailVer.NewEmail}
+
+            Para concluir a alteração do seu endereço de email, acesse o seguinte link. Esse link expira em 72 horas. 
+            {!ChgEmailVer.Url}

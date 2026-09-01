@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NavigationMenu xmlns="http://soap.sforce.com/2006/04/metadata">
+    <container>ESW_Chat_Web_ADV_1784647608387</container>
+    <containerType>Network</containerType>
+    <label>Default Navigation</label>
+    <navigationMenuItem>
+        <label>Tópicos</label>
+        <position>1</position>
+        <publiclyAvailable>true</publiclyAvailable>
+        <target>ShowMoreTopics</target>
+        <type>NavigationalTopic</type>
+    </navigationMenuItem>
+</NavigationMenu>

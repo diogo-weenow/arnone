@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DigitalExperienceBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Conteúdo para suas campanhas de marketing.</description>
+    <digitalExperienceFolderShares/>
+    <label>Espaço de trabalho de conteúdo para o Marketing Cloud</label>
+    <modules>
+        <module>
+            <fullyQualifiedName>sfdc_cms__formHandler</fullyQualifiedName>
+            <status>ENABLED</status>
+        </module>
+        <module>
+            <fullyQualifiedName>sfdc_cms__brand</fullyQualifiedName>
+            <status>ENABLED</status>
+        </module>
+        <module>
+            <fullyQualifiedName>sfdc_cms__email</fullyQualifiedName>
+            <status>ENABLED</status>
+        </module>
+        <module>
+            <fullyQualifiedName>sfdc_cms__orchestrator</fullyQualifiedName>
+            <status>ENABLED</status>
+        </module>
+        <module>
+            <fullyQualifiedName>sfdc_cms__externalAssetsProvider</fullyQualifiedName>
+            <status>ENABLED</status>
+        </module>
+        <module>
+            <fullyQualifiedName>sfdc_cms__exportImport</fullyQualifiedName>
+            <status>ENABLED</status>
+        </module>
+        <module>
+            <fullyQualifiedName>sfdc_cms__form</fullyQualifiedName>
+            <status>ENABLED</status>
+        </module>
+        <module>
+            <fullyQualifiedName>sfdc_cms__landingPage</fullyQualifiedName>
+            <status>ENABLED</status>
+        </module>
+        <module>
+            <fullyQualifiedName>sfdc_cms__preferencePage</fullyQualifiedName>
+            <status>ENABLED</status>
+        </module>
+        <module>
+            <fullyQualifiedName>sfdc_cms__landingPageTemplate</fullyQualifiedName>
+            <status>ENABLED</status>
+        </module>
+    </modules>
+</DigitalExperienceBundle>

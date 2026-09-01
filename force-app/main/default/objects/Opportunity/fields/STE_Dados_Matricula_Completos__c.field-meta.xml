@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Dados_Matricula_Completos__c</fullName>
+    <description>Fórmula: verdadeiro quando turma, data de início, dados bancários e endereço estão completos (obrigatórios da US 09). Condição de avanço da Pré-Matrícula.</description>
+    <formula>AND(
+  NOT(ISPICKVAL(STE_Turma__c, &quot;&quot;)), NOT(ISBLANK(STE_Data_Inicio_Turma__c)),
+  LEN(STE_Banco__c) &gt; 0, LEN(STE_Agencia__c) &gt; 0, LEN(STE_Conta__c) &gt; 0, NOT(ISPICKVAL(STE_Tipo_Conta__c, &quot;&quot;)),
+  LEN(STE_CEP__c) &gt; 0, LEN(STE_Cidade__c) &gt; 0, NOT(ISPICKVAL(STE_Estado__c, &quot;&quot;)),
+  LEN(STE_Logradouro__c) &gt; 0, LEN(STE_Numero__c) &gt; 0, LEN(STE_Bairro__c) &gt; 0
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Dados da matrícula completos</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

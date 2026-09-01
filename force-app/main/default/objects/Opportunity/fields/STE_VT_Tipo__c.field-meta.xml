@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_VT_Tipo__c</fullName>
+    <description>Tipo de transporte que o candidato usará no vale-transporte (US 09).</description>
+    <label>Tipo de transporte (VT)</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Bilhete Único</fullName>
+                <default>false</default>
+                <label>Bilhete Único</label>
+            </value>
+            <value>
+                <fullName>Ônibus</fullName>
+                <default>false</default>
+                <label>Ônibus</label>
+            </value>
+            <value>
+                <fullName>Metrô</fullName>
+                <default>false</default>
+                <label>Metrô</label>
+            </value>
+            <value>
+                <fullName>Trem</fullName>
+                <default>false</default>
+                <label>Trem</label>
+            </value>
+            <value>
+                <fullName>Não utiliza VT</fullName>
+                <default>false</default>
+                <label>Não utiliza VT</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

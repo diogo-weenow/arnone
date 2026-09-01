@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Protocolo_Criado__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Marca que o protocolo de não comparecimento (4 tarefas) já foi criado (US 11). Evita duplicação; setado pelo Flow STE_Comparecimento_Protocolo.</description>
+    <label>Protocolo de contato criado</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

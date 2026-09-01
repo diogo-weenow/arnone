@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Percentual_Comissao__c</fullName>
+    <description>Percentual de êxito que a Arnone cobra sobre o valor recuperado, em Recuperação Tributária. O rótulo diz Arnone para não ser lido como comissão de vendedor ou de parceiro. ART 360 não usa este campo: lá o preço vem do catálogo.</description>
+    <label>Percentual de comissão Arnone</label>
+    <precision>5</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <type>Percent</type>
+</CustomField>

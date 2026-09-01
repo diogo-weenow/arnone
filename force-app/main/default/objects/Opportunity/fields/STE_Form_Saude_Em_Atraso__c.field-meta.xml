@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Form_Saude_Em_Atraso__c</fullName>
+    <description>Sinaliza que o prazo do formulário de saúde venceu sem envio, ainda na etapa Saúde Ocupacional (US 07). Para list views e relatórios de acompanhamento.</description>
+    <formula>AND(NOT(STE_Form_Saude_Enviado__c), ISPICKVAL(StageName,&quot;Saúde Ocupacional&quot;), NOT(ISBLANK(STE_Prazo_Form_Saude__c)), TODAY() &gt; STE_Prazo_Form_Saude__c)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Formulário de saúde em atraso</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

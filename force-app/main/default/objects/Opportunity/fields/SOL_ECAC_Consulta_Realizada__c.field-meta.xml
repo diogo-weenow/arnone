@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_ECAC_Consulta_Realizada__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Marca que o consultor já entrou no e-CAC com a procuração do cliente e apurou a situação dele. Só marcar depois de consultar de verdade: é esta marca que torna data e resultado obrigatórios.</description>
+    <label>Consulta ao e-CAC realizada</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

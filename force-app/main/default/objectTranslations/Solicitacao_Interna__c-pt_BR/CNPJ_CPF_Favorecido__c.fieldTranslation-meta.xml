@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- CNPJ / CPF do favorecido --></label>
+    <name>CNPJ_CPF_Favorecido__c</name>
+</CustomFieldTranslation>

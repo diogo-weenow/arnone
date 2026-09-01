@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Lead_Parado__c</fullName>
+    <description>Liga sozinho quando um lead da Arnone Soluções passa 2 dias sem nenhuma atualização, ainda em aberto. É o sinal de que ele precisa de outro responsável — quem já está com ele não está tocando. Não conta lead convertido nem desqualificado: esses já tiveram desfecho.</description>
+    <formula>AND(
+  $RecordType.DeveloperName = &apos;SOL&apos;,
+  NOT(IsConverted),
+  NOT(ISPICKVAL(Status, &apos;Desqualificado&apos;)),
+  FLOOR(NOW() - LastModifiedDate) &gt;= 2
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Lead parado</label>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BusinessProcess xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Funil_STE_Telecom</fullName>
+    <description>Funil do curso Stech Telecom. A Oportunidade nasce em Verificação de Antecedentes (US 05); Saúde Ocupacional entra na US 06. Pré-matrícula, efetivação e comparecimento entram com as USs 07 a 11.</description>
+    <isActive>true</isActive>
+    <values>
+        <fullName>Efetivação</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Ganho</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Perdido</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Pré-Matrícula</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Saúde Ocupacional</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Verificação de Antecedentes</fullName>
+        <default>false</default>
+    </values>
+</BusinessProcess>

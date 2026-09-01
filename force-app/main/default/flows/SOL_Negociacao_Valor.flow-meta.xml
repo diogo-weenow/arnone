@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Grava antes de salvar, na própria transação, sem SOQL nem DML extra.</description>
+        <name>Calcular_Amount</name>
+        <label>Levar o total da Arnone para o valor da Oportunidade</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Amount</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Total_Arnone</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <description>CLICKUP-9353 — em Recuperação Tributária o valor da Oportunidade passa a ser o que a Arnone fatura: comissão de êxito mais taxa de serviço. O valor recuperado é dinheiro do cliente, e deixá-lo no Amount inflaria o pipeline com receita que não é da empresa; deixar o Amount vazio faria o contrário. Como o produto não tem catálogo, não há rollup de itens para fazer isso sozinho. ART 360 não passa por aqui: lá o Amount continua sendo a soma dos produtos, calculada pela plataforma. O gatilho filtra pelo produto e não pelo record type: critério de entrada de flow antes de salvar não alcança campo de registro relacionado, e o produto é campo exclusivo desta BU. Consequência assumida: em Recuperação Tributária o Amount é derivado e não deve ser digitado à mão — quem quiser mudá-lo mexe no percentual ou na taxa de serviço.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Campo de fórmula não existe em flow antes de salvar: ele só é recalculado depois da gravação. O cálculo é repetido aqui a partir dos campos crus, e SOL_Valor_Total_Arnone__c continua sendo o que a tela mostra.</description>
+        <name>Total_Arnone</name>
+        <dataType>Currency</dataType>
+        <expression>BLANKVALUE({!$Record.SOL_Valor_Recuperavel__c}, 0) * BLANKVALUE({!$Record.SOL_Percentual_Comissao__c}, 0) / 100 + BLANKVALUE({!$Record.SOL_Valor_Servico__c}, 0)</expression>
+        <scale>2</scale>
+    </formulas>
+    <interviewLabel>SOL_Negociacao_Valor {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL — Valor da Oportunidade em Recuperação Tributária</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Calcular_Amount</targetReference>
+        </connector>
+        <filterFormula>AND(
+  ISPICKVAL({!$Record.SOL_Produto_Negocio__c}, &quot;Recuperação Tributária&quot;),
+  OR(
+    NOT(ISBLANK({!$Record.SOL_Percentual_Comissao__c})),
+    NOT(ISBLANK({!$Record.SOL_Valor_Servico__c}))
+  )
+)</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Quantidade_Produtos__c</fullName>
+    <description>Quantos itens de catálogo estão na Oportunidade. Existe para a regra de ART 360, que não pode ser ganha sem Price Book e ao menos um produto — e não há como contar itens dentro de uma validation rule sem este resumo.</description>
+    <label>Quantidade de produtos</label>
+    <summaryForeignKey>OpportunityLineItem.OpportunityId</summaryForeignKey>
+    <summaryOperation>count</summaryOperation>
+    <trackHistory>false</trackHistory>
+    <type>Summary</type>
+</CustomField>

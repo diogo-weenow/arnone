@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Possui_CNH__c</fullName>
+    <description>Declaração de quando o candidato pretende enviar a CNH. Não confirma recebimento nem validação do documento.</description>
+    <label>Posse de CNH</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Sim, envio imediato</fullName>
+                <default>false</default>
+                <label>Sim, envio imediato</label>
+            </value>
+            <value>
+                <fullName>Sim, envio posterior</fullName>
+                <default>false</default>
+                <label>Sim, envio posterior</label>
+            </value>
+            <value>
+                <fullName>Não</fullName>
+                <default>false</default>
+                <label>Não</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

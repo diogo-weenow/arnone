@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Valor_Comissao__c</fullName>
+    <description>Quanto o percentual de êxito representa em dinheiro, calculado sobre o valor apurado no diagnóstico. Campo de fórmula: não se digita, se acerta o percentual.</description>
+    <formula>SOL_Valor_Recuperavel__c * SOL_Percentual_Comissao__c</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Valor da comissão</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackHistory>false</trackHistory>
+    <type>Currency</type>
+</CustomField>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description>Guardrail do documento de arquitetura: nenhuma automação da BU roda sem confirmar o record type. Se o WhoId apontar para um contato, ou para um lead de outra unidade, a busca não traz nada e o flow para aqui.</description>
+        <name>E_Lead_Da_Unidade</name>
+        <label>É lead da Arnone Soluções?</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <defaultConnectorLabel>Não</defaultConnectorLabel>
+        <rules>
+            <name>Sim</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Buscar_Lead</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Buscar_Lead.RecordType.DeveloperName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>SOL</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Marcar_SQL</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <description>CLICKUP-9348 — quando uma reunião comercial da Arnone Soluções é agendada, o lead passa de MQL para SQL. O lead continua lead: nenhuma Conta, Contato ou Oportunidade é criada aqui. O comparecimento e o histórico da agenda ficam no próprio Event; o lead guarda só o estado consolidado.</description>
+    <environments>Default</environments>
+    <interviewLabel>SOL_Reuniao_Agendada_SQL {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL — Reunião agendada leva o lead a SQL</label>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>WhoId é polimórfico: pode apontar para Lead ou Contato. Buscar em Lead resolve os dois casos — quando é contato, não vem registro e o flow encerra.</description>
+        <name>Buscar_Lead</name>
+        <label>Buscar o lead do compromisso</label>
+        <locationX>176</locationX>
+        <locationY>168</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>E_Lead_Da_Unidade</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.WhoId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Lead</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordUpdates>
+        <description>Promove quem ainda não passou de SQL. Antes exigia estar exatamente em &quot;Recebido - MQL&quot;; com a etapa de Captação na frente, um lead que agendasse reunião antes de virar MQL ficaria parado. Só promove de Captação ou de MQL: quem já avançou para procuração não volta atrás porque a agenda foi reaberta.</description>
+        <name>Marcar_SQL</name>
+        <label>Levar o lead para SQL</label>
+        <locationX>50</locationX>
+        <locationY>384</locationY>
+        <filterLogic>1 AND (2 OR 3)</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Buscar_Lead.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Status</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Captação - Contato</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Status</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Recebido - MQL</stringValue>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Reunião Agendada - SQL</stringValue>
+            </value>
+        </inputAssignments>
+        <object>Lead</object>
+    </recordUpdates>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Buscar_Lead</targetReference>
+        </connector>
+        <filterFormula>AND(
+  NOT(ISBLANK({!$Record.WhoId})),
+  ISPICKVAL({!$Record.SOL_Resultado_Reuniao__c}, &quot;Agendada&quot;)
+)</filterFormula>
+        <object>Event</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

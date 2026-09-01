@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StandardValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sorted>false</sorted>
+    <standardValue>
+        <fullName>Serviços Jurídicos</fullName>
+        <default>false</default>
+        <label>Serviços Jurídicos</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Consultoria</fullName>
+        <default>false</default>
+        <label>Consultoria</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Programas &amp; Certificações</fullName>
+        <default>false</default>
+        <label>Programas &amp; Certificações</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Educação &amp; Treinamento</fullName>
+        <default>false</default>
+        <label>Educação &amp; Treinamento</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Tecnologia</fullName>
+        <default>false</default>
+        <label>Tecnologia</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Recorrência / Assinatura</fullName>
+        <default>false</default>
+        <label>Recorrência / Assinatura</label>
+    </standardValue>
+</StandardValueSet>

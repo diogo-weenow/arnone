@@ -1,0 +1,12 @@
+{
+  "type" : "sfdc_cms__trustedSites",
+  "title" : "trustedSites",
+  "contentBody" : {
+    "trustedSites" : [ {
+      "isActive" : true,
+      "source" : "https://inspiration-page-5465--dev2weenow.sandbox.my.salesforce-scrt.com",
+      "sourceName" : "Host do Chat da Web aprimorado"
+    } ]
+  },
+  "urlName" : "trustedsites"
+}

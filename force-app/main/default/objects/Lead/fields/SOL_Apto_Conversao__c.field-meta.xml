@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Apto_Conversao__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Liberação manual para converter um lead de ART 360, que dispensa a procuração. Marcar aqui não converte nada: é a ação guiada que converte, e ela exige esta marca. Recuperação Tributária ignora este campo — lá o portão é a procuração recebida com arquivo anexado.</description>
+    <label>Apto para conversão (ART 360)</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Prazo_Antecedentes__c</fullName>
+    <description>Data-limite para retorno da checagem de antecedentes: 2 dias úteis a partir da criação da Oportunidade (US 06, regra 4.1). Fórmula com aproximação de dias úteis, sem feriados (ADR-0009).</description>
+    <formula>DATEVALUE(CreatedDate) + CASE(MOD(DATEVALUE(CreatedDate) - DATE(1900,1,7),7), 4,4, 5,4, 6,3, 2)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Prazo dos antecedentes</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

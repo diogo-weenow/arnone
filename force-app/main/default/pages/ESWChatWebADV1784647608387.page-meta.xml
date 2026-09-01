@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>58.0</apiVersion>
+    <availableInTouch>false</availableInTouch>
+    <confirmationTokenRequired>false</confirmationTokenRequired>
+    <description>Página Testar Chat da Web aprimorado para implementação do serviço integrado Chat_Web_ADV</description>
+    <label>ESWChatWebADV1784647608387</label>
+</ApexPage>

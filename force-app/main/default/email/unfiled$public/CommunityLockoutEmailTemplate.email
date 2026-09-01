@@ -1,0 +1,13 @@
+Olá, {!Receiving_User.FirstName},
+
+            Recebemos sua solicitação de redefinir sua senha da {!Community_Name}. Não é possível redefinir sua senha no momento. Sua conta está bloqueada após muitas tentativas de login.
+
+            {!CASE(1,
+            IF(VALUE(PASSWORD_LOCK_TIME) > 0, 1, 0), "Tente novamente em " + PASSWORD_LOCK_TIME + " minutos.",
+            IF(VALUE(PASSWORD_LOCK_TIME) < 0, 1, 0), "Entre em contato com seu administrador da " + Community_Name + " para desbloquear sua conta.",
+            "")}
+
+            Se você não solicitou uma redefinição de senha ou não tentou fazer login em sua conta recentemente, entre em contato com o administrador da {!Community_Name} ou responda a esse email.
+
+            Obrigado,
+            {!Community_Name}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Chave_Externa__c</fullName>
+    <caseSensitive>false</caseSensitive>
+    <description>Número da solicitação mais a posição na trilha (SOL-AAAA-0000-hist-7). Garante que reenviar a trilha inteira não duplique passos já gravados.</description>
+    <externalId>true</externalId>
+    <label>Chave externa</label>
+    <length>40</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

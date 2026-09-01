@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Aprovar_Segue_Saude</name>
+        <label>Aprovado — segue para Saúde Ocupacional</label>
+        <locationX>176</locationX>
+        <locationY>384</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.StageName</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Saúde Ocupacional</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.STE_Data_Entrada_Saude__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Flow.CurrentDateTime</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Reprovar_Encerra_Perdido</name>
+        <label>Reprovado — encerra como Perdido</label>
+        <locationX>440</locationX>
+        <locationY>384</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.StageName</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Perdido</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.STE_Motivo_Perda__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Reprovado Antecedentes</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <name>Resultado_Antecedentes</name>
+        <label>Resultado dos antecedentes?</label>
+        <locationX>308</locationX>
+        <locationY>276</locationY>
+        <defaultConnector>
+            <targetReference>Reprovar_Encerra_Perdido</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Reprovado</defaultConnectorLabel>
+        <rules>
+            <name>Aprovado</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.STE_Resultado_Antecedentes__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Aprovado</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Aprovar_Segue_Saude</targetReference>
+            </connector>
+            <label>Aprovado</label>
+        </rules>
+    </decisions>
+    <description>US 06 — Verificação de Antecedentes. Quando o analista registra o resultado na etapa de Verificação de Antecedentes do funil Stech Telecom: Aprovado avança a Oportunidade para Saúde Ocupacional; Reprovado a encerra como Perdido com o motivo &quot;Reprovado pelos antecedentes&quot;. Before-save (atualiza o próprio registro, sem DML extra). O prazo de 2 dias úteis e o atraso são campos-fórmula (STE_Prazo_Antecedentes__c / STE_Antecedentes_Em_Atraso__c).</description>
+    <environments>Default</environments>
+    <interviewLabel>STE_Antecedentes_Transicao {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>STE_Antecedentes_Transicao</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Resultado_Antecedentes</targetReference>
+        </connector>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &quot;STE_Telecom&quot;,
+  ISPICKVAL({!$Record.StageName}, &quot;Verificação de Antecedentes&quot;),
+  OR(
+    ISPICKVAL({!$Record.STE_Resultado_Antecedentes__c}, &quot;Aprovado&quot;),
+    ISPICKVAL({!$Record.STE_Resultado_Antecedentes__c}, &quot;Reprovado&quot;)
+  )
+)</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

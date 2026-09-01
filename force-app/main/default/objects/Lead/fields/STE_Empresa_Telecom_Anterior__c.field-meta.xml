@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Empresa_Telecom_Anterior__c</fullName>
+    <description>Nome informado pelo candidato para a empresa parceira de Telecom em que já trabalhou; não cria Conta (CLICKUP-9346).</description>
+    <externalId>false</externalId>
+    <label>Qual empresa de Telecom</label>
+    <length>255</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

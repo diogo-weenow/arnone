@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Saude_Status__c</fullName>
+    <description>Status do envio do formulário de saúde (US 07): &quot;Aguardando formulário&quot;, &quot;Formulário recebido&quot; ou &quot;Para ativação&quot; (prazo vencido sem envio — dispara a cadência de contato humano da US 10).</description>
+    <externalId>false</externalId>
+    <formula>IF(STE_Form_Saude_Enviado__c, &quot;Formulário recebido&quot;, IF(AND(NOT(ISBLANK(STE_Prazo_Form_Saude__c)), TODAY() &gt; STE_Prazo_Form_Saude__c), &quot;Para ativação&quot;, &quot;Aguardando formulário&quot;))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Status do formulário de saúde</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Email que os usuários recebem com a senha de uso único durante o fluxo de registro autônomo</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Experience Cloud: email de senha de uso único para a verificação de registro autônoma</name>
+    <style>none</style>
+    <subject>Verifique sua identidade em {!Community.Name}</subject>
+    <type>text</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

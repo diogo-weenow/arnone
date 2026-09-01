@@ -1,0 +1,7 @@
+Olá, {!HeadlessAuth.FirstName} {!HeadlessAuth.LastName},
+
+            Para confirmar sua inscrição como {!HeadlessAuth.Username} na {!Community.Name},
+
+            vamos verificar sua identidade. Insira esta senha de uso único quando solicitado.
+
+            Senha: {!Verification.Code}

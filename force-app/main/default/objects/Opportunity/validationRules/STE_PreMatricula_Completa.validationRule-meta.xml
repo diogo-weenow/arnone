@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_PreMatricula_Completa</fullName>
+    <active>true</active>
+    <description>Bloqueia o avanço da Oportunidade para fora da etapa Pré-Matrícula (exceto Perdido) enquanto turma e data de início não estiverem completos. Só se aplica ao funil Stech Telecom (record type STE_Telecom).</description>
+    <errorConditionFormula>AND(
+  RecordType.DeveloperName = &quot;STE_Telecom&quot;,
+  ISCHANGED(StageName),
+  ISPICKVAL(PRIORVALUE(StageName), &quot;Pré-Matrícula&quot;),
+  NOT(ISPICKVAL(StageName, &quot;Perdido&quot;)),
+  OR(
+    ISPICKVAL(STE_Turma__c, &quot;&quot;),
+    ISBLANK(STE_Data_Inicio_Turma__c)
+  )
+)</errorConditionFormula>
+    <errorMessage>Para avançar a matrícula é preciso preencher Turma e Data de início. — Pré-Matrícula</errorMessage>
+</ValidationRule>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Cadencia_Concluida__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Marca que as 4 tarefas da cadência pré-aula foram concluídas (US 10). Setado pelo Flow STE_Cadencia_Concluir; condição para avançar à Efetivação.</description>
+    <label>Cadência pré-aula concluída</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

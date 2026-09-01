@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Fila_ADV_MessagingSession</fullName>
+    <filterScope>Queue</filterScope>
+    <label>Fila Arnone Advogados</label>
+    <queue>Fila_ADV</queue>
+    <sharedTo>
+        <allInternalUsers></allInternalUsers>
+    </sharedTo>
+</ListView>

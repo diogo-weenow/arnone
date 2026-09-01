@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Define, por faixa de valor estimado, quantos orçamentos a cotação exige e se há visita técnica obrigatória. Consumida por SolicitacaoRegras.</description>
+    <label>Faixa de Valor da Solicitação</label>
+    <pluralLabel>Faixas de Valor da Solicitação</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

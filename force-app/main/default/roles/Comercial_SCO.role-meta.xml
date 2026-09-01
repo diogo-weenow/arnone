@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Role xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseAccessLevel>Edit</caseAccessLevel>
+    <contactAccessLevel>Edit</contactAccessLevel>
+    <description>Time comercial da unidade S.Company — nó de forecast da BU.</description>
+    <mayForecastManagerShare>false</mayForecastManagerShare>
+    <name>Comercial S.Company</name>
+    <opportunityAccessLevel>Edit</opportunityAccessLevel>
+    <parentRole>Diretoria_Grupo</parentRole>
+</Role>

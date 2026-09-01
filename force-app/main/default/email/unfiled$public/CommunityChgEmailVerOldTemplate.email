@@ -1,0 +1,8 @@
+Olá, {!User.FirstName},
+
+            Recebemos uma solicitação para alterar o endereço de email para o nome de usuário {!User.Username}. Verifique se as seguintes alterações estão corretas:
+
+            Endereço de email anterior: {!ChgEmailVer.OldEmail}
+Novo endereço de email: {!ChgEmailVer.NewEmail}
+
+            Se você não solicitou esta alteração, entre em contato com o administrador da {!Community_Name} ou responda e esse email.

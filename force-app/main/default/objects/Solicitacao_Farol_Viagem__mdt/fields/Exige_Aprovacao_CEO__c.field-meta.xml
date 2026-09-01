@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Exige_Aprovacao_CEO__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Se marcado, a solicitação passa pelo CEO antes do Financeiro.</description>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Exige aprovação do CEO</label>
+    <type>Checkbox</type>
+</CustomField>

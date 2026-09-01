@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Solicitacao__c</fullName>
+    <description>Solicitação a que este orçamento pertence. Mestre-detalhe: orçamento não existe fora da solicitação, e apagar uma leva os seus junto.</description>
+    <label>Solicitação</label>
+    <referenceTo>Solicitacao_Interna__c</referenceTo>
+    <relationshipLabel>Orçamentos</relationshipLabel>
+    <relationshipName>Orcamentos</relationshipName>
+    <relationshipOrder>0</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

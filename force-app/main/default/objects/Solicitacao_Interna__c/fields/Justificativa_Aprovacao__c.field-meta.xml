@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Justificativa_Aprovacao__c</fullName>
+    <description>Texto que o gestor registra ao aprovar a abertura da solicitação. Obrigatório desde 14/08/2026 — a reprovação já exigia motivo, e aprovar sem registrar o porquê deixava a trilha torta no caminho que libera dinheiro.</description>
+    <label>Justificativa da aprovação</label>
+    <length>2000</length>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>4</visibleLines>
+</CustomField>

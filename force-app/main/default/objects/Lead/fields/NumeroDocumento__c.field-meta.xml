@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>NumeroDocumento__c</fullName>
+    <description>Número do documento fiscal do lead (CPF ou CNPJ, o que estiver preenchido). Alimenta o número da identificação no Data Cloud para identity resolution (A1.3).</description>
+    <externalId>false</externalId>
+    <formula>IF(NOT(ISBLANK(CPF__c)), CPF__c, CNPJ__c)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Número do Documento</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

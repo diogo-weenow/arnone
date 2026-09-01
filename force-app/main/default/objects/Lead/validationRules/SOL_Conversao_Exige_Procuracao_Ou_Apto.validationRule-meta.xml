@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Conversao_Exige_Procuracao_Ou_Apto</fullName>
+    <active>true</active>
+    <description>Bloqueia a conversão do lead da Arnone Soluções a menos que a procuração esteja Recebida.</description>
+    <errorConditionFormula>AND(
+RecordType.DeveloperName = &quot;SOL&quot;,
+ISCHANGED(IsConverted),
+IsConverted = TRUE,
+NOT(ISPICKVAL(SOL_Status_Procuracao__c, &quot;Recebida&quot;))
+)</errorConditionFormula>
+    <errorMessage>Não é possível converter: é preciso a procuração Recebida.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Unidades_Atendidas__c</fullName>
+    <description>Unidades do Grupo Arnone que atendem este cliente — visão consolidada multi-BU (A2.6). Mantido pela operação/automação a partir das oportunidades.</description>
+    <label>Unidades Atendidas</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetName>VS_Unidades</valueSetName>
+    </valueSet>
+    <visibleLines>5</visibleLines>
+</CustomField>

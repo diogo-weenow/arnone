@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Converter</name>
+        <label>Converter o Lead</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <actionName>STE_ConverterLead</actionName>
+        <actionType>apex</actionType>
+        <connector>
+            <targetReference>Tela_Resultado</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>leadIds</name>
+            <value>
+                <elementReference>recordId</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>STE_ConverterLead</nameSegment>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </actionCalls>
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>US 05 — botão de conversão manual do Lead do funil Stech Telecom (premissa 5 da US). A tela só confirma a intenção; a regra toda vive na classe STE_ConverterLead, que é onde ela fica versionada e coberta por teste. A conversão cria Conta pessoa física, Contato e Oportunidade, transfere as respostas do chatbot e associa o curso Telecom.</description>
+    <environments>Default</environments>
+    <interviewLabel>STE_Converter_Lead {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Converter Lead — Stech Telecom</label>
+    <processType>Flow</processType>
+    <screens>
+        <name>Tela_Confirmar</name>
+        <label>Converter candidato</label>
+        <locationX>176</locationX>
+        <locationY>168</locationY>
+        <allowBack>true</allowBack>
+        <allowFinish>false</allowFinish>
+        <allowPause>false</allowPause>
+        <connector>
+            <targetReference>Converter</targetReference>
+        </connector>
+        <fields>
+            <name>Texto_Confirmar</name>
+            <fieldText>&lt;p&gt;Ao confirmar, este candidato passa a existir como &lt;b&gt;Conta (pessoa física)&lt;/b&gt;, &lt;b&gt;Contato&lt;/b&gt; e &lt;b&gt;Oportunidade&lt;/b&gt;, ligados entre si.&lt;/p&gt;&lt;p&gt;A Oportunidade nasce na etapa &lt;b&gt;Verificação de Antecedentes&lt;/b&gt; com o curso &lt;b&gt;Telecom&lt;/b&gt; associado.&lt;/p&gt;&lt;p&gt;Pré-requisitos: a CNH precisa ter sido recebida e o CPF precisa estar preenchido no Lead. A conversão não tem desfazer.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <nextOrFinishButtonLabel>Converter</nextOrFinishButtonLabel>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <name>Tela_Resultado</name>
+        <label>Resultado da conversão</label>
+        <locationX>176</locationX>
+        <locationY>384</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>Texto_Resultado</name>
+            <fieldText>&lt;p&gt;{!Converter.mensagem}&lt;/p&gt;&lt;p&gt;Feche esta janela e atualize a página para ver o resultado.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Tela_Confirmar</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>Id do Lead, preenchido pela ação rápida na tela do registro.</description>
+        <name>recordId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

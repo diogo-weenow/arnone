@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DigitalExperienceConfig xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Páginas de destino de marketing</label>
+    <site>
+        <urlPathPrefix>lp</urlPathPrefix>
+    </site>
+    <space>site/pginas_de_destino_de_marketing_7pc1</space>
+</DigitalExperienceConfig>

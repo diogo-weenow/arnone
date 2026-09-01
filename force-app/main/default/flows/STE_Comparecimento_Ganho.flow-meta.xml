@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Marcar_Ganho</name>
+        <label>Marcar como Ganho</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.StageName</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Ganho</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <description>US 11 — quando o aluno é marcado como &quot;Compareceu&quot; na etapa Efetivação do funil Stech Telecom, a Oportunidade avança para Ganho. Before-save (atualiza o próprio registro).</description>
+    <environments>Default</environments>
+    <interviewLabel>STE_Comparecimento_Ganho {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>STE_Comparecimento_Ganho</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Marcar_Ganho</targetReference>
+        </connector>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &quot;STE_Telecom&quot;,
+  ISPICKVAL({!$Record.StageName}, &quot;Efetivação&quot;),
+  ISPICKVAL({!$Record.STE_Comparecimento__c}, &quot;Compareceu&quot;)
+)</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

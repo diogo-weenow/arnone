@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Motivo_Perda__c</fullName>
+    <description>Motivo da perda no funil Stech Telecom, preenchido automaticamente pela automação de etapa (US 06/08). Segregado do Loss Reason genérico das demais BUs.</description>
+    <label>Motivo da perda (STech)</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>StageName</controllingField>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>CNH Provisória</fullName>
+                <default>false</default>
+                <label>CNH Provisória</label>
+            </value>
+            <value>
+                <fullName>Desistiu</fullName>
+                <default>false</default>
+                <label>Desistiu</label>
+            </value>
+            <value>
+                <fullName>Gênero</fullName>
+                <default>false</default>
+                <label>Gênero</label>
+            </value>
+            <value>
+                <fullName>Idade fora do perfil</fullName>
+                <default>false</default>
+                <label>Idade fora do perfil</label>
+            </value>
+            <value>
+                <fullName>Localização</fullName>
+                <default>false</default>
+                <label>Localização</label>
+            </value>
+            <value>
+                <fullName>Não atendeu</fullName>
+                <default>false</default>
+                <label>Não atendeu</label>
+            </value>
+            <value>
+                <fullName>Não possui disponibilidade</fullName>
+                <default>false</default>
+                <label>Não possui disponibilidade</label>
+            </value>
+            <value>
+                <fullName>Número incorreto</fullName>
+                <default>false</default>
+                <label>Número incorreto</label>
+            </value>
+            <value>
+                <fullName>Pré Matriculado</fullName>
+                <default>false</default>
+                <label>Pré Matriculado</label>
+            </value>
+            <value>
+                <fullName>Reprovado Antecedentes</fullName>
+                <default>false</default>
+                <label>Reprovado Antecedentes</label>
+            </value>
+            <value>
+                <fullName>Reprovado Saúde</fullName>
+                <default>false</default>
+                <label>Reprovado Saúde</label>
+            </value>
+            <value>
+                <fullName>Sem CNH</fullName>
+                <default>false</default>
+                <label>Sem CNH</label>
+            </value>
+            <value>
+                <fullName>Sem retorno</fullName>
+                <default>false</default>
+                <label>Sem retorno</label>
+            </value>
+            <value>
+                <fullName>Reprovado no exame médico</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Reprovado no exame médico</label>
+            </value>
+            <value>
+                <fullName>Reprovado pelos antecedentes</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Reprovado pelos antecedentes</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Perdido</controllingFieldValue>
+            <valueName>CNH Provisória</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdido</controllingFieldValue>
+            <valueName>Desistiu</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdido</controllingFieldValue>
+            <valueName>Gênero</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdido</controllingFieldValue>
+            <valueName>Idade fora do perfil</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdido</controllingFieldValue>
+            <valueName>Localização</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdido</controllingFieldValue>
+            <valueName>Não atendeu</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdido</controllingFieldValue>
+            <valueName>Não possui disponibilidade</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdido</controllingFieldValue>
+            <valueName>Número incorreto</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdido</controllingFieldValue>
+            <valueName>Pré Matriculado</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdido</controllingFieldValue>
+            <valueName>Reprovado Antecedentes</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdido</controllingFieldValue>
+            <valueName>Reprovado Saúde</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdido</controllingFieldValue>
+            <valueName>Sem CNH</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Perdido</controllingFieldValue>
+            <valueName>Sem retorno</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

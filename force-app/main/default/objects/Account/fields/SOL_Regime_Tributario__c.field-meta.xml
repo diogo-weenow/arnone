@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Regime_Tributario__c</fullName>
+    <description>Regime tributário informado na captação (Driva / Formulário), para a jornada da Arnone Soluções. Valores ativos restritos ao record type Arnone Soluções.</description>
+    <label>Regime Tributário</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Lucro Presumido</fullName>
+                <default>false</default>
+                <label>Lucro Presumido</label>
+            </value>
+            <value>
+                <fullName>Lucro Real</fullName>
+                <default>false</default>
+                <label>Lucro Real</label>
+            </value>
+            <value>
+                <fullName>Simples Nacional</fullName>
+                <default>false</default>
+                <label>Simples Nacional</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

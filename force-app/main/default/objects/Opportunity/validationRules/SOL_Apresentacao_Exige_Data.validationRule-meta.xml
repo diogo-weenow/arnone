@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Apresentacao_Exige_Data</fullName>
+    <active>true</active>
+    <description>Apresentação marcada sem data deixa a etapa sem o único dado que permite medir a espera pela resposta do cliente.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SOL&apos;,
+  SOL_Apresentacao_Realizada__c,
+  ISBLANK(SOL_Data_Apresentacao__c)
+)</errorConditionFormula>
+    <errorDisplayField>SOL_Data_Apresentacao__c</errorDisplayField>
+    <errorMessage>Informe a data da apresentação. Sem ela não há como saber há quanto tempo a proposta está com o cliente.</errorMessage>
+</ValidationRule>

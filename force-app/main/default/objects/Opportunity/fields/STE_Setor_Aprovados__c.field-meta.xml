@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Setor_Aprovados__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Classifica o candidato como aprovado na saúde ocupacional (US 08), sem alterar o proprietário. Marcado automaticamente na aprovação do exame; base para list views/relatórios do setor de aprovados.</description>
+    <label>Setor de aprovados</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

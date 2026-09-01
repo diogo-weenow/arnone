@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_CPF_Confirmado__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indica que o atendente conferiu o CPF lendo a CNH, conforme a premissa da US 04 (leitura manual).</description>
+    <label>CPF confirmado na CNH</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

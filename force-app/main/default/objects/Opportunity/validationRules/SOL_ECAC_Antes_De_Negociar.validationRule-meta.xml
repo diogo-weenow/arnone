@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_ECAC_Antes_De_Negociar</fullName>
+    <active>true</active>
+    <description>É a regra central do card: só avança para Negociação quem tem valor real a recuperar. Sem ela a etapa de Diagnóstico vira formalidade e o consultor pode apresentar proposta sem ter consultado nada.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SOL&apos;,
+  ISPICKVAL(SOL_Produto_Negocio__c, &apos;Recuperação Tributária&apos;),
+  OR(
+    ISPICKVAL(StageName, &apos;Negociação&apos;),
+    ISPICKVAL(StageName, &apos;Fechamento&apos;),
+    ISPICKVAL(StageName, &apos;Ganho&apos;)
+  ),
+  NOT(
+    AND(
+      SOL_ECAC_Consulta_Realizada__c,
+      ISPICKVAL(SOL_ECAC_Resultado__c, &apos;Valor a recuperar&apos;)
+    )
+  )
+)</errorConditionFormula>
+    <errorDisplayField>SOL_ECAC_Resultado__c</errorDisplayField>
+    <errorMessage>Para avançar, registre a consulta ao e-CAC com resultado &quot;Valor a recuperar&quot;. Sem valor apurado não há proposta a apresentar — se não houver o que recuperar, leve a Oportunidade para Perdido.</errorMessage>
+</ValidationRule>

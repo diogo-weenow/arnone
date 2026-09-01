@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Prazo_Envio_CNH__c</fullName>
+    <description>Limite de 2 horas para o candidato da fila Morna enviar a CNH (US 04, cenário 02). Vencido o prazo sem envio, o caso vai para tratamento humano.</description>
+    <label>Prazo para envio da CNH</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>DateTime</type>
+</CustomField>

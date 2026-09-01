@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Entrada_Negociacao__c</fullName>
+    <description>Quando a Oportunidade chegou à etapa de Negociação. Carimbada pelo flow SOL_Carimbo_Negociacao, porque a plataforma não guarda a data de entrada na etapa atual — sem este campo não há como medir há quanto tempo a negociação está parada.</description>
+    <label>Entrada em Negociação</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>DateTime</type>
+</CustomField>

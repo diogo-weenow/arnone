@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Observacao_Desqualificacao__c</fullName>
+    <description>Por que o lead foi perdido: não compareceu às agendas, não enviou a procuração ou não tem fit. Texto livre porque os motivos padronizados ainda não foram definidos pelo negócio.</description>
+    <label>Observação da desqualificação</label>
+    <length>2000</length>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>LongTextArea</type>
+    <visibleLines>4</visibleLines>
+</CustomField>

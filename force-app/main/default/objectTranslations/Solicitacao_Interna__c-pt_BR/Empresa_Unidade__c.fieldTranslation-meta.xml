@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Empresa / unidade --></label>
+    <name>Empresa_Unidade__c</name>
+    <picklistValues>
+        <masterLabel>ADV</masterLabel>
+        <translation><!-- ADV --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>ESG</masterLabel>
+        <translation><!-- ESG --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>GRP</masterLabel>
+        <translation><!-- GRP --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>IDH</masterLabel>
+        <translation><!-- IDH --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>SCO</masterLabel>
+        <translation><!-- SCO --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>SGA</masterLabel>
+        <translation><!-- SGA --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>SOL</masterLabel>
+        <translation><!-- SOL --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>STE</masterLabel>
+        <translation><!-- STE --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>VVE</masterLabel>
+        <translation><!-- VVE --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

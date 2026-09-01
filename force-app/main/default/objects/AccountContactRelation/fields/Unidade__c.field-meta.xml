@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Unidade__c</fullName>
+    <description>Unidade do Grupo Arnone pela qual o contato se relaciona com a conta (A2.6).</description>
+    <label>Unidade</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetName>VS_Unidades</valueSetName>
+    </valueSet>
+</CustomField>

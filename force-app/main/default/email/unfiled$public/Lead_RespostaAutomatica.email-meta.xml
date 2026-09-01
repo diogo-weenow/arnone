@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Resposta automática aos leads captados via Web-to-Lead (A2.7).</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Lead Resposta Automática</name>
+    <style>none</style>
+    <subject>Recebemos seu contato — Grupo Arnone</subject>
+    <type>text</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

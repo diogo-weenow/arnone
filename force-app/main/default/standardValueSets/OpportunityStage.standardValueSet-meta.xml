@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StandardValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sorted>false</sorted>
+    <standardValue>
+        <fullName>Verificação de Antecedentes</fullName>
+        <default>false</default>
+        <description>Etapa inicial do funil do curso Stech Telecom: a Oportunidade nasce aqui na conversão do Lead (US 05). Exclusiva do processo Funil_STE_Telecom.</description>
+        <label>Verificação de Antecedentes</label>
+        <closed>false</closed>
+        <forecastCategory>Pipeline</forecastCategory>
+        <probability>10</probability>
+        <won>false</won>
+    </standardValue>
+    <standardValue>
+        <fullName>Qualificação</fullName>
+        <default>false</default>
+        <description>Oportunidade identificada; validando aderência, orçamento e decisor.</description>
+        <label>Qualificação</label>
+        <closed>false</closed>
+        <forecastCategory>Pipeline</forecastCategory>
+        <probability>10</probability>
+        <won>false</won>
+    </standardValue>
+    <standardValue>
+        <fullName>Diagnóstico</fullName>
+        <default>false</default>
+        <description>Levantamento da necessidade e desenho da solução/escopo.</description>
+        <label>Diagnóstico</label>
+        <closed>false</closed>
+        <forecastCategory>Pipeline</forecastCategory>
+        <probability>30</probability>
+        <won>false</won>
+    </standardValue>
+    <standardValue>
+        <fullName>Proposta</fullName>
+        <default>false</default>
+        <description>Proposta/honorários apresentados ao cliente.</description>
+        <label>Proposta</label>
+        <closed>false</closed>
+        <forecastCategory>BestCase</forecastCategory>
+        <probability>50</probability>
+        <won>false</won>
+    </standardValue>
+    <standardValue>
+        <fullName>Negociação</fullName>
+        <default>false</default>
+        <description>Negociação de condições, valores e prazos.</description>
+        <label>Negociação</label>
+        <closed>false</closed>
+        <forecastCategory>BestCase</forecastCategory>
+        <probability>70</probability>
+        <won>false</won>
+    </standardValue>
+    <standardValue>
+        <fullName>Contratação</fullName>
+        <default>false</default>
+        <description>Acordo fechado verbalmente; contrato em assinatura.</description>
+        <label>Contratação</label>
+        <closed>false</closed>
+        <forecastCategory>Forecast</forecastCategory>
+        <probability>90</probability>
+        <won>false</won>
+    </standardValue>
+    <standardValue>
+        <fullName>Ganho</fullName>
+        <default>false</default>
+        <description>Contrato assinado — oportunidade ganha.</description>
+        <label>Ganho</label>
+        <closed>true</closed>
+        <forecastCategory>Closed</forecastCategory>
+        <probability>100</probability>
+        <won>true</won>
+    </standardValue>
+    <standardValue>
+        <fullName>Perdido</fullName>
+        <default>false</default>
+        <description>Oportunidade perdida ou cancelada; registrar motivo.</description>
+        <label>Perdido</label>
+        <closed>true</closed>
+        <forecastCategory>Omitted</forecastCategory>
+        <probability>0</probability>
+        <won>false</won>
+    </standardValue>
+    <standardValue>
+        <fullName>Saúde Ocupacional</fullName>
+        <default>false</default>
+        <description>Etapa do funil Stech Telecom após aprovação nos antecedentes (US 06): candidato segue para o formulário e o exame de saúde ocupacional (US 07/08). Exclusiva do processo Funil_STE_Telecom.</description>
+        <label>Saúde Ocupacional</label>
+        <closed>false</closed>
+        <forecastCategory>Pipeline</forecastCategory>
+        <probability>30</probability>
+        <won>false</won>
+    </standardValue>
+    <standardValue>
+        <fullName>Pré-Matrícula</fullName>
+        <default>false</default>
+        <description>Etapa do funil Stech Telecom após aprovação no exame de saúde (US 08): coleta de turma, transporte e dados cadastrais (US 09) e cadência pré-aula (US 10). Exclusiva do processo Funil_STE_Telecom.</description>
+        <label>Pré-Matrícula</label>
+        <closed>false</closed>
+        <forecastCategory>Pipeline</forecastCategory>
+        <probability>60</probability>
+        <won>false</won>
+    </standardValue>
+    <standardValue>
+        <fullName>Efetivação</fullName>
+        <default>false</default>
+        <description>Etapa do funil Stech Telecom após a cadência pré-aula concluída (US 10): fechamento da matrícula, aguardando confirmação de comparecimento no primeiro dia (US 11). Exclusiva do processo Funil_STE_Telecom.</description>
+        <label>Efetivação</label>
+        <closed>false</closed>
+        <forecastCategory>BestCase</forecastCategory>
+        <probability>85</probability>
+        <won>false</won>
+    </standardValue>
+    <standardValue>
+        <fullName>Fechamento</fullName>
+        <default>false</default>
+        <description>Decisão do cliente registrada, aguardando o desfecho como Ganho ou Perdido. Exclusiva do funil da Arnone Soluções.</description>
+        <label>Fechamento</label>
+        <closed>false</closed>
+        <forecastCategory>Forecast</forecastCategory>
+        <probability>80</probability>
+        <won>false</won>
+    </standardValue>
+</StandardValueSet>

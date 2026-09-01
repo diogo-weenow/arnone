@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Classificacao_Fila__c</fullName>
+    <description>Classificação técnica definida pelo Assistente Stech Telecom para o flow outbound encaminhar a sessão à fila Quente, Morna ou Fria.</description>
+    <label>Classificação da fila STech</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Quente</fullName>
+                <default>false</default>
+                <label>Quente</label>
+            </value>
+            <value>
+                <fullName>Morna</fullName>
+                <default>false</default>
+                <label>Morna</label>
+            </value>
+            <value>
+                <fullName>Fria</fullName>
+                <default>false</default>
+                <label>Fria</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Valor_Debito__c</fullName>
+    <description>Quanto o cliente deve à Receita, quando a consulta encontra débito em vez de crédito. Fica registrado porque é a informação que a Arnone leva de volta ao cliente, mesmo sem negócio.</description>
+    <label>Valor do débito</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Currency</type>
+</CustomField>

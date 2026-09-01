@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Compromisso__c</fullName>
+    <description>Data do compromisso (Event) mais recente vinculado a este lead pelo WhoId, mantida pelo flow SOL_Atualizar_Data_Compromisso. Usada pela regra de validação SOL_Recuperacao_Exige_Compromisso para liberar a saída de &quot;Recebido - MQL&quot; em Recuperação Tributária. Não é editável na tela — campo de suporte para automação.</description>
+    <label>Data do compromisso (SOL)</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

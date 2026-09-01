@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Ação guiada da procuração para o e-CAC (CLICKUP-9349). Solicita, acompanha e registra o recebimento exigindo o arquivo anexado. Roda o flow SOL_Procuracao.</description>
+    <flowDefinition>SOL_Procuracao</flowDefinition>
+    <label>Procuração (e-CAC)</label>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <type>Flow</type>
+</QuickAction>

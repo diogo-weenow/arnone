@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Tipo_Demanda__c</fullName>
+    <description>Tipo da demanda solicitada. Controla quais blocos de campos são preenchidos.</description>
+    <label>Tipo de demanda</label>
+    <required>true</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>viagens</fullName>
+                <default>false</default>
+                <label>Viagens</label>
+            </value>
+            <value>
+                <fullName>compras</fullName>
+                <default>false</default>
+                <label>Compras</label>
+            </value>
+            <value>
+                <fullName>pagamentos</fullName>
+                <default>false</default>
+                <label>Pagamentos</label>
+            </value>
+            <value>
+                <fullName>contratos</fullName>
+                <default>false</default>
+                <label>Contratos</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

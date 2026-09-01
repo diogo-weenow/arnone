@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Data_Entrada_PreMatricula__c</fullName>
+    <description>Data/hora em que a Oportunidade entrou na etapa Pré-Matrícula, carimbada pelo Flow da US 08 na aprovação do exame. Base para prazos/cadências da Pré-Matrícula (US 09/10).</description>
+    <label>Entrada em Pré-Matrícula</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>DateTime</type>
+</CustomField>

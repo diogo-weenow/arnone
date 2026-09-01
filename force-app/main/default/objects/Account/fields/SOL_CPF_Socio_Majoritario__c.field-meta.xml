@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_CPF_Socio_Majoritario__c</fullName>
+    <description>CPF do sócio majoritário (formato 000.000.000-00), informado na captação (Driva / Vendedor). Formato garantido pela regra de validação SOL_CPF_Socio_Formato_Invalido.</description>
+    <externalId>false</externalId>
+    <label>CPF Sócio Majoritário</label>
+    <length>14</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_CNH_Enviada__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Confirma que a CNH foi recebida antes da conversão — pré-requisito do cenário 01 da US 05.</description>
+    <label>CNH enviada</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

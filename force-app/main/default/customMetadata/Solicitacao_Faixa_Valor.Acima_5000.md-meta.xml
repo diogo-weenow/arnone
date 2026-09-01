@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Acima de R$ 5.000,00</label>
+    <protected>false</protected>
+    <values>
+        <field>Exige_Visita_Tecnica__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Orcamentos_Minimos__c</field>
+        <value xsi:type="xsd:double">3.0</value>
+    </values>
+    <values>
+        <field>Ordem__c</field>
+        <value xsi:type="xsd:double">3.0</value>
+    </values>
+    <values>
+        <field>Rotulo__c</field>
+        <value xsi:type="xsd:string">Acima de R$ 5.000,00</value>
+    </values>
+    <values>
+        <field>Valor_Maximo__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>Valor_Minimo__c</field>
+        <value xsi:type="xsd:double">5000.01</value>
+    </values>
+</CustomMetadata>

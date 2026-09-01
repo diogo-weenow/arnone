@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+    <available>true</available>
+    <description>Email que os usuários recebem com o código de verificação.</description>
+    <encodingKey>UTF-8</encodingKey>
+    <name>Experience Cloud: email de verificação de ativação do dispositivo</name>
+    <style>none</style>
+    <subject>Verifique sua identidade em {!Community_Name}</subject>
+    <type>text</type>
+    <uiType>Aloha</uiType>
+</EmailTemplate>

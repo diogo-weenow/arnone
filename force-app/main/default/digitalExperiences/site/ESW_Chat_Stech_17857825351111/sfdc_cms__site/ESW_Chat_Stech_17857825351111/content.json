@@ -1,0 +1,9 @@
+{
+  "type" : "sfdc_cms__site",
+  "title" : "ESW_Chat_Stech_1785782535111",
+  "contentBody" : {
+    "authenticationType" : "AUTHENTICATED_WITH_PUBLIC_ACCESS_ENABLED",
+    "geoBotsAllowed" : false
+  },
+  "urlName" : "esw-chat-stech-1785782535111"
+}

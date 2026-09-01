@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Tipo_Passageiro__c</fullName>
+    <description>Identificação de quem viaja: colaborador do grupo, convidado/terceiro, ou os dois.</description>
+    <label>Quem viaja</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>colaborador</fullName>
+                <default>false</default>
+                <label>colaborador</label>
+            </value>
+            <value>
+                <fullName>terceiro</fullName>
+                <default>false</default>
+                <label>terceiro</label>
+            </value>
+            <value>
+                <fullName>ambos</fullName>
+                <default>false</default>
+                <label>ambos</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

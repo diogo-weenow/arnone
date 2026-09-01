@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Agente de atendimento por mensagens (chat/WhatsApp): licença Digital Engagement, permissões de agente e acesso às sessões de mensagem (F3).</description>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Contact.CPF_Mascarado__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Atendimento — Mensagens</label>
+    <license>DEUnlimitedAccessPsl</license>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>LMEndMessagingSessionUserPerm</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>LiveMessageAgent</name>
+    </userPermissions>
+</PermissionSet>

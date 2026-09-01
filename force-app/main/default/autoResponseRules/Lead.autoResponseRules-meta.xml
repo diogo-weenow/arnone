@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AutoResponseRules xmlns="http://soap.sforce.com/2006/04/metadata">
+    <autoResponseRule>
+        <fullName>Resposta_Automatica_Web</fullName>
+        <active>true</active>
+        <ruleEntry>
+            <booleanFilter>1 OR 2</booleanFilter>
+            <criteriaItems>
+                <field>Lead.RecordTypeId</field>
+                <operation>equals</operation>
+                <value>Arnone Advogados</value>
+            </criteriaItems>
+            <criteriaItems>
+                <field>Lead.Unidade_Origem__c</field>
+                <operation>equals</operation>
+                <value>ADV</value>
+            </criteriaItems>
+            <senderEmail>joao.silva@weenow.com.br</senderEmail>
+            <senderName>Arnone Advogados</senderName>
+            <template>unfiled$public/Lead_RespostaAutomatica</template>
+        </ruleEntry>
+        <ruleEntry>
+            <booleanFilter>1 OR 2</booleanFilter>
+            <criteriaItems>
+                <field>Lead.RecordTypeId</field>
+                <operation>equals</operation>
+                <value>Arnone Soluções</value>
+            </criteriaItems>
+            <criteriaItems>
+                <field>Lead.Unidade_Origem__c</field>
+                <operation>equals</operation>
+                <value>SOL</value>
+            </criteriaItems>
+            <senderEmail>joao.silva@weenow.com.br</senderEmail>
+            <senderName>Arnone Soluções</senderName>
+            <template>unfiled$public/Lead_RespostaAutomatica</template>
+        </ruleEntry>
+        <ruleEntry>
+            <booleanFilter>1 OR 2</booleanFilter>
+            <criteriaItems>
+                <field>Lead.RecordTypeId</field>
+                <operation>equals</operation>
+                <value>S.Company</value>
+            </criteriaItems>
+            <criteriaItems>
+                <field>Lead.Unidade_Origem__c</field>
+                <operation>equals</operation>
+                <value>SCO</value>
+            </criteriaItems>
+            <senderEmail>joao.silva@weenow.com.br</senderEmail>
+            <senderName>S.Company</senderName>
+            <template>unfiled$public/Lead_RespostaAutomatica</template>
+        </ruleEntry>
+        <ruleEntry>
+            <booleanFilter>1 OR 2</booleanFilter>
+            <criteriaItems>
+                <field>Lead.RecordTypeId</field>
+                <operation>equals</operation>
+                <value>Instituto Global ESG</value>
+            </criteriaItems>
+            <criteriaItems>
+                <field>Lead.Unidade_Origem__c</field>
+                <operation>equals</operation>
+                <value>ESG</value>
+            </criteriaItems>
+            <senderEmail>joao.silva@weenow.com.br</senderEmail>
+            <senderName>Instituto Global ESG</senderName>
+            <template>unfiled$public/Lead_RespostaAutomatica</template>
+        </ruleEntry>
+        <ruleEntry>
+            <booleanFilter>1 OR 2</booleanFilter>
+            <criteriaItems>
+                <field>Lead.RecordTypeId</field>
+                <operation>equals</operation>
+                <value>Instituto STech</value>
+            </criteriaItems>
+            <criteriaItems>
+                <field>Lead.Unidade_Origem__c</field>
+                <operation>equals</operation>
+                <value>STE</value>
+            </criteriaItems>
+            <senderEmail>joao.silva@weenow.com.br</senderEmail>
+            <senderName>Instituto STech</senderName>
+            <template>unfiled$public/Lead_RespostaAutomatica</template>
+        </ruleEntry>
+    </autoResponseRule>
+</AutoResponseRules>

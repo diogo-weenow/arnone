@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Form_Saude_Enviado__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Marca que o candidato enviou o formulário de saúde ocupacional (US 07). Enquanto falso e vencido o prazo, o status vira Para ativação.</description>
+    <label>Formulário de saúde enviado</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

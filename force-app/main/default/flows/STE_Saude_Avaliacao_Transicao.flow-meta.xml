@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Aprovar_Segue_PreMatricula</name>
+        <label>Aprovado — segue para Pré-Matrícula</label>
+        <locationX>176</locationX>
+        <locationY>384</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.StageName</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Pré-Matrícula</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.STE_Setor_Aprovados__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.STE_Data_Entrada_PreMatricula__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Flow.CurrentDateTime</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <assignments>
+        <name>Reprovar_Encerra_Perdido</name>
+        <label>Reprovado — encerra como Perdido</label>
+        <locationX>440</locationX>
+        <locationY>384</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.StageName</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Perdido</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.STE_Motivo_Perda__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Reprovado no exame médico</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <name>Resultado_Exame</name>
+        <label>Resultado do exame de saúde?</label>
+        <locationX>308</locationX>
+        <locationY>276</locationY>
+        <defaultConnector>
+            <targetReference>Reprovar_Encerra_Perdido</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Reprovado</defaultConnectorLabel>
+        <rules>
+            <name>Aprovado</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.STE_Resultado_Exame_Saude__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Aprovado</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Aprovar_Segue_PreMatricula</targetReference>
+            </connector>
+            <label>Aprovado</label>
+        </rules>
+    </decisions>
+    <description>US 08 — Avaliação do Exame de Saúde Ocupacional. Na etapa Saúde Ocupacional do funil Stech Telecom, quando o analista registra o resultado do exame: Aprovado classifica no Setor de Aprovados (mantendo o proprietário), carimba a entrada em Pré-Matrícula e avança para Pré-Matrícula; Reprovado encerra como Perdido com motivo &quot;Reprovado no exame médico&quot;. Before-save (atualiza o próprio registro).</description>
+    <environments>Default</environments>
+    <interviewLabel>STE_Saude_Avaliacao_Transicao {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>STE_Saude_Avaliacao_Transicao</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Resultado_Exame</targetReference>
+        </connector>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &quot;STE_Telecom&quot;,
+  ISPICKVAL({!$Record.StageName}, &quot;Saúde Ocupacional&quot;),
+  OR(
+    ISPICKVAL({!$Record.STE_Resultado_Exame_Saude__c}, &quot;Aprovado&quot;),
+    ISPICKVAL({!$Record.STE_Resultado_Exame_Saude__c}, &quot;Reprovado&quot;)
+  )
+)</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Interesse_Pre_Inscricao__c</fullName>
+    <description>Primeira escolha do candidato no chatbot: seguir diretamente ou consultar mais informações antes da pré-inscrição.</description>
+    <label>Interesse na pré-inscrição</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Sim, vamos lá!</fullName>
+                <default>false</default>
+                <label>Sim, vamos lá!</label>
+            </value>
+            <value>
+                <fullName>Quero saber mais</fullName>
+                <default>false</default>
+                <label>Quero saber mais</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

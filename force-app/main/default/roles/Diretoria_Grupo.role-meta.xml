@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Role xmlns="http://soap.sforce.com/2006/04/metadata">
+    <caseAccessLevel>Edit</caseAccessLevel>
+    <contactAccessLevel>Edit</contactAccessLevel>
+    <description>Topo da hierarquia: visão consolidada do forecast das 5 unidades.</description>
+    <mayForecastManagerShare>false</mayForecastManagerShare>
+    <name>Diretoria Grupo Arnone</name>
+    <opportunityAccessLevel>Edit</opportunityAccessLevel>
+</Role>

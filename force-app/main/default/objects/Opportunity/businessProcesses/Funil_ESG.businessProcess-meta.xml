@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BusinessProcess xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Funil_ESG</fullName>
+    <description>Funil comercial da unidade Instituto Global ESG. Etapas iniciais padrão do grupo; revisar após o discovery comercial (D1).</description>
+    <isActive>true</isActive>
+    <values>
+        <fullName>Contratação</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Diagnóstico</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Ganho</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Negociação</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Perdido</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Proposta</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Qualificação</fullName>
+        <default>false</default>
+    </values>
+</BusinessProcess>

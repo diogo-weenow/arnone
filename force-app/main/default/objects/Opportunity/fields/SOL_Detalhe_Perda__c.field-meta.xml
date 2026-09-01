@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Detalhe_Perda__c</fullName>
+    <description>O que a lista padronizada não conta: contexto, o que o cliente disse, o que tentar numa próxima abordagem. Obrigatório quando o motivo é Outros — sem isso a perda entra no relatório como uma categoria que não explica nada.</description>
+    <label>Detalhe da perda</label>
+    <length>2000</length>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>LongTextArea</type>
+    <visibleLines>4</visibleLines>
+</CustomField>

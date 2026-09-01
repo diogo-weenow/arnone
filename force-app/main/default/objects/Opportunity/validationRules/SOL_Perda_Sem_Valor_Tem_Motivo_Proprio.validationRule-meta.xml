@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Perda_Sem_Valor_Tem_Motivo_Proprio</fullName>
+    <active>true</active>
+    <description>Cenário 3 do card: quando a consulta ao e-CAC não achou valor, o motivo da perda tem de ser esse, e não um genérico. Sem a regra, a mesma causa aparece no relatório sob três rótulos diferentes.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SOL&apos;,
+  ISPICKVAL(SOL_Produto_Negocio__c, &apos;Recuperação Tributária&apos;),
+  ISPICKVAL(StageName, &apos;Perdido&apos;),
+  ISPICKVAL(SOL_ECAC_Resultado__c, &apos;Sem valor&apos;),
+  NOT(ISPICKVAL(SOL_Motivo_Perda__c, &apos;Sem valor a recuperar no e-CAC&apos;))
+)</errorConditionFormula>
+    <errorDisplayField>SOL_Motivo_Perda__c</errorDisplayField>
+    <errorMessage>A consulta ao e-CAC não apurou valor a recuperar: o motivo da perda precisa ser &quot;Sem valor a recuperar no e-CAC&quot;.</errorMessage>
+</ValidationRule>

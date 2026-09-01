@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bot xmlns="http://soap.sforce.com/2006/04/metadata">
+    <agentDSLEnabled>false</agentDSLEnabled>
+    <botMlDomain>
+        <label>Assistente Stech Telecom Teste</label>
+        <mlIntents>
+            <developerName>Informar_Email</developerName>
+            <label>Informar e-mail</label>
+        </mlIntents>
+        <name>Assistente_Stech_Telecom_Teste</name>
+    </botMlDomain>
+    <botSource>None</botSource>
+    <contextVariables>
+        <contextVariableMappings>
+            <SObjectType>MessagingSession</SObjectType>
+            <fieldName>MessagingSession.ChannelType</fieldName>
+            <messageType>EmbeddedMessaging</messageType>
+        </contextVariableMappings>
+        <dataType>Text</dataType>
+        <description>Tipo do canal de origem da conversa.</description>
+        <developerName>ChannelType</developerName>
+        <includeInPrompt>true</includeInPrompt>
+        <label>Tipo de canal</label>
+    </contextVariables>
+    <contextVariables>
+        <contextVariableMappings>
+            <SObjectType>MessagingEndUser</SObjectType>
+            <fieldName>MessagingEndUser.ContactId</fieldName>
+            <messageType>EmbeddedMessaging</messageType>
+        </contextVariableMappings>
+        <dataType>Id</dataType>
+        <description>Contato associado ao usuário final, quando identificado.</description>
+        <developerName>ContactId</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>ID do Contato</label>
+    </contextVariables>
+    <contextVariables>
+        <contextVariableMappings>
+            <SObjectType>MessagingSession</SObjectType>
+            <fieldName>MessagingSession.MessagingEndUserId</fieldName>
+            <messageType>EmbeddedMessaging</messageType>
+        </contextVariableMappings>
+        <dataType>Id</dataType>
+        <description>Identificador do usuário final na sessão de mensageria.</description>
+        <developerName>EndUserId</developerName>
+        <includeInPrompt>true</includeInPrompt>
+        <label>ID de usuário final</label>
+    </contextVariables>
+    <contextVariables>
+        <contextVariableMappings>
+            <SObjectType>MessagingSession</SObjectType>
+            <fieldName>MessagingSession.Id</fieldName>
+            <messageType>EmbeddedMessaging</messageType>
+        </contextVariableMappings>
+        <dataType>Id</dataType>
+        <description>Identificador roteável da sessão de mensageria.</description>
+        <developerName>RoutableId</developerName>
+        <includeInPrompt>true</includeInPrompt>
+        <label>ID roteável</label>
+    </contextVariables>
+    <defaultOutboundFlow>Route_to_Assistente_STE_Aprimorado</defaultOutboundFlow>
+    <description>Assistente de pré-inscrição do curso da Stech Telecom (BU Instituto STech). Qualifica o interessado por faixa etária e posse de CNH e encaminha para as filas quente, morna ou fria.</description>
+    <label>Assistente Stech Telecom Teste</label>
+    <logPrivateConversationData>false</logPrivateConversationData>
+    <richContentEnabled>true</richContentEnabled>
+    <sessionTimeout>0</sessionTimeout>
+    <type>Bot</type>
+</Bot>

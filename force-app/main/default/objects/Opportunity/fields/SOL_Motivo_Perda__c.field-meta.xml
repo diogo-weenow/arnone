@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Motivo_Perda__c</fullName>
+    <description>Por que o negócio não aconteceu, em lista padronizada para alimentar o relatório de funil. Obrigatório ao levar a Oportunidade para Perdido, e vazio quando ela é ganha.</description>
+    <label>Motivo da perda</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Sem valor a recuperar no e-CAC</fullName>
+                <default>false</default>
+                <label>Sem valor a recuperar no e-CAC</label>
+            </value>
+            <value>
+                <fullName>Recusou usar o valor apurado</fullName>
+                <default>false</default>
+                <label>Recusou usar o valor apurado</label>
+            </value>
+            <value>
+                <fullName>Não houve acordo na negociação</fullName>
+                <default>false</default>
+                <label>Não houve acordo na negociação</label>
+            </value>
+            <value>
+                <fullName>Opt Out</fullName>
+                <default>false</default>
+                <label>Opt Out</label>
+            </value>
+            <value>
+                <fullName>Contato Errado</fullName>
+                <default>false</default>
+                <label>Contato Errado</label>
+            </value>
+            <value>
+                <fullName>Sem retorno</fullName>
+                <default>false</default>
+                <label>Sem retorno</label>
+            </value>
+            <value>
+                <fullName>Sem interesse</fullName>
+                <default>false</default>
+                <label>Sem interesse</label>
+            </value>
+            <value>
+                <fullName>Lucro Presumido</fullName>
+                <default>false</default>
+                <label>Lucro Presumido</label>
+            </value>
+            <value>
+                <fullName>Outros</fullName>
+                <default>false</default>
+                <label>Outros</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

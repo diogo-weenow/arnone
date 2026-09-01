@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_ECAC_Consulta_Exige_Dados</fullName>
+    <active>true</active>
+    <description>Marcar a consulta como realizada sem dizer quando e o que ela achou deixa a etapa parecendo cumprida sem nenhuma informação aproveitável.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SOL&apos;,
+  ISPICKVAL(SOL_Produto_Negocio__c, &apos;Recuperação Tributária&apos;),
+  SOL_ECAC_Consulta_Realizada__c,
+  OR(
+    ISBLANK(SOL_ECAC_Data_Consulta__c),
+    ISPICKVAL(SOL_ECAC_Resultado__c, &apos;&apos;)
+  )
+)</errorConditionFormula>
+    <errorDisplayField>SOL_ECAC_Data_Consulta__c</errorDisplayField>
+    <errorMessage>Informe a data e o resultado da consulta ao e-CAC. Marcar a consulta como realizada sem esses dados deixa a etapa sem informação aproveitável.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Cadencia_PreAula__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Marca a Tarefa como parte da cadência de lembrete pré-aula do funil Stech Telecom (US 10). Uso interno das automações de criação e gating.</description>
+    <label>Cadência pré-aula</label>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Acesso do time comercial da Arnone Soluções: junta o acesso comercial do grupo ao permission set da unidade.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Arnone Soluções — Acesso Comercial</label>
+    <permissionSets>PS_Comercial</permissionSets>
+    <permissionSets>PS_SOL_Comercial</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>

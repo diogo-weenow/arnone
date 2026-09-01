@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>US 10 — avança a Oportunidade da Pré-Matrícula para Efetivação automaticamente quando a cadência pré-aula está concluída E os dados da matrícula estão completos (US 09). Cobre o Cenário 04 (última tarefa concluída → avança) e também o caso de a cadência terminar antes de os dados ficarem completos (avança quando os dados forem preenchidos).</description>
+    <environments>Default</environments>
+    <interviewLabel>STE_PreMatricula_Avancar {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>STE_PreMatricula_Avancar</label>
+    <processType>AutoLaunchedFlow</processType>
+    <recordUpdates>
+        <name>Avancar_Efetivacao</name>
+        <label>Avançar para Efetivação</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <inputAssignments>
+            <field>StageName</field>
+            <value>
+                <stringValue>Efetivação</stringValue>
+            </value>
+        </inputAssignments>
+        <inputReference>$Record</inputReference>
+    </recordUpdates>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Avancar_Efetivacao</targetReference>
+        </connector>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &quot;STE_Telecom&quot;,
+  ISPICKVAL({!$Record.StageName}, &quot;Pré-Matrícula&quot;),
+  {!$Record.STE_Cadencia_Concluida__c},
+  {!$Record.STE_Dados_Matricula_Completos__c}
+)</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
