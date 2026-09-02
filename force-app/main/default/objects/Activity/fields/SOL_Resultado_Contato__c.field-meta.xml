@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Resultado_Contato__c</fullName>
-    <description>Desfecho da tentativa de contato registrada nesta atividade (só jornada Arnone Soluções). Sucesso = contato efetivado, impede a reatribuição do ciclo atual. Sem sucesso = tentativa sem contato; 3 no mesmo ciclo do vendedor disparam a reatribuição automática do Lead. Preenchido pelo vendedor ao concluir a tarefa. CLICKUP-9400.</description>
+    <description>Desfecho da tentativa de contato registrada nesta atividade (só jornada Arnone Soluções). Atendeu = contato efetivado, impede a reatribuição do ciclo atual. Não atendeu / Não foi possível ligar = tentativa sem contato; 3 no mesmo ciclo do vendedor disparam a reatribuição automática do Lead. Preenchido pelo vendedor ao concluir a tarefa. CLICKUP-9400 / CLICKUP-9396.</description>
     <label>Resultado do contato</label>
     <required>false</required>
     <type>Picklist</type>
@@ -10,14 +10,19 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>Sucesso</fullName>
+                <fullName>Atendeu</fullName>
                 <default>false</default>
-                <label>Sucesso</label>
+                <label>Atendeu</label>
             </value>
             <value>
-                <fullName>Sem sucesso</fullName>
+                <fullName>Não atendeu</fullName>
                 <default>false</default>
-                <label>Sem sucesso</label>
+                <label>Não atendeu</label>
+            </value>
+            <value>
+                <fullName>Não foi possível ligar</fullName>
+                <default>false</default>
+                <label>Não foi possível ligar</label>
             </value>
         </valueSetDefinition>
     </valueSet>

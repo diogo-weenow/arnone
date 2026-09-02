@@ -106,6 +106,13 @@ private class SOLReatribuicaoContatoInvocableTest {
       CNPJ__c = CNPJ
     );
     insert l;
+    // Remove a Task "1ª Ligação" da distribuição inicial — os testes contam só
+    // o que a reatribuição cria (CLICKUP-9396).
+    delete [
+      SELECT Id
+      FROM Task
+      WHERE WhoId = :l.Id AND Subject = '1ª Ligação'
+    ];
     return [SELECT Id, OwnerId FROM Lead WHERE Id = :l.Id];
   }
 
@@ -137,9 +144,9 @@ private class SOLReatribuicaoContatoInvocableTest {
 
     Test.startTest();
     insert new List<Task>{
-      tarefa(l.Id, 'Sem sucesso', 'Completed'),
-      tarefa(l.Id, 'Sem sucesso', 'Completed'),
-      tarefa(l.Id, 'Sem sucesso', 'Completed')
+      tarefa(l.Id, 'Não atendeu', 'Completed'),
+      tarefa(l.Id, 'Não atendeu', 'Completed'),
+      tarefa(l.Id, 'Não atendeu', 'Completed')
     };
     Test.stopTest();
 
@@ -161,9 +168,9 @@ private class SOLReatribuicaoContatoInvocableTest {
 
     Test.startTest();
     insert new List<Task>{
-      tarefa(l.Id, 'Sem sucesso', 'Open'),
-      tarefa(l.Id, 'Sem sucesso', 'Open'),
-      tarefa(l.Id, 'Sem sucesso', 'Open')
+      tarefa(l.Id, 'Não atendeu', 'Open'),
+      tarefa(l.Id, 'Não atendeu', 'Open'),
+      tarefa(l.Id, 'Não atendeu', 'Open')
     };
     Test.stopTest();
 
@@ -182,9 +189,9 @@ private class SOLReatribuicaoContatoInvocableTest {
 
     Test.startTest();
     insert new List<Task>{
-      tarefa(l.Id, 'Sucesso', 'Completed'),
-      tarefa(l.Id, 'Sucesso', 'Completed'),
-      tarefa(l.Id, 'Sucesso', 'Completed')
+      tarefa(l.Id, 'Atendeu', 'Completed'),
+      tarefa(l.Id, 'Atendeu', 'Completed'),
+      tarefa(l.Id, 'Atendeu', 'Completed')
     };
     Test.stopTest();
 
@@ -197,9 +204,9 @@ private class SOLReatribuicaoContatoInvocableTest {
     Cenario c = montarCenario(3);
     Lead l = leadDistribuido('Dup');
     insert new List<Task>{
-      tarefa(l.Id, 'Sem sucesso', 'Completed'),
-      tarefa(l.Id, 'Sem sucesso', 'Completed'),
-      tarefa(l.Id, 'Sem sucesso', 'Completed')
+      tarefa(l.Id, 'Não atendeu', 'Completed'),
+      tarefa(l.Id, 'Não atendeu', 'Completed'),
+      tarefa(l.Id, 'Não atendeu', 'Completed')
     };
     Decimal qtdApos = recarregar(l.Id).SOL_Quantidade_Reatribuicoes__c;
 
@@ -234,7 +241,7 @@ private class SOLReatribuicaoContatoInvocableTest {
 
     Test.startTest();
     SOLDistribuicaoService.singletonKeyOverride = 'RR_INEXISTENTE_9400';
-    Task t = tarefa(l.Id, 'Sem sucesso', 'Completed');
+    Task t = tarefa(l.Id, 'Não atendeu', 'Completed');
     insert t; // Flow -> serviço falha -> Invocable engole -> Task é criada
     Test.stopTest();
     SOLDistribuicaoService.singletonKeyOverride = null;
