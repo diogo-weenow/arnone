@@ -40,6 +40,39 @@ public without sharing class SOLDistribuicaoService {
   @TestVisible
   private static final String STATUS_ERRO = 'Erro';
 
+  // ---- CLICKUP-9400: reatribuição por falta de contato ----
+
+  /** Tentativas sem contato, no ciclo do vendedor atual, que disparam a troca. */
+  @TestVisible
+  private static final Integer TENTATIVAS_PARA_REATRIBUIR = 3;
+
+  @TestVisible
+  private static final String RESULTADO_SEM_SUCESSO = 'Sem sucesso';
+  @TestVisible
+  private static final String RESULTADO_SUCESSO = 'Sucesso';
+
+  @TestVisible
+  private static final String REATRIB_EM_ACOMPANHAMENTO = 'Em acompanhamento';
+  @TestVisible
+  private static final String REATRIB_REATRIBUIDO = 'Reatribuido';
+  @TestVisible
+  private static final String REATRIB_SEM_OUTRO_VENDEDOR = 'Sem outro vendedor';
+
+  @TestVisible
+  private static final String MOTIVO_REATRIBUICAO = 'Sem contato após 3 tentativas';
+  @TestVisible
+  private static final String MOTIVO_SEM_OUTRO_VENDEDOR = 'Não havia outro vendedor ativo disponível na fila.';
+
+  /** Assunto da tarefa criada para o novo proprietário após a reatribuição. */
+  @TestVisible
+  private static final String SUBJECT_PRIMEIRA_LIGACAO = '1ª Ligação';
+  /** Valor de Status aberto válido na org (TaskStatus IsClosed = false). */
+  @TestVisible
+  private static final String TASK_STATUS_ABERTO = 'Open';
+  /** Prazo operacional da nova tentativa: minutos após a reatribuição. */
+  @TestVisible
+  private static final Integer PRAZO_CONTATO_MINUTOS = 5;
+
   /** Mensagens controladas — sem detalhe técnico sensível. */
   @TestVisible
   private static final String MSG_ERRO_GENERICO = 'A distribuição não pôde ser concluída agora. O lead será reprocessado.';
@@ -70,6 +103,19 @@ public without sharing class SOLDistribuicaoService {
     public Integer distribuidos = 0;
     public Integer emFallback = 0;
     public Integer ignorados = 0;
+    public Integer comErro = 0;
+    public List<String> mensagens = new List<String>();
+  }
+
+  /** Resultado controlado da reatribuição por falta de contato (CLICKUP-9400). */
+  public class ResultadoReatribuicao {
+    /** Leads que trocaram de proprietário. */
+    public Integer reatribuidos = 0;
+    /** Leads com 3 tentativas sem contato mas sem outro vendedor disponível. */
+    public Integer semOutroVendedor = 0;
+    /** Leads fora do escopo (outro Record Type, convertido, ciclo não iniciado, kill-switch). */
+    public Integer ignorados = 0;
+    /** Leads não reatribuídos por erro controlado. */
     public Integer comErro = 0;
     public List<String> mensagens = new List<String>();
   }
@@ -192,6 +238,9 @@ public without sharing class SOLDistribuicaoService {
         l.SOL_Status_Distribuicao__c = STATUS_DISTRIBUIDO;
         l.SOL_Data_Distribuicao__c = agora;
         l.SOL_Erro_Distribuicao__c = null;
+        // CLICKUP-9400: abre o ciclo de contato do vendedor que recebeu o Lead.
+        l.SOL_Data_Inicio_Ciclo_Contato__c = agora;
+        l.SOL_Status_Reatribuicao__c = REATRIB_EM_ACOMPANHAMENTO;
       }
       update elegiveis;
 
@@ -286,6 +335,290 @@ public without sharing class SOLDistribuicaoService {
       }
     }
     return -1;
+  }
+
+  // =====================================================================
+  //  REATRIBUIÇÃO POR FALTA DE CONTATO (CLICKUP-9400)
+  // =====================================================================
+
+  /**
+   * Reatribui, em round-robin, os Leads do Record Type SOL cujo ciclo de contato
+   * do vendedor atual acumulou {@link #TENTATIVAS_PARA_REATRIBUIR} Tasks
+   * concluídas com resultado "Sem sucesso" — desde que nenhuma Task do ciclo
+   * tenha resultado "Sucesso" (contato efetivado bloqueia a troca do ciclo).
+   *
+   * Bulk-safe: nenhuma consulta ou DML dentro de laço. Transacional: Savepoint /
+   * rollback. Usa o MESMO singleton, lock (FOR UPDATE), fila, roster e ponteiro
+   * global da distribuição inicial (CLICKUP-9394) — serializa com ela e evita
+   * duas reatribuições concorrentes do mesmo Lead (a segunda transação relê o
+   * ciclo já reiniciado e não encontra 3 tentativas).
+   *
+   * NÃO reaproveita a proteção que impede redistribuir Leads já "Distribuido":
+   * todo alvo aqui já está distribuído.
+   *
+   * @param leadIds Ids de Lead candidatos (qualquer origem; filtrados aqui).
+   * @return contagens controladas.
+   */
+  public static ResultadoReatribuicao reatribuirPorFaltaDeContato(
+    List<Id> leadIds
+  ) {
+    ResultadoReatribuicao r = new ResultadoReatribuicao();
+    if (leadIds == null || leadIds.isEmpty()) {
+      return r;
+    }
+
+    Set<Id> ids = new Set<Id>(leadIds);
+    Datetime agora = System.now();
+
+    Savepoint sp = Database.setSavepoint();
+    try {
+      // Mesmo lock da distribuição inicial: serializa o avanço do ponteiro e a
+      // própria reatribuição entre transações concorrentes.
+      SOL_Distribuicao_Estado__c estado = bloquearSingleton();
+
+      List<Lead> carregados = [
+        SELECT
+          Id,
+          OwnerId,
+          RecordType.DeveloperName,
+          SOL_Data_Inicio_Ciclo_Contato__c,
+          SOL_Quantidade_Reatribuicoes__c
+        FROM Lead
+        WHERE Id IN :ids AND IsConverted = false
+      ];
+
+      // Só Record Type SOL e com ciclo de contato já iniciado (distribuição
+      // inicial concluída). Leads convertidos/inexistentes: ignorados.
+      Map<Id, Lead> candidatos = new Map<Id, Lead>();
+      Set<Id> encontrados = new Set<Id>();
+      for (Lead l : carregados) {
+        encontrados.add(l.Id);
+        if (l.RecordType.DeveloperName != RECORD_TYPE_DEVELOPER_NAME) {
+          r.ignorados++;
+          continue;
+        }
+        if (l.SOL_Data_Inicio_Ciclo_Contato__c == null) {
+          r.ignorados++;
+          continue;
+        }
+        candidatos.put(l.Id, l);
+      }
+      r.ignorados += (ids.size() - encontrados.size());
+
+      if (candidatos.isEmpty()) {
+        return r;
+      }
+
+      // Kill-switch desligado: a reatribuição também para.
+      if (!estado.Ativo__c) {
+        r.ignorados += candidatos.size();
+        return r;
+      }
+
+      // Menor início de ciclo entre os candidatos: reduz as linhas de Task lidas.
+      Datetime corteMinimo = null;
+      for (Lead l : candidatos.values()) {
+        if (
+          corteMinimo == null ||
+          l.SOL_Data_Inicio_Ciclo_Contato__c < corteMinimo
+        ) {
+          corteMinimo = l.SOL_Data_Inicio_Ciclo_Contato__c;
+        }
+      }
+
+      // (contagem) Tasks CONCLUÍDAS, ligadas ao Lead por WhoId, com resultado
+      // Sucesso/Sem sucesso, concluídas a partir do corte. Uma única consulta;
+      // o corte por Lead é aplicado em memória (varia por Lead).
+      Map<Id, Integer> semSucessoNoCiclo = new Map<Id, Integer>();
+      Set<Id> teveSucessoNoCiclo = new Set<Id>();
+      // Última conclusão contada por Lead: base para reiniciar o ciclo de forma
+      // que as Tasks que dispararam a troca não voltem a contar.
+      Map<Id, Datetime> ultimaConclusaoNoCiclo = new Map<Id, Datetime>();
+      for (Task t : [
+        SELECT WhoId, SOL_Resultado_Contato__c, CompletedDateTime
+        FROM Task
+        WHERE
+          WhoId IN :candidatos.keySet()
+          AND IsClosed = true
+          AND SOL_Resultado_Contato__c IN (:RESULTADO_SEM_SUCESSO, :RESULTADO_SUCESSO)
+          AND CompletedDateTime >= :corteMinimo
+      ]) {
+        Lead l = candidatos.get(t.WhoId);
+        if (
+          l == null ||
+          t.CompletedDateTime == null ||
+          t.CompletedDateTime < l.SOL_Data_Inicio_Ciclo_Contato__c
+        ) {
+          continue;
+        }
+        if (
+          !ultimaConclusaoNoCiclo.containsKey(t.WhoId) ||
+          t.CompletedDateTime > ultimaConclusaoNoCiclo.get(t.WhoId)
+        ) {
+          ultimaConclusaoNoCiclo.put(t.WhoId, t.CompletedDateTime);
+        }
+        if (t.SOL_Resultado_Contato__c == RESULTADO_SUCESSO) {
+          teveSucessoNoCiclo.add(t.WhoId);
+        } else {
+          Integer c = semSucessoNoCiclo.containsKey(t.WhoId)
+            ? semSucessoNoCiclo.get(t.WhoId)
+            : 0;
+          semSucessoNoCiclo.put(t.WhoId, c + 1);
+        }
+      }
+
+      List<Lead> paraReatribuir = new List<Lead>();
+      for (Lead l : candidatos.values()) {
+        if (teveSucessoNoCiclo.contains(l.Id)) {
+          // Contato efetivado no ciclo: não reatribui.
+          continue;
+        }
+        Integer qtd = semSucessoNoCiclo.containsKey(l.Id)
+          ? semSucessoNoCiclo.get(l.Id)
+          : 0;
+        if (qtd >= TENTATIVAS_PARA_REATRIBUIR) {
+          paraReatribuir.add(l);
+        }
+      }
+
+      if (paraReatribuir.isEmpty()) {
+        return r;
+      }
+
+      // Roster: mesmos membros diretos ativos da Fila_Leads_SOL.
+      Group fila = localizarFilaValida();
+      List<User> ativos;
+      try {
+        ativos = obterMembrosDiretosAtivos(fila.Id);
+      } catch (RosterVazioException e) {
+        ativos = new List<User>();
+      }
+      Integer n = ativos.size();
+
+      // Ponto de partida: o próximo após o ponteiro global (User.Id ASC).
+      Integer cursor = 0;
+      if (n > 0 && estado.Ultimo_Usuario__c != null) {
+        Integer k = indiceDe(ativos, estado.Ultimo_Usuario__c);
+        cursor = (k >= 0) ? Math.mod(k + 1, n) : 0;
+      }
+
+      Id ponteiroNovo = estado.Ultimo_Usuario__c;
+      List<Lead> leadsAlterados = new List<Lead>();
+      List<Task> tarefasNovas = new List<Task>();
+
+      for (Lead l : paraReatribuir) {
+        Id escolhido = proximoVendedorExcluindo(ativos, cursor, l.OwnerId);
+
+        // Novo início de ciclo: logo após a última Task contada (e nunca no
+        // passado). Garante que as Tasks que dispararam a avaliação não voltem
+        // a contar — mesmo quando System.now() é constante (contexto de teste)
+        // ou a avaliação roda de novo na mesma transação.
+        Datetime novoCiclo = agora;
+        if (ultimaConclusaoNoCiclo.containsKey(l.Id)) {
+          Datetime aposUltima = Datetime.newInstance(
+            ultimaConclusaoNoCiclo.get(l.Id).getTime() + 1000
+          );
+          if (aposUltima > novoCiclo) {
+            novoCiclo = aposUltima;
+          }
+        }
+
+        if (escolhido == null) {
+          // Só há (no máximo) o próprio proprietário atual ativo: mantém o Lead.
+          l.SOL_Status_Reatribuicao__c = REATRIB_SEM_OUTRO_VENDEDOR;
+          l.SOL_Motivo_Ultima_Reatribuicao__c = MOTIVO_SEM_OUTRO_VENDEDOR;
+          // Reinicia o ciclo mesmo aqui: evita reavaliar a cada nova Task
+          // enquanto não houver outro vendedor.
+          l.SOL_Data_Inicio_Ciclo_Contato__c = novoCiclo;
+          leadsAlterados.add(l);
+          r.semOutroVendedor++;
+          continue;
+        }
+
+        // Consome o ponteiro: avança para depois do vendedor escolhido.
+        Integer ie = indiceDe(ativos, escolhido);
+        cursor = Math.mod(ie + 1, n);
+
+        l.OwnerId = escolhido;
+        l.SOL_Quantidade_Reatribuicoes__c =
+          (l.SOL_Quantidade_Reatribuicoes__c == null
+            ? 0
+            : l.SOL_Quantidade_Reatribuicoes__c) + 1;
+        l.SOL_Data_Ultima_Reatribuicao__c = agora;
+        l.SOL_Motivo_Ultima_Reatribuicao__c = MOTIVO_REATRIBUICAO;
+        l.SOL_Status_Reatribuicao__c = REATRIB_REATRIBUIDO;
+        // Reinicia o ciclo: as Tasks anteriores ficam no histórico, fora da
+        // nova contagem.
+        l.SOL_Data_Inicio_Ciclo_Contato__c = novoCiclo;
+        leadsAlterados.add(l);
+        ponteiroNovo = escolhido;
+        r.reatribuidos++;
+
+        tarefasNovas.add(
+          new Task(
+            Subject = SUBJECT_PRIMEIRA_LIGACAO,
+            WhoId = l.Id,
+            OwnerId = escolhido,
+            Status = TASK_STATUS_ABERTO,
+            ActivityDate = Date.today(),
+            SOL_Prazo_Contato__c = agora.addMinutes(PRAZO_CONTATO_MINUTOS)
+          )
+        );
+      }
+
+      if (!leadsAlterados.isEmpty()) {
+        update leadsAlterados;
+      }
+      if (!tarefasNovas.isEmpty()) {
+        insert tarefasNovas;
+      }
+      if (ponteiroNovo != estado.Ultimo_Usuario__c) {
+        estado.Ultimo_Usuario__c = ponteiroNovo;
+        estado.Data_Ultima_Distribuicao__c = agora;
+        update estado;
+      }
+
+      return r;
+    } catch (DistribuicaoException e) {
+      Database.rollback(sp);
+      r.comErro = ids.size();
+      r.mensagens.add(MSG_CONFIG);
+      return r;
+    } catch (Exception e) {
+      Database.rollback(sp);
+      System.debug(
+        LoggingLevel.ERROR,
+        'SOLDistribuicaoService.reatribuirPorFaltaDeContato: ' +
+          e.getTypeName() +
+          ': ' +
+          e.getMessage() +
+          '\n' +
+          e.getStackTraceString()
+      );
+      r.comErro = ids.size();
+      r.mensagens.add(MSG_ERRO_GENERICO);
+      return r;
+    }
+  }
+
+  /**
+   * Próximo vendedor na rotação a partir de `cursor`, pulando `donoAtual`.
+   * Retorna null quando não há nenhum vendedor ativo diferente do dono atual
+   * (roster vazio, ou o dono atual é o único ativo).
+   */
+  private static Id proximoVendedorExcluindo(
+    List<User> ativos,
+    Integer cursor,
+    Id donoAtual
+  ) {
+    Integer n = ativos.size();
+    for (Integer passo = 0; passo < n; passo++) {
+      User u = ativos[Math.mod(cursor + passo, n)];
+      if (u.Id != donoAtual) {
+        return u.Id;
+      }
+    }
+    return null;
   }
 
   // =====================================================================

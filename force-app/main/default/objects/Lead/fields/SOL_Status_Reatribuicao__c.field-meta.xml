@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Status_Reatribuicao__c</fullName>
+    <description>Situação do Lead no fluxo de reatribuição por falta de contato (só Record Type SOL). Fica VAZIO até a distribuição inicial. Em acompanhamento = ciclo de contato do vendedor atual em curso; Reatribuido = trocou de vendedor por falta de contato; Sem outro vendedor = 3 tentativas sem contato mas não havia outro vendedor ativo, o Lead permaneceu com o vendedor atual. Escrito apenas pelo serviço SOLDistribuicaoService. CLICKUP-9400.</description>
+    <label>Status da reatribuição SOL</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Em acompanhamento</fullName>
+                <default>false</default>
+                <label>Em acompanhamento</label>
+            </value>
+            <value>
+                <fullName>Reatribuido</fullName>
+                <default>false</default>
+                <label>Reatribuido</label>
+            </value>
+            <value>
+                <fullName>Sem outro vendedor</fullName>
+                <default>false</default>
+                <label>Sem outro vendedor</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
