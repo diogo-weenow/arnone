@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Distribuicao__c</fullName>
+    <description>Data e hora da última ação de distribuição SOL sobre este Lead (atribuição, fallback ou erro). Escrito apenas pelo serviço SOLDistribuicaoService. CLICKUP-9394.</description>
+    <label>Data Distribuição SOL</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>DateTime</type>
+</CustomField>

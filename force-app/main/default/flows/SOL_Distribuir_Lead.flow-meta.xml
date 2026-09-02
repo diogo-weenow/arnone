@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Chamar_Distribuicao_SOL</name>
+        <label>Chamar distribuição SOL</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <actionName>SOLDistribuicaoInvocable</actionName>
+        <actionType>apex</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>leadId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>SOLDistribuicaoInvocable</nameSegment>
+    </actionCalls>
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>CLICKUP-9394 — Aciona SOLDistribuicaoInvocable quando um Lead passa a ser do Record Type SOL (nasce SOL ou muda para SOL). Não altera campos aqui. Não modifica a Assignment Rule Distribuicao_Por_Unidade nem outros Flows.</description>
+    <environments>Default</environments>
+    <interviewLabel>SOL_Distribuir_Lead {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL_Distribuir_Lead</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Chamar_Distribuicao_SOL</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>{!$Record.RecordType.DeveloperName} = &apos;SOL&apos;</filterFormula>
+        <object>Lead</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
