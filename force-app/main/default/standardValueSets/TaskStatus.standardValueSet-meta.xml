@@ -13,4 +13,10 @@
         <label>Completed</label>
         <closed>true</closed>
     </standardValue>
+    <standardValue>
+        <fullName>Cancelada</fullName>
+        <default>false</default>
+        <label>Cancelada</label>
+        <closed>true</closed>
+    </standardValue>
 </StandardValueSet>

@@ -88,6 +88,18 @@ public without sharing class SOLDistribuicaoService {
   /** Valor de Status aberto válido na org (TaskStatus IsClosed = false). */
   @TestVisible
   private static final String TASK_STATUS_ABERTO = 'Open';
+
+  // ---- CLICKUP-9417: classificação e cancelamento de tarefas de contato ----
+
+  /** Classificador técnico da tarefa de contato SOL (não usar o Subject). */
+  @TestVisible
+  private static final String TIPO_TAREFA_CONTATO = 'Contato';
+  /** Status "Cancelada" (TaskStatus closed) — tarefa encerrada pelo sistema. */
+  @TestVisible
+  private static final String TASK_STATUS_CANCELADA = 'Cancelada';
+  /** Motivo do cancelamento quando o contato com o Lead foi efetivado. */
+  @TestVisible
+  private static final String MOTIVO_CANCELAMENTO_CONTATO_EFETIVADO = 'Contato efetivado';
   /** Business Hours para o cálculo do prazo (etapa controlada de implantação). */
   @TestVisible
   private static final String BUSINESS_HOURS_NAME = 'Arnone Soluções - Horário Comercial';
@@ -130,6 +142,18 @@ public without sharing class SOLDistribuicaoService {
     public Integer ignorados = 0;
     public Integer comErro = 0;
     public List<String> mensagens = new List<String>();
+  }
+
+  /** Resultado controlado do contato efetivado (CLICKUP-9417). */
+  public class ResultadoContatoEfetivado {
+    /** Leads marcados como "contato efetivado" agora. */
+    public Integer leadsSinalizados = 0;
+    /** Tarefas de contato pendentes canceladas. */
+    public Integer tarefasCanceladas = 0;
+    /** Leads fora do escopo (outro Record Type, convertido, inexistente). */
+    public Integer ignorados = 0;
+    /** Leads não processados por erro controlado. */
+    public Integer comErro = 0;
   }
 
   /** Resultado controlado da reatribuição por falta de contato (CLICKUP-9400). */
@@ -655,6 +679,124 @@ public without sharing class SOLDistribuicaoService {
   }
 
   // =====================================================================
+  //  CONTATO EFETIVADO — CANCELAMENTO DE TAREFAS PENDENTES (CLICKUP-9417)
+  // =====================================================================
+
+  /**
+   * Sinaliza o contato efetivado nos Leads informados e cancela as tarefas de
+   * contato SOL ainda PENDENTES desses Leads.
+   *
+   * Disparado quando o vendedor conclui uma tarefa de contato
+   * (SOL_Tipo_Tarefa__c = 'Contato') com resultado "Atendeu" — a qualquer
+   * momento, sem bloqueio por horário/dia (cliente pode retornar no fim de
+   * semana).
+   *
+   * Bulk-safe: nenhuma consulta ou DML dentro de laço. Transacional:
+   * Savepoint/rollback. Concorrência: os Leads são travados com FOR UPDATE, o
+   * que serializa dois "Atendeu" simultâneos do mesmo Lead. Idempotente: um 2º
+   * disparo não encontra mais tarefas pendentes e não reprocessa o flag.
+   * Recursão: as tarefas ficam com Status "Cancelada" e sem resultado "Atendeu"
+   * — o Flow SOL_Contato_Efetivado não volta a disparar.
+   *
+   * NÃO altera tarefas já concluídas (Status "Completed"): o histórico de
+   * tentativas anteriores permanece intacto. NÃO altera o status do funil do
+   * Lead nem cria tarefas.
+   *
+   * @param leadIds Ids de Lead (qualquer origem; filtrados aqui para RT SOL).
+   * @return contagens controladas.
+   */
+  public static ResultadoContatoEfetivado registrarContatoEfetivado(
+    List<Id> leadIds
+  ) {
+    ResultadoContatoEfetivado r = new ResultadoContatoEfetivado();
+    if (leadIds == null || leadIds.isEmpty()) {
+      return r;
+    }
+
+    Set<Id> ids = new Set<Id>(leadIds);
+    Datetime agora = System.now();
+
+    Savepoint sp = Database.setSavepoint();
+    try {
+      // Trava os Leads: serializa dois "Atendeu" concorrentes do mesmo Lead.
+      List<Lead> carregados = [
+        SELECT
+          Id,
+          RecordType.DeveloperName,
+          SOL_Contato_Efetivado__c,
+          SOL_Data_Contato_Efetivado__c
+        FROM Lead
+        WHERE Id IN :ids AND IsConverted = false
+        FOR UPDATE
+      ];
+
+      List<Lead> leadsParaSinalizar = new List<Lead>();
+      Set<Id> leadsSOL = new Set<Id>();
+      Set<Id> encontrados = new Set<Id>();
+      for (Lead l : carregados) {
+        encontrados.add(l.Id);
+        if (l.RecordType.DeveloperName != RECORD_TYPE_DEVELOPER_NAME) {
+          r.ignorados++;
+          continue;
+        }
+        leadsSOL.add(l.Id);
+        // Idempotência: só grava o flag/data se ainda não sinalizado.
+        if (l.SOL_Contato_Efetivado__c != true) {
+          l.SOL_Contato_Efetivado__c = true;
+          l.SOL_Data_Contato_Efetivado__c = agora;
+          leadsParaSinalizar.add(l);
+        }
+      }
+      r.ignorados += (ids.size() - encontrados.size());
+
+      if (leadsSOL.isEmpty()) {
+        return r;
+      }
+
+      // Tarefas de contato AINDA PENDENTES (IsClosed = false) dos Leads SOL. A
+      // tarefa que efetivou o contato já está "Completed" e não entra aqui;
+      // tarefas já concluídas não são tocadas.
+      List<Task> pendentes = [
+        SELECT Id
+        FROM Task
+        WHERE
+          WhoId IN :leadsSOL
+          AND SOL_Tipo_Tarefa__c = :TIPO_TAREFA_CONTATO
+          AND IsClosed = false
+        FOR UPDATE
+      ];
+      for (Task t : pendentes) {
+        t.Status = TASK_STATUS_CANCELADA;
+        t.SOL_Motivo_Cancelamento__c = MOTIVO_CANCELAMENTO_CONTATO_EFETIVADO;
+      }
+
+      if (!leadsParaSinalizar.isEmpty()) {
+        update leadsParaSinalizar;
+      }
+      if (!pendentes.isEmpty()) {
+        update pendentes;
+      }
+
+      r.leadsSinalizados = leadsParaSinalizar.size();
+      r.tarefasCanceladas = pendentes.size();
+      return r;
+    } catch (Exception e) {
+      Database.rollback(sp);
+      System.debug(
+        LoggingLevel.ERROR,
+        'SOLDistribuicaoService.registrarContatoEfetivado: ' +
+          e.getTypeName() +
+          ': ' +
+          e.getMessage() +
+          '\n' +
+          e.getStackTraceString()
+      );
+      r.comErro = ids.size();
+      return r;
+    }
+  }
+
+  // =====================================================================
   //  TASK "1ª LIGAÇÃO" — CRIAÇÃO CENTRALIZADA (CLICKUP-9396)
   // =====================================================================
 
@@ -695,7 +837,10 @@ public without sharing class SOLDistribuicaoService {
           OwnerId = donoPorLead.get(leadId),
           Status = TASK_STATUS_ABERTO,
           ActivityDate = prazo.dateGmt(),
-          SOL_Prazo_Contato__c = prazo
+          SOL_Prazo_Contato__c = prazo,
+          // CLICKUP-9417: classificador técnico (o Subject é editável e não deve
+          // ser a identificação da tarefa de contato).
+          SOL_Tipo_Tarefa__c = TIPO_TAREFA_CONTATO
           // SOL_Resultado_Contato__c fica vazio (preenchido pelo vendedor).
         )
       );

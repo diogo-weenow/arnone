@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Contato_Efetivado__c</fullName>
+    <description>Data e hora em que o contato com o Lead foi efetivado (só Record Type SOL). Registrada independentemente do horário/dia (inclui retorno do cliente fora do expediente). Escrito apenas pela automação SOL. CLICKUP-9417.</description>
+    <label>Data do contato efetivado (SOL)</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>DateTime</type>
+</CustomField>

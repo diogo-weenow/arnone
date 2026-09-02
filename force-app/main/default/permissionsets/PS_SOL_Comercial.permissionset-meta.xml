@@ -36,6 +36,16 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Lead.SOL_Contato_Efetivado__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.SOL_Data_Contato_Efetivado__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Lead.SOL_Data_Inicio_Ciclo_Contato__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -196,12 +206,22 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Task.SOL_Motivo_Cancelamento__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Task.SOL_Prazo_Contato__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
         <field>Task.SOL_Resultado_Contato__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Task.SOL_Tipo_Tarefa__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
