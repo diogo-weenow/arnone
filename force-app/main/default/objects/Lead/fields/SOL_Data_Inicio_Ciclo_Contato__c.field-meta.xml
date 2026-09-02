@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Inicio_Ciclo_Contato__c</fullName>
+    <description>Início do ciclo de contato do vendedor atual (só Record Type SOL). Preenchido pela automação SOL na distribuição inicial e reiniciado a cada reatribuição por falta de contato. Só Tasks concluídas a partir desta data e hora entram na contagem de tentativas do ciclo. Escrito apenas pelo serviço SOLDistribuicaoService. CLICKUP-9400.</description>
+    <label>Início do ciclo de contato SOL</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>DateTime</type>
+</CustomField>
