@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Erro_Distribuicao__c</fullName>
+    <description>Mensagem controlada da última falha de distribuição SOL deste Lead. Sem detalhes técnicos sensíveis. Limpo quando a distribuição é concluída. Escrito apenas pelo serviço SOLDistribuicaoService. CLICKUP-9394.</description>
+    <label>Erro Distribuição SOL</label>
+    <length>32768</length>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>

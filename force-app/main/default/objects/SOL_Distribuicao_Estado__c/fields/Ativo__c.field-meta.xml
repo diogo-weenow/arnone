@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Ativo__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Kill-switch do round-robin de Leads SOL. Falso: o serviço de distribuição não altera proprietário nem ponteiro. Mantido pelo time administrador Salesforce. CLICKUP-9394.</description>
+    <label>Ativo</label>
+    <trackHistory>true</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Status_Distribuicao__c</fullName>
+    <description>Situação da distribuição round-robin deste Lead (só Record Type SOL). Fica VAZIO até a automação SOL iniciar o processamento. Pendente = na fila para distribuir; Distribuido = atribuído a um vendedor; Fallback = deixado na fila Fila_Leads_SOL; Erro = falha controlada, será reprocessado. Escrito apenas pelo serviço SOLDistribuicaoService. Sem valor padrão de propósito: Leads de outros Record Types permanecem vazios. CLICKUP-9394.</description>
+    <label>Status Distribuição SOL</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Pendente</fullName>
+                <default>false</default>
+                <label>Pendente</label>
+            </value>
+            <value>
+                <fullName>Distribuido</fullName>
+                <default>false</default>
+                <label>Distribuido</label>
+            </value>
+            <value>
+                <fullName>Fallback</fullName>
+                <default>false</default>
+                <label>Fallback</label>
+            </value>
+            <value>
+                <fullName>Erro</fullName>
+                <default>false</default>
+                <label>Erro</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

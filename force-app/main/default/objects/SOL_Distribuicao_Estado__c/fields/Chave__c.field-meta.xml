@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Chave__c</fullName>
+    <caseSensitive>false</caseSensitive>
+    <defaultValue>&quot;SOL&quot;</defaultValue>
+    <description>Chave do singleton. Unique + External ID: garante um único registro de estado. O valor padrão &quot;SOL&quot; faz com que qualquer segundo registro colida no índice único. Não editável pelo operador. CLICKUP-9394.</description>
+    <externalId>true</externalId>
+    <label>Chave</label>
+    <length>40</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>
