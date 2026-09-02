@@ -132,8 +132,9 @@ private class SOLDistribuicaoServiceTest {
   /**
    * Cria N Leads SOL (o Flow ativo os distribui na inserção) e os devolve ao
    * estado "ainda não distribuído": status/data/erro nulos, owner = usuário do
-   * teste, singleton zerado. O update de reset não re-dispara o Flow (o
-   * RecordType não mudou).
+   * teste, singleton zerado, e as Tasks "1ª Ligação" da distribuição inicial
+   * removidas (para os testes contarem só o que a chamada explícita cria). O
+   * update de reset não re-dispara o Flow (o RecordType não mudou).
    */
   private static List<Lead> leadsSOLPristinos(Integer qtd) {
     Id rt = rtLead('SOL');
@@ -151,6 +152,12 @@ private class SOLDistribuicaoServiceTest {
       );
     }
     insert leads;
+
+    delete [
+      SELECT Id
+      FROM Task
+      WHERE WhoId IN :leads AND Subject = '1ª Ligação'
+    ];
 
     List<Lead> reset = new List<Lead>();
     for (Lead l : leads) {
@@ -463,6 +470,18 @@ private class SOLDistribuicaoServiceTest {
     SOL_Distribuicao_Estado__c est = estado();
     System.assertEquals(c.vendedores[0], est.Ultimo_Usuario__c);
     System.assert(est.Total_Distribuido__c == 1);
+    // CLICKUP-9396: uma Task "1ª Ligação" para o vendedor que recebeu o Lead.
+    List<Task> tks = [
+      SELECT OwnerId, Status, SOL_Prazo_Contato__c, SOL_Resultado_Contato__c, ActivityDate
+      FROM Task
+      WHERE WhoId = :leads[0].Id AND Subject = '1ª Ligação'
+    ];
+    System.assertEquals(1, tks.size());
+    System.assertEquals(c.vendedores[0], tks[0].OwnerId);
+    System.assertEquals('Open', tks[0].Status);
+    System.assertNotEquals(null, tks[0].SOL_Prazo_Contato__c);
+    System.assertEquals(null, tks[0].SOL_Resultado_Contato__c);
+    System.assertEquals(tks[0].SOL_Prazo_Contato__c.dateGmt(), tks[0].ActivityDate);
   }
 
   @IsTest
@@ -581,6 +600,11 @@ private class SOLDistribuicaoServiceTest {
       System.assertEquals('Fallback', s);
     }
     System.assertEquals(null, estado().Ultimo_Usuario__c);
+    System.assertEquals(
+      0,
+      [SELECT COUNT() FROM Task WHERE WhoId IN :ids AND Subject = '1ª Ligação'],
+      'CLICKUP-9396: fallback não cria Task.'
+    );
   }
 
   @IsTest
@@ -604,6 +628,11 @@ private class SOLDistribuicaoServiceTest {
       System.assertEquals('Fallback', s);
     }
     System.assertEquals(null, estado().Ultimo_Usuario__c);
+    System.assertEquals(
+      0,
+      [SELECT COUNT() FROM Task WHERE WhoId IN :ids AND Subject = '1ª Ligação'],
+      'CLICKUP-9396: kill-switch/fallback não cria Task.'
+    );
   }
 
   @IsTest
@@ -650,6 +679,12 @@ private class SOLDistribuicaoServiceTest {
     System.assertEquals(1, r2.ignorados);
     System.assertEquals(ownersApos1.get(leads[0].Id), ownersDe(ids).get(leads[0].Id));
     System.assertEquals(totalApos1, estado().Total_Distribuido__c);
+    // CLICKUP-9396: reexecução não duplica a Task "1ª Ligação".
+    System.assertEquals(
+      1,
+      [SELECT COUNT() FROM Task WHERE WhoId IN :ids AND Subject = '1ª Ligação'],
+      'Reprocessar um Lead já Distribuido não cria outra Task.'
+    );
   }
 
   @IsTest
@@ -671,9 +706,15 @@ private class SOLDistribuicaoServiceTest {
     Test.stopTest();
 
     System.assertEquals(200, r.distribuidos);
-    System.assert(soql <= 8, 'SOQL não escala por Lead: ' + soql);
-    System.assert(dml <= 3, 'DML não escala por Lead: ' + dml);
+    System.assert(soql <= 10, 'SOQL não escala por Lead: ' + soql);
+    System.assert(dml <= 4, 'DML não escala por Lead: ' + dml);
     System.assert(estado().Total_Distribuido__c == 200);
+    // CLICKUP-9396: exatamente uma Task "1ª Ligação" por Lead distribuído.
+    System.assertEquals(
+      200,
+      [SELECT COUNT() FROM Task WHERE WhoId IN :ids AND Subject = '1ª Ligação'],
+      'Uma Task "1ª Ligação" por Lead, mesmo em bulk.'
+    );
   }
 
   @IsTest
@@ -721,6 +762,11 @@ private class SOLDistribuicaoServiceTest {
       System.assertEquals(c.filaId, owner, 'Erro -> Lead fica na fila.');
     }
     System.assertEquals(null, estado().Ultimo_Usuario__c);
+    System.assertEquals(
+      0,
+      [SELECT COUNT() FROM Task WHERE WhoId IN :ids AND Subject = '1ª Ligação'],
+      'CLICKUP-9396: erro não cria Task.'
+    );
   }
 
   @IsTest

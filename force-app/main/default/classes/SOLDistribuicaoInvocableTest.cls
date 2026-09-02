@@ -203,16 +203,21 @@ private class SOLDistribuicaoInvocableTest {
     Test.stopTest();
 
     System.assert(
-      soql <= 12,
+      soql <= 14,
       'SOQL do insert de 200 Leads não pode escalar por Lead: ' + soql
     );
     System.assert(
-      dml <= 6,
+      dml <= 8,
       'DML do insert de 200 Leads não pode escalar por Lead: ' + dml
     );
     System.assert(
       estado().Total_Distribuido__c == 200,
       'Distribuídos numa única chamada bulk: ' + estado().Total_Distribuido__c
+    );
+    // CLICKUP-9396: uma Task "1ª Ligação" por Lead, mesmo com o Flow em bulk.
+    System.assertEquals(
+      200,
+      [SELECT COUNT() FROM Task WHERE WhoId IN :leads AND Subject = '1ª Ligação']
     );
   }
 
@@ -269,6 +274,16 @@ private class SOLDistribuicaoInvocableTest {
     System.assertEquals('Distribuido', d.SOL_Status_Distribuicao__c);
     System.assertEquals(c.vendedores[0], d.OwnerId, 'Primeiro vendedor.');
     System.assertNotEquals(null, d.SOL_Data_Distribuicao__c);
+    // CLICKUP-9396: distribuição inicial cria uma Task "1ª Ligação".
+    List<Task> tks = [
+      SELECT OwnerId, Status, SOL_Prazo_Contato__c
+      FROM Task
+      WHERE WhoId = :l.Id AND Subject = '1ª Ligação'
+    ];
+    System.assertEquals(1, tks.size());
+    System.assertEquals(c.vendedores[0], tks[0].OwnerId);
+    System.assertEquals('Open', tks[0].Status);
+    System.assertNotEquals(null, tks[0].SOL_Prazo_Contato__c);
   }
 
   @IsTest
@@ -329,6 +344,12 @@ private class SOLDistribuicaoInvocableTest {
       estado().Total_Distribuido__c,
       'Sem nova distribuição.'
     );
+    // CLICKUP-9396: atualização comum não duplica a Task "1ª Ligação".
+    System.assertEquals(
+      1,
+      [SELECT COUNT() FROM Task WHERE WhoId = :l.Id AND Subject = '1ª Ligação'],
+      'Continua com uma única Task "1ª Ligação".'
+    );
   }
 
   @IsTest
@@ -387,6 +408,11 @@ private class SOLDistribuicaoInvocableTest {
       'Owner não é um vendedor do rodízio.'
     );
     System.assert(estado().Total_Distribuido__c == 0);
+    System.assertEquals(
+      0,
+      [SELECT COUNT() FROM Task WHERE WhoId = :l.Id AND Subject = '1ª Ligação'],
+      'CLICKUP-9396: Lead de outra BU não cria Task.'
+    );
   }
 
   @IsTest

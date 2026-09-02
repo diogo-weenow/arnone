@@ -109,7 +109,11 @@ private class SOLReatribuicaoContatoServiceTest {
     return statusCache;
   }
 
-  /** Insere um Lead SOL — o Flow ativo o distribui e abre o ciclo de contato. */
+  /**
+   * Insere um Lead SOL — o Flow ativo o distribui e abre o ciclo de contato.
+   * A Task "1ª Ligação" da distribuição inicial é removida para os testes de
+   * reatribuição contarem só a Task que a reatribuição cria.
+   */
   private static Lead novoLeadSOLDistribuido(String nome) {
     Lead l = new Lead(
       RecordTypeId = rtSOL(),
@@ -119,6 +123,11 @@ private class SOLReatribuicaoContatoServiceTest {
       CNPJ__c = CNPJ
     );
     insert l;
+    delete [
+      SELECT Id
+      FROM Task
+      WHERE WhoId = :l.Id AND Subject = '1ª Ligação'
+    ];
     return recarregar(l.Id);
   }
 
@@ -145,7 +154,9 @@ private class SOLReatribuicaoContatoServiceTest {
     ];
   }
 
-  private static void tasksSemSucesso(Id leadId, Integer qtd) {
+  // CLICKUP-9396: "Não atendeu" e "Não foi possível ligar" contam como tentativa
+  // negativa; "Atendeu" = contato efetivado (bloqueia a reatribuição do ciclo).
+  private static void tasksResultado(Id leadId, Integer qtd, String resultado) {
     List<Task> ts = new List<Task>();
     for (Integer i = 0; i < qtd; i++) {
       ts.add(
@@ -154,20 +165,24 @@ private class SOLReatribuicaoContatoServiceTest {
           Subject = 'Tentativa de contato',
           Status = 'Completed',
           ActivityDate = Date.today(),
-          SOL_Resultado_Contato__c = 'Sem sucesso'
+          SOL_Resultado_Contato__c = resultado
         )
       );
     }
     insert ts;
   }
 
-  private static void taskSucesso(Id leadId) {
+  private static void tasksNegativas(Id leadId, Integer qtd) {
+    tasksResultado(leadId, qtd, 'Não atendeu');
+  }
+
+  private static void taskAtendeu(Id leadId) {
     insert new Task(
       WhoId = leadId,
       Subject = 'Contato efetivado',
       Status = 'Completed',
       ActivityDate = Date.today(),
-      SOL_Resultado_Contato__c = 'Sucesso'
+      SOL_Resultado_Contato__c = 'Atendeu'
     );
   }
 
@@ -220,7 +235,7 @@ private class SOLReatribuicaoContatoServiceTest {
     Id ownerInicial = l.OwnerId;
 
     Test.startTest();
-    tasksSemSucesso(l.Id, 2);
+    tasksNegativas(l.Id, 2);
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
     Test.stopTest();
 
@@ -237,7 +252,7 @@ private class SOLReatribuicaoContatoServiceTest {
     Id ownerInicial = l.OwnerId; // c.vendedores[0]
 
     Test.startTest();
-    tasksSemSucesso(l.Id, 3);
+    tasksNegativas(l.Id, 3);
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
     Test.stopTest();
 
@@ -271,8 +286,8 @@ private class SOLReatribuicaoContatoServiceTest {
     Id ownerInicial = l.OwnerId;
 
     Test.startTest();
-    taskSucesso(l.Id); // contato efetivado no ciclo
-    tasksSemSucesso(l.Id, 3);
+    taskAtendeu(l.Id); // contato efetivado no ciclo
+    tasksNegativas(l.Id, 3);
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
     Test.stopTest();
 
@@ -294,7 +309,7 @@ private class SOLReatribuicaoContatoServiceTest {
     );
 
     Test.startTest();
-    tasksSemSucesso(l.Id, 3); // Flow dispara mas nada conta (antes do ciclo)
+    tasksNegativas(l.Id, 3); // Flow dispara mas nada conta (antes do ciclo)
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
     Test.stopTest();
 
@@ -313,7 +328,7 @@ private class SOLReatribuicaoContatoServiceTest {
     Lead l = novoLeadSOLDistribuido('S5');
 
     // 1ª troca real: 3 tarefas sem sucesso.
-    tasksSemSucesso(l.Id, 3);
+    tasksNegativas(l.Id, 3);
     System.assertEquals(1, recarregar(l.Id).SOL_Quantidade_Reatribuicoes__c);
 
     // Simula um novo ciclo limpo (o relógio do teste é congelado, então as
@@ -326,11 +341,11 @@ private class SOLReatribuicaoContatoServiceTest {
     );
 
     Test.startTest();
-    tasksSemSucesso(l.Id, 2); // novo ciclo: só 2 -> não reatribui
+    tasksNegativas(l.Id, 2); // novo ciclo: só 2 -> não reatribui
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
     System.assertEquals(1, recarregar(l.Id).SOL_Quantidade_Reatribuicoes__c);
 
-    tasksSemSucesso(l.Id, 1); // fecha as 3 do novo ciclo -> reatribui de novo
+    tasksNegativas(l.Id, 1); // fecha as 3 do novo ciclo -> reatribui de novo
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
     Test.stopTest();
 
@@ -344,7 +359,7 @@ private class SOLReatribuicaoContatoServiceTest {
     Cenario c = montarCenario(3);
     Lead l = novoLeadSemRT('S6');
     Id ownerInicial = l.OwnerId;
-    tasksSemSucesso(l.Id, 3);
+    tasksNegativas(l.Id, 3);
 
     Test.startTest();
     SOLDistribuicaoService.ResultadoReatribuicao r = SOLDistribuicaoService.reatribuirPorFaltaDeContato(
@@ -361,7 +376,7 @@ private class SOLReatribuicaoContatoServiceTest {
   static void leadConvertidoEhIgnorado() {
     Cenario c = montarCenario(3);
     Lead l = novoLeadSOLDistribuido('S7');
-    tasksSemSucesso(l.Id, 3);
+    tasksNegativas(l.Id, 3);
     Lead aposTarefas = recarregar(l.Id);
     Id ownerAntesConversao = aposTarefas.OwnerId;
 
@@ -394,7 +409,7 @@ private class SOLReatribuicaoContatoServiceTest {
     killSwitch();
 
     Test.startTest();
-    tasksSemSucesso(l.Id, 3);
+    tasksNegativas(l.Id, 3);
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
     Test.stopTest();
 
@@ -413,7 +428,7 @@ private class SOLReatribuicaoContatoServiceTest {
     ponteiro(c.vendedores[2]);
 
     Test.startTest();
-    tasksSemSucesso(l.Id, 3);
+    tasksNegativas(l.Id, 3);
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
     Test.stopTest();
 
@@ -432,7 +447,7 @@ private class SOLReatribuicaoContatoServiceTest {
     Id anterior = l.OwnerId;
 
     Test.startTest();
-    tasksSemSucesso(l.Id, 3);
+    tasksNegativas(l.Id, 3);
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
     Test.stopTest();
 
@@ -459,7 +474,7 @@ private class SOLReatribuicaoContatoServiceTest {
       Id = l.Id,
       SOL_Data_Inicio_Ciclo_Contato__c = System.now().addMinutes(30)
     );
-    tasksSemSucesso(l.Id, 3);
+    tasksNegativas(l.Id, 3);
     update new Lead(
       Id = l.Id,
       SOL_Data_Inicio_Ciclo_Contato__c = System.now().addMinutes(-10)
@@ -499,7 +514,7 @@ private class SOLReatribuicaoContatoServiceTest {
     }
 
     Test.startTest();
-    tasksSemSucesso(l.Id, 3);
+    tasksNegativas(l.Id, 3);
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
     Test.stopTest();
 
@@ -529,7 +544,7 @@ private class SOLReatribuicaoContatoServiceTest {
     Lead l = novoLeadSOLDistribuido('S13');
 
     Test.startTest();
-    tasksSemSucesso(l.Id, 3);
+    tasksNegativas(l.Id, 3);
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
     Test.stopTest();
 
@@ -573,7 +588,7 @@ private class SOLReatribuicaoContatoServiceTest {
             Subject = 'T',
             Status = 'Completed',
             ActivityDate = Date.today(),
-            SOL_Resultado_Contato__c = 'Sem sucesso'
+            SOL_Resultado_Contato__c = 'Não atendeu'
           )
         );
       }
@@ -610,11 +625,11 @@ private class SOLReatribuicaoContatoServiceTest {
     Cenario c = montarCenario(3);
     Lead l = novoLeadSOLDistribuido('S14');
 
-    tasksSemSucesso(l.Id, 1); // 1ª tentativa (Flow: 1 < 3, no-op)
+    tasksNegativas(l.Id, 1); // 1ª tentativa (Flow: 1 < 3, no-op)
 
     Test.startTest();
     // 2ª e 3ª concluídas no MESMO DML: Flow dispara uma vez em bulk.
-    tasksSemSucesso(l.Id, 2);
+    tasksNegativas(l.Id, 2);
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
     Test.stopTest();
 
@@ -637,7 +652,7 @@ private class SOLReatribuicaoContatoServiceTest {
     Lead l = novoLeadSOLDistribuido('S15');
 
     Test.startTest();
-    tasksSemSucesso(l.Id, 3);
+    tasksNegativas(l.Id, 3);
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
     Test.stopTest();
@@ -659,16 +674,18 @@ private class SOLReatribuicaoContatoServiceTest {
     Lead l = novoLeadSOLDistribuido('S16');
 
     Test.startTest();
-    tasksSemSucesso(l.Id, 3);
+    tasksNegativas(l.Id, 3);
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
     Test.stopTest();
 
-    Integer semSucesso = [
+    Integer negativas = [
       SELECT COUNT()
       FROM Task
-      WHERE WhoId = :l.Id AND SOL_Resultado_Contato__c = 'Sem sucesso'
+      WHERE
+        WhoId = :l.Id
+        AND SOL_Resultado_Contato__c IN ('Não atendeu', 'Não foi possível ligar')
     ];
-    System.assertEquals(3, semSucesso, 'As 3 tarefas do ciclo anterior continuam no histórico.');
+    System.assertEquals(3, negativas, 'As 3 tarefas do ciclo anterior continuam no histórico.');
     System.assertEquals(4, totalTasks(l.Id), '3 antigas + 1 nova (1ª Ligação).');
   }
 
@@ -712,5 +729,178 @@ private class SOLReatribuicaoContatoServiceTest {
       );
       System.assertNotEquals(null, ds[i].SOL_Data_Inicio_Ciclo_Contato__c);
     }
+  }
+
+  // ============================================================ CLICKUP-9396
+
+  @IsTest
+  static void resultadoNaoFoiPossivelLigarContaComoNegativo() {
+    Cenario c = montarCenario(3);
+    Lead l = novoLeadSOLDistribuido('S9396a');
+    Id ownerInicial = l.OwnerId;
+
+    Test.startTest();
+    tasksResultado(l.Id, 3, 'Não foi possível ligar');
+    SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
+    Test.stopTest();
+
+    Lead d = recarregar(l.Id);
+    System.assertNotEquals(ownerInicial, d.OwnerId, '3x "Não foi possível ligar" reatribui.');
+    System.assertEquals(1, d.SOL_Quantidade_Reatribuicoes__c);
+  }
+
+  @IsTest
+  static void combinacaoDeResultadosNegativosReatribui() {
+    Cenario c = montarCenario(3);
+    Lead l = novoLeadSOLDistribuido('S9396b');
+    Id ownerInicial = l.OwnerId;
+
+    Test.startTest();
+    tasksResultado(l.Id, 1, 'Não atendeu');
+    tasksResultado(l.Id, 2, 'Não foi possível ligar');
+    SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
+    Test.stopTest();
+
+    Lead d = recarregar(l.Id);
+    System.assertNotEquals(
+      ownerInicial,
+      d.OwnerId,
+      '3 negativos combinados (1 "Não atendeu" + 2 "Não foi possível ligar") reatribuem.'
+    );
+    System.assertEquals(1, d.SOL_Quantidade_Reatribuicoes__c);
+  }
+
+  @IsTest
+  static void atendeuNoCicloBloqueiaMesmoComTresNegativos() {
+    Cenario c = montarCenario(3);
+    Lead l = novoLeadSOLDistribuido('S9396c');
+    Id ownerInicial = l.OwnerId;
+
+    Test.startTest();
+    tasksResultado(l.Id, 2, 'Não atendeu');
+    taskAtendeu(l.Id);
+    tasksResultado(l.Id, 1, 'Não foi possível ligar'); // 3 negativos no total
+    SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
+    Test.stopTest();
+
+    Lead d = recarregar(l.Id);
+    System.assertEquals(
+      ownerInicial,
+      d.OwnerId,
+      '"Atendeu" no ciclo bloqueia mesmo com 3 negativos.'
+    );
+    System.assertEquals(0, d.SOL_Quantidade_Reatribuicoes__c);
+  }
+
+  @IsTest
+  static void prazoDaLigacaoUsaHorarioComercial() {
+    Cenario c = montarCenario(3);
+    Lead l = novoLeadSOLDistribuido('S9396d');
+
+    Test.startTest();
+    tasksNegativas(l.Id, 3);
+    SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
+    Test.stopTest();
+
+    List<Task> pl = primeirasLigacoes(l.Id);
+    System.assertEquals(1, pl.size());
+    Lead d = recarregar(l.Id);
+    Datetime atribuicao = d.SOL_Data_Ultima_Reatribuicao__c;
+    System.assertNotEquals(null, pl[0].SOL_Prazo_Contato__c);
+
+    Id bhId = SOLDistribuicaoService.businessHoursComercialId();
+    System.assertNotEquals(
+      null,
+      bhId,
+      'Business Hours "Arnone Soluções - Horário Comercial" é pré-requisito de implantação.'
+    );
+    // ~5 minutos ÚTEIS entre a atribuição e o prazo (BusinessHours.add
+    // normaliza os segundos da origem, então a diferença fica ≈ 5 min).
+    Long diffUtil = BusinessHours.diff(bhId, atribuicao, pl[0].SOL_Prazo_Contato__c);
+    System.assert(
+      diffUtil >= 210000L && diffUtil <= 300000L,
+      'Prazo ≈ 5 minutos úteis (BusinessHours.diff = ' + diffUtil + ' ms).'
+    );
+    System.assert(
+      BusinessHours.isWithin(bhId, pl[0].SOL_Prazo_Contato__c),
+      'O prazo cai dentro do expediente.'
+    );
+    System.assert(pl[0].SOL_Prazo_Contato__c >= atribuicao, 'Nunca antes da atribuição.');
+    // O prazo é EXATAMENTE o que BusinessHours.add produz para essa atribuição.
+    System.assertEquals(
+      BusinessHours.add(bhId, atribuicao, 5L * 60L * 1000L),
+      pl[0].SOL_Prazo_Contato__c,
+      'Prazo = BusinessHours.add(atribuição, 5 min).'
+    );
+  }
+
+  @IsTest
+  static void validationRuleExigeResultadoParaConcluirTask() {
+    Cenario c = montarCenario(3);
+    Lead l = novoLeadSOLDistribuido('S9396e');
+    tasksNegativas(l.Id, 3); // Flow reatribui e cria a Task "1ª Ligação"
+
+    Task ligacao = [
+      SELECT Id, Status
+      FROM Task
+      WHERE WhoId = :l.Id AND Subject = '1ª Ligação'
+      LIMIT 1
+    ];
+
+    Test.startTest();
+    // Concluir SEM resultado -> bloqueado
+    Boolean bloqueado = false;
+    try {
+      update new Task(Id = ligacao.Id, Status = 'Completed');
+    } catch (DmlException e) {
+      bloqueado = true;
+      System.assert(
+        e.getMessage().contains('Informe o resultado da ligação antes de concluir a tarefa'),
+        'Mensagem da validação: ' + e.getMessage()
+      );
+    }
+    System.assert(bloqueado, 'Concluir sem resultado deve ser bloqueado.');
+
+    // Concluir COM resultado -> permitido
+    update new Task(
+      Id = ligacao.Id,
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Atendeu'
+    );
+    Test.stopTest();
+
+    System.assertEquals(
+      'Completed',
+      [SELECT Status FROM Task WHERE Id = :ligacao.Id].Status
+    );
+  }
+
+  @IsTest
+  static void tarefaVencidaPodeSerConcluida() {
+    Cenario c = montarCenario(3);
+    Lead l = novoLeadSOLDistribuido('S9396f');
+    tasksNegativas(l.Id, 3);
+    Task ligacao = [
+      SELECT Id
+      FROM Task
+      WHERE WhoId = :l.Id AND Subject = '1ª Ligação'
+      LIMIT 1
+    ];
+
+    Test.startTest();
+    // "vence" a Task e ainda assim conclui com resultado
+    update new Task(Id = ligacao.Id, ActivityDate = Date.today().addDays(-5));
+    update new Task(
+      Id = ligacao.Id,
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Não atendeu'
+    );
+    Test.stopTest();
+
+    System.assertEquals(
+      'Completed',
+      [SELECT Status FROM Task WHERE Id = :ligacao.Id].Status,
+      'Task vencida conclui normalmente (com resultado).'
+    );
   }
 }

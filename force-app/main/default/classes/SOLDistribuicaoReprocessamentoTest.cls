@@ -140,6 +140,14 @@ private class SOLDistribuicaoReprocessamentoTest {
     }
     insert l;
 
+    // Remove a Task "1ª Ligação" da distribuição inicial (Flow) para os testes
+    // contarem só o que o reprocessamento cria (CLICKUP-9396).
+    delete [
+      SELECT Id
+      FROM Task
+      WHERE WhoId = :l.Id AND Subject = '1ª Ligação'
+    ];
+
     update new Lead(
       Id = l.Id,
       OwnerId = owner,
@@ -208,6 +216,15 @@ private class SOLDistribuicaoReprocessamentoTest {
     Lead d = recarregar(l.Id);
     System.assertEquals('Distribuido', d.SOL_Status_Distribuicao__c);
     System.assert(c.vendedores.contains(d.OwnerId));
+    // CLICKUP-9396: reprocessamento que distribui cria uma Task "1ª Ligação".
+    List<Task> tks = [
+      SELECT OwnerId, Status
+      FROM Task
+      WHERE WhoId = :l.Id AND Subject = '1ª Ligação'
+    ];
+    System.assertEquals(1, tks.size());
+    System.assertEquals(d.OwnerId, tks[0].OwnerId);
+    System.assertEquals('Open', tks[0].Status);
   }
 
   @IsTest
@@ -284,6 +301,11 @@ private class SOLDistribuicaoReprocessamentoTest {
       null,
       recarregar(outra.Id).SOL_Status_Distribuicao__c,
       'Lead de outra BU não é reprocessado.'
+    );
+    System.assertEquals(
+      0,
+      [SELECT COUNT() FROM Task WHERE WhoId = :outra.Id AND Subject = '1ª Ligação'],
+      'CLICKUP-9396: Lead de outra BU não cria Task no reprocessamento.'
     );
     System.assertEquals(
       'Distribuido',
@@ -368,6 +390,11 @@ private class SOLDistribuicaoReprocessamentoTest {
       lmdAntes,
       d.LastModifiedDate,
       'Roster vazio -> o batch não churna o Lead.'
+    );
+    System.assertEquals(
+      0,
+      [SELECT COUNT() FROM Task WHERE WhoId = :l.Id AND Subject = '1ª Ligação'],
+      'CLICKUP-9396: roster vazio no reprocessamento não cria Task.'
     );
   }
 
