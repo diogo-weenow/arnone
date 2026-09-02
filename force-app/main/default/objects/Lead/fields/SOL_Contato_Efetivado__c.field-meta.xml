@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Contato_Efetivado__c</fullName>
+    <description>Sinaliza que o contato com o Lead foi efetivado (uma tarefa de contato SOL concluída com resultado "Atendeu"). Ao ser marcado, o sistema cancela as tarefas de contato ainda pendentes. Só Record Type SOL. Escrito apenas pela automação SOL. CLICKUP-9417.</description>
+    <label>Contato efetivado (SOL)</label>
+    <defaultValue>false</defaultValue>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

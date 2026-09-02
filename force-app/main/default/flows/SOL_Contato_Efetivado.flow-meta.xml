@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Chamar_Contato_Efetivado_SOL</name>
+        <label>Registrar contato efetivado SOL</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <actionName>SOLContatoEfetivadoInvocable</actionName>
+        <actionType>apex</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>leadId</name>
+            <value>
+                <elementReference>$Record.WhoId</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>SOLContatoEfetivadoInvocable</nameSegment>
+    </actionCalls>
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>CLICKUP-9417 — Aciona SOLContatoEfetivadoInvocable quando uma tarefa de contato SOL (SOL_Tipo_Tarefa__c = "Contato", WhoId preenchido) é concluída com Resultado do contato = "Atendeu". Sem bloqueio por horário/dia. Toda a sinalização e o cancelamento das tarefas pendentes ficam no Apex (bulk, FOR UPDATE, idempotente). Não altera campos aqui. Não modifica outros Flows.</description>
+    <environments>Default</environments>
+    <interviewLabel>SOL_Contato_Efetivado {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL_Contato_Efetivado</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Chamar_Contato_Efetivado_SOL</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  TEXT({!$Record.Status}) = &apos;Completed&apos;,
+  TEXT({!$Record.SOL_Resultado_Contato__c}) = &apos;Atendeu&apos;,
+  TEXT({!$Record.SOL_Tipo_Tarefa__c}) = &apos;Contato&apos;,
+  NOT(ISBLANK({!$Record.WhoId}))
+)</filterFormula>
+        <object>Task</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
