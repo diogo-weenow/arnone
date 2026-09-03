@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Chamar_Criar_Acompanhamento</name>
+        <label>Criar tarefa de acompanhamento da procuração SOL</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <actionName>SOLProcuracaoAcompanhamentoInvocable</actionName>
+        <actionType>apex</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>leadId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>SOLProcuracaoAcompanhamentoInvocable</nameSegment>
+    </actionCalls>
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>CLICKUP-9426 — Card 07B. Quando um Lead da Arnone Soluções (Recuperação Tributária ou ART 360, não convertido) registra EFETIVAMENTE a solicitação da procuração — Status = "Procuração Solicitada" E SOL_Status_Procuracao__c = "Solicitada" E SOL_Data_Solicitacao_Procuracao__c preenchida — aciona SOLProcuracaoAcompanhamentoInvocable para criar UMA Task "Acompanhar recebimento da procuração" (vencimento 7 dias úteis). A fórmula exige a mudança de SOL_Status_Procuracao__c ou de SOL_Data_Solicitacao_Procuracao__c: alterar só o Status do Lead NÃO dispara. Não altera campos aqui. Não modifica SOL_Procuracao. Idempotência (Lead + data da solicitação) e prazo ficam no Apex (bulk, FOR UPDATE, atômico).</description>
+    <environments>Default</environments>
+    <interviewLabel>SOL_Tarefa_Acompanhamento_Procuracao {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL_Tarefa_Acompanhamento_Procuracao</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Chamar_Criar_Acompanhamento</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &apos;SOL&apos;,
+  OR(
+    ISPICKVAL({!$Record.SOL_Produto_Interesse__c}, &apos;Recuperação Tributária&apos;),
+    ISPICKVAL({!$Record.SOL_Produto_Interesse__c}, &apos;ART 360&apos;)
+  ),
+  ISPICKVAL({!$Record.Status}, &apos;Procuração Solicitada&apos;),
+  ISPICKVAL({!$Record.SOL_Status_Procuracao__c}, &apos;Solicitada&apos;),
+  NOT(ISBLANK({!$Record.SOL_Data_Solicitacao_Procuracao__c})),
+  NOT({!$Record.IsConverted}),
+  OR(
+    ISCHANGED({!$Record.SOL_Status_Procuracao__c}),
+    ISCHANGED({!$Record.SOL_Data_Solicitacao_Procuracao__c})
+  )
+)</filterFormula>
+        <object>Lead</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

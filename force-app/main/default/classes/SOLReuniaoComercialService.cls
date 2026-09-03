@@ -39,9 +39,7 @@ public without sharing class SOLReuniaoComercialService {
   @TestVisible
   private static final Integer DIAS_UTEIS_PRAZO = 7;
   @TestVisible
-  private static final String BUSINESS_HOURS_NAME = 'Arnone Soluções - Horário Comercial';
-  @TestVisible
-  private static final String TZ_SAO_PAULO = 'America/Sao_Paulo';
+  private static final String TZ_SAO_PAULO = SOLBusinessHoursHelper.TZ_SAO_PAULO;
 
   /** Mensagem controlada exibida ao vendedor quando a criação da tarefa falha. */
   public static final String MSG_FALHA = 'Não foi possível criar a tarefa de reunião comercial. Nenhuma alteração foi salva — tente registrar a reunião novamente.';
@@ -59,9 +57,6 @@ public without sharing class SOLReuniaoComercialService {
     /** Leads fora do escopo (outro RT/produto, convertido, opt-out, status ≠ SQL) ou que já tinham a tarefa. */
     public Integer ignorados = 0;
   }
-
-  private static Id bhCache;
-  private static Boolean bhResolvido = false;
 
   /**
    * Cria a Task "Realizar reunião comercial" para os Leads que acabaram de
@@ -172,6 +167,12 @@ public without sharing class SOLReuniaoComercialService {
       }
       System.debug(LoggingLevel.ERROR, 'SOLReuniaoComercialService: ' + e.getMessage());
       throw e;
+    } catch (SOLBusinessHoursHelper.CalendarioIndisponivelException e) {
+      if (sp != null) {
+        Database.rollback(sp);
+      }
+      System.debug(LoggingLevel.ERROR, 'SOLReuniaoComercialService: ' + e.getMessage());
+      throw new ReuniaoComercialException(MSG_SEM_CALENDARIO);
     } catch (Exception e) {
       if (sp != null) {
         Database.rollback(sp);
@@ -189,73 +190,27 @@ public without sharing class SOLReuniaoComercialService {
     }
   }
 
-  /**
-   * Abertura efetiva do dia útil que fica `dias` dias ÚTEIS depois da DATA
-   * (America/Sao_Paulo) de `origem`. Conta pelo Business Hours `bhId`: uma data
-   * conta como dia útil quando POSSUI algum período de expediente nela — a
-   * verificação usa a abertura efetiva do dia (BusinessHours.nextStartDate a
-   * partir da véspera), NÃO o horário da origem. Assim uma sexta que encerra às
-   * 17:00 conta como dia útil mesmo quando a mudança ocorreu numa quinta às
-   * 17:30. Fim de semana e feriados do calendário são preservados; sem
-   * addDays(7) e sem grade fixa de segunda a sexta.
-   */
+  // Cálculo de dias úteis / Business Hours: lógica única em
+  // SOLBusinessHoursHelper (validada no CLICKUP-9401). Os wrappers abaixo
+  // preservam a assinatura usada pelos testes deste card.
+
   @TestVisible
   private static Datetime prazoEmDiasUteis(Id bhId, Datetime origem, Integer dias) {
-    Date data = dataEm(origem, TZ_SAO_PAULO);
-    Integer contados = 0;
-    Integer guarda = 0;
-    Datetime abertura = null;
-    while (contados < dias && guarda < 400) {
-      data = data.addDays(1);
-      // Instante seguramente ANTERIOR à abertura de `data` em São Paulo
-      // (00:00 UTC de `data` = véspera à noite em SP, sempre fora de expediente).
-      Datetime antesDaAbertura = Datetime.newInstanceGmt(
-        data,
-        Time.newInstance(0, 0, 0, 0)
-      );
-      Datetime proximaAbertura = BusinessHours.nextStartDate(bhId, antesDaAbertura);
-      if (proximaAbertura != null && dataEm(proximaAbertura, TZ_SAO_PAULO) == data) {
-        contados++;
-        abertura = proximaAbertura;
-      }
-      guarda++;
-    }
-    if (contados < dias || abertura == null) {
-      // Calendário sem dias úteis suficientes — trata como calendário inválido.
-      throw new ReuniaoComercialException(MSG_SEM_CALENDARIO);
-    }
-    return abertura;
+    return SOLBusinessHoursHelper.prazoEmDiasUteis(bhId, origem, dias);
   }
 
-  /** Data no fuso `tz` correspondente ao instante `dt` (sem deslocamento GMT). */
   @TestVisible
   private static Date dataEm(Datetime dt, String tz) {
-    return Date.valueOf(dt.format('yyyy-MM-dd', tz));
+    return SOLBusinessHoursHelper.dataEm(dt, tz);
   }
 
-  /**
-   * Id do Business Hours "Arnone Soluções - Horário Comercial" (ativo), ou null
-   * se não existir / não estiver ativo. Resolvido uma única vez por transação.
-   */
   @TestVisible
   private static Id businessHoursComercialId() {
-    if (!bhResolvido) {
-      List<BusinessHours> bhs = [
-        SELECT Id
-        FROM BusinessHours
-        WHERE Name = :BUSINESS_HOURS_NAME AND IsActive = true
-        LIMIT 1
-      ];
-      bhCache = bhs.isEmpty() ? null : bhs[0].Id;
-      bhResolvido = true;
-    }
-    return bhCache;
+    return SOLBusinessHoursHelper.businessHoursId();
   }
 
-  /** Só para testes: força o cache do Business Hours (ex.: calendário ausente). */
   @TestVisible
   private static void forcarBusinessHours(Id valor) {
-    bhCache = valor;
-    bhResolvido = true;
+    SOLBusinessHoursHelper.overrideBusinessHours(valor);
   }
 }
