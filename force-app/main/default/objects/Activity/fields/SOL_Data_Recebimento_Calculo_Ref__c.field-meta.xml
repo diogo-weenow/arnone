@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Recebimento_Calculo_Ref__c</fullName>
+    <description>Referência técnica estável do recebimento do cálculo jurídico a que a tarefa "Reunião final" pertence: cópia de Task.SOL_Data_Recebimento_Calculo__c da tarefa de acompanhamento concluída. Chave de idempotência (Opportunity + esta data) — no máximo uma tarefa "Reunião final" por Oportunidade e por recebimento, mesmo em reprocessamento ou com a tarefa anterior encerrada. Origem do prazo de 7 dias úteis. Preenchida apenas pela automação SOLReuniaoFinalService. Somente leitura para Comercial e Distribuição Admin. CLICKUP-9422.</description>
+    <label>Recebimento do cálculo (ref. SOL)</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

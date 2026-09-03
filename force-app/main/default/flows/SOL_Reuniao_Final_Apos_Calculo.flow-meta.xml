@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Chamar_Preparar_Reuniao_Final</name>
+        <label>Preparar reunião final após o cálculo jurídico SOL</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <actionName>SOLReuniaoFinalInvocable</actionName>
+        <actionType>apex</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>taskId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>SOLReuniaoFinalInvocable</nameSegment>
+    </actionCalls>
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>CLICKUP-9422 — Card 11. Quando a Task de acompanhamento do cálculo jurídico (SOL_Tipo_Tarefa__c = "Acompanhamento do cálculo jurídico") muda REALMENTE para "Completed", com SOL_Data_Recebimento_Calculo__c preenchida e WhatId de Opportunity, aciona SOLReuniaoFinalInvocable para: avançar a Oportunidade SOL / Recuperação Tributária de "Diagnóstico" para "Negociação" e criar UMA Task "Realizar reunião final" (vencimento 7 dias úteis após o recebimento, responsável = proprietário atual da Oportunidade). doesRequireRecordChangedToMeetCriteria=true garante a transição real (o Flow só roda quando o registro passa a atender aos critérios e não os atendia antes), sem usar o Subject. Idempotência (Opportunity + data de recebimento), prazo e atomicidade (avanço da etapa + criação da Task; VRs de e-CAC preservadas) ficam no Apex. ART 360, outras BUs, outros tipos de Task e outras etapas ficam intactos. Não cria a tarefa de fechamento (CLICKUP-9423).</description>
+    <environments>Default</environments>
+    <interviewLabel>SOL_Reuniao_Final_Apos_Calculo {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL_Reuniao_Final_Apos_Calculo</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Chamar_Preparar_Reuniao_Final</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  ISPICKVAL({!$Record.SOL_Tipo_Tarefa__c}, &apos;Acompanhamento do cálculo jurídico&apos;),
+  ISPICKVAL({!$Record.Status}, &apos;Completed&apos;),
+  NOT(ISBLANK({!$Record.SOL_Data_Recebimento_Calculo__c})),
+  NOT(ISBLANK({!$Record.WhatId}))
+)</filterFormula>
+        <object>Task</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

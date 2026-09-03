@@ -87,11 +87,14 @@ private class SOLAcompanhamentoCalculoTest {
     if (oppSOL) {
       o.RecordTypeId = rtOppSOL();
     }
+    // e-CAC satisfeito por padrão: o CLICKUP-9422 (Flow after-save de Task)
+    // avança a Opp para Negociação quando a tarefa de acompanhamento é concluída,
+    // e a VR SOL_ECAC_Antes_De_Negociar exige estes campos. Card 10 não os lê.
+    o.SOL_ECAC_Consulta_Realizada__c = true;
+    o.SOL_ECAC_Data_Consulta__c = Date.today();
+    o.SOL_ECAC_Resultado__c = 'Valor a recuperar';
+    o.SOL_Valor_Recuperavel__c = 1000;
     if (etapaOpp == 'Negociação') {
-      o.SOL_ECAC_Consulta_Realizada__c = true;
-      o.SOL_ECAC_Data_Consulta__c = Date.today();
-      o.SOL_ECAC_Resultado__c = 'Valor a recuperar';
-      o.SOL_Valor_Recuperavel__c = 1000;
       o.StageName = 'Negociação';
     } else if (etapaOpp == 'Perdido') {
       o.SOL_Motivo_Perda__c = 'Sem interesse';
