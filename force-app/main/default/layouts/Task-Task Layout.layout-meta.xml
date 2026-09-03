@@ -93,6 +93,10 @@
                 <behavior>Readonly</behavior>
                 <field>SOL_Tipo_Tarefa__c</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>SOL_Data_Reuniao_Final__c</field>
+            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
@@ -106,6 +110,10 @@
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>SOL_Data_Recebimento_Calculo__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>SOL_Data_Recebimento_Calculo_Ref__c</field>
             </layoutItems>
         </layoutColumns>
         <style>TwoColumnsLeftToRight</style>
