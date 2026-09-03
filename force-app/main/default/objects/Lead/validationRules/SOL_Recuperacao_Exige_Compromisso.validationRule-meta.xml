@@ -2,13 +2,19 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Recuperacao_Exige_Compromisso</fullName>
     <active>true</active>
-    <description>Recuperação Tributária: bloqueia sair de &quot;Recebido - MQL&quot; sem compromisso com data até hoje. Não bloqueia a perda do Lead: a transição para &quot;Desqualificado&quot; é permitida (ex.: opt-out — CLICKUP-9418).</description>
+    <description>Recuperação Tributária: bloqueia sair de &quot;Recebido - MQL&quot; sem compromisso até hoje. Exceção só p/ opt-out (CLICKUP-9418): Status &quot;Desqualificado&quot; + SOL_Opt_Out__c + motivo &quot;Opt-out&quot; juntos. Perda manual/outro motivo segue bloqueada.</description>
     <errorConditionFormula>AND(
   RecordType.DeveloperName = &quot;SOL&quot;,
   ISPICKVAL(SOL_Produto_Interesse__c, &quot;Recuperação Tributária&quot;),
   ISCHANGED(Status),
   ISPICKVAL(PRIORVALUE(Status), &quot;Recebido - MQL&quot;),
-  NOT(ISPICKVAL(Status, &quot;Desqualificado&quot;)),
+  NOT(
+    AND(
+      ISPICKVAL(Status, &quot;Desqualificado&quot;),
+      SOL_Opt_Out__c = true,
+      ISPICKVAL(SOL_Motivo_Desqualificacao__c, &quot;Opt-out&quot;)
+    )
+  ),
   OR(
     ISBLANK(SOL_Data_Compromisso__c),
     SOL_Data_Compromisso__c &gt; TODAY()

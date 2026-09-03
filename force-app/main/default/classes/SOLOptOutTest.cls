@@ -285,6 +285,81 @@ private class SOLOptOutTest {
     Lead d = recarregar(l.Id);
     System.assertEquals('Desqualificado', d.Status, 'Opt-out desqualifica mesmo em Recebido-MQL sem compromisso.');
     System.assertEquals(true, d.SOL_Opt_Out__c);
+    System.assertEquals('Opt-out', d.SOL_Motivo_Desqualificacao__c);
+  }
+
+  @IsTest
+  static void desqualificacaoManualSemCompromissoContinuaBloqueada() {
+    Cenario c = montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S4m', 'Recuperação Tributária', 'Recebido - MQL');
+
+    Test.startTest();
+    Boolean bloqueou = false;
+    try {
+      // Perda manual, sem opt-out e sem compromisso: a regra anterior vale.
+      update new Lead(Id = l.Id, Status = 'Desqualificado');
+    } catch (DmlException e) {
+      bloqueou = true;
+      System.assert(
+        e.getMessage().contains('compromisso registrado'),
+        'Mensagem da VR SOL_Recuperacao_Exige_Compromisso: ' + e.getMessage()
+      );
+    }
+    Test.stopTest();
+
+    System.assert(bloqueou, 'Desqualificação manual sem compromisso deve continuar bloqueada.');
+    System.assertEquals('Recebido - MQL', recarregar(l.Id).Status);
+  }
+
+  @IsTest
+  static void desqualificadoComMotivoOptOutMasSemFlagNaoRecebeExcecao() {
+    Cenario c = montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S4f', 'Recuperação Tributária', 'Recebido - MQL');
+
+    Test.startTest();
+    Boolean bloqueou = false;
+    try {
+      // Motivo "Opt-out" preenchido à mão, mas SOL_Opt_Out__c continua falso:
+      // a exceção da VR exige os três sinais juntos.
+      update new Lead(
+        Id = l.Id,
+        Status = 'Desqualificado',
+        SOL_Motivo_Desqualificacao__c = 'Opt-out'
+      );
+    } catch (DmlException e) {
+      bloqueou = true;
+    }
+    Test.stopTest();
+
+    System.assert(
+      bloqueou,
+      'Sem SOL_Opt_Out__c = true a exceção não se aplica — a perda continua bloqueada.'
+    );
+  }
+
+  @IsTest
+  static void desqualificadoComFlagMasSemMotivoNaoRecebeExcecao() {
+    Cenario c = montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S4a', 'Recuperação Tributária', 'Recebido - MQL');
+
+    Test.startTest();
+    Boolean bloqueou = false;
+    try {
+      // Flag marcada, mas motivo ausente: a exceção da VR não se aplica.
+      update new Lead(
+        Id = l.Id,
+        Status = 'Desqualificado',
+        SOL_Opt_Out__c = true
+      );
+    } catch (DmlException e) {
+      bloqueou = true;
+    }
+    Test.stopTest();
+
+    System.assert(
+      bloqueou,
+      'Sem o motivo "Opt-out" a exceção não se aplica — a perda continua bloqueada.'
+    );
   }
 
   @IsTest
@@ -586,6 +661,90 @@ private class SOLOptOutTest {
       'Cancelada',
       [SELECT Status FROM Task WHERE Id = :extra.Id].Status
     );
+  }
+
+  private static Id psSolDistribuicaoAdminId() {
+    return [
+      SELECT Id
+      FROM PermissionSet
+      WHERE Name = 'PS_SOL_Distribuicao_Admin'
+      LIMIT 1
+    ]
+    .Id;
+  }
+
+  private static User usuarioStandard(String sobrenome, String alias) {
+    List<Profile> ps = [
+      SELECT Id
+      FROM Profile
+      WHERE UserType = 'Standard'
+      ORDER BY Name
+      LIMIT 1
+    ];
+    return new User(
+      FirstName = 'RR',
+      LastName = sobrenome,
+      Alias = alias,
+      Email = 'rr.' + alias + '@arnone.invalid',
+      Username = 'rr.' +
+        alias +
+        '.' +
+        String.valueOf(Math.abs(Crypto.getRandomInteger())) +
+        '@arnone.clickup9418.test.invalid',
+      ProfileId = ps.isEmpty() ? UserInfo.getProfileId() : ps[0].Id,
+      TimeZoneSidKey = 'America/Sao_Paulo',
+      LocaleSidKey = 'pt_BR',
+      EmailEncodingKey = 'UTF-8',
+      LanguageLocaleKey = 'pt_BR',
+      IsActive = true
+    );
+  }
+
+  private static void assertVeSemEditar(String rotulo) {
+    Map<String, Schema.SObjectField> f = Schema.SObjectType.Lead.fields.getMap();
+    for (String campo : new List<String>{
+      'SOL_Opt_Out__c',
+      'SOL_Data_Opt_Out__c',
+      'SOL_Motivo_Desqualificacao__c'
+    }) {
+      Schema.DescribeFieldResult d = f.get(campo).getDescribe();
+      System.assert(
+        d.isAccessible(),
+        rotulo + ' deveria enxergar ' + campo
+      );
+      System.assert(
+        !d.isUpdateable(),
+        rotulo + ' NÃO deveria poder editar ' + campo
+      );
+    }
+  }
+
+  @IsTest
+  static void vendedorEGestorVeemMotivoFlagEDataSemEditar() {
+    User comercial = usuarioStandard('Comercial FLS', 'roofls1');
+    User gestor = usuarioStandard('Gestor FLS', 'roofls2');
+    System.runAs(contextoAtual()) {
+      insert new List<User>{ comercial, gestor };
+      insert new List<PermissionSetAssignment>{
+        new PermissionSetAssignment(
+          AssigneeId = comercial.Id,
+          PermissionSetId = psSolComercialId()
+        ),
+        new PermissionSetAssignment(
+          AssigneeId = gestor.Id,
+          PermissionSetId = psSolDistribuicaoAdminId()
+        )
+      };
+    }
+
+    Test.startTest();
+    System.runAs(new User(Id = comercial.Id)) {
+      assertVeSemEditar('Vendedor (PS_SOL_Comercial)');
+    }
+    System.runAs(new User(Id = gestor.Id)) {
+      assertVeSemEditar('Gestor (PS_SOL_Distribuicao_Admin)');
+    }
+    Test.stopTest();
   }
 
   // ============================================================ VALIDATION RULE
