@@ -17,6 +17,10 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>SOLSolicitarCalculoInvocable</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>SOL_ConverterLead</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -153,6 +157,11 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Opportunity.SOL_Data_Entrada_Negociacao__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.SOL_Data_Solicitacao_Calculo__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

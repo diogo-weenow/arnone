@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>CLICKUP-9420 — Ação guiada para o vendedor registrar a data em que solicitou externamente o cálculo ao jurídico. Só Oportunidade SOL / Recuperação Tributária / aberta / etapa Diagnóstico. Roda o flow SOL_Solicitar_Calculo.</description>
+    <flowDefinition>SOL_Solicitar_Calculo</flowDefinition>
+    <label>Solicitar cálculo (jurídico)</label>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <type>Flow</type>
+</QuickAction>

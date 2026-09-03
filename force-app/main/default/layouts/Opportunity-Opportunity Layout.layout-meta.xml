@@ -342,6 +342,10 @@
         <label>Diagnóstico e-CAC — Arnone Soluções</label>
         <layoutColumns>
             <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>SOL_Data_Solicitacao_Calculo__c</field>
+            </layoutItems>
+            <layoutItems>
                 <behavior>Edit</behavior>
                 <field>SOL_ECAC_Consulta_Realizada__c</field>
             </layoutItems>
@@ -535,6 +539,11 @@
             <actionName>FeedItem.ContentPost</actionName>
             <actionType>QuickAction</actionType>
             <sortOrder>9</sortOrder>
+        </platformActionListItems>
+        <platformActionListItems>
+            <actionName>Opportunity.SOL_Solicitar_Calculo</actionName>
+            <actionType>QuickAction</actionType>
+            <sortOrder>10</sortOrder>
         </platformActionListItems>
     </platformActionList>
     <quickActionList>
