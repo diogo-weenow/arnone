@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Tipo_Tarefa__c</fullName>
-    <description>Classificador técnico da tarefa de automação da jornada Arnone Soluções. Preenchido apenas pelas automações SOL — não é o assunto editável da Task. "Contato" = tarefa de contato do ciclo (ligação/e-mail/WhatsApp; CLICKUP-9417). "Reunião comercial" = tarefa para realizar a reunião comercial após o lead entrar em "Reunião Agendada - SQL" (CLICKUP-9401). "Acompanhamento da procuração" = tarefa para acompanhar o recebimento da procuração após a solicitação registrada (CLICKUP-9426). Usado como chave de idempotência das automações — nunca o Subject.</description>
+    <description>Classificador técnico da tarefa de automação da jornada Arnone Soluções. Preenchido apenas pelas automações SOL — não é o assunto editável da Task. "Contato" = tarefa de contato do ciclo (ligação/e-mail/WhatsApp; CLICKUP-9417). "Reunião comercial" = tarefa para realizar a reunião comercial após o lead entrar em "Reunião Agendada - SQL" (CLICKUP-9401). "Acompanhamento da procuração" = tarefa para acompanhar o recebimento da procuração após a solicitação registrada (CLICKUP-9426). "Acompanhamento do cálculo jurídico" = tarefa para acompanhar o recebimento do cálculo jurídico após a solicitação registrada na Oportunidade (CLICKUP-9421). Usado como chave de idempotência das automações — nunca o Subject.</description>
     <label>Tipo de tarefa SOL</label>
     <required>false</required>
     <type>Picklist</type>
@@ -23,6 +23,11 @@
                 <fullName>Acompanhamento da procuração</fullName>
                 <default>false</default>
                 <label>Acompanhamento da procuração</label>
+            </value>
+            <value>
+                <fullName>Acompanhamento do cálculo jurídico</fullName>
+                <default>false</default>
+                <label>Acompanhamento do cálculo jurídico</label>
             </value>
         </valueSetDefinition>
     </valueSet>

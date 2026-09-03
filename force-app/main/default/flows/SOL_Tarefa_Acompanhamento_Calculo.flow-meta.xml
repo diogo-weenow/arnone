@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Chamar_Criar_Acompanhamento_Calculo</name>
+        <label>Criar tarefa de acompanhamento do cálculo jurídico SOL</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <actionName>SOLAcompanhamentoCalculoInvocable</actionName>
+        <actionType>apex</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>opportunityId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>SOLAcompanhamentoCalculoInvocable</nameSegment>
+    </actionCalls>
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>CLICKUP-9421 — Card 10. Quando uma Oportunidade da Arnone Soluções (Record Type SOL, produto "Recuperação Tributária", etapa "Diagnóstico", aberta) tem SOL_Data_Solicitacao_Calculo__c preenchida (ação guiada do CLICKUP-9420), aciona SOLAcompanhamentoCalculoInvocable para criar UMA Task "Acompanhar recebimento do cálculo jurídico" (vencimento 7 dias úteis após a data da solicitação, responsável = proprietário atual da Oportunidade). A fórmula exige ISCHANGED de SOL_Data_Solicitacao_Calculo__c e o campo não vazio: o Card 09 grava a data uma única vez e nunca a sobrescreve, então dispara só no primeiro preenchimento. Idempotência (Opportunity + data da solicitação) e prazo ficam no Apex (bulk, FOR UPDATE, atômico). ART 360 fica fora. Não altera a Oportunidade aqui, não avança etapa, não cria a reunião final (CLICKUP-9422).</description>
+    <environments>Default</environments>
+    <interviewLabel>SOL_Tarefa_Acompanhamento_Calculo {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL_Tarefa_Acompanhamento_Calculo</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Chamar_Criar_Acompanhamento_Calculo</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &apos;SOL&apos;,
+  ISPICKVAL({!$Record.SOL_Produto_Negocio__c}, &apos;Recuperação Tributária&apos;),
+  ISPICKVAL({!$Record.StageName}, &apos;Diagnóstico&apos;),
+  NOT({!$Record.IsClosed}),
+  NOT(ISBLANK({!$Record.SOL_Data_Solicitacao_Calculo__c})),
+  ISCHANGED({!$Record.SOL_Data_Solicitacao_Calculo__c})
+)</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

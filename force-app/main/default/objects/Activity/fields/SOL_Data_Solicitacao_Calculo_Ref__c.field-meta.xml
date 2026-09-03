@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Solicitacao_Calculo_Ref__c</fullName>
+    <description>Referência técnica estável da solicitação do cálculo jurídico à qual a tarefa de acompanhamento pertence: cópia de Opportunity.SOL_Data_Solicitacao_Calculo__c no momento da criação. Chave de idempotência (Opportunity + esta data) — no máximo uma tarefa "Acompanhamento do cálculo jurídico" por Oportunidade e por solicitação, mesmo em reprocessamento ou com a tarefa anterior encerrada. Preenchido apenas pela automação SOLAcompanhamentoCalculoService. Somente leitura para Comercial e Distribuição Admin. CLICKUP-9421.</description>
+    <label>Solicitação do cálculo (ref. SOL)</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>
