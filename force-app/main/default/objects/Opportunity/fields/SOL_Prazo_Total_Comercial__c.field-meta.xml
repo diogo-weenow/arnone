@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Prazo_Total_Comercial__c</fullName>
+    <description>Limite do prazo total do ciclo comercial: 30 dias ÚTEIS após SOL_Data_Inicio_Ciclo_Comercial__c, calculado por SOLBusinessHoursHelper (calendário oficial, feriados, America/Sao_Paulo) e gravado na conversão. NUNCA é recalculado por mudança de etapa nem por reatribuição. Quando vence e a Oportunidade continua aberta, SOLPrazoTotalService a reatribui ao próximo vendedor da Fila_Leads_SOL (CLICKUP-9424). Campo técnico, somente leitura.</description>
+    <label>Prazo total comercial (30 d.ú.)</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <type>DateTime</type>
+</CustomField>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Qtd_Reatribuicoes_Prazo__c</fullName>
+    <description>Quantidade de reatribuições por estouro do prazo total (CLICKUP-9424). A regra roda UMA única vez por Oportunidade: valor maior que zero marca a Oportunidade como já processada e o Batch não a considera novamente. Quando não há outro vendedor ativo, a contagem NÃO é incrementada — a Oportunidade continua elegível para nova tentativa. Campo técnico, somente leitura.</description>
+    <label>Reatribuições por prazo</label>
+    <externalId>false</externalId>
+    <precision>4</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

@@ -41,7 +41,7 @@ public with sharing class SOL_ConverterLead {
     'Id, Name, FirstName, LastName, Company, Email, Phone, IsConverted, ' +
     'CNPJ__c, RecordType.DeveloperName, SOL_Produto_Interesse__c, ' +
     'SOL_Status_Procuracao__c, SOL_Data_Recebimento_Procuracao__c, ' +
-    'SOL_Apto_Conversao__c';
+    'SOL_Apto_Conversao__c, SOL_Data_Contato_Efetivado__c';
 
   // ------------------------------------------------- regras compartilhadas
   //
@@ -384,12 +384,38 @@ public with sharing class SOL_ConverterLead {
    * do e-CAC; ART 360 não tem diagnóstico e vai direto para a Negociação.
    */
   private static String avancarOportunidade(Lead l, Id oportunidadeId) {
-    update new Opportunity(
+    Opportunity nascimento = new Opportunity(
       Id = oportunidadeId,
       RecordTypeId = recordTypeId(Opportunity.SObjectType, RT_OPORTUNIDADE),
       StageName = ETAPA_NASCIMENTO,
       SOL_Produto_Negocio__c = l.SOL_Produto_Interesse__c
     );
+
+    // CLICKUP-9424 — o prazo total de 30 dias úteis começa no contato efetivado
+    // registrado no Lead. A data ORIGINAL é transportada para a Oportunidade
+    // aqui, na conversão, e nunca é recalculada depois (nem por CreatedDate,
+    // nem por mudança de etapa, nem por reatribuição). Vale para Recuperação
+    // Tributária e ART 360.
+    if (l.SOL_Data_Contato_Efetivado__c != null) {
+      nascimento.SOL_Data_Inicio_Ciclo_Comercial__c = l.SOL_Data_Contato_Efetivado__c;
+      try {
+        nascimento.SOL_Prazo_Total_Comercial__c = SOLPrazoTotalService.calcularPrazoTotal(
+          l.SOL_Data_Contato_Efetivado__c
+        );
+      } catch (SOLBusinessHoursHelper.CalendarioIndisponivelException e) {
+        // Calendário indisponível não pode derrubar a conversão. A data de
+        // início fica gravada e o limite permanece vazio — o diagnóstico /
+        // backfill do CLICKUP-9424 recalcula pelo Lead convertido, sem inferir
+        // nada a partir de CreatedDate.
+        System.debug(
+          LoggingLevel.ERROR,
+          'SOL_ConverterLead: prazo total não calculado (calendário indisponível): ' +
+            e.getMessage()
+        );
+      }
+    }
+
+    update nascimento;
 
     String destino = l.SOL_Produto_Interesse__c == PRODUTO_ART
       ? ETAPA_ART

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Inicio_Ciclo_Comercial__c</fullName>
+    <description>Início do ciclo comercial da Arnone Soluções: cópia de Lead.SOL_Data_Contato_Efetivado__c gravada por SOL_ConverterLead durante a conversão. É a ORIGEM do prazo total de 30 dias úteis (CLICKUP-9424) e NUNCA é recalculada a partir de CreatedDate, mudança de etapa ou reatribuição. Campo técnico, somente leitura para Comercial e Distribuição Admin. Vazia = Lead sem contato efetivado registrado; nesse caso o prazo total não é inferido.</description>
+    <label>Início do ciclo comercial</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <type>DateTime</type>
+</CustomField>

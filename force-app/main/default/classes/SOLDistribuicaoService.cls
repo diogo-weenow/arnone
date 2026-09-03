@@ -441,7 +441,12 @@ public without sharing class SOLDistribuicaoService {
     r.mensagens.add(mensagem);
   }
 
-  private static Integer indiceDe(List<User> lista, Id alvo) {
+  /**
+   * Índice de `alvo` no roster ordenado, ou -1. Público para que os serviços de
+   * reatribuição (CLICKUP-9400 / CLICKUP-9424) REUTILIZEM a rotação em vez de
+   * duplicá-la. Função pura: sem SOQL, sem DML, sem estado.
+   */
+  public static Integer indiceDe(List<User> lista, Id alvo) {
     for (Integer i = 0; i < lista.size(); i++) {
       if (lista[i].Id == alvo) {
         return i;
@@ -723,8 +728,12 @@ public without sharing class SOLDistribuicaoService {
    * Próximo vendedor na rotação a partir de `cursor`, pulando `donoAtual`.
    * Retorna null quando não há nenhum vendedor ativo diferente do dono atual
    * (roster vazio, ou o dono atual é o único ativo).
+   *
+   * Público para que os serviços de reatribuição (CLICKUP-9400 / CLICKUP-9424)
+   * REUTILIZEM esta seleção em vez de duplicá-la. Função pura: sem SOQL, sem
+   * DML, sem estado.
    */
-  private static Id proximoVendedorExcluindo(
+  public static Id proximoVendedorExcluindo(
     List<User> ativos,
     Integer cursor,
     Id donoAtual
