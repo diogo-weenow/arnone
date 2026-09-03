@@ -685,40 +685,126 @@ private class SOLReuniaoFinalTest {
     }
   }
 
-  @IsTest
-  static void vendedorComercialEnxergaCampos() {
-    Id perfil = [SELECT Id FROM Profile WHERE UserType = 'Standard' ORDER BY Name LIMIT 1].Id;
-    User v = new User(
+  private static Id perfilStandard() {
+    Map<String, Id> porNome = new Map<String, Id>();
+    for (Profile p : [SELECT Id, Name FROM Profile WHERE UserType = 'Standard']) {
+      porNome.put(p.Name, p.Id);
+    }
+    if (porNome.containsKey('Standard User')) {
+      return porNome.get('Standard User');
+    }
+    return porNome.isEmpty() ? UserInfo.getProfileId() : porNome.values()[0];
+  }
+
+  private static User usuarioStandard(String tag) {
+    return new User(
       FirstName = 'SOL',
-      LastName = 'Reuniao Final',
-      Alias = 'solrf',
-      Email = 'sol.reuniao.final@arnone.invalid',
-      Username = 'sol.reuniao.final.' +
+      LastName = 'RF ' + tag,
+      Alias = ('rf' + tag).left(8),
+      Email = 'sol.rf.' + tag + '@arnone.invalid',
+      Username = 'sol.rf.' +
+        tag +
+        '.' +
         String.valueOf(Math.abs(Crypto.getRandomInteger())) +
         '@arnone.clickup9422.test.invalid',
-      ProfileId = perfil,
+      ProfileId = perfilStandard(),
       TimeZoneSidKey = TZ_SP,
       LocaleSidKey = 'pt_BR',
       EmailEncodingKey = 'UTF-8',
       LanguageLocaleKey = 'pt_BR',
       IsActive = true
     );
-    System.runAs(new User(Id = UserInfo.getUserId())) {
-      insert v;
-      insert new PermissionSetAssignment(
-        AssigneeId = v.Id,
-        PermissionSetId = [SELECT Id FROM PermissionSet WHERE Name = 'PS_SOL_Comercial' LIMIT 1].Id
+  }
+
+  private static Task reuniaoFinalPara(Id oppId, Id ownerId, Date refRecebimento) {
+    Task t = new Task(
+      Subject = SUBJECT_FINAL,
+      WhatId = oppId,
+      OwnerId = ownerId,
+      Status = 'Open',
+      ActivityDate = Date.today().addDays(5),
+      SOL_Tipo_Tarefa__c = TIPO_FINAL,
+      SOL_Data_Recebimento_Calculo_Ref__c = refRecebimento
+    );
+    insert t;
+    return t;
+  }
+
+  private static void verificarFLSEOperacao(User u, String psName, Id oppId, Id taskId) {
+    System.runAs(new User(Id = u.Id)) {
+      Schema.DescribeFieldResult reuniao = Task.SOL_Data_Reuniao_Final__c.getDescribe();
+      Schema.DescribeFieldResult ref = Task.SOL_Data_Recebimento_Calculo_Ref__c.getDescribe();
+
+      System.assert(reuniao.isAccessible(), psName + ': SOL_Data_Reuniao_Final__c isAccessible.');
+      System.assert(reuniao.isUpdateable(), psName + ': SOL_Data_Reuniao_Final__c isUpdateable.');
+      System.assert(ref.isAccessible(), psName + ': SOL_Data_Recebimento_Calculo_Ref__c isAccessible.');
+      System.assert(
+        !ref.isUpdateable(),
+        psName + ': SOL_Data_Recebimento_Calculo_Ref__c NÃO é isUpdateable (referência técnica).'
+      );
+
+      // Operação real: o usuário preenche a data e conclui a Task acessível.
+      // Pré-requisito: o perfil precisa permitir editar Task. Se não permitir,
+      // isto falha aqui e a dependência do perfil deve ser reportada.
+      System.assert(
+        Task.SObjectType.getDescribe().isUpdateable(),
+        psName +
+          ': o perfil Standard precisa de "Edit" em Activities para o vendedor/gestor concluir a tarefa.'
+      );
+      update new Task(
+        Id = taskId,
+        SOL_Data_Reuniao_Final__c = Date.today().addDays(-1),
+        Status = 'Completed'
       );
     }
 
-    Test.startTest();
-    System.runAs(new User(Id = v.Id)) {
-      Schema.DescribeFieldResult reuniao = Task.SOL_Data_Reuniao_Final__c.getDescribe();
-      System.assert(reuniao.isAccessible(), 'Vendedor enxerga a data da reunião final.');
-      Schema.DescribeFieldResult ref = Task.SOL_Data_Recebimento_Calculo_Ref__c.getDescribe();
-      System.assert(ref.isAccessible(), 'Vendedor enxerga a referência técnica.');
-      System.assert(!ref.isUpdateable(), 'A referência técnica é somente leitura.');
+    Task depois = [SELECT Status, SOL_Data_Reuniao_Final__c FROM Task WHERE Id = :taskId];
+    System.assertEquals('Completed', depois.Status, psName + ': Task concluída pelo próprio usuário.');
+    System.assertEquals(
+      Date.today().addDays(-1),
+      depois.SOL_Data_Reuniao_Final__c,
+      psName + ': data da reunião final preenchida pelo próprio usuário.'
+    );
+  }
+
+  @IsTest
+  static void flsEfetiva_comercialEGestor() {
+    User vCom = usuarioStandard('com');
+    User vAdm = usuarioStandard('adm');
+    System.runAs(new User(Id = UserInfo.getUserId())) {
+      insert new List<User>{ vCom, vAdm };
+      insert new List<PermissionSetAssignment>{
+        new PermissionSetAssignment(
+          AssigneeId = vCom.Id,
+          PermissionSetId = [SELECT Id FROM PermissionSet WHERE Name = 'PS_SOL_Comercial' LIMIT 1].Id
+        ),
+        new PermissionSetAssignment(
+          AssigneeId = vAdm.Id,
+          PermissionSetId = [
+            SELECT Id
+            FROM PermissionSet
+            WHERE Name = 'PS_SOL_Distribuicao_Admin'
+            LIMIT 1
+          ]
+          .Id
+        )
+      };
     }
+
+    // Uma Opp SOL + uma Task "Reunião final" para cada usuário — Task e Opp de
+    // propriedade do próprio usuário, para haver acesso ao registro.
+    Id oppCom = oppPronta();
+    Id oppAdm = oppPronta();
+    Task tCom = reuniaoFinalPara(oppCom, vCom.Id, Date.today().addDays(-5));
+    Task tAdm = reuniaoFinalPara(oppAdm, vAdm.Id, Date.today().addDays(-5));
+    System.runAs(new User(Id = UserInfo.getUserId())) {
+      update new Opportunity(Id = oppCom, OwnerId = vCom.Id);
+      update new Opportunity(Id = oppAdm, OwnerId = vAdm.Id);
+    }
+
+    Test.startTest();
+    verificarFLSEOperacao(vCom, 'PS_SOL_Comercial', oppCom, tCom.Id);
+    verificarFLSEOperacao(vAdm, 'PS_SOL_Distribuicao_Admin', oppAdm, tAdm.Id);
     Test.stopTest();
   }
 
