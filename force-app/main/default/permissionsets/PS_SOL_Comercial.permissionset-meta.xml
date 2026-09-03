@@ -13,6 +13,14 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>SOLFechamentoCriarInvocable</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>SOLFechamentoEncerrarInvocable</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>SOLProcuracaoAcompanhamentoInvocable</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -268,8 +276,18 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>false</editable>
+        <field>Task.SOL_Data_Reuniao_Final_Ref__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>true</editable>
         <field>Task.SOL_Data_Reuniao_Final__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Task.SOL_Encerrado_Pela_Oportunidade__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
