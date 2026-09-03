@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Chamar_Criar_Tarefa_Reuniao</name>
+        <label>Criar tarefa de reunião comercial SOL</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <actionName>SOLReuniaoComercialInvocable</actionName>
+        <actionType>apex</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>leadId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>SOLReuniaoComercialInvocable</nameSegment>
+    </actionCalls>
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>CLICKUP-9401 — Card 07A. Quando um Lead da Arnone Soluções (Recuperação Tributária ou ART 360, não convertido e sem opt-out) tem o Status ALTERADO nesta atualização para "Reunião Agendada - SQL", aciona SOLReuniaoComercialInvocable para criar UMA Task "Realizar reunião comercial" (vencimento 7 dias úteis, Business Hours). A fórmula exige ISCHANGED(Status): só dispara na transição real do Status. Não altera campos aqui. Não modifica SOL_Reuniao_Agendada_SQL nem SOL_Atualizar_Data_Compromisso. Idempotência e prazo ficam no Apex (bulk, FOR UPDATE, atômico).</description>
+    <environments>Default</environments>
+    <interviewLabel>SOL_Tarefa_Reuniao_Comercial {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL_Tarefa_Reuniao_Comercial</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Chamar_Criar_Tarefa_Reuniao</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &apos;SOL&apos;,
+  OR(
+    ISPICKVAL({!$Record.SOL_Produto_Interesse__c}, &apos;Recuperação Tributária&apos;),
+    ISPICKVAL({!$Record.SOL_Produto_Interesse__c}, &apos;ART 360&apos;)
+  ),
+  ISCHANGED({!$Record.Status}),
+  ISPICKVAL({!$Record.Status}, &apos;Reunião Agendada - SQL&apos;),
+  NOT({!$Record.IsConverted}),
+  NOT({!$Record.SOL_Opt_Out__c})
+)</filterFormula>
+        <object>Lead</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
