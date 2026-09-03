@@ -2,11 +2,11 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Fechamento_Exige_Encerramento_Auto</fullName>
     <active>true</active>
-    <description>CLICKUP-9423: a tarefa tipo "Fechamento" só conclui pela automação (Oportunidade em Ganho/Perdido marca o checkbox técnico). ISCHANGED(Status) não bloqueia a manutenção posterior de registros históricos. Sem exceção por Subject, perfil ou usuário.</description>
+    <description>CLICKUP-9423: a tarefa tipo "Fechamento" só conclui pela automação (Ganho/Perdido marca o checkbox). OR(ISNEW(), ISCHANGED(Status)) cobre a criação já concluída sem bloquear manutenção de registros históricos. Sem exceção por Subject/perfil.</description>
     <errorConditionFormula>AND(
   ISPICKVAL( SOL_Tipo_Tarefa__c , &quot;Fechamento&quot; ),
   ISPICKVAL( Status , &quot;Completed&quot; ),
-  ISCHANGED( Status ),
+  OR( ISNEW(), ISCHANGED( Status ) ),
   NOT( SOL_Encerrado_Pela_Oportunidade__c )
 )</errorConditionFormula>
     <errorDisplayField>Status</errorDisplayField>

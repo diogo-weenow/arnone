@@ -249,16 +249,10 @@ private class SOLFechamentoTest {
   static void tarefaAnteriorEncerradaNaoDuplica() {
     Id oppId = oppNegociacao();
     Date reuniao = Date.today();
-    // Tarefa de fechamento pré-existente, já concluída, da MESMA reunião.
-    insert new Task(
-      Subject = SUBJECT_FECHAMENTO,
-      WhatId = oppId,
-      OwnerId = UserInfo.getUserId(),
-      Status = 'Completed',
-      ActivityDate = Date.today().addDays(7),
-      SOL_Tipo_Tarefa__c = TIPO_FECHAMENTO,
-      SOL_Data_Reuniao_Final_Ref__c = reuniao
-    );
+    // Tarefa de fechamento pré-existente, já concluída, da MESMA reunião. Estado
+    // VÁLIDO: uma tarefa concluída só existe com o checkbox técnico verdadeiro
+    // (a VR SOL_Fechamento_Exige_Encerramento_Auto cobre também a criação).
+    insert fechamentoConcluido(oppId, reuniao);
     Task rf = reuniaoFinalTask(oppId, null, reuniao);
 
     Test.startTest();
@@ -404,6 +398,23 @@ private class SOLFechamentoTest {
     );
     insert t;
     return t;
+  }
+
+  /**
+   * Task "Fechamento" já concluída em estado VÁLIDO (checkbox técnico
+   * verdadeiro) — como só a automação produz esse estado. Retorna sem inserir.
+   */
+  private static Task fechamentoConcluido(Id oppId, Date reuniaoRef) {
+    return new Task(
+      Subject = SUBJECT_FECHAMENTO,
+      WhatId = oppId,
+      OwnerId = UserInfo.getUserId(),
+      Status = 'Completed',
+      ActivityDate = Date.today().addDays(7),
+      SOL_Tipo_Tarefa__c = TIPO_FECHAMENTO,
+      SOL_Data_Reuniao_Final_Ref__c = reuniaoRef,
+      SOL_Encerrado_Pela_Oportunidade__c = true
+    );
   }
 
   @IsTest
@@ -552,7 +563,7 @@ private class SOLFechamentoTest {
   @IsTest
   static void manutencaoPosteriorDeRegistroHistoricoNaoEhBloqueada() {
     // Task de fechamento já concluída pela automação: editar depois (sem mudar o
-    // Status) não é bloqueado — é o papel do ISCHANGED(Status) na VR.
+    // Status) não é bloqueado — é o papel do OR(ISNEW(), ISCHANGED(Status)) na VR.
     Id oppId = oppNegociacao();
     Task f = fechamentoAberto(oppId, Date.today().addDays(-3));
     update new Opportunity(Id = oppId, StageName = 'Ganho');
@@ -570,6 +581,121 @@ private class SOLFechamentoTest {
     System.assertEquals('Completed', depois.Status);
     System.assertEquals('anotação de auditoria', depois.Description);
     System.assert(depois.SOL_Encerrado_Pela_Oportunidade__c);
+  }
+
+  // ============================= ISNEW: CRIAÇÃO JÁ CONCLUÍDA (revisão)
+
+  @IsTest
+  static void insercaoConcluidaSemCheckboxBloqueada() {
+    // OR(ISNEW(), ISCHANGED(Status)): criar a Task de fechamento já em
+    // "Completed" com o checkbox falso — via carga de dados, por exemplo — é
+    // bloqueado do mesmo jeito.
+    Id oppId = oppNegociacao();
+    Task nova = new Task(
+      Subject = SUBJECT_FECHAMENTO,
+      WhatId = oppId,
+      OwnerId = UserInfo.getUserId(),
+      Status = 'Completed',
+      ActivityDate = Date.today().addDays(7),
+      SOL_Tipo_Tarefa__c = TIPO_FECHAMENTO,
+      SOL_Data_Reuniao_Final_Ref__c = Date.today().addDays(-3)
+    );
+
+    Test.startTest();
+    Boolean bloqueou = false;
+    try {
+      insert nova;
+    } catch (DmlException e) {
+      bloqueou = true;
+      System.assert(
+        e.getDmlMessage(0).containsIgnoreCase('concluída automaticamente'),
+        e.getDmlMessage(0)
+      );
+    }
+    Test.stopTest();
+
+    System.assert(bloqueou, 'Inserir a tarefa de fechamento já concluída sem o checkbox é bloqueado.');
+    System.assertEquals(0, fechamentos(oppId).size(), 'Nada foi gravado.');
+  }
+
+  @IsTest
+  static void insercaoAbertaEConcluidaValidaPermitidas() {
+    Id oppId = oppNegociacao();
+
+    Test.startTest();
+    // Aberta: continua permitido (é como a automação cria).
+    Task aberta = fechamentoAberto(oppId, Date.today().addDays(-3));
+    // Já concluída, mas em estado VÁLIDO (checkbox verdadeiro): permitido.
+    Task concluida = fechamentoConcluido(oppId, Date.today().addDays(-10));
+    insert concluida;
+    Test.stopTest();
+
+    System.assertEquals('Open', [SELECT Status FROM Task WHERE Id = :aberta.Id].Status);
+    Task hist = [
+      SELECT Status, SOL_Encerrado_Pela_Oportunidade__c
+      FROM Task
+      WHERE Id = :concluida.Id
+    ];
+    System.assertEquals('Completed', hist.Status);
+    System.assert(hist.SOL_Encerrado_Pela_Oportunidade__c);
+    System.assertEquals(2, fechamentos(oppId).size());
+  }
+
+  @IsTest
+  static void manutencaoDeHistoricoInseridoValidoNaoEhBloqueada() {
+    // Registro historicamente concluído (checkbox verdadeiro): editar depois,
+    // sem mudar o Status, continua permitido.
+    Id oppId = oppNegociacao();
+    Task hist = fechamentoConcluido(oppId, Date.today().addDays(-20));
+    insert hist;
+
+    Test.startTest();
+    update new Task(
+      Id = hist.Id,
+      Description = 'auditoria histórica',
+      Subject = 'Realizar fechamento (histórico)'
+    );
+    Test.stopTest();
+
+    Task depois = [
+      SELECT Status, Description, Subject, SOL_Encerrado_Pela_Oportunidade__c
+      FROM Task
+      WHERE Id = :hist.Id
+    ];
+    System.assertEquals('Completed', depois.Status);
+    System.assertEquals('auditoria histórica', depois.Description);
+    System.assertEquals('Realizar fechamento (histórico)', depois.Subject);
+    System.assert(depois.SOL_Encerrado_Pela_Oportunidade__c);
+  }
+
+  @IsTest
+  static void encerramentoAutomaticoContinuaGravandoCheckbox() {
+    // Após a mudança para OR(ISNEW(), ISCHANGED(Status)), o Evento 2 segue
+    // gravando Completed + checkbox verdadeiro, em Ganho e em Perdido.
+    Id oppGanho = oppNegociacao();
+    Task fGanho = fechamentoAberto(oppGanho, Date.today().addDays(-3));
+    Id oppPerdido = oppNegociacao();
+    Task fPerdido = fechamentoAberto(oppPerdido, Date.today().addDays(-3));
+
+    Test.startTest();
+    update new Opportunity(Id = oppGanho, StageName = 'Ganho');
+    update new Opportunity(
+      Id = oppPerdido,
+      StageName = 'Perdido',
+      SOL_Motivo_Perda__c = 'Sem retorno'
+    );
+    Test.stopTest();
+
+    for (Task t : [
+      SELECT Id, Status, SOL_Encerrado_Pela_Oportunidade__c
+      FROM Task
+      WHERE Id IN (:fGanho.Id, :fPerdido.Id)
+    ]) {
+      System.assertEquals('Completed', t.Status, 'Task ' + t.Id);
+      System.assert(t.SOL_Encerrado_Pela_Oportunidade__c, 'Checkbox marcado na Task ' + t.Id);
+    }
+    System.assertEquals('Ganho', opp(oppGanho).StageName);
+    System.assertEquals('Perdido', opp(oppPerdido).StageName);
   }
 
   @IsTest
