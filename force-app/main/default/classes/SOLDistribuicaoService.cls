@@ -144,6 +144,19 @@ public without sharing class SOLDistribuicaoService {
     public List<String> mensagens = new List<String>();
   }
 
+  /**
+   * Falha controlada do cancelamento por contato efetivado (CLICKUP-9417).
+   * Lançada para ABORTAR a transação inteira: se as tarefas pendentes não
+   * puderem ser canceladas, a própria conclusão da Task é desfeita e o vendedor
+   * recebe esta mensagem para tentar de novo (operação atômica, sem estado
+   * inconsistente e sem descartar a falha em silêncio).
+   */
+  public class ContatoEfetivadoException extends Exception {
+  }
+
+  /** Mensagem controlada exibida ao vendedor quando o cancelamento falha. */
+  public static final String MSG_CONTATO_EFETIVADO_FALHA = 'Não foi possível cancelar as tarefas de contato pendentes deste lead. Nenhuma alteração foi salva — conclua a tarefa novamente.';
+
   /** Resultado controlado do contato efetivado (CLICKUP-9417). */
   public class ResultadoContatoEfetivado {
     /** Leads marcados como "contato efetivado" agora. */
@@ -152,8 +165,6 @@ public without sharing class SOLDistribuicaoService {
     public Integer tarefasCanceladas = 0;
     /** Leads fora do escopo (outro Record Type, convertido, inexistente). */
     public Integer ignorados = 0;
-    /** Leads não processados por erro controlado. */
-    public Integer comErro = 0;
   }
 
   /** Resultado controlado da reatribuição por falta de contato (CLICKUP-9400). */
@@ -691,12 +702,17 @@ public without sharing class SOLDistribuicaoService {
    * momento, sem bloqueio por horário/dia (cliente pode retornar no fim de
    * semana).
    *
-   * Bulk-safe: nenhuma consulta ou DML dentro de laço. Transacional:
-   * Savepoint/rollback. Concorrência: os Leads são travados com FOR UPDATE, o
-   * que serializa dois "Atendeu" simultâneos do mesmo Lead. Idempotente: um 2º
-   * disparo não encontra mais tarefas pendentes e não reprocessa o flag.
-   * Recursão: as tarefas ficam com Status "Cancelada" e sem resultado "Atendeu"
-   * — o Flow SOL_Contato_Efetivado não volta a disparar.
+   * Bulk-safe: nenhuma consulta ou DML dentro de laço. Concorrência: os Leads e
+   * as tarefas pendentes são travados com FOR UPDATE, o que serializa dois
+   * "Atendeu" simultâneos do mesmo Lead. Idempotente: um 2º disparo não
+   * encontra mais tarefas pendentes e não reprocessa o flag. Recursão: as
+   * tarefas ficam com Status "Cancelada" e sem resultado "Atendeu" — o Flow
+   * SOL_Contato_Efetivado não volta a disparar.
+   *
+   * ATÔMICO: em qualquer falha, o Savepoint desfaz o que foi alterado e o
+   * método RELANÇA {@link ContatoEfetivadoException}. Propagada pelo Invocable,
+   * ela aborta a transação inteira (incl. a conclusão da Task), evitando estado
+   * inconsistente. A falha nunca é descartada em silêncio.
    *
    * NÃO altera tarefas já concluídas (Status "Completed"): o histórico de
    * tentativas anteriores permanece intacto. NÃO altera o status do funil do
@@ -704,6 +720,8 @@ public without sharing class SOLDistribuicaoService {
    *
    * @param leadIds Ids de Lead (qualquer origem; filtrados aqui para RT SOL).
    * @return contagens controladas.
+   * @throws ContatoEfetivadoException falha ao sinalizar/cancelar (transação
+   *   deve ser abortada).
    */
   public static ResultadoContatoEfetivado registrarContatoEfetivado(
     List<Id> leadIds
@@ -716,8 +734,9 @@ public without sharing class SOLDistribuicaoService {
     Set<Id> ids = new Set<Id>(leadIds);
     Datetime agora = System.now();
 
-    Savepoint sp = Database.setSavepoint();
+    Savepoint sp = null;
     try {
+      sp = Database.setSavepoint();
       // Trava os Leads: serializa dois "Atendeu" concorrentes do mesmo Lead.
       List<Lead> carregados = [
         SELECT
@@ -781,7 +800,13 @@ public without sharing class SOLDistribuicaoService {
       r.tarefasCanceladas = pendentes.size();
       return r;
     } catch (Exception e) {
-      Database.rollback(sp);
+      // Operação ATÔMICA: desfaz o que este método alterou e RELANÇA uma falha
+      // controlada. Quem chama (Flow/Invocable) propaga a exceção, o que
+      // desfaz também a conclusão da Task que disparou tudo — nada fica em
+      // estado inconsistente e a falha não é descartada em silêncio.
+      if (sp != null) {
+        Database.rollback(sp);
+      }
       System.debug(
         LoggingLevel.ERROR,
         'SOLDistribuicaoService.registrarContatoEfetivado: ' +
@@ -791,8 +816,7 @@ public without sharing class SOLDistribuicaoService {
           '\n' +
           e.getStackTraceString()
       );
-      r.comErro = ids.size();
-      return r;
+      throw new ContatoEfetivadoException(MSG_CONTATO_EFETIVADO_FALHA);
     }
   }
 

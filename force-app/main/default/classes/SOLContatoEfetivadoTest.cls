@@ -7,7 +7,9 @@
  * sinalização + cancelamento. Os testes convivem com a automação real e também
  * chamam o serviço diretamente — a operação é idempotente.
  *
- * Nenhum teste depende de permission set: o serviço roda em contexto de sistema.
+ * O serviço roda em contexto de sistema; há também um teste executado como
+ * VENDEDOR COM O PERMISSION SET COMERCIAL (PS_SOL_Comercial), comprovando o
+ * acesso à classe Invocable e aos campos (ajuste do PR #5).
  */
 @IsTest
 private class SOLContatoEfetivadoTest {
@@ -566,6 +568,226 @@ private class SOLContatoEfetivadoTest {
       false,
       d.SOL_Contato_Efetivado__c,
       'Resultado negativo não sinaliza contato efetivado.'
+    );
+  }
+
+  // ============================================================ VENDEDOR COMERCIAL
+
+  private static Id psSolComercialId() {
+    return [SELECT Id FROM PermissionSet WHERE Name = 'PS_SOL_Comercial' LIMIT 1].Id;
+  }
+
+  private static User vendedorComercial() {
+    List<Profile> ps = [
+      SELECT Id
+      FROM Profile
+      WHERE UserType = 'Standard'
+      ORDER BY Name
+      LIMIT 1
+    ];
+    return new User(
+      FirstName = 'RR',
+      LastName = 'Comercial CEf',
+      Alias = 'rrcecom',
+      Email = 'rr.cecom@arnone.invalid',
+      Username = 'rr.cecom.' +
+        String.valueOf(Math.abs(Crypto.getRandomInteger())) +
+        '@arnone.clickup9417.test.invalid',
+      ProfileId = ps.isEmpty() ? UserInfo.getProfileId() : ps[0].Id,
+      TimeZoneSidKey = 'America/Sao_Paulo',
+      LocaleSidKey = 'pt_BR',
+      EmailEncodingKey = 'UTF-8',
+      LanguageLocaleKey = 'pt_BR',
+      IsActive = true
+    );
+  }
+
+  @IsTest
+  static void vendedorComercialDisparaFlowEApex() {
+    User comercial = vendedorComercial();
+    System.runAs(contextoAtual()) {
+      insert comercial;
+      insert new PermissionSetAssignment(
+        AssigneeId = comercial.Id,
+        PermissionSetId = psSolComercialId()
+      );
+      Group fila = new Group(
+        Name = 'RR ContEf Comercial 9417',
+        DeveloperName = FILA_SINTETICA,
+        Type = 'Queue'
+      );
+      insert fila;
+      insert new QueueSobject(QueueId = fila.Id, SobjectType = 'Lead');
+      insert new GroupMember(GroupId = fila.Id, UserOrGroupId = comercial.Id);
+    }
+    SOLDistribuicaoService.queueDeveloperNameOverride = FILA_SINTETICA;
+
+    Lead l = novoLeadSOLDistribuido('SComercial', 'Recuperação Tributária');
+    System.assertEquals(comercial.Id, l.OwnerId, 'Lead distribuído ao vendedor comercial.');
+    Task extra = tarefaContatoAberta(l.Id, comercial.Id);
+    Task lig = [
+      SELECT Id
+      FROM Task
+      WHERE WhoId = :l.Id AND Subject = '1ª Ligação'
+      LIMIT 1
+    ];
+
+    Test.startTest();
+    // O VENDEDOR (perfil Standard + PS_SOL_Comercial) conclui a própria tarefa.
+    System.runAs(new User(Id = comercial.Id)) {
+      update new Task(
+        Id = lig.Id,
+        Status = 'Completed',
+        SOL_Resultado_Contato__c = 'Atendeu'
+      );
+    }
+    Test.stopTest();
+
+    Lead d = recarregar(l.Id);
+    System.assertEquals(
+      true,
+      d.SOL_Contato_Efetivado__c,
+      'Concluir a Task como vendedor comercial dispara o Flow SOL_Contato_Efetivado e o Apex.'
+    );
+    System.assertNotEquals(null, d.SOL_Data_Contato_Efetivado__c);
+    System.assertEquals(
+      'Cancelada',
+      [SELECT Status FROM Task WHERE Id = :extra.Id].Status,
+      'Tarefa de contato pendente cancelada.'
+    );
+  }
+
+  // ============================================================ VALIDATION RULE (STATUS CANCELADA)
+
+  @IsTest
+  static void statusCanceladaExigeClassificacaoSOL() {
+    Cenario c = montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('SVR', 'Recuperação Tributária');
+
+    // (a) Task de outra BU — sem SOL_Tipo_Tarefa__c — não pode usar "Cancelada".
+    Task outra = new Task(
+      Subject = 'x',
+      WhoId = l.Id,
+      OwnerId = l.OwnerId,
+      Status = 'Open',
+      ActivityDate = Date.today()
+    );
+    insert outra;
+
+    // (b) Task classificada como Contato mas SEM o motivo do cancelamento.
+    Task semMotivo = tarefaContatoAberta(l.Id, l.OwnerId);
+
+    Test.startTest();
+    Boolean bloqueadoSemTipo = false;
+    try {
+      update new Task(Id = outra.Id, Status = 'Cancelada');
+    } catch (DmlException e) {
+      bloqueadoSemTipo = true;
+      System.assert(
+        e.getMessage().contains('exclusivo das tarefas de automação Arnone Soluções'),
+        'Mensagem da VR: ' + e.getMessage()
+      );
+    }
+
+    Boolean bloqueadoSemMotivo = false;
+    try {
+      update new Task(Id = semMotivo.Id, Status = 'Cancelada');
+    } catch (DmlException e) {
+      bloqueadoSemMotivo = true;
+    }
+    Test.stopTest();
+
+    System.assert(bloqueadoSemTipo, 'Task não classificada não pode usar "Cancelada".');
+    System.assert(bloqueadoSemMotivo, '"Cancelada" exige SOL_Motivo_Cancelamento__c.');
+  }
+
+  @IsTest
+  static void cancelamentoDoServicoPassaNaValidationRule() {
+    Cenario c = montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('SVRok', 'Recuperação Tributária');
+    Task pendente = tarefaContatoAberta(l.Id, l.OwnerId);
+    Task alvo = tarefaContatoAberta(l.Id, l.OwnerId);
+
+    Test.startTest();
+    concluirComoAtendeu(alvo.Id); // serviço seta Status=Cancelada + tipo + motivo
+    Test.stopTest();
+
+    Task t = [
+      SELECT Status, SOL_Tipo_Tarefa__c, SOL_Motivo_Cancelamento__c
+      FROM Task
+      WHERE Id = :pendente.Id
+    ];
+    System.assertEquals('Cancelada', t.Status);
+    System.assertEquals('Contato', t.SOL_Tipo_Tarefa__c);
+    System.assertEquals('Contato efetivado', t.SOL_Motivo_Cancelamento__c);
+  }
+
+  // ============================================================ ATOMICIDADE DA FALHA
+
+  @IsTest
+  static void falhaNoCancelamentoAbortaAtomicamente() {
+    Cenario c = montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('SAtom', 'Recuperação Tributária');
+    Task pendente = tarefaContatoAberta(l.Id, l.OwnerId);
+
+    Test.startTest();
+    Test.setReadOnlyApplicationMode(true); // qualquer DML/lock falha
+    Boolean lancou = false;
+    try {
+      SOLDistribuicaoService.registrarContatoEfetivado(new List<Id>{ l.Id });
+    } catch (SOLDistribuicaoService.ContatoEfetivadoException e) {
+      lancou = true;
+      System.assertEquals(
+        SOLDistribuicaoService.MSG_CONTATO_EFETIVADO_FALHA,
+        e.getMessage(),
+        'Mensagem controlada, sem detalhe técnico.'
+      );
+    }
+    Test.setReadOnlyApplicationMode(false);
+    Test.stopTest();
+
+    System.assert(
+      lancou,
+      'A falha NÃO é descartada em silêncio: relança ContatoEfetivadoException.'
+    );
+    Lead d = recarregar(l.Id);
+    System.assertEquals(false, d.SOL_Contato_Efetivado__c, 'Lead não foi sinalizado.');
+    System.assertEquals(
+      'Open',
+      [SELECT Status FROM Task WHERE Id = :pendente.Id].Status,
+      'Tarefa pendente intacta (rollback).'
+    );
+  }
+
+  @IsTest
+  static void invocableRelancaAFalhaParaAbortarATransacao() {
+    Cenario c = montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('SInv', 'Recuperação Tributária');
+    tarefaContatoAberta(l.Id, l.OwnerId);
+
+    SOLContatoEfetivadoInvocable.Entrada e = new SOLContatoEfetivadoInvocable.Entrada();
+    e.leadId = l.Id;
+
+    Test.startTest();
+    Test.setReadOnlyApplicationMode(true);
+    Boolean lancou = false;
+    try {
+      SOLContatoEfetivadoInvocable.registrar(
+        new List<SOLContatoEfetivadoInvocable.Entrada>{ e }
+      );
+    } catch (SOLDistribuicaoService.ContatoEfetivadoException ex) {
+      lancou = true;
+      System.assertEquals(
+        SOLDistribuicaoService.MSG_CONTATO_EFETIVADO_FALHA,
+        ex.getMessage()
+      );
+    }
+    Test.setReadOnlyApplicationMode(false);
+    Test.stopTest();
+
+    System.assert(
+      lancou,
+      'O Invocable relança a falha para o Flow abortar a transação (a Task não fica concluída).'
     );
   }
 }
