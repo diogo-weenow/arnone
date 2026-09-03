@@ -508,7 +508,34 @@ private class SOLContatoEfetivadoTest {
   static void colecaoVaziaNulaEConvertidoIgnorados() {
     Cenario c = montarCenario(2);
     Lead l = novoLeadSOLDistribuido('S9', 'Recuperação Tributária');
-    update new Lead(Id = l.Id, SOL_Status_Procuracao__c = 'Recebida');
+    // CLICKUP-9419: converter exige reunião realizada + procuração Recebida com data + arquivo.
+    Task reu9419 = new Task(
+      Subject = 'r',
+      WhoId = l.Id,
+      OwnerId = l.OwnerId,
+      Status = 'Open',
+      ActivityDate = Date.today(),
+      SOL_Tipo_Tarefa__c = 'Reunião comercial'
+    );
+    insert reu9419;
+    update new Task(Id = reu9419.Id, Status = 'Completed', SOL_Resultado_Reuniao__c = 'Realizada');
+    update new Lead(
+      Id = l.Id,
+      SOL_Status_Procuracao__c = 'Recebida',
+      SOL_Data_Recebimento_Procuracao__c = Date.today()
+    );
+    ContentVersion cv9419 = new ContentVersion(
+      Title = 'p9419',
+      PathOnClient = 'p.txt',
+      VersionData = Blob.valueOf('x')
+    );
+    insert cv9419;
+    insert new ContentDocumentLink(
+      ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv9419.Id]
+        .ContentDocumentId,
+      LinkedEntityId = l.Id,
+      ShareType = 'V'
+    );
     Database.LeadConvert lc = new Database.LeadConvert();
     lc.setLeadId(l.Id);
     lc.setDoNotCreateOpportunity(true);

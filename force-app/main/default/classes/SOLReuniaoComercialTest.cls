@@ -250,7 +250,34 @@ private class SOLReuniaoComercialTest {
   static void leadConvertidoNaoCria() {
     Cenario c = montarCenario(2);
     Lead l = novoLeadSOL('S6', 'Recuperação Tributária');
-    update new Lead(Id = l.Id, SOL_Status_Procuracao__c = 'Recebida');
+    // CLICKUP-9419: converter exige reunião realizada + procuração Recebida com data + arquivo.
+    Task reu9419 = new Task(
+      Subject = 'r',
+      WhoId = l.Id,
+      OwnerId = l.OwnerId,
+      Status = 'Open',
+      ActivityDate = Date.today(),
+      SOL_Tipo_Tarefa__c = 'Reunião comercial'
+    );
+    insert reu9419;
+    update new Task(Id = reu9419.Id, Status = 'Completed', SOL_Resultado_Reuniao__c = 'Realizada');
+    update new Lead(
+      Id = l.Id,
+      SOL_Status_Procuracao__c = 'Recebida',
+      SOL_Data_Recebimento_Procuracao__c = Date.today()
+    );
+    ContentVersion cv = new ContentVersion(
+      Title = 'p9419',
+      PathOnClient = 'p.txt',
+      VersionData = Blob.valueOf('x')
+    );
+    insert cv;
+    insert new ContentDocumentLink(
+      ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv.Id]
+        .ContentDocumentId,
+      LinkedEntityId = l.Id,
+      ShareType = 'V'
+    );
     Database.LeadConvert lc = new Database.LeadConvert();
     lc.setLeadId(l.Id);
     lc.setDoNotCreateOpportunity(true);
@@ -258,6 +285,7 @@ private class SOLReuniaoComercialTest {
       [SELECT MasterLabel FROM LeadStatus WHERE IsConverted = TRUE LIMIT 1].MasterLabel
     );
     Database.convertLead(lc);
+    Integer antes = tarefasReuniao(l.Id).size();
 
     Test.startTest();
     SOLReuniaoComercialService.ResultadoReuniaoComercial r = SOLReuniaoComercialService.criarTarefaReuniao(
@@ -267,7 +295,11 @@ private class SOLReuniaoComercialTest {
 
     System.assertEquals(0, r.tarefasCriadas);
     System.assert(r.ignorados >= 1);
-    System.assertEquals(0, tarefasReuniao(l.Id).size());
+    System.assertEquals(
+      antes,
+      tarefasReuniao(l.Id).size(),
+      'Lead convertido: o serviço não cria tarefa de reunião.'
+    );
   }
 
   @IsTest
@@ -317,7 +349,8 @@ private class SOLReuniaoComercialTest {
     System.assertEquals(1, tarefasReuniao(l.Id).size());
 
     Test.startTest();
-    update new Lead(Id = l.Id, Status = 'Procuração Solicitada');
+    // Sai de SQL para uma etapa anterior (não gatilhada pelo CLICKUP-9419) e reentra.
+    update new Lead(Id = l.Id, Status = 'Captação - Contato');
     update new Lead(Id = l.Id, Status = STATUS_SQL); // reentra em SQL
     Test.stopTest();
 

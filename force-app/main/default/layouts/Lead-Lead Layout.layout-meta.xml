@@ -208,6 +208,10 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Readonly</behavior>
+                <field>SOL_Data_Reuniao_Realizada__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
                 <field>SOL_Lead_Parado__c</field>
             </layoutItems>
             <layoutItems>

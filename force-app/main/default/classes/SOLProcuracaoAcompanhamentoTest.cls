@@ -138,8 +138,62 @@ private class SOLProcuracaoAcompanhamentoTest {
     ];
   }
 
+  /**
+   * Reunião comercial REALIZADA — pré-requisito do CLICKUP-9419 para entrar em
+   * "Procuração Solicitada". Idempotência de teste: só cria se ainda não houver.
+   */
+  private static void reuniaoRealizada(Id leadId) {
+    if (
+      ![
+        SELECT Id
+        FROM Task
+        WHERE
+          WhoId = :leadId
+          AND SOL_Tipo_Tarefa__c = 'Reunião comercial'
+          AND Status = 'Completed'
+          AND SOL_Resultado_Reuniao__c = 'Realizada'
+      ]
+      .isEmpty()
+    ) {
+      return;
+    }
+    Task t = new Task(
+      Subject = 'reunião realizada',
+      WhoId = leadId,
+      OwnerId = UserInfo.getUserId(),
+      Status = 'Open',
+      ActivityDate = Date.today(),
+      SOL_Tipo_Tarefa__c = 'Reunião comercial'
+    );
+    insert t;
+    update new Task(Id = t.Id, Status = 'Completed', SOL_Resultado_Reuniao__c = 'Realizada');
+  }
+
+  /** Anexa um arquivo ao Lead — pré-requisito do CLICKUP-9419 para converter. */
+  private static void anexarArquivo(Id leadId) {
+    ContentVersion cv = new ContentVersion(
+      Title = 'proc9426',
+      PathOnClient = 'proc.txt',
+      VersionData = Blob.valueOf('doc')
+    );
+    insert cv;
+    insert new ContentDocumentLink(
+      ContentDocumentId = [
+        SELECT ContentDocumentId
+        FROM ContentVersion
+        WHERE Id = :cv.Id
+      ]
+      .ContentDocumentId,
+      LinkedEntityId = leadId,
+      ShareType = 'V'
+    );
+  }
+
   /** Mesmas gravações que SOL_Procuracao.Registrar_Solicitacao faz no Lead. */
   private static void registrarSolicitacao(Id leadId, Date data) {
+    // CLICKUP-9419: a validação before-save exige reunião realizada para entrar
+    // em "Procuração Solicitada".
+    reuniaoRealizada(leadId);
     update new Lead(
       Id = leadId,
       Status = STATUS_PROC,
@@ -250,33 +304,49 @@ private class SOLProcuracaoAcompanhamentoTest {
   static void somenteStatusSemSolicitacaoNaoCria() {
     Cenario c = montarCenario(2);
     Lead l = novoLeadSOL('S4', 'Recuperação Tributária');
+    reuniaoRealizada(l.Id);
 
     Test.startTest();
     // Status muda, mas sem o campo de status da procuração nem a data.
-    update new Lead(Id = l.Id, Status = STATUS_PROC);
+    // CLICKUP-9419 bloqueia a própria entrada em "Procuração Solicitada" aqui.
+    Boolean bloqueado = false;
+    try {
+      update new Lead(Id = l.Id, Status = STATUS_PROC);
+    } catch (DmlException e) {
+      bloqueado = true;
+    }
     Test.stopTest();
 
-    System.assertEquals(0, tarefas(l.Id).size(), 'Sem os três sinais, nada é criado.');
+    System.assert(bloqueado, 'Sem solicitação válida, o avanço é bloqueado (CLICKUP-9419).');
+    System.assertEquals(0, tarefas(l.Id).size(), 'Nenhuma tarefa de acompanhamento criada.');
   }
 
   @IsTest
   static void statusProcuracaoSemDataNaoCria() {
     Cenario c = montarCenario(2);
     Lead l = novoLeadSOL('S4b', 'ART 360');
+    reuniaoRealizada(l.Id);
 
     Test.startTest();
-    update new Lead(
-      Id = l.Id,
-      Status = STATUS_PROC,
-      SOL_Status_Procuracao__c = 'Solicitada'
-      // sem SOL_Data_Solicitacao_Procuracao__c
-    );
-    // chamada direta também ignora
+    // Sem a data, CLICKUP-9419 bloqueia a entrada em "Procuração Solicitada".
+    Boolean bloqueado = false;
+    try {
+      update new Lead(
+        Id = l.Id,
+        Status = STATUS_PROC,
+        SOL_Status_Procuracao__c = 'Solicitada'
+        // sem SOL_Data_Solicitacao_Procuracao__c
+      );
+    } catch (DmlException e) {
+      bloqueado = true;
+    }
+    // chamada direta ao serviço 9426 também ignora (Status não avançou).
     SOLProcuracaoAcompanhamentoService.ResultadoAcompanhamento rr = SOLProcuracaoAcompanhamentoService.criarTarefaAcompanhamento(
       new List<Id>{ l.Id }
     );
     Test.stopTest();
 
+    System.assert(bloqueado, 'Solicitação sem data é bloqueada (CLICKUP-9419).');
     System.assertEquals(0, rr.tarefasCriadas);
     System.assertEquals(0, tarefas(l.Id).size());
   }
@@ -327,7 +397,14 @@ private class SOLProcuracaoAcompanhamentoTest {
   static void leadConvertidoNaoCria() {
     Cenario c = montarCenario(2);
     Lead l = novoLeadSOL('S7', 'Recuperação Tributária');
-    update new Lead(Id = l.Id, SOL_Status_Procuracao__c = 'Recebida');
+    // CLICKUP-9419: converter exige procuração Recebida com data + arquivo.
+    reuniaoRealizada(l.Id);
+    update new Lead(
+      Id = l.Id,
+      SOL_Status_Procuracao__c = 'Recebida',
+      SOL_Data_Recebimento_Procuracao__c = Date.today()
+    );
+    anexarArquivo(l.Id);
     Database.LeadConvert lc = new Database.LeadConvert();
     lc.setLeadId(l.Id);
     lc.setDoNotCreateOpportunity(true);
@@ -464,6 +541,27 @@ private class SOLProcuracaoAcompanhamentoTest {
       );
     }
     insert leads;
+
+    // CLICKUP-9419: reunião realizada para todos, em bulk (sem SOQL/DML em laço).
+    List<Task> reunioes = new List<Task>();
+    for (Lead l : leads) {
+      reunioes.add(
+        new Task(
+          Subject = 'r',
+          WhoId = l.Id,
+          OwnerId = UserInfo.getUserId(),
+          Status = 'Open',
+          ActivityDate = Date.today(),
+          SOL_Tipo_Tarefa__c = 'Reunião comercial'
+        )
+      );
+    }
+    insert reunioes;
+    List<Task> fecha = new List<Task>();
+    for (Task t : reunioes) {
+      fecha.add(new Task(Id = t.Id, Status = 'Completed', SOL_Resultado_Reuniao__c = 'Realizada'));
+    }
+    update fecha;
 
     List<Lead> upd = new List<Lead>();
     for (Lead l : leads) {
@@ -730,6 +828,7 @@ private class SOLProcuracaoAcompanhamentoTest {
 
     Lead l = novoLeadSOL('SComercial', 'Recuperação Tributária');
     System.assertEquals(comercial.Id, l.OwnerId);
+    reuniaoRealizada(l.Id); // CLICKUP-9419: pré-requisito para "Procuração Solicitada"
 
     Test.startTest();
     System.runAs(new User(Id = comercial.Id)) {

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <customErrors>
+        <name>Erro_Documento</name>
+        <label>Documento da procuração ausente</label>
+        <locationX>710</locationX>
+        <locationY>500</locationY>
+        <customErrorMessages>
+            <errorMessage>O documento da procuração ainda não foi anexado ao Lead. Anexe o arquivo assinado em Arquivos, no próprio Lead, antes de avançar a etapa ou converter.</errorMessage>
+            <isFieldError>false</isFieldError>
+        </customErrorMessages>
+    </customErrors>
+    <customErrors>
+        <name>Erro_Procuracao</name>
+        <label>Procuração não recebida</label>
+        <locationX>530</locationX>
+        <locationY>500</locationY>
+        <customErrorMessages>
+            <errorMessage>A procuração ainda não foi recebida. É preciso Status da procuração = &quot;Recebida&quot; e a Data do recebimento da procuração preenchida para avançar para Apto para Conversão / Qualificado ou converter o Lead.</errorMessage>
+            <isFieldError>false</isFieldError>
+        </customErrorMessages>
+    </customErrors>
+    <customErrors>
+        <name>Erro_Reuniao</name>
+        <label>Reunião ainda não realizada</label>
+        <locationX>176</locationX>
+        <locationY>288</locationY>
+        <customErrorMessages>
+            <errorMessage>A reunião comercial ainda não foi realizada. É preciso uma tarefa de Reunião comercial concluída, com Resultado da reunião = &quot;Realizada&quot; e data/hora de conclusão preenchida, antes de avançar a etapa ou converter.</errorMessage>
+            <isFieldError>false</isFieldError>
+        </customErrorMessages>
+    </customErrors>
+    <customErrors>
+        <name>Erro_Solicitacao</name>
+        <label>Solicitação da procuração incompleta</label>
+        <locationX>350</locationX>
+        <locationY>500</locationY>
+        <customErrorMessages>
+            <errorMessage>A solicitação da procuração está incompleta. É preciso Status da procuração = &quot;Solicitada&quot; e a Data da solicitação da procuração preenchida para entrar em Procuração Solicitada.</errorMessage>
+            <isFieldError>false</isFieldError>
+        </customErrorMessages>
+    </customErrors>
+    <decisions>
+        <name>Procuracao_Confirmada</name>
+        <label>Procuração recebida com documento?</label>
+        <locationX>620</locationX>
+        <locationY>380</locationY>
+        <defaultConnectorLabel>Sim — pode avançar / converter</defaultConnectorLabel>
+        <rules>
+            <name>Procuracao_Nao_Recebida</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.SOL_Status_Procuracao__c</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <stringValue>Recebida</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.SOL_Data_Recebimento_Procuracao__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Erro_Procuracao</targetReference>
+            </connector>
+            <label>Procuração não recebida</label>
+        </rules>
+        <rules>
+            <name>Sem_Documento</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Arquivo</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Erro_Documento</targetReference>
+            </connector>
+            <label>Sem documento anexado</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Qual_Portao</name>
+        <label>Qual portão de avanço?</label>
+        <locationX>440</locationX>
+        <locationY>260</locationY>
+        <defaultConnectorLabel>Portão 2 — Apto / Qualificado / conversão</defaultConnectorLabel>
+        <rules>
+            <name>Portao_1_Procuracao_Solicitada</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Status</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Procuração Solicitada</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.IsConverted</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Solicitacao_Completa</targetReference>
+            </connector>
+            <label>Portão 1 — entrar em Procuração Solicitada</label>
+        </rules>
+        <rules>
+            <name>Portao_2</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Status</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <stringValue>Procuração Solicitada</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Arquivo</targetReference>
+            </connector>
+            <label>Portão 2</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Solicitacao_Completa</name>
+        <label>Solicitação da procuração completa?</label>
+        <locationX>350</locationX>
+        <locationY>380</locationY>
+        <defaultConnectorLabel>Sim — pode entrar em Procuração Solicitada</defaultConnectorLabel>
+        <rules>
+            <name>Solicitacao_Incompleta</name>
+            <conditionLogic>or</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.SOL_Status_Procuracao__c</leftValueReference>
+                <operator>NotEqualTo</operator>
+                <rightValue>
+                    <stringValue>Solicitada</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>$Record.SOL_Data_Solicitacao_Procuracao__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Erro_Solicitacao</targetReference>
+            </connector>
+            <label>Solicitação incompleta</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Tem_Reuniao_Realizada</name>
+        <label>Reunião comercial realizada?</label>
+        <locationX>176</locationX>
+        <locationY>158</locationY>
+        <defaultConnectorLabel>Sim</defaultConnectorLabel>
+        <rules>
+            <name>Sem_Reuniao_Realizada</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.SOL_Data_Reuniao_Realizada__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Erro_Reuniao</targetReference>
+            </connector>
+            <label>Sem reunião realizada</label>
+        </rules>
+        <rules>
+            <name>Com_Reuniao_Realizada</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.SOL_Data_Reuniao_Realizada__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Qual_Portao</targetReference>
+            </connector>
+            <label>Com reunião realizada</label>
+        </rules>
+    </decisions>
+    <description>CLICKUP-9419 — Card 08. Validação before-save de Lead da Arnone Soluções (Recuperação Tributária ou ART 360). Portão 1: para entrar em &quot;Procuração Solicitada&quot;, exige reunião comercial realizada (Lead.SOL_Data_Reuniao_Realizada__c preenchida) + solicitação válida. Portão 2: para entrar em &quot;Apto para Conversão&quot; / &quot;Qualificado&quot; ou converter (IsConverted), exige reunião realizada + procuração &quot;Recebida&quot; com data + ao menos um arquivo no Lead. A evidência da reunião vem do campo consolidado Lead.SOL_Data_Reuniao_Realizada__c (preenchido pelo Flow SOL_Consolidar_Reuniao_Realizada) — assim funciona também durante Database.convertLead, sem consultar Task. Custom Errors com mensagens separadas. Roda ANTES dos Flows after-save 07A/07B. Não bloqueia outras BUs, atualizações sem avanço, desqualificação/opt-out nem retorno de etapa. Não altera SOL_Procuracao, SOL_ConverterLead nem os cards anteriores.</description>
+    <environments>Default</environments>
+    <interviewLabel>SOL_Validar_Avanco_Reuniao_Procuracao {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL_Validar_Avanco_Reuniao_Procuracao</label>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>Get_Arquivo</name>
+        <label>Buscar arquivo anexado ao Lead</label>
+        <locationX>620</locationX>
+        <locationY>260</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Procuracao_Confirmada</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>LinkedEntityId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>ContentDocumentLink</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Tem_Reuniao_Realizada</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &apos;SOL&apos;,
+  OR(
+    ISPICKVAL({!$Record.SOL_Produto_Interesse__c}, &apos;Recuperação Tributária&apos;),
+    ISPICKVAL({!$Record.SOL_Produto_Interesse__c}, &apos;ART 360&apos;)
+  ),
+  OR(
+    AND(
+      ISCHANGED({!$Record.Status}),
+      OR(
+        ISPICKVAL({!$Record.Status}, &apos;Procuração Solicitada&apos;),
+        ISPICKVAL({!$Record.Status}, &apos;Apto para Conversão&apos;),
+        ISPICKVAL({!$Record.Status}, &apos;Qualificado&apos;)
+      )
+    ),
+    AND(ISCHANGED({!$Record.IsConverted}), {!$Record.IsConverted})
+  )
+)</filterFormula>
+        <object>Lead</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
