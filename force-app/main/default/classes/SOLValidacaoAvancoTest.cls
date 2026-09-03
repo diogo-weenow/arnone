@@ -305,6 +305,16 @@ private class SOLValidacaoAvancoTest {
     System.assert(erro != null, 'Salto Captação -> Apto sem nada: bloqueia. ' + erro);
   }
 
+  @IsTest
+  static void portao2_qualificadoManualSemReuniaoBloqueia() {
+    Lead l = novoLead('ART 360');
+    Test.startTest();
+    // A alteração manual para "Qualificado" também passa pelo Portão 2.
+    String erro = tentar(l.Id, new Lead(Status = 'Qualificado'));
+    Test.stopTest();
+    System.assert(erro != null && erro.contains('reunião'), '"Qualificado" manual sem reunião: bloqueia. ' + erro);
+  }
+
   // ============================================================ CONVERSÃO
 
   @IsTest
@@ -331,6 +341,32 @@ private class SOLValidacaoAvancoTest {
   }
 
   @IsTest
+  static void conversao_comProcuracaoEArquivoMasSemReuniaoBloqueia() {
+    // O bloqueador do PR: procuração marcada como recebida + arquivo, SEM
+    // nenhuma reunião realizada (SOL_Data_Reuniao_Realizada__c vazio).
+    Lead l = novoLead('Recuperação Tributária');
+    update new Lead(
+      Id = l.Id,
+      SOL_Status_Procuracao__c = 'Recebida',
+      SOL_Data_Recebimento_Procuracao__c = Date.today()
+    );
+    arquivo(l.Id);
+    System.assertEquals(
+      null,
+      [SELECT SOL_Data_Reuniao_Realizada__c FROM Lead WHERE Id = :l.Id].SOL_Data_Reuniao_Realizada__c
+    );
+
+    Test.startTest();
+    String erro = tentarConverter(l.Id);
+    Test.stopTest();
+
+    System.assert(
+      erro != null && erro.contains('reunião'),
+      'Conversão com procuração + arquivo mas SEM reunião: bloqueia. ' + erro
+    );
+  }
+
+  @IsTest
   static void conversao_comReuniaoProcuracaoEArquivoConverte() {
     Lead l = leadComReuniaoESolicitacao('Recuperação Tributária');
     update new Lead(
@@ -340,6 +376,11 @@ private class SOLValidacaoAvancoTest {
     );
     arquivo(l.Id);
     update new Lead(Id = l.Id, Status = APTO);
+    System.assertNotEquals(
+      null,
+      [SELECT SOL_Data_Reuniao_Realizada__c FROM Lead WHERE Id = :l.Id].SOL_Data_Reuniao_Realizada__c,
+      'A reunião ficou consolidada no Lead.'
+    );
     Test.startTest();
     String erro = tentarConverter(l.Id);
     Test.stopTest();
