@@ -9,6 +9,10 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>SOLProcuracaoAcompanhamentoInvocable</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>SOLReuniaoComercialInvocable</apexClass>
         <enabled>true</enabled>
     </classAccesses>
@@ -229,6 +233,11 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Opportunity.SOL_Valor_Total_Arnone__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Task.SOL_Data_Solicitacao_Ref__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
