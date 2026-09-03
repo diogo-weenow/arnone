@@ -532,6 +532,12 @@ private class SOLAcompanhamentoCalculoTest {
   // ============================================================ CONCLUSÃO DA TAREFA (VRs)
 
   private static Task criarTarefaParaConcluir(Date vencimento) {
+    // Referência bem no passado — os testes de conclusão focam nas VRs de
+    // presença e de data futura, não na regra cronológica.
+    return criarTarefaParaConcluir(vencimento, Date.today().addDays(-60));
+  }
+
+  private static Task criarTarefaParaConcluir(Date vencimento, Date refSolicitacao) {
     Id opp = oppDiagnostico();
     Task t = new Task(
       Subject = SUBJECT,
@@ -540,7 +546,7 @@ private class SOLAcompanhamentoCalculoTest {
       Status = 'Open',
       ActivityDate = vencimento,
       SOL_Tipo_Tarefa__c = TIPO,
-      SOL_Data_Solicitacao_Calculo_Ref__c = Date.today()
+      SOL_Data_Solicitacao_Calculo_Ref__c = refSolicitacao
     );
     insert t;
     return t;
@@ -600,6 +606,102 @@ private class SOLAcompanhamentoCalculoTest {
     Task depois = [SELECT Status, SOL_Data_Recebimento_Calculo__c FROM Task WHERE Id = :t.Id];
     System.assertEquals('Completed', depois.Status);
     System.assertEquals(Date.today().addDays(-2), depois.SOL_Data_Recebimento_Calculo__c);
+  }
+
+  // ================================================ RECEBIMENTO x SOLICITAÇÃO (VR cronológica)
+
+  @IsTest
+  static void recebimentoAnteriorASolicitacaoBloqueado() {
+    // Solicitação hoje; recebimento ontem => antes da solicitação.
+    Task t = criarTarefaParaConcluir(Date.today().addDays(7), Date.today());
+
+    Test.startTest();
+    Boolean bloqueou = false;
+    try {
+      update new Task(
+        Id = t.Id,
+        SOL_Data_Recebimento_Calculo__c = Date.today().addDays(-1),
+        Status = 'Completed'
+      );
+    } catch (DmlException e) {
+      bloqueou = true;
+      System.assert(
+        e.getDmlMessage(0).containsIgnoreCase('anterior à data da solicitação'),
+        e.getDmlMessage(0)
+      );
+    }
+    Test.stopTest();
+
+    System.assert(bloqueou, 'Recebimento anterior à solicitação é bloqueado.');
+    System.assertEquals('Open', [SELECT Status FROM Task WHERE Id = :t.Id].Status);
+  }
+
+  @IsTest
+  static void recebimentoNaMesmaDataDaSolicitacaoPermitido() {
+    Date ref = Date.today().addDays(-10);
+    Task t = criarTarefaParaConcluir(Date.today().addDays(-3), ref);
+
+    Test.startTest();
+    update new Task(Id = t.Id, SOL_Data_Recebimento_Calculo__c = ref, Status = 'Completed');
+    Test.stopTest();
+
+    System.assertEquals('Completed', [SELECT Status FROM Task WHERE Id = :t.Id].Status);
+  }
+
+  @IsTest
+  static void recebimentoPosteriorASolicitacaoPermitido() {
+    Task t = criarTarefaParaConcluir(Date.today().addDays(-3), Date.today().addDays(-10));
+
+    Test.startTest();
+    update new Task(
+      Id = t.Id,
+      SOL_Data_Recebimento_Calculo__c = Date.today().addDays(-4),
+      Status = 'Completed'
+    );
+    Test.stopTest();
+
+    System.assertEquals('Completed', [SELECT Status FROM Task WHERE Id = :t.Id].Status);
+  }
+
+  @IsTest
+  static void regraCronologicaNaoAfetaTaskComum() {
+    Id opp = oppDiagnostico();
+    // Task comum (sem SOL_Tipo_Tarefa__c) com recebimento ANTES da referência:
+    // a VR cronológica não dispara porque o tipo não é o de acompanhamento.
+    Task comum = new Task(
+      Subject = 'ligar',
+      WhatId = opp,
+      Status = 'Open',
+      ActivityDate = Date.today(),
+      SOL_Data_Solicitacao_Calculo_Ref__c = Date.today(),
+      SOL_Data_Recebimento_Calculo__c = Date.today().addDays(-15)
+    );
+    insert comum;
+
+    Test.startTest();
+    update new Task(Id = comum.Id, Status = 'Completed');
+    Test.stopTest();
+
+    System.assertEquals('Completed', [SELECT Status FROM Task WHERE Id = :comum.Id].Status);
+  }
+
+  @IsTest
+  static void referenciaAusenteNaoDisparaRegraCronologica() {
+    // Tarefa de acompanhamento SEM referência técnica: a regra cronológica não
+    // pode gerar erro adicional — a conclusão depende só das outras VRs.
+    Task t = criarTarefaParaConcluir(Date.today().addDays(7), null);
+
+    Test.startTest();
+    update new Task(
+      Id = t.Id,
+      SOL_Data_Recebimento_Calculo__c = Date.today().addDays(-20),
+      Status = 'Completed'
+    );
+    Test.stopTest();
+
+    Task depois = [SELECT Status, SOL_Data_Solicitacao_Calculo_Ref__c FROM Task WHERE Id = :t.Id];
+    System.assertEquals('Completed', depois.Status);
+    System.assertEquals(null, depois.SOL_Data_Solicitacao_Calculo_Ref__c);
   }
 
   @IsTest
