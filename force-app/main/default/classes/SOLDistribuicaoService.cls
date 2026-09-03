@@ -100,6 +100,21 @@ public without sharing class SOLDistribuicaoService {
   /** Motivo do cancelamento quando o contato com o Lead foi efetivado. */
   @TestVisible
   private static final String MOTIVO_CANCELAMENTO_CONTATO_EFETIVADO = 'Contato efetivado';
+
+  // ---- CLICKUP-9418: opt-out (Lead pede para não ser mais contatado) ----
+
+  /** Resultado da tarefa de contato quando o Lead pede opt-out. */
+  @TestVisible
+  private static final String RESULTADO_OPT_OUT = 'Opt-out';
+  /** Motivo do cancelamento das tarefas pendentes por opt-out. */
+  @TestVisible
+  private static final String MOTIVO_CANCELAMENTO_OPT_OUT = 'Opt-out';
+  /** Motivo estruturado da desqualificação do Lead por opt-out. */
+  @TestVisible
+  private static final String MOTIVO_DESQUALIFICACAO_OPT_OUT = 'Opt-out';
+  /** Status de perda do Lead na org (já existente). */
+  @TestVisible
+  private static final String LEAD_STATUS_DESQUALIFICADO = 'Desqualificado';
   /** Business Hours para o cálculo do prazo (etapa controlada de implantação). */
   @TestVisible
   private static final String BUSINESS_HOURS_NAME = 'Arnone Soluções - Horário Comercial';
@@ -161,6 +176,28 @@ public without sharing class SOLDistribuicaoService {
   public class ResultadoContatoEfetivado {
     /** Leads marcados como "contato efetivado" agora. */
     public Integer leadsSinalizados = 0;
+    /** Tarefas de contato pendentes canceladas. */
+    public Integer tarefasCanceladas = 0;
+    /** Leads fora do escopo (outro Record Type, convertido, inexistente). */
+    public Integer ignorados = 0;
+  }
+
+  /**
+   * Falha controlada do opt-out (CLICKUP-9418). Mesma semântica atômica da
+   * {@link ContatoEfetivadoException}: se a desqualificação / cancelamento não
+   * puder ser concluída, a conclusão da Task é desfeita e o vendedor tenta de
+   * novo — sem estado inconsistente e sem descartar a falha em silêncio.
+   */
+  public class OptOutException extends Exception {
+  }
+
+  /** Mensagem controlada exibida ao vendedor quando o opt-out falha. */
+  public static final String MSG_OPT_OUT_FALHA = 'Não foi possível registrar o opt-out deste lead. Nenhuma alteração foi salva — conclua a tarefa novamente.';
+
+  /** Resultado controlado do opt-out (CLICKUP-9418). */
+  public class ResultadoOptOut {
+    /** Leads desqualificados por opt-out agora. */
+    public Integer leadsDesqualificados = 0;
     /** Tarefas de contato pendentes canceladas. */
     public Integer tarefasCanceladas = 0;
     /** Leads fora do escopo (outro Record Type, convertido, inexistente). */
@@ -230,7 +267,8 @@ public without sharing class SOLDistribuicaoService {
           OwnerId,
           CreatedDate,
           RecordType.DeveloperName,
-          SOL_Status_Distribuicao__c
+          SOL_Status_Distribuicao__c,
+          SOL_Opt_Out__c
         FROM Lead
         WHERE Id IN :ids AND IsConverted = false
         ORDER BY CreatedDate ASC, Id ASC
@@ -246,6 +284,11 @@ public without sharing class SOLDistribuicaoService {
           continue;
         }
         if (l.SOL_Status_Distribuicao__c == STATUS_DISTRIBUIDO) {
+          r.ignorados++;
+          continue;
+        }
+        // (CLICKUP-9418) opt-out: não distribui nem cria tarefa de contato.
+        if (l.SOL_Opt_Out__c == true) {
           r.ignorados++;
           continue;
         }
@@ -452,7 +495,8 @@ public without sharing class SOLDistribuicaoService {
           OwnerId,
           RecordType.DeveloperName,
           SOL_Data_Inicio_Ciclo_Contato__c,
-          SOL_Quantidade_Reatribuicoes__c
+          SOL_Quantidade_Reatribuicoes__c,
+          SOL_Opt_Out__c
         FROM Lead
         WHERE Id IN :ids AND IsConverted = false
       ];
@@ -468,6 +512,12 @@ public without sharing class SOLDistribuicaoService {
           continue;
         }
         if (l.SOL_Data_Inicio_Ciclo_Contato__c == null) {
+          r.ignorados++;
+          continue;
+        }
+        // (CLICKUP-9418) opt-out: Lead desqualificado não é reatribuído e não
+        // recebe nova tarefa de contato.
+        if (l.SOL_Opt_Out__c == true) {
           r.ignorados++;
           continue;
         }
@@ -817,6 +867,128 @@ public without sharing class SOLDistribuicaoService {
           e.getStackTraceString()
       );
       throw new ContatoEfetivadoException(MSG_CONTATO_EFETIVADO_FALHA);
+    }
+  }
+
+  // =====================================================================
+  //  OPT-OUT — LEAD PEDE PARA NÃO SER MAIS CONTATADO (CLICKUP-9418)
+  // =====================================================================
+
+  /**
+   * Registra o opt-out dos Leads informados: marca o flag e a data, desqualifica
+   * o Lead (Status "Desqualificado", motivo "Opt-out") e cancela as tarefas de
+   * contato SOL ainda PENDENTES. A partir daí, `distribuir()` e
+   * `reatribuirPorFaltaDeContato()` ignoram o Lead — nenhuma nova tarefa de
+   * contato é criada.
+   *
+   * Disparado quando o vendedor conclui uma tarefa de contato
+   * (SOL_Tipo_Tarefa__c = 'Contato') com resultado "Opt-out", a qualquer
+   * momento da cadência, sem bloqueio por horário/dia ou prazo.
+   *
+   * Bulk-safe: nenhuma consulta ou DML dentro de laço. Concorrência: Leads e
+   * tarefas pendentes travados com FOR UPDATE. Idempotente: um 2º disparo não
+   * encontra Lead sem opt-out nem tarefa pendente. Recursão: as tarefas ficam
+   * "Cancelada" (sem resultado "Opt-out") e o Lead fica com SOL_Opt_Out__c =
+   * true — o Flow SOL_Opt_Out não volta a disparar.
+   *
+   * ATÔMICO: em qualquer falha, o Savepoint desfaz tudo e o método RELANÇA
+   * {@link OptOutException}; propagada pelo Invocable, aborta a transação
+   * inteira (incl. a conclusão da Task). A falha nunca é descartada em silêncio.
+   *
+   * NÃO altera tarefas já concluídas (o histórico permanece intacto). NÃO
+   * encerra tarefas que não sejam de contato — o encerramento geral por perda
+   * do negócio é escopo do CLICKUP-9425.
+   *
+   * @param leadIds Ids de Lead (qualquer origem; filtrados aqui para RT SOL).
+   * @return contagens controladas.
+   * @throws OptOutException falha ao desqualificar/cancelar (transação deve ser
+   *   abortada).
+   */
+  public static ResultadoOptOut registrarOptOut(List<Id> leadIds) {
+    ResultadoOptOut r = new ResultadoOptOut();
+    if (leadIds == null || leadIds.isEmpty()) {
+      return r;
+    }
+
+    Set<Id> ids = new Set<Id>(leadIds);
+    Datetime agora = System.now();
+
+    Savepoint sp = null;
+    try {
+      sp = Database.setSavepoint();
+      // Trava os Leads: serializa dois opt-outs concorrentes do mesmo Lead.
+      List<Lead> carregados = [
+        SELECT Id, RecordType.DeveloperName, SOL_Opt_Out__c
+        FROM Lead
+        WHERE Id IN :ids AND IsConverted = false
+        FOR UPDATE
+      ];
+
+      List<Lead> leadsParaDesqualificar = new List<Lead>();
+      Set<Id> leadsSOL = new Set<Id>();
+      Set<Id> encontrados = new Set<Id>();
+      for (Lead l : carregados) {
+        encontrados.add(l.Id);
+        if (l.RecordType.DeveloperName != RECORD_TYPE_DEVELOPER_NAME) {
+          r.ignorados++;
+          continue;
+        }
+        leadsSOL.add(l.Id);
+        // Idempotência: só desqualifica se ainda não estava em opt-out.
+        if (l.SOL_Opt_Out__c != true) {
+          l.SOL_Opt_Out__c = true;
+          l.SOL_Data_Opt_Out__c = agora;
+          l.Status = LEAD_STATUS_DESQUALIFICADO;
+          l.SOL_Motivo_Desqualificacao__c = MOTIVO_DESQUALIFICACAO_OPT_OUT;
+          leadsParaDesqualificar.add(l);
+        }
+      }
+      r.ignorados += (ids.size() - encontrados.size());
+
+      if (leadsSOL.isEmpty()) {
+        return r;
+      }
+
+      // Tarefas de contato AINDA PENDENTES dos Leads SOL. A que registrou o
+      // opt-out já está "Completed" e não entra aqui; concluídas não são tocadas.
+      List<Task> pendentes = [
+        SELECT Id
+        FROM Task
+        WHERE
+          WhoId IN :leadsSOL
+          AND SOL_Tipo_Tarefa__c = :TIPO_TAREFA_CONTATO
+          AND IsClosed = false
+        FOR UPDATE
+      ];
+      for (Task t : pendentes) {
+        t.Status = TASK_STATUS_CANCELADA;
+        t.SOL_Motivo_Cancelamento__c = MOTIVO_CANCELAMENTO_OPT_OUT;
+      }
+
+      if (!leadsParaDesqualificar.isEmpty()) {
+        update leadsParaDesqualificar;
+      }
+      if (!pendentes.isEmpty()) {
+        update pendentes;
+      }
+
+      r.leadsDesqualificados = leadsParaDesqualificar.size();
+      r.tarefasCanceladas = pendentes.size();
+      return r;
+    } catch (Exception e) {
+      if (sp != null) {
+        Database.rollback(sp);
+      }
+      System.debug(
+        LoggingLevel.ERROR,
+        'SOLDistribuicaoService.registrarOptOut: ' +
+          e.getTypeName() +
+          ': ' +
+          e.getMessage() +
+          '\n' +
+          e.getStackTraceString()
+      );
+      throw new OptOutException(MSG_OPT_OUT_FALHA);
     }
   }
 

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Opt_Out__c</fullName>
+    <description>O Lead pediu para não ser mais contatado durante a cadência (opt-out). Ao ser marcado, o sistema desqualifica o Lead, cancela as tarefas de contato pendentes e não cria novas tarefas de contato. Só Record Type SOL. Escrito apenas pela automação SOL. CLICKUP-9418.</description>
+    <label>Opt-out (SOL)</label>
+    <defaultValue>false</defaultValue>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>
