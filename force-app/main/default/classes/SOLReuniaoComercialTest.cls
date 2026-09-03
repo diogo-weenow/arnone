@@ -147,6 +147,7 @@ private class SOLReuniaoComercialTest {
     Cenario c = montarCenario(3);
     Lead l = novoLeadSOL('S1', 'Recuperação Tributária');
 
+    Datetime t0 = System.now();
     Test.startTest();
     promoverParaSQL(l.Id);
     Test.stopTest();
@@ -158,9 +159,13 @@ private class SOLReuniaoComercialTest {
     System.assertEquals(l.Id, ts[0].WhoId);
     System.assertEquals(l.OwnerId, ts[0].OwnerId, 'Proprietário da tarefa = dono do Lead.');
     System.assertEquals('Reunião comercial', ts[0].SOL_Tipo_Tarefa__c);
-    System.assertNotEquals(null, ts[0].ActivityDate);
+    System.assertEquals(
+      esperado(bhIdReq(), t0, 7),
+      ts[0].ActivityDate,
+      '7 dias úteis (SP) após a mudança, pelo Business Hours.'
+    );
     System.assert(
-      ts[0].ActivityDate >= Date.today().addDays(9),
+      dataSP(t0).daysBetween(ts[0].ActivityDate) >= 9,
       '7 dias úteis atravessam pelo menos um fim de semana: ' + ts[0].ActivityDate
     );
     // Não avança o Lead para "Procuração Solicitada".
@@ -407,43 +412,149 @@ private class SOLReuniaoComercialTest {
 
   // ============================================================ PRAZO / CALENDÁRIO
 
-  @IsTest
-  static void prazoUsaSeteDiasUteisEPulaFimDeSemana() {
+  private static final String TZ_SP = 'America/Sao_Paulo';
+
+  private static Id bhIdReq() {
     Id bhId = SOLReuniaoComercialService.businessHoursComercialId();
     System.assertNotEquals(
       null,
       bhId,
       'Business Hours "Arnone Soluções - Horário Comercial" é pré-requisito.'
     );
+    return bhId;
+  }
 
-    // Quarta-feira ao meio-dia GMT (dia útil).
-    Datetime origem = Datetime.newInstanceGmt(2026, 3, 4, 12, 0, 0);
+  /** Instante = HH:mm de São Paulo na data indicada (SP = GMT-3, sem verão). */
+  private static Datetime spInstant(Integer y, Integer mo, Integer d, Integer h, Integer mi) {
+    // 00:00 SP == 03:00 GMT do mesmo dia; soma minutos com rollover seguro.
+    return Datetime.newInstanceGmt(y, mo, d, 0, 0, 0).addMinutes((h + 3) * 60 + mi);
+  }
+
+  private static Date dataSP(Datetime dt) {
+    return Date.valueOf(dt.format('yyyy-MM-dd', TZ_SP));
+  }
+
+  /** Recontagem independente: N dias úteis após a DATA (SP) de `origem`. */
+  private static Date esperado(Id bhId, Datetime origem, Integer n) {
+    Date data = dataSP(origem);
+    Integer contados = 0;
+    Integer guarda = 0;
+    while (contados < n && guarda < 400) {
+      data = data.addDays(1);
+      Datetime antes = Datetime.newInstanceGmt(data, Time.newInstance(0, 0, 0, 0));
+      Datetime prox = BusinessHours.nextStartDate(bhId, antes);
+      if (prox != null && dataSP(prox) == data) {
+        contados++;
+      }
+      guarda++;
+    }
+    return data;
+  }
+
+  @IsTest
+  static void prazoContaSextaMesmoComOrigemQuintaAs1730() {
+    Id bhId = bhIdReq();
+    // Quinta 2026-09-10, 17:30 SP (expediente da quinta vai até 18:00).
+    Datetime origem = spInstant(2026, 9, 10, 17, 30);
     Datetime prazo = SOLReuniaoComercialService.prazoEmDiasUteis(bhId, origem, 7);
 
-    System.assert(BusinessHours.isWithin(bhId, prazo), 'O prazo cai em dia/hora útil.');
+    // 09-11 é SEXTA (fecha 17:00) e DEVE contar como dia 1.
+    // Dias úteis após 09-10: 11(1) 14(2) 15(3) 16(4) 17(5) 18(6) 21(7).
+    System.assertEquals(
+      Date.newInstance(2026, 9, 21),
+      dataSP(prazo),
+      'A sexta 09-11 conta como dia útil mesmo encerrando às 17h.'
+    );
+    System.assertEquals(Date.newInstance(2026, 9, 21), esperado(bhId, origem, 7));
+  }
 
-    Datetime cursor = BusinessHours.add(bhId, origem, 1);
+  @IsTest
+  static void prazoComOrigemForaDoExpediente() {
+    Id bhId = bhIdReq();
+    // Quinta 2026-09-10, 22:00 SP — muito depois do fechamento.
+    Datetime origem = spInstant(2026, 9, 10, 22, 0);
+    Datetime prazo = SOLReuniaoComercialService.prazoEmDiasUteis(bhId, origem, 7);
+    // A contagem começa no dia seguinte por DATA: 09-11 ainda é dia 1.
+    System.assertEquals(Date.newInstance(2026, 9, 21), dataSP(prazo));
+  }
+
+  @IsTest
+  static void prazoComOrigemNoFimDeSemana() {
+    Id bhId = bhIdReq();
+    // Sábado 2026-09-12, 10:00 SP.
+    Datetime origem = spInstant(2026, 9, 12, 10, 0);
+    Datetime prazo = SOLReuniaoComercialService.prazoEmDiasUteis(bhId, origem, 7);
+    // Dias úteis após 09-12: 14(1) 15(2) 16(3) 17(4) 18(5) 21(6) 22(7).
+    System.assertEquals(Date.newInstance(2026, 9, 22), dataSP(prazo));
+    System.assertEquals(Date.newInstance(2026, 9, 22), esperado(bhId, origem, 7));
+  }
+
+  @IsTest
+  static void activityDateConvertidaSemDeslocamentoDeTimezone() {
+    Cenario c = montarCenario(2);
+    Lead l = novoLeadSOL('SPrazo', 'Recuperação Tributária');
+
+    // Origem numa QUARTA => o 7º dia útil cai numa SEXTA (2026-09-11).
+    Datetime origem = spInstant(2026, 9, 2, 12, 0);
+    Id bhId = bhIdReq();
+    Datetime prazo = SOLReuniaoComercialService.prazoEmDiasUteis(bhId, origem, 7);
+
+    // prazo é a abertura (08:00 SP = 11:00 GMT); a data em SP é 09-11.
+    System.assertEquals('2026-09-11', prazo.format('yyyy-MM-dd', TZ_SP));
+    System.assertEquals(Date.newInstance(2026, 9, 11), dataSP(prazo));
+    System.assertEquals(
+      Date.newInstance(2026, 9, 11),
+      SOLReuniaoComercialService.dataEm(prazo, TZ_SP),
+      'Task.ActivityDate = data de São Paulo, sem deslocar por GMT.'
+    );
+
+    // E a tarefa real: ActivityDate = data (SP) do 7º dia útil a partir de agora.
+    Datetime t0 = System.now();
+    Test.startTest();
+    promoverParaSQL(l.Id);
+    Test.stopTest();
+
+    List<Task> ts = tarefasReuniao(l.Id);
+    System.assertEquals(1, ts.size());
+    System.assertEquals(
+      esperado(bhId, t0, 7),
+      ts[0].ActivityDate,
+      'ActivityDate = 7º dia útil (SP) contado a partir da mudança.'
+    );
+  }
+
+  @IsTest
+  static void prazoSeteDiasUteisRegressao() {
+    Id bhId = bhIdReq();
+    // Terça 2026-03-03, meio-dia SP.
+    Datetime origem = spInstant(2026, 3, 3, 12, 0);
+    Datetime prazo = SOLReuniaoComercialService.prazoEmDiasUteis(bhId, origem, 7);
+
+    Date esperada = esperado(bhId, origem, 7);
+    System.assertEquals(esperada, dataSP(prazo), '7 dias úteis pelo Business Hours.');
+
+    // No intervalo (origem, prazo] há exatamente 7 dias úteis e pelo menos um
+    // fim de semana pulado.
     Integer uteis = 0;
     Integer naoUteis = 0;
-    Datetime d = cursor.addDays(1);
-    while (d <= prazo) {
-      if (BusinessHours.isWithin(bhId, d)) {
+    Date d = dataSP(origem);
+    while (d < esperada) {
+      d = d.addDays(1);
+      Datetime antes = Datetime.newInstanceGmt(d, Time.newInstance(0, 0, 0, 0));
+      Datetime prox = BusinessHours.nextStartDate(bhId, antes);
+      if (prox != null && dataSP(prox) == d) {
         uteis++;
       } else {
         naoUteis++;
       }
-      d = d.addDays(1);
     }
-    System.assertEquals(7, uteis, 'Exatamente 7 dias úteis contados pelo Business Hours.');
+    System.assertEquals(7, uteis, 'Exatamente 7 dias úteis entre a mudança e o prazo (inclusive).');
+    System.assert(naoUteis >= 2, 'Pelo menos um fim de semana foi pulado (não úteis: ' + naoUteis + ').');
     System.assert(
-      naoUteis >= 2,
-      'O intervalo pulou pelo menos um fim de semana (dias não úteis: ' + naoUteis + ').'
-    );
-    System.assert(
-      cursor.date().daysBetween(prazo.date()) >= 9,
+      dataSP(origem).daysBetween(esperada) >= 9,
       '7 dias úteis = pelo menos 9 dias corridos.'
     );
-    // Mesma via de cálculo (BusinessHours.isWithin) exclui feriados do calendário.
+    // A MESMA via (BusinessHours.nextStartDate) exclui feriados do calendário.
   }
 
   @IsTest

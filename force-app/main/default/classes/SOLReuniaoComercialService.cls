@@ -40,6 +40,8 @@ public without sharing class SOLReuniaoComercialService {
   private static final Integer DIAS_UTEIS_PRAZO = 7;
   @TestVisible
   private static final String BUSINESS_HOURS_NAME = 'Arnone Soluções - Horário Comercial';
+  @TestVisible
+  private static final String TZ_SAO_PAULO = 'America/Sao_Paulo';
 
   /** Mensagem controlada exibida ao vendedor quando a criação da tarefa falha. */
   public static final String MSG_FALHA = 'Não foi possível criar a tarefa de reunião comercial. Nenhuma alteração foi salva — tente registrar a reunião novamente.';
@@ -145,6 +147,7 @@ public without sharing class SOLReuniaoComercialService {
         throw new ReuniaoComercialException(MSG_SEM_CALENDARIO);
       }
       Datetime prazo = prazoEmDiasUteis(bhId, mudanca, DIAS_UTEIS_PRAZO);
+      Date vencimento = dataEm(prazo, TZ_SAO_PAULO);
 
       List<Task> novas = new List<Task>();
       for (Id leadId : donoPorLead.keySet()) {
@@ -154,7 +157,7 @@ public without sharing class SOLReuniaoComercialService {
             WhoId = leadId,
             OwnerId = donoPorLead.get(leadId),
             Status = TASK_STATUS_ABERTO,
-            ActivityDate = prazo.dateGmt(),
+            ActivityDate = vencimento,
             // Classificador técnico — chave de idempotência (nunca o Subject).
             SOL_Tipo_Tarefa__c = TIPO_TAREFA_REUNIAO
           )
@@ -187,30 +190,47 @@ public without sharing class SOLReuniaoComercialService {
   }
 
   /**
-   * Datetime `dias` dias ÚTEIS depois de `origem`, contados pelo Business Hours
-   * `bhId` — respeita a grade semanal e os feriados do calendário. Sem
-   * addDays(7): normaliza a origem para dentro do expediente e avança um dia de
-   * calendário por vez, contando só os que caem em dia útil.
+   * Abertura efetiva do dia útil que fica `dias` dias ÚTEIS depois da DATA
+   * (America/Sao_Paulo) de `origem`. Conta pelo Business Hours `bhId`: uma data
+   * conta como dia útil quando POSSUI algum período de expediente nela — a
+   * verificação usa a abertura efetiva do dia (BusinessHours.nextStartDate a
+   * partir da véspera), NÃO o horário da origem. Assim uma sexta que encerra às
+   * 17:00 conta como dia útil mesmo quando a mudança ocorreu numa quinta às
+   * 17:30. Fim de semana e feriados do calendário são preservados; sem
+   * addDays(7) e sem grade fixa de segunda a sexta.
    */
   @TestVisible
   private static Datetime prazoEmDiasUteis(Id bhId, Datetime origem, Integer dias) {
-    // +1 ms de tempo útil: se `origem` está fora do expediente, salta para o
-    // próximo período útil; o horário resultante fica dentro do expediente.
-    Datetime prazo = BusinessHours.add(bhId, origem, 1);
+    Date data = dataEm(origem, TZ_SAO_PAULO);
     Integer contados = 0;
     Integer guarda = 0;
+    Datetime abertura = null;
     while (contados < dias && guarda < 400) {
-      prazo = prazo.addDays(1);
-      if (BusinessHours.isWithin(bhId, prazo)) {
+      data = data.addDays(1);
+      // Instante seguramente ANTERIOR à abertura de `data` em São Paulo
+      // (00:00 UTC de `data` = véspera à noite em SP, sempre fora de expediente).
+      Datetime antesDaAbertura = Datetime.newInstanceGmt(
+        data,
+        Time.newInstance(0, 0, 0, 0)
+      );
+      Datetime proximaAbertura = BusinessHours.nextStartDate(bhId, antesDaAbertura);
+      if (proximaAbertura != null && dataEm(proximaAbertura, TZ_SAO_PAULO) == data) {
         contados++;
+        abertura = proximaAbertura;
       }
       guarda++;
     }
-    if (contados < dias) {
+    if (contados < dias || abertura == null) {
       // Calendário sem dias úteis suficientes — trata como calendário inválido.
       throw new ReuniaoComercialException(MSG_SEM_CALENDARIO);
     }
-    return prazo;
+    return abertura;
+  }
+
+  /** Data no fuso `tz` correspondente ao instante `dt` (sem deslocamento GMT). */
+  @TestVisible
+  private static Date dataEm(Datetime dt, String tz) {
+    return Date.valueOf(dt.format('yyyy-MM-dd', tz));
   }
 
   /**
