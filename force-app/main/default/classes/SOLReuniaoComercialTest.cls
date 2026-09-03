@@ -250,7 +250,24 @@ private class SOLReuniaoComercialTest {
   static void leadConvertidoNaoCria() {
     Cenario c = montarCenario(2);
     Lead l = novoLeadSOL('S6', 'Recuperação Tributária');
-    update new Lead(Id = l.Id, SOL_Status_Procuracao__c = 'Recebida');
+    // CLICKUP-9419: converter exige procuração Recebida com data + arquivo.
+    update new Lead(
+      Id = l.Id,
+      SOL_Status_Procuracao__c = 'Recebida',
+      SOL_Data_Recebimento_Procuracao__c = Date.today()
+    );
+    ContentVersion cv = new ContentVersion(
+      Title = 'p9419',
+      PathOnClient = 'p.txt',
+      VersionData = Blob.valueOf('x')
+    );
+    insert cv;
+    insert new ContentDocumentLink(
+      ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv.Id]
+        .ContentDocumentId,
+      LinkedEntityId = l.Id,
+      ShareType = 'V'
+    );
     Database.LeadConvert lc = new Database.LeadConvert();
     lc.setLeadId(l.Id);
     lc.setDoNotCreateOpportunity(true);
@@ -317,7 +334,8 @@ private class SOLReuniaoComercialTest {
     System.assertEquals(1, tarefasReuniao(l.Id).size());
 
     Test.startTest();
-    update new Lead(Id = l.Id, Status = 'Procuração Solicitada');
+    // Sai de SQL para uma etapa anterior (não gatilhada pelo CLICKUP-9419) e reentra.
+    update new Lead(Id = l.Id, Status = 'Captação - Contato');
     update new Lead(Id = l.Id, Status = STATUS_SQL); // reentra em SQL
     Test.stopTest();
 

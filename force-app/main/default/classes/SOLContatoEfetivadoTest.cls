@@ -508,7 +508,24 @@ private class SOLContatoEfetivadoTest {
   static void colecaoVaziaNulaEConvertidoIgnorados() {
     Cenario c = montarCenario(2);
     Lead l = novoLeadSOLDistribuido('S9', 'Recuperação Tributária');
-    update new Lead(Id = l.Id, SOL_Status_Procuracao__c = 'Recebida');
+    // CLICKUP-9419: converter exige procuração Recebida com data + arquivo.
+    update new Lead(
+      Id = l.Id,
+      SOL_Status_Procuracao__c = 'Recebida',
+      SOL_Data_Recebimento_Procuracao__c = Date.today()
+    );
+    ContentVersion cv9419 = new ContentVersion(
+      Title = 'p9419',
+      PathOnClient = 'p.txt',
+      VersionData = Blob.valueOf('x')
+    );
+    insert cv9419;
+    insert new ContentDocumentLink(
+      ContentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv9419.Id]
+        .ContentDocumentId,
+      LinkedEntityId = l.Id,
+      ShareType = 'V'
+    );
     Database.LeadConvert lc = new Database.LeadConvert();
     lc.setLeadId(l.Id);
     lc.setDoNotCreateOpportunity(true);
