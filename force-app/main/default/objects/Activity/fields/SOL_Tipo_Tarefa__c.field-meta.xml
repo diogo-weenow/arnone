@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Tipo_Tarefa__c</fullName>
-    <description>Classificador técnico da tarefa de automação da jornada Arnone Soluções. Preenchido apenas pelas automações SOL — não é o assunto editável da Task. "Contato" = tarefa de contato do ciclo (ligação/e-mail/WhatsApp; CLICKUP-9417). "Reunião comercial" = tarefa para realizar a reunião comercial após o lead entrar em "Reunião Agendada - SQL" (CLICKUP-9401). "Acompanhamento da procuração" = tarefa para acompanhar o recebimento da procuração após a solicitação registrada (CLICKUP-9426). "Acompanhamento do cálculo jurídico" = tarefa para acompanhar o recebimento do cálculo jurídico após a solicitação registrada na Oportunidade (CLICKUP-9421). "Reunião final" = tarefa para realizar a reunião final após o recebimento do cálculo jurídico, quando a Oportunidade avança de Diagnóstico para Negociação (CLICKUP-9422). Usado como chave de idempotência das automações — nunca o Subject.</description>
+    <description>Classificador técnico da tarefa de automação da jornada Arnone Soluções. Preenchido apenas pelas automações SOL — nunca o Subject; é a chave de idempotência. "Contato" = tarefa de contato do ciclo (CLICKUP-9417). "Reunião comercial" = realizar a reunião comercial após "Reunião Agendada - SQL" (CLICKUP-9401). "Acompanhamento da procuração" = acompanhar o recebimento da procuração (CLICKUP-9426). "Acompanhamento do cálculo jurídico" = acompanhar o recebimento do cálculo jurídico (CLICKUP-9421). "Reunião final" = realizar a reunião final após o recebimento do cálculo, quando a Opp avança de Diagnóstico para Negociação (CLICKUP-9422). "Fechamento" = realizar o fechamento após a reunião final; concluída automaticamente quando a Opp vira Ganho ou Perdido (CLICKUP-9423).</description>
     <label>Tipo de tarefa SOL</label>
     <required>false</required>
     <type>Picklist</type>
@@ -33,6 +33,11 @@
                 <fullName>Reunião final</fullName>
                 <default>false</default>
                 <label>Reunião final</label>
+            </value>
+            <value>
+                <fullName>Fechamento</fullName>
+                <default>false</default>
+                <label>Fechamento</label>
             </value>
         </valueSetDefinition>
     </valueSet>

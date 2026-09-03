@@ -511,7 +511,10 @@ private class SOLReuniaoFinalTest {
   }
 
   @IsTest
-  static void concluirReuniaoFinalNaoCriaTarefaDeFechamento() {
+  static void concluirReuniaoFinalDisparaFechamentoSemAvancarEtapa() {
+    // Regressão do CLICKUP-9423: concluir a reunião final agora cria a tarefa de
+    // fechamento (tipo "Fechamento"), mas NÃO avança a Oportunidade além de
+    // "Negociação".
     Id oppId = oppPronta();
     Task acomp = acompanhamento(oppId);
     concluir(acomp.Id, Date.today());
@@ -522,8 +525,16 @@ private class SOLReuniaoFinalTest {
     Test.stopTest();
 
     System.assertEquals('Completed', [SELECT Status FROM Task WHERE Id = :fin.Id].Status);
-    // CLICKUP-9423 não é antecipado: nenhuma tarefa nova além da própria reunião
-    // final e da de acompanhamento.
+    System.assertEquals(
+      1,
+      [
+        SELECT COUNT()
+        FROM Task
+        WHERE WhatId = :oppId AND SOL_Tipo_Tarefa__c = 'Fechamento'
+      ],
+      'CLICKUP-9423: uma tarefa de fechamento.'
+    );
+    // Nenhuma tarefa de tipo inesperado.
     System.assertEquals(
       0,
       [
@@ -533,6 +544,7 @@ private class SOLReuniaoFinalTest {
           WhatId = :oppId
           AND SOL_Tipo_Tarefa__c != :TIPO_FINAL
           AND SOL_Tipo_Tarefa__c != :TIPO_ACOMP
+          AND SOL_Tipo_Tarefa__c != 'Fechamento'
       ]
     );
     System.assertEquals('Negociação', opp(oppId).StageName, 'Não avança além de Negociação.');

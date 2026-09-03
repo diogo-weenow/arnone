@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Chamar_Criar_Tarefa_Fechamento</name>
+        <label>Criar tarefa de fechamento após a reunião final SOL</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <actionName>SOLFechamentoCriarInvocable</actionName>
+        <actionType>apex</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>taskId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>SOLFechamentoCriarInvocable</nameSegment>
+    </actionCalls>
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>CLICKUP-9423 — Card 12, Evento 1. Quando a Task "Reunião final" (SOL_Tipo_Tarefa__c = "Reunião final") muda REALMENTE para "Completed", com SOL_Data_Reuniao_Final__c preenchida e WhatId de Opportunity, aciona SOLFechamentoCriarInvocable para criar UMA Task "Realizar fechamento" (vencimento 7 dias úteis após a reunião, responsável = proprietário atual da Oportunidade). A Oportunidade permanece em "Negociação". doesRequireRecordChangedToMeetCriteria=true garante a transição real, sem usar o Subject. Idempotência (Opportunity + tipo Fechamento + data da reunião), prazo e atomicidade (desfaz a conclusão da reunião final se falhar) ficam no Apex. Escopo RT SOL + Recuperação Tributária; ART 360 e outras BUs ficam intactas.</description>
+    <environments>Default</environments>
+    <interviewLabel>SOL_Tarefa_Fechamento_Apos_Reuniao {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL_Tarefa_Fechamento_Apos_Reuniao</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Chamar_Criar_Tarefa_Fechamento</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  ISPICKVAL({!$Record.SOL_Tipo_Tarefa__c}, &apos;Reunião final&apos;),
+  ISPICKVAL({!$Record.Status}, &apos;Completed&apos;),
+  NOT(ISBLANK({!$Record.SOL_Data_Reuniao_Final__c})),
+  NOT(ISBLANK({!$Record.WhatId}))
+)</filterFormula>
+        <object>Task</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

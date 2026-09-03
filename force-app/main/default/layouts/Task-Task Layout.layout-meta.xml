@@ -115,6 +115,10 @@
                 <behavior>Readonly</behavior>
                 <field>SOL_Data_Recebimento_Calculo_Ref__c</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>SOL_Data_Reuniao_Final_Ref__c</field>
+            </layoutItems>
         </layoutColumns>
         <style>TwoColumnsLeftToRight</style>
     </layoutSections>
