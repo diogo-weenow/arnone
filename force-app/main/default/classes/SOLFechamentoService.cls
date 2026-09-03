@@ -21,7 +21,11 @@
  *
  * EVENTO 2 — encerrarTarefasFechamento(opportunityIds):
  *   Quando a Oportunidade muda REALMENTE para "Ganho" ou "Perdido", conclui
- *   automaticamente TODAS as Tasks abertas do tipo "Fechamento" dela. Não altera
+ *   automaticamente TODAS as Tasks abertas do tipo "Fechamento" dela, gravando
+ *   Status = "Completed" e SOL_Encerrado_Pela_Oportunidade__c = true
+ *   na MESMA atualização. É esse checkbox técnico que autoriza a transição na VR
+ *   SOL_Fechamento_Exige_Encerramento_Auto: sem ele, a conclusão MANUAL da Task
+ *   de fechamento (com a Oportunidade ainda aberta) é bloqueada. Não altera
  *   outras Tasks. Se não houver tarefa de fechamento, a mudança da Oportunidade
  *   segue normalmente. As Validation Rules de Ganho/Perdido são preservadas (o
  *   Flow é after-save: só roda se a mudança já passou pelas VRs).
@@ -303,7 +307,17 @@ public without sharing class SOLFechamentoService {
       Set<Id> oppsComTarefa = new Set<Id>();
       List<Task> concluir = new List<Task>();
       for (Task t : abertas) {
-        concluir.add(new Task(Id = t.Id, Status = STATUS_COMPLETED));
+        // Status e o checkbox técnico gravados SIMULTANEAMENTE: é o checkbox que
+        // autoriza a transição para "Completed" na VR
+        // SOL_Fechamento_Exige_Encerramento_Auto — a conclusão manual, com a
+        // Oportunidade ainda aberta, fica bloqueada.
+        concluir.add(
+          new Task(
+            Id = t.Id,
+            Status = STATUS_COMPLETED,
+            SOL_Encerrado_Pela_Oportunidade__c = true
+          )
+        );
         oppsComTarefa.add(t.WhatId);
       }
       update concluir;

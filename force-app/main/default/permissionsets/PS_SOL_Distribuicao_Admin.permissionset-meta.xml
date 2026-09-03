@@ -98,6 +98,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Task.SOL_Encerrado_Pela_Oportunidade__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Task.SOL_Data_Solicitacao_Calculo_Ref__c</field>
         <readable>true</readable>
     </fieldPermissions>

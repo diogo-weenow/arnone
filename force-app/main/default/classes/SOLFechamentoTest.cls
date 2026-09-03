@@ -415,7 +415,16 @@ private class SOLFechamentoTest {
     update new Opportunity(Id = oppId, StageName = 'Ganho');
     Test.stopTest();
 
-    System.assertEquals('Completed', [SELECT Status FROM Task WHERE Id = :f.Id].Status);
+    Task depois = [
+      SELECT Status, SOL_Encerrado_Pela_Oportunidade__c
+      FROM Task
+      WHERE Id = :f.Id
+    ];
+    System.assertEquals('Completed', depois.Status);
+    System.assert(
+      depois.SOL_Encerrado_Pela_Oportunidade__c,
+      'O checkbox técnico é marcado junto com a conclusão automática.'
+    );
     System.assertEquals('Ganho', opp(oppId).StageName);
   }
 
@@ -432,7 +441,16 @@ private class SOLFechamentoTest {
     );
     Test.stopTest();
 
-    System.assertEquals('Completed', [SELECT Status FROM Task WHERE Id = :f.Id].Status);
+    Task depois = [
+      SELECT Status, SOL_Encerrado_Pela_Oportunidade__c
+      FROM Task
+      WHERE Id = :f.Id
+    ];
+    System.assertEquals('Completed', depois.Status);
+    System.assert(
+      depois.SOL_Encerrado_Pela_Oportunidade__c,
+      'O checkbox técnico é marcado junto com a conclusão automática.'
+    );
     System.assertEquals('Perdido', opp(oppId).StageName);
   }
 
@@ -476,16 +494,134 @@ private class SOLFechamentoTest {
   }
 
   @IsTest
-  static void conclusaoManualDaTaskNaoAlteraEstagio() {
+  static void conclusaoManualBloqueadaComOportunidadeAberta() {
     Id oppId = oppNegociacao();
     Task f = fechamentoAberto(oppId, Date.today().addDays(-3));
 
     Test.startTest();
-    update new Task(Id = f.Id, Status = 'Completed');
+    Boolean bloqueou = false;
+    try {
+      update new Task(Id = f.Id, Status = 'Completed');
+    } catch (DmlException e) {
+      bloqueou = true;
+      System.assert(
+        e.getDmlMessage(0).containsIgnoreCase('concluída automaticamente'),
+        e.getDmlMessage(0)
+      );
+    }
     Test.stopTest();
 
+    System.assert(bloqueou, 'A conclusão manual da tarefa de fechamento é bloqueada.');
+    Task depois = [
+      SELECT Status, SOL_Encerrado_Pela_Oportunidade__c
+      FROM Task
+      WHERE Id = :f.Id
+    ];
+    System.assertEquals('Open', depois.Status, 'A Task permanece aberta.');
+    System.assertEquals(false, depois.SOL_Encerrado_Pela_Oportunidade__c);
+    System.assertEquals(
+      'Negociação',
+      opp(oppId).StageName,
+      'A Oportunidade permanece em Negociação.'
+    );
+  }
+
+  @IsTest
+  static void trocarOutrosCamposNaoBurlaARegra() {
+    // O checkbox é somente leitura para Comercial e Distribuição Admin (FLS) e
+    // não há exceção por Subject, perfil ou usuário: sem a automação, a Task
+    // continua bloqueada para conclusão manual.
+    Id oppId = oppNegociacao();
+    Task f = fechamentoAberto(oppId, Date.today().addDays(-3));
+
+    Test.startTest();
+    Boolean bloqueou = false;
+    try {
+      // Mesmo alterando só o Status (o único caminho disponível ao usuário),
+      // a VR barra a transição.
+      update new Task(Id = f.Id, Status = 'Completed', Subject = 'qualquer assunto');
+    } catch (DmlException e) {
+      bloqueou = true;
+    }
+    Test.stopTest();
+
+    System.assert(bloqueou, 'Trocar o Subject não cria exceção à regra.');
+    System.assertEquals('Open', [SELECT Status FROM Task WHERE Id = :f.Id].Status);
+  }
+
+  @IsTest
+  static void manutencaoPosteriorDeRegistroHistoricoNaoEhBloqueada() {
+    // Task de fechamento já concluída pela automação: editar depois (sem mudar o
+    // Status) não é bloqueado — é o papel do ISCHANGED(Status) na VR.
+    Id oppId = oppNegociacao();
+    Task f = fechamentoAberto(oppId, Date.today().addDays(-3));
+    update new Opportunity(Id = oppId, StageName = 'Ganho');
     System.assertEquals('Completed', [SELECT Status FROM Task WHERE Id = :f.Id].Status);
-    System.assertEquals('Negociação', opp(oppId).StageName, 'Concluir a Task manualmente não muda a etapa.');
+
+    Test.startTest();
+    update new Task(Id = f.Id, Description = 'anotação de auditoria');
+    Test.stopTest();
+
+    Task depois = [
+      SELECT Status, Description, SOL_Encerrado_Pela_Oportunidade__c
+      FROM Task
+      WHERE Id = :f.Id
+    ];
+    System.assertEquals('Completed', depois.Status);
+    System.assertEquals('anotação de auditoria', depois.Description);
+    System.assert(depois.SOL_Encerrado_Pela_Oportunidade__c);
+  }
+
+  @IsTest
+  static void encerramentoEmLoteMarcaOCheckbox() {
+    List<Id> opps = new List<Id>();
+    List<Task> fechs = new List<Task>();
+    for (Integer i = 0; i < 10; i++) {
+      Id oppId = oppNegociacao();
+      opps.add(oppId);
+      fechs.add(
+        new Task(
+          Subject = SUBJECT_FECHAMENTO,
+          WhatId = oppId,
+          OwnerId = UserInfo.getUserId(),
+          Status = 'Open',
+          ActivityDate = Date.today().addDays(7),
+          SOL_Tipo_Tarefa__c = TIPO_FECHAMENTO,
+          SOL_Data_Reuniao_Final_Ref__c = Date.today().addDays(-3)
+        )
+      );
+    }
+    insert fechs;
+    List<Opportunity> encerrar = new List<Opportunity>();
+    for (Id oppId : opps) {
+      encerrar.add(
+        new Opportunity(Id = oppId, StageName = 'Perdido', SOL_Motivo_Perda__c = 'Sem retorno')
+      );
+    }
+
+    Test.startTest();
+    Integer q0 = Limits.getQueries();
+    Integer d0 = Limits.getDmlStatements();
+    update encerrar;
+    Integer soql = Limits.getQueries() - q0;
+    Integer dml = Limits.getDmlStatements() - d0;
+    Test.stopTest();
+
+    System.assertEquals(
+      10,
+      [
+        SELECT COUNT()
+        FROM Task
+        WHERE
+          WhatId IN :opps
+          AND SOL_Tipo_Tarefa__c = :TIPO_FECHAMENTO
+          AND Status = 'Completed'
+          AND SOL_Encerrado_Pela_Oportunidade__c = TRUE
+      ],
+      'Lote: todas concluídas com o checkbox marcado.'
+    );
+    System.assert(soql < 15, 'SOQL não escala por registro: ' + soql);
+    System.assert(dml < 6, 'DML não escala por registro: ' + dml);
   }
 
   @IsTest
@@ -776,30 +912,75 @@ private class SOLFechamentoTest {
   }
 
   private static void verificar(User u, String psName, Id oppId, Id taskId) {
+    Boolean bloqueou = false;
     System.runAs(new User(Id = u.Id)) {
       Schema.DescribeFieldResult ref = Task.SOL_Data_Reuniao_Final_Ref__c.getDescribe();
+      Schema.DescribeFieldResult flag = Task.SOL_Encerrado_Pela_Oportunidade__c
+        .getDescribe();
+
       System.assert(ref.isAccessible(), psName + ': SOL_Data_Reuniao_Final_Ref__c isAccessible.');
       System.assert(
         !ref.isUpdateable(),
         psName + ': SOL_Data_Reuniao_Final_Ref__c NÃO é isUpdateable (referência técnica).'
       );
       System.assert(
-        Task.SObjectType.getDescribe().isUpdateable(),
-        psName + ': o perfil precisa de Edit em Activities para o usuário concluir a tarefa.'
+        flag.isAccessible(),
+        psName + ': SOL_Encerrado_Pela_Oportunidade__c isAccessible.'
       );
-      // Operação real: o usuário conclui a Task de fechamento que possui.
-      update new Task(Id = taskId, Status = 'Completed');
+      System.assert(
+        !flag.isUpdateable(),
+        psName +
+          ': SOL_Encerrado_Pela_Oportunidade__c NÃO é isUpdateable (checkbox técnico).'
+      );
+      System.assert(
+        Task.SObjectType.getDescribe().isUpdateable(),
+        psName + ': o perfil precisa de Edit em Activities para operar a tarefa.'
+      );
+
+      // Operação real 1: a conclusão MANUAL da tarefa de fechamento é bloqueada
+      // para este papel, com a Oportunidade ainda aberta.
+      try {
+        update new Task(Id = taskId, Status = 'Completed');
+      } catch (DmlException e) {
+        bloqueou = true;
+      }
     }
+    System.assert(bloqueou, psName + ': conclusão manual bloqueada.');
     System.assertEquals(
-      'Completed',
+      'Open',
       [SELECT Status FROM Task WHERE Id = :taskId].Status,
-      psName + ': Task de fechamento concluída pelo próprio usuário.'
+      psName + ': a Task permanece aberta.'
     );
     System.assertEquals(
       'Negociação',
       opp(oppId).StageName,
-      psName + ': concluir a Task manualmente não mudou a etapa.'
+      psName + ': a Oportunidade permanece em Negociação.'
     );
+
+    // Operação real 2: o mesmo usuário encerra o negócio pela Oportunidade e a
+    // automação conclui a tarefa marcando o checkbox técnico.
+    System.runAs(new User(Id = u.Id)) {
+      update new Opportunity(
+        Id = oppId,
+        StageName = 'Perdido',
+        SOL_Motivo_Perda__c = 'Sem retorno'
+      );
+    }
+    Task depois = [
+      SELECT Status, SOL_Encerrado_Pela_Oportunidade__c
+      FROM Task
+      WHERE Id = :taskId
+    ];
+    System.assertEquals(
+      'Completed',
+      depois.Status,
+      psName + ': ao encerrar a Oportunidade, a automação concluiu a tarefa.'
+    );
+    System.assert(
+      depois.SOL_Encerrado_Pela_Oportunidade__c,
+      psName + ': checkbox técnico marcado pela automação.'
+    );
+    System.assertEquals('Perdido', opp(oppId).StageName);
   }
 
   @IsTest
