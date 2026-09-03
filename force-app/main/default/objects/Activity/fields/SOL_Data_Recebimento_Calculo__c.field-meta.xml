@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Recebimento_Calculo__c</fullName>
+    <description>Data em que o cálculo jurídico foi efetivamente recebido, informada pelo vendedor (ou gestor) na tarefa "Acompanhar recebimento do cálculo jurídico" da jornada Arnone Soluções. Aceita a data de hoje ou uma data passada — data futura é rejeitada pela VR SOL_Data_Recebimento_Calculo_Nao_Futura — e não pode ser anterior a SOL_Data_Solicitacao_Calculo_Ref__c, a data da solicitação ao jurídico (VR SOL_Recebimento_Nao_Antes_Solicitacao; se a referência estiver ausente, a regra não dispara). A tarefa de acompanhamento (SOL_Tipo_Tarefa__c = "Acompanhamento do cálculo jurídico") só pode ser concluída quando esta data estiver preenchida (VR SOL_Calculo_Exige_Recebimento). Para o CLICKUP-9422, o recebimento é considerado confirmado quando a tarefa está concluída com esta data preenchida. CLICKUP-9421.</description>
+    <label>Data de recebimento do cálculo</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

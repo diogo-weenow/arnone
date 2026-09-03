@@ -194,6 +194,14 @@ private class SOLSolicitarCalculoTest {
     return [SELECT COUNT() FROM Task WHERE WhatId = :oppId];
   }
 
+  private static Integer tarefasAcompanhamentoCalculo(Id oppId) {
+    return [
+      SELECT COUNT()
+      FROM Task
+      WHERE WhatId = :oppId AND SOL_Tipo_Tarefa__c = 'Acompanhamento do cálculo jurídico'
+    ];
+  }
+
   // ============================================================ POSITIVO
 
   @IsTest
@@ -208,7 +216,10 @@ private class SOLSolicitarCalculoTest {
     System.assert(r.sucesso, 'Caminho feliz grava a data. ' + r.mensagem);
     System.assertEquals(false, r.jaRegistrado);
     System.assertEquals(hoje, campoData(x.oppId));
-    System.assertEquals(0, tarefasDa(x.oppId), 'Não cria tarefa neste card.');
+    // O Card 09 não cria tarefa; a tarefa de acompanhamento do cálculo é do
+    // CLICKUP-9421 (Flow after-save em Opportunity), disparado por este registro.
+    System.assertEquals(1, tarefasDa(x.oppId), 'Só a tarefa de acompanhamento (CLICKUP-9421).');
+    System.assertEquals(1, tarefasAcompanhamentoCalculo(x.oppId));
   }
 
   @IsTest
@@ -488,8 +499,21 @@ private class SOLSolicitarCalculoTest {
       FROM Opportunity
       WHERE Id IN :opps AND SOL_Data_Solicitacao_Calculo__c = TODAY
     ]);
-    System.assert(soql <= 5, 'SOQL não escala por pedido: ' + soql);
-    System.assert(dml <= 2, 'DML não escala por pedido: ' + dml);
+    // Inclui as consultas/DML do Flow after-save do CLICKUP-9421 (uma vez para o
+    // lote inteiro): 2 Savepoints + 1 update + 1 insert = 4 DML fixos. O ponto
+    // do teste é: nada escala por pedido — com 4 Opps, um algoritmo por-registro
+    // passaria de 15 SOQL / 8 DML.
+    System.assert(soql <= 9, 'SOQL não escala por pedido: ' + soql);
+    System.assert(dml <= 5, 'DML não escala por pedido: ' + dml);
+    System.assertEquals(
+      4,
+      [
+        SELECT COUNT()
+        FROM Task
+        WHERE WhatId IN :opps AND SOL_Tipo_Tarefa__c = 'Acompanhamento do cálculo jurídico'
+      ],
+      'CLICKUP-9421: uma tarefa de acompanhamento por Opp, em lote.'
+    );
   }
 
   @IsTest
