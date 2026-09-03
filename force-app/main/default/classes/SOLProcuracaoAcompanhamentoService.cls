@@ -24,10 +24,14 @@
  *  - no máximo uma tarefa por Lead e por solicitação.
  *
  * ATÔMICO: em qualquer falha (inclusive calendário ausente), o Savepoint desfaz
- * tudo e o método RELANÇA {@link AcompanhamentoException}; propagada pelo
- * Invocable, aborta a transação inteira — o registro da solicitação é desfeito
- * junto, sem estado parcial. Sem 7 dias corridos, sem grade fixa seg–sex e sem
- * fallback silencioso.
+ * o trabalho feito DENTRO deste serviço após a sua criação (as queries com
+ * lock e o insert das Tasks) e o método RELANÇA {@link AcompanhamentoException}.
+ * O registro anterior da solicitação (Status + campos do Lead), feito pela
+ * atualização que disparou o Flow, é desfeito porque a exceção é propagada pelo
+ * Invocable ao Flow (flowTransactionModel = CurrentTransaction), abortando a
+ * transação completa — não pelo rollback do Savepoint. Resultado: sem estado
+ * parcial. Sem 7 dias corridos, sem grade fixa seg–sex e sem fallback
+ * silencioso.
  *
  * NÃO altera o Status do Lead. NÃO trata recebimento/conversão da procuração
  * nem encerra a tarefa no recebimento (fora do escopo do card).
@@ -72,6 +76,11 @@ public without sharing class SOLProcuracaoAcompanhamentoService {
   /**
    * Cria a Task "Acompanhar recebimento da procuração" para os Leads que
    * acabaram de registrar a solicitação da procuração.
+   *
+   * Em caso de falha: o Savepoint desfaz o que este serviço fez após criá-lo e
+   * a {@link AcompanhamentoException} é relançada; o Invocable a propaga ao Flow
+   * (CurrentTransaction), que aborta a transação inteira — é isso que desfaz a
+   * atualização anterior do Lead (o registro da solicitação).
    *
    * @param leadIds Ids de Lead (qualquer origem; filtrados aqui).
    * @return contagens controladas.
@@ -197,6 +206,9 @@ public without sharing class SOLProcuracaoAcompanhamentoService {
       r.tarefasCriadas = novas.size();
       return r;
     } catch (AcompanhamentoException e) {
+      // rollback(sp): desfaz só o trabalho deste serviço após setSavepoint().
+      // A atualização anterior do Lead é desfeita pelo abort da transação
+      // quando o Invocable relança esta exceção ao Flow (CurrentTransaction).
       if (sp != null) {
         Database.rollback(sp);
       }

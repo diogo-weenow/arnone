@@ -439,7 +439,13 @@ private class SOLProcuracaoAcompanhamentoTest {
     System.assert(refs.contains(d1) && refs.contains(d2), 'Uma tarefa por solicitação: ' + refs);
   }
 
-  // ============================================================ BULK / CONCORRÊNCIA
+  // ======================================= BULK / IDEMPOTÊNCIA SEQUENCIAL
+  //
+  // Concorrência real (duas transações paralelas para o mesmo Lead) NÃO é
+  // simulável em teste Apex. A proteção é o SELECT ... FOR UPDATE em
+  // criarTarefaAcompanhamento, que serializa as transações no nível do banco.
+  // Os testes abaixo cobrem só a idempotência SEQUENCIAL (chamadas repetidas
+  // na mesma transação).
 
   @IsTest
   static void processamentoBulk() {
@@ -489,6 +495,7 @@ private class SOLProcuracaoAcompanhamentoTest {
 
   @IsTest
   static void duasChamadasNaMesmaTransacaoCriamUmaSo() {
+    // Idempotência SEQUENCIAL — NÃO é teste de concorrência (ver nota da seção).
     Cenario c = montarCenario(2);
     Lead l = novoLeadSOL('S12', 'ART 360');
     registrarSolicitacao(l.Id, Date.today());
@@ -502,6 +509,12 @@ private class SOLProcuracaoAcompanhamentoTest {
   }
 
   // ============================================================ PRAZO / CALENDÁRIO
+  //
+  // FERIADO: a implementação delega a BusinessHours.nextStartDate, que respeita
+  // os feriados associados ao calendário. NÃO há teste automatizado direto com
+  // um Holiday: um Holiday inserido no teste não se associa a um Business Hours
+  // não-default e, portanto, não afetaria BusinessHours.nextStartDate aqui.
+  // Cobertura de feriado = configurar o calendário em Setup (fora do código).
 
   @IsTest
   static void prazoContaSextaComExpedienteReduzido() {
