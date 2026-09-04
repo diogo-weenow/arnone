@@ -44,14 +44,19 @@
  * kill-switch do singleton (Ativo__c = false ⇒ nada é tocado).
  *
  * ATOMICIDADE POR OPORTUNIDADE (revisão do PR #15): cada Oportunidade é gravada
- * dentro do SEU PRÓPRIO Savepoint — proprietário + Tasks abertas + auditoria
- * num bloco só. Se a transferência de uma Task falhar, o rollback desfaz APENAS
- * aquela Oportunidade (r.comErro++), e as demais elegíveis seguem reatribuídas
- * normalmente. A Oportunidade que falhou continua com
- * SOL_Qtd_Reatribuicoes_Prazo__c nulo/0 e volta na próxima varredura. O ponteiro
- * global só reflete as trocas EFETIVADAS e é persistido no fim, em bloco
- * próprio. O resultado devolve r.comErro > 0 quando algo falhou — o
- * SOLPrazoTotalBatch converte isso em falha visível do AsyncApexJob.
+ * dentro do SEU PRÓPRIO Savepoint, e o bloco inclui QUATRO passos —
+ * proprietário, Tasks abertas, auditoria e o PONTEIRO GLOBAL do round-robin.
+ * Só depois de todos os quatro a reatribuição é contada como sucesso. Se
+ * qualquer um falhar, o rollback desfaz TUDO daquela Oportunidade (inclusive o
+ * avanço do ponteiro), a contagem dela fica zerada, o cursor NÃO avança e
+ * r.comErro é incrementado — o SOLPrazoTotalBatch converte isso em falha
+ * visível do AsyncApexJob. As demais Oportunidades elegíveis seguem
+ * reatribuídas normalmente e a que falhou volta na próxima varredura.
+ *
+ * Não existe estado intermediário "reatribuída mas ponteiro não avançado": com
+ * o ponteiro dentro do Savepoint, uma Oportunidade reatribuída implica um
+ * ponteiro coerente, e um ponteiro que não pôde ser gravado implica uma
+ * Oportunidade intacta.
  *
  * CONCORRÊNCIA: o singleton é travado com FOR UPDATE (serializa com a
  * distribuição inicial e com a reatribuição por falta de contato); as
@@ -265,8 +270,6 @@ public without sharing class SOLPrazoTotalService {
     // --------------------------------------------------------------- fase 2
     // Uma Oportunidade por vez, cada uma no SEU Savepoint. A falha de uma não
     // desfaz nem impede as outras.
-    Id ponteiro = estado.Ultimo_Usuario__c;
-    Boolean ponteiroMudou = false;
     List<Opportunity> semVendedorParaGravar = new List<Opportunity>();
 
     for (Opportunity o : candidatas) {
@@ -295,6 +298,12 @@ public without sharing class SOLPrazoTotalService {
       }
 
       Integer proxCursor = Math.mod(SOLDistribuicaoService.indiceDe(ativos, escolhido) + 1, n);
+
+      // Valores em memória do ponteiro ANTES desta Oportunidade: o rollback
+      // desfaz o banco, mas não a instância `estado` que segue para a próxima
+      // iteração — restaurar é obrigatório.
+      Id ponteiroAnterior = estado.Ultimo_Usuario__c;
+      Datetime dataPonteiroAnterior = estado.Data_Ultima_Distribuicao__c;
 
       Savepoint spOpp = Database.setSavepoint();
       try {
@@ -330,16 +339,27 @@ public without sharing class SOLPrazoTotalService {
           update transferir;
         }
 
+        // PONTEIRO NO MESMO SAVEPOINT (revisão final do PR #15). Se o ponteiro
+        // não puder ser gravado, o round-robin ficaria incorreto com a
+        // Oportunidade já reatribuída — então a Oportunidade, as Tasks, a
+        // auditoria e o ponteiro são tudo ou nada.
+        if (escolhido != estado.Ultimo_Usuario__c) {
+          estado.Ultimo_Usuario__c = escolhido;
+          estado.Data_Ultima_Distribuicao__c = agora;
+          gravarPonteiro(estado);
+        }
+
+        // Só AGORA a reatribuição conta como sucesso.
         r.reatribuidas++;
         r.tarefasTransferidas += transferir.size();
-        // Só consome o ponteiro quando a troca foi EFETIVADA.
         cursor = proxCursor;
-        ponteiro = escolhido;
-        ponteiroMudou = true;
       } catch (Exception e) {
-        // Desfaz APENAS esta Oportunidade. As demais seguem. A Opp fica
-        // elegível para a próxima varredura (contagem intacta).
+        // Desfaz APENAS esta Oportunidade — proprietário, Tasks, auditoria E
+        // ponteiro. As demais seguem. A Opp fica elegível para a próxima
+        // varredura (contagem intacta) e o cursor NÃO avança.
         Database.rollback(spOpp);
+        estado.Ultimo_Usuario__c = ponteiroAnterior;
+        estado.Data_Ultima_Distribuicao__c = dataPonteiroAnterior;
         r.comErro++;
         r.mensagens.add('Oportunidade ' + o.Id + ': ' + e.getMessage());
         System.debug(
@@ -367,23 +387,30 @@ public without sharing class SOLPrazoTotalService {
       }
     }
 
-    // Ponteiro: uma gravação, no seu Savepoint. Se falhar, as reatribuições já
-    // efetivadas permanecem — só o ponteiro global não avança.
-    if (ponteiroMudou && ponteiro != estado.Ultimo_Usuario__c) {
-      Savepoint spPont = Database.setSavepoint();
-      try {
-        estado.Ultimo_Usuario__c = ponteiro;
-        estado.Data_Ultima_Distribuicao__c = agora;
-        update estado;
-      } catch (Exception e) {
-        Database.rollback(spPont);
-        r.mensagens.add(
-          'Reatribuições efetivadas, mas o ponteiro global não avançou: ' + e.getMessage()
-        );
-        System.debug(LoggingLevel.ERROR, 'SOLPrazoTotalService (ponteiro): ' + e.getMessage());
-      }
-    }
-
     return r;
+  }
+
+  /**
+   * Somente testes: força a falha da gravação do ponteiro para comprovar que a
+   * Oportunidade, as Tasks, a auditoria e o ponteiro são tudo ou nada. Não há
+   * como derrubar só este DML por dados (o singleton não tem Validation Rule
+   * nem lookup filter), então a injeção é explícita e blindada por
+   * `Test.isRunningTest()`.
+   */
+  @TestVisible
+  private static Boolean falharGravacaoDoPonteiro = false;
+
+  /** Gravação do ponteiro global. Isolada só para permitir a injeção de falha. */
+  private static void gravarPonteiro(SOL_Distribuicao_Estado__c estado) {
+    if (Test.isRunningTest() && falharGravacaoDoPonteiro) {
+      throw new PonteiroException(
+        'Falha simulada na gravação do ponteiro global (somente testes).'
+      );
+    }
+    update estado;
+  }
+
+  /** Falha na gravação do ponteiro global do round-robin. */
+  public class PonteiroException extends Exception {
   }
 }

@@ -23,9 +23,13 @@
  * na varredura seguinte.
  *
  * Salvaguardas:
- * - Só age se o singleton estiver ATIVO (kill-switch) e houver ao menos um
- *   vendedor direto ativo na fila; caso contrário `start()` devolve um
- *   QueryLocator vazio e nenhuma Oportunidade é tocada.
+ * - Kill-switch (`Ativo__c = false`) devolve QueryLocator vazio: nenhuma
+ *   Oportunidade é tocada, de propósito.
+ * - Singleton ausente ou fila inválida/ausente fazem `start()` LANÇAR, para o
+ *   AsyncApexJob registrar a falha operacional (ver comentário de `start`).
+ * - Roster vazio NÃO é barreira: as Oportunidades vencidas chegam ao serviço e
+ *   recebem "Sem outro vendedor", sem troca de proprietário e sem virarem
+ *   processadas.
  * - Ganho/Perdido nunca entram (IsClosed = true).
  * - Nunca recalcula o prazo: o filtro apenas LÊ SOL_Prazo_Total_Comercial__c.
  * - Oportunidades sem data de início / sem prazo calculado ficam de fora, sem
@@ -39,16 +43,50 @@ public without sharing class SOLPrazoTotalBatch implements Database.Batchable<SO
   public class LoteComFalhaException extends Exception {
   }
 
+  /** Configuração ausente/inválida — falha operacional, não sucesso silencioso. */
+  public class ConfiguracaoInvalidaException extends Exception {
+  }
+
+  /**
+   * Revisão final do PR #15 — as três situações de configuração são tratadas
+   * SEPARADAMENTE, em vez de colapsadas num único "podeRodar":
+   *
+   * 1. **Kill-switch desligado** (`Ativo__c = false`): comportamento
+   *    INTENCIONAL. QueryLocator vazio, nenhuma Oportunidade tocada, job
+   *    termina como sucesso.
+   * 2. **Roster vazio** (fila válida, mas sem vendedor direto ativo): NÃO é
+   *    barreira. As Oportunidades vencidas CHEGAM ao serviço e recebem
+   *    "Sem outro vendedor" — sem troca de proprietário e sem marcação como
+   *    processadas, permitindo nova tentativa. Antes, `haVendedorDiretoAtivo()`
+   *    devolvia QueryLocator vazio e essa situação ficava invisível.
+   * 3. **Singleton ausente ou fila inválida/ausente**: falha OPERACIONAL. O
+   *    `start()` LANÇA, e a plataforma marca o AsyncApexJob como falho com
+   *    `ExtendedStatus` — nunca termina em silêncio como sucesso.
+   */
   public Database.QueryLocator start(Database.BatchableContext bc) {
     SOL_Distribuicao_Estado__c estado = SOLDistribuicaoService.lerEstado();
 
-    Boolean podeRodar =
-      estado != null &&
-      estado.Ativo__c == true &&
-      SOLDistribuicaoService.haVendedorDiretoAtivo();
+    // (3) Singleton ausente: configuração quebrada, não "nada a fazer".
+    if (estado == null) {
+      throw new ConfiguracaoInvalidaException(
+        'CLICKUP-9424 — registro de estado da distribuição SOL não encontrado. ' +
+          'A varredura do prazo total não pode rodar sem o singleton.'
+      );
+    }
 
-    if (!podeRodar) {
+    // (1) Kill-switch desligado: encerra sem tocar em nada, de propósito.
+    if (estado.Ativo__c != true) {
       return Database.getQueryLocator([SELECT Id FROM Opportunity WHERE Id = NULL]);
+    }
+
+    // (3) Fila ausente ou não habilitada para Lead: também falha operacional.
+    // O roster VAZIO, ao contrário, é situação controlada e segue adiante.
+    try {
+      SOLDistribuicaoService.localizarFilaValida();
+    } catch (SOLDistribuicaoService.DistribuicaoException e) {
+      throw new ConfiguracaoInvalidaException(
+        'CLICKUP-9424 — fila da distribuição SOL inválida ou ausente: ' + e.getMessage()
+      );
     }
 
     this.limite = System.now();
