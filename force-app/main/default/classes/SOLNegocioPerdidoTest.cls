@@ -2425,4 +2425,204 @@ private class SOLNegocioPerdidoTest {
       'Concluir por Ganho não marca cancelamento por perda.'
     );
   }
+
+  // ============== 20. D3 — NÃO SE DESFAZ O SINAL DEPOIS DE ENCERRAR
+  //
+  // Enquanto a regra só reavaliava em ISNEW() e ISCHANGED(Status), bastava
+  // encerrar a tarefa corretamente e, numa SEGUNDA gravação, mexer só no motivo
+  // ou só numa das flags: o estado protegido saía do ar sem a regra reabrir.
+  // Agora ela reavalia a cada mudança de Status, tipo, motivo ou das duas flags.
+
+  /** (20.1) Cancelou certo; trocar SÓ o motivo depois é bloqueado. */
+  @IsTest
+  static void naoTrocaOMotivoDeUmFechamentoJaCancelado() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Task fechamento = tarefaDeFechamento(oppId, vs[0]);
+    update new Task(
+      Id = fechamento.Id,
+      Status = 'Cancelada',
+      SOL_Cancelada_Por_Perda__c = true,
+      SOL_Motivo_Cancelamento__c = MOTIVO_PERDA
+    );
+
+    Test.startTest();
+    Boolean bloqueou = false;
+    try {
+      update new Task(
+        Id = fechamento.Id,
+        SOL_Motivo_Cancelamento__c = 'Contato efetivado'
+      );
+    } catch (DmlException e) {
+      bloqueou = true;
+    }
+    Test.stopTest();
+
+    System.assert(bloqueou, 'Trocar só o motivo depois do cancelamento é bypass.');
+    assertCanceladaPorPerda(fechamento.Id, 'fechamento cancelado por perda');
+  }
+
+  /** (20.2) Cancelou certo; desligar SÓ a flag de perda depois é bloqueado. */
+  @IsTest
+  static void naoDesligaAFlagDePerdaDeUmFechamentoJaCancelado() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Task fechamento = tarefaDeFechamento(oppId, vs[0]);
+    update new Task(
+      Id = fechamento.Id,
+      Status = 'Cancelada',
+      SOL_Cancelada_Por_Perda__c = true,
+      SOL_Motivo_Cancelamento__c = MOTIVO_PERDA
+    );
+
+    Test.startTest();
+    Boolean bloqueou = false;
+    try {
+      update new Task(Id = fechamento.Id, SOL_Cancelada_Por_Perda__c = false);
+    } catch (DmlException e) {
+      bloqueou = true;
+    }
+    Test.stopTest();
+
+    System.assert(bloqueou, 'Desligar só a flag de perda é bypass.');
+    assertCanceladaPorPerda(fechamento.Id, 'fechamento cancelado por perda');
+  }
+
+  /**
+   * (20.3) Concluiu certo pela automação de Ganho; desligar SÓ a flag de
+   * encerramento depois é bloqueado.
+   */
+  @IsTest
+  static void naoDesligaAFlagDeEncerramentoDeUmFechamentoJaConcluido() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Task fechamento = tarefaDeFechamento(oppId, vs[0]);
+    update new Task(
+      Id = fechamento.Id,
+      SOL_Encerrado_Pela_Oportunidade__c = true,
+      Status = 'Completed'
+    );
+
+    Test.startTest();
+    Boolean bloqueou = false;
+    try {
+      update new Task(
+        Id = fechamento.Id,
+        SOL_Encerrado_Pela_Oportunidade__c = false
+      );
+    } catch (DmlException e) {
+      bloqueou = true;
+    }
+    Test.stopTest();
+
+    System.assert(bloqueou, 'Desligar só a flag de encerramento é bypass.');
+    Task depois = recarregar(fechamento.Id);
+    System.assertEquals('Completed', depois.Status, 'Segue concluída.');
+    System.assertEquals(
+      true,
+      depois.SOL_Encerrado_Pela_Oportunidade__c,
+      'A marca do encerramento automático continua de pé.'
+    );
+  }
+
+  /**
+   * (20.4) Caminho de fora: uma tarefa de OUTRO tipo, cancelada legitimamente
+   * com outro motivo, não pode virar "Fechamento" depois — seria uma tarefa de
+   * fechamento encerrada sem o sinal de perda.
+   */
+  @IsTest
+  static void naoTransformaTarefaJaCanceladaEmFechamento() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Task contato = tarefa(null, oppId, vs[0], 'Contato');
+    update new Task(
+      Id = contato.Id,
+      Status = 'Cancelada',
+      SOL_Motivo_Cancelamento__c = 'Contato efetivado'
+    );
+
+    Test.startTest();
+    Boolean bloqueou = false;
+    try {
+      update new Task(Id = contato.Id, SOL_Tipo_Tarefa__c = 'Fechamento');
+    } catch (DmlException e) {
+      bloqueou = true;
+    }
+    Test.stopTest();
+
+    System.assert(
+      bloqueou,
+      'Virar "Fechamento" depois de cancelada por outro motivo é bypass.'
+    );
+    Task depois = recarregar(contato.Id);
+    System.assertEquals(
+      'Contato',
+      depois.SOL_Tipo_Tarefa__c,
+      'O tipo original foi preservado.'
+    );
+    System.assertEquals(
+      'Contato efetivado',
+      depois.SOL_Motivo_Cancelamento__c,
+      'O cancelamento legítimo de contato não foi tocado.'
+    );
+  }
+
+  /**
+   * (20.5) O gatilho novo não engessa o registro: editar campo alheio ao estado
+   * protegido segue permitido, nos DOIS estados válidos de encerramento.
+   */
+  @IsTest
+  static void editarCampoAlheioSeguePermitidoNosEstadosValidos() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+
+    Task cancelada = tarefaDeFechamento(oppId, vs[0]);
+    update new Task(
+      Id = cancelada.Id,
+      Status = 'Cancelada',
+      SOL_Cancelada_Por_Perda__c = true,
+      SOL_Motivo_Cancelamento__c = MOTIVO_PERDA
+    );
+    Task concluida = tarefaDeFechamento(oppId, vs[0]);
+    update new Task(
+      Id = concluida.Id,
+      SOL_Encerrado_Pela_Oportunidade__c = true,
+      Status = 'Completed'
+    );
+
+    Test.startTest();
+    update new List<Task>{
+      new Task(Id = cancelada.Id, Description = 'Nota do gestor na cancelada.'),
+      new Task(Id = concluida.Id, Description = 'Nota do gestor na concluída.')
+    };
+    Test.stopTest();
+
+    Map<Id, Task> porId = new Map<Id, Task>(
+      [
+        SELECT Id, Status, Description, SOL_Cancelada_Por_Perda__c, SOL_Encerrado_Pela_Oportunidade__c
+        FROM Task
+        WHERE Id IN (:cancelada.Id, :concluida.Id)
+      ]
+    );
+    System.assertEquals(
+      'Nota do gestor na cancelada.',
+      porId.get(cancelada.Id).Description,
+      'Manutenção da cancelada válida segue permitida.'
+    );
+    System.assertEquals(
+      'Cancelada',
+      porId.get(cancelada.Id).Status,
+      'O estado da cancelada não mudou.'
+    );
+    System.assertEquals(
+      'Nota do gestor na concluída.',
+      porId.get(concluida.Id).Description,
+      'Manutenção da concluída válida segue permitida.'
+    );
+    System.assertEquals(
+      'Completed',
+      porId.get(concluida.Id).Status,
+      'O estado da concluída não mudou.'
+    );
+  }
 }

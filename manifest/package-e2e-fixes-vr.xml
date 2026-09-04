@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Task.SOL_Fechamento_Exige_Encerramento_Auto</members>
+        <name>ValidationRule</name>
+    </types>
+    <types>
+        <members>SOLNegocioPerdidoTest</members>
+        <name>ApexClass</name>
+    </types>
+    <version>66.0</version>
+</Package>
