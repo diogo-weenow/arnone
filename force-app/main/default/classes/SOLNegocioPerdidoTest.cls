@@ -582,30 +582,66 @@ private class SOLNegocioPerdidoTest {
   static void desqualificadoSemSinalExatoNaoDispara() {
     List<Id> vs = montarFila(2);
 
-    // (a) Desqualificado SEM motivo nenhum.
-    Lead semMotivo = novoLead(PRODUTO_RT);
-    Id tSemMotivo = tarefa(semMotivo.Id, null, lead(semMotivo.Id).OwnerId, 'Contato').Id;
-    // (b) Desqualificado com motivo de perda MAS com opt-out marcado.
+    // (a) Lead que segue na cadência, sem desqualificação nenhuma.
+    Lead naCadencia = novoLead(PRODUTO_RT);
+    Id tNaCadencia = tarefa(naCadencia.Id, null, lead(naCadencia.Id).OwnerId, 'Contato').Id;
+    // (b) Lead em opt-out — desqualificado, mas por outro motivo.
     Lead comOptOut = novoLead(PRODUTO_RT);
     Id tComOptOut = tarefa(comOptOut.Id, null, lead(comOptOut.Id).OwnerId, 'Contato').Id;
+    // (c) Leads para as tentativas incoerentes, que a VR do D2 agora barra.
+    Lead semMotivo = novoLead(PRODUTO_RT);
+    Lead perdaComFlag = novoLead(PRODUTO_RT);
 
     Test.startTest();
-    update new Lead(Id = semMotivo.Id, Status = 'Desqualificado');
-    update new Lead(
-      Id = comOptOut.Id,
-      Status = 'Desqualificado',
-      SOL_Motivo_Desqualificacao__c = MOTIVO_PERDA,
-      SOL_Opt_Out__c = true
-    );
+    // Desde o D2 da homologação E2E os dois estados incoerentes nem chegam a
+    // existir: a VR SOL_Desqualificacao_Coerente barra a gravação. O serviço
+    // continua exigindo o sinal exato, e agora o banco também.
+    Boolean bloqueouSemMotivo = false;
+    try {
+      update new Lead(Id = semMotivo.Id, Status = 'Desqualificado');
+    } catch (DmlException e) {
+      bloqueouSemMotivo = true;
+    }
+    Boolean bloqueouPerdaComFlag = false;
+    try {
+      update new Lead(
+        Id = perdaComFlag.Id,
+        Status = 'Desqualificado',
+        SOL_Motivo_Desqualificacao__c = MOTIVO_PERDA,
+        SOL_Opt_Out__c = true
+      );
+    } catch (DmlException e) {
+      bloqueouPerdaComFlag = true;
+    }
+
+    // Os dois estados que EXISTEM de verdade sem ser perda seguem ignorados.
+    SOLDistribuicaoService.registrarOptOut(new List<Id>{ comOptOut.Id });
     SOLNegocioPerdidoService.ResultadoPerda r = SOLNegocioPerdidoService.encerrarPorLeadPerdido(
-      new List<Id>{ semMotivo.Id, comOptOut.Id }
+      new List<Id>{ naCadencia.Id, comOptOut.Id }
     );
     Test.stopTest();
 
+    System.assert(bloqueouSemMotivo, 'Desqualificar sem motivo é barrado na gravação.');
+    System.assert(
+      bloqueouPerdaComFlag,
+      'Perda com a flag de opt-out ligada é barrada na gravação.'
+    );
     System.assertEquals(0, r.negociosPerdidos, 'Nenhum dos dois tem o sinal EXATO de perda.');
     System.assertEquals(2, r.ignorados);
-    System.assertEquals('Open', recarregar(tSemMotivo).Status, 'Sem motivo: tarefa intacta.');
-    System.assertEquals('Open', recarregar(tComOptOut).Status, 'Com opt-out: tarefa intacta.');
+    System.assertEquals(
+      'Open',
+      recarregar(tNaCadencia).Status,
+      'Lead na cadência: tarefa intacta.'
+    );
+    System.assertEquals(
+      'Cancelada',
+      recarregar(tComOptOut).Status,
+      'A tarefa do opt-out foi cancelada pelo 9418 — não pela perda.'
+    );
+    System.assert(
+      recarregar(tComOptOut).SOL_Cancelada_Por_Perda__c != true,
+      'E sem a marca de cancelamento por perda.'
+    );
   }
 
   // ============================================ 11. SAÍDA DE "RECEBIDO - MQL"
@@ -642,12 +678,16 @@ private class SOLNegocioPerdidoTest {
       bloqueou = e.getMessage().containsIgnoreCase('compromisso');
     }
 
-    // (c) Desqualificado sem o motivo de perda: também BLOQUEADO.
+    // (c) Desqualificado sem o motivo de perda: também BLOQUEADO. Desde o D2 da
+    // homologação E2E duas regras cobrem este desvio — a do compromisso e a de
+    // coerência do motivo —, e a plataforma reporta a primeira que avaliar.
     Boolean bloqueouSemMotivo = false;
     try {
       update new Lead(Id = paraBloquear.Id, Status = 'Desqualificado');
     } catch (DmlException e) {
-      bloqueouSemMotivo = e.getMessage().containsIgnoreCase('compromisso');
+      bloqueouSemMotivo =
+        e.getMessage().containsIgnoreCase('compromisso') ||
+        e.getMessage().containsIgnoreCase('incoerente');
     }
 
     // (d) OPT-OUT: permitido, como antes do card.
@@ -1758,6 +1798,1112 @@ private class SOLNegocioPerdidoTest {
       'Cancelada',
       recarregar(manualPorPerda.Id).Status,
       'A exceção do card permite tarefa manual sem tipo.'
+    );
+  }
+
+  // ============================== 18. D2 — PERDA MANUAL PELO VENDEDOR
+  //
+  // A homologação E2E mostrou que SOL_Motivo_Desqualificacao__c era somente
+  // leitura em TODOS os permission sets da org: nenhum vendedor conseguia
+  // marcar "Negócio perdido", e a entrada do card pelo Lead era inalcançável.
+  // O campo agora é editável no PS_SOL_Comercial, e a VR
+  // SOL_Desqualificacao_Coerente garante que motivo e flag de opt-out não
+  // possam divergir.
+
+  /** Vendedor Standard com um único permission set: o PS_SOL_Comercial. */
+  private static User vendedorComPsComercial(String tag) {
+    User u = vendedor(tag);
+    System.runAs(contextoAtual()) {
+      insert u;
+      insert new PermissionSetAssignment(
+        AssigneeId = u.Id,
+        PermissionSetId = [
+          SELECT Id
+          FROM PermissionSet
+          WHERE Name = 'PS_SOL_Comercial'
+          LIMIT 1
+        ]
+        .Id
+      );
+    }
+    return u;
+  }
+
+  /**
+   * (18.1) O vendedor perde o negócio pela edição que agora lhe é permitida —
+   * em USER_MODE, que é o que o botão de salvar da tela faz: valida FLS e CRUD
+   * do usuário, não só a VR.
+   */
+  @IsTest
+  static void vendedorPerdeLeadPelaEdicaoPermitida() {
+    User vend = vendedorComPsComercial('d2a' + rnd().left(3));
+    Lead l = novoLead(PRODUTO_RT);
+    update new Lead(Id = l.Id, OwnerId = vend.Id);
+
+    Test.startTest();
+    System.runAs(new User(Id = vend.Id)) {
+      // Não toca em SOL_Opt_Out__c: continua somente leitura para o vendedor.
+      Database.update(
+        new List<Lead>{
+          new Lead(
+            Id = l.Id,
+            Status = 'Desqualificado',
+            SOL_Motivo_Desqualificacao__c = MOTIVO_PERDA
+          )
+        },
+        AccessLevel.USER_MODE
+      );
+    }
+    Test.stopTest();
+
+    Lead depois = lead(l.Id);
+    System.assertEquals('Desqualificado', depois.Status, 'Lead desqualificado.');
+    System.assertEquals(
+      MOTIVO_PERDA,
+      depois.SOL_Motivo_Desqualificacao__c,
+      'O vendedor conseguiu gravar o motivo da perda.'
+    );
+    System.assert(
+      depois.SOL_Opt_Out__c != true,
+      'Perda comercial não é opt-out.'
+    );
+    System.assert(
+      SOLNegocioPerdidoService.leadPerdido(depois),
+      'O sinal de perda do card ficou completo.'
+    );
+  }
+
+  /**
+   * (18.2) A perda feita pelo vendedor dispara o encerramento do 9425: as
+   * tarefas abertas do Lead são canceladas pelo Flow, inclusive a manual sem
+   * tipo, e as já concluídas ficam intactas.
+   */
+  @IsTest
+  static void perdaManualDoVendedorCancelaAsTarefasAbertas() {
+    User vend = vendedorComPsComercial('d2b' + rnd().left(3));
+    Lead l = novoLead(PRODUTO_RT);
+    update new Lead(Id = l.Id, OwnerId = vend.Id);
+
+    Task aberta = tarefa(l.Id, null, vend.Id, 'Contato');
+    Task manual = tarefa(l.Id, null, vend.Id, null);
+    Task concluida = tarefa(l.Id, null, vend.Id, 'Contato');
+    update new Task(
+      Id = concluida.Id,
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Não atendeu'
+    );
+
+    Test.startTest();
+    System.runAs(new User(Id = vend.Id)) {
+      Database.update(
+        new List<Lead>{
+          new Lead(
+            Id = l.Id,
+            Status = 'Desqualificado',
+            SOL_Motivo_Desqualificacao__c = MOTIVO_PERDA
+          )
+        },
+        AccessLevel.USER_MODE
+      );
+    }
+    Test.stopTest();
+
+    assertCanceladaPorPerda(aberta.Id, 'tarefa tipada aberta');
+    assertCanceladaPorPerda(manual.Id, 'tarefa manual sem tipo');
+    Task jaFeita = recarregar(concluida.Id);
+    System.assertEquals(
+      'Completed',
+      jaFeita.Status,
+      'Tarefa já concluída não é reescrita pela perda.'
+    );
+    System.assert(
+      jaFeita.SOL_Cancelada_Por_Perda__c != true,
+      'Tarefa concluída não recebe a marca de cancelamento por perda.'
+    );
+  }
+
+  /**
+   * (18.3) O opt-out automático continua funcionando depois da mudança de FLS
+   * e da nova VR: quem grava motivo e flag juntos é a automação, e o resultado
+   * NÃO é lido como "Negócio perdido".
+   */
+  @IsTest
+  static void optOutAutomaticoSegueFuncionandoComANovaRegra() {
+    List<Id> vs = montarFila(2);
+    Lead l = novoLead(PRODUTO_RT);
+    update new Lead(Id = l.Id, OwnerId = vs[0]);
+    Task contato = tarefa(l.Id, null, vs[0], 'Contato');
+    Task outra = tarefa(l.Id, null, vs[0], 'Contato');
+
+    Test.startTest();
+    update new Task(
+      Id = contato.Id,
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Opt-out'
+    );
+    Test.stopTest();
+
+    Lead depois = lead(l.Id);
+    System.assertEquals('Desqualificado', depois.Status, 'Opt-out desqualifica.');
+    System.assertEquals(true, depois.SOL_Opt_Out__c, 'Flag de opt-out ligada.');
+    System.assertEquals(
+      'Opt-out',
+      depois.SOL_Motivo_Desqualificacao__c,
+      'Motivo gravado pela automação.'
+    );
+    System.assertNotEquals(
+      null,
+      depois.SOL_Data_Opt_Out__c,
+      'Data do opt-out registrada.'
+    );
+    System.assert(
+      !SOLNegocioPerdidoService.leadPerdido(depois),
+      'Opt-out NÃO é negócio perdido.'
+    );
+    Task cancelada = recarregar(outra.Id);
+    System.assertEquals(
+      'Cancelada',
+      cancelada.Status,
+      'Tarefa de contato cancelada pelo opt-out.'
+    );
+    System.assertEquals(
+      'Opt-out',
+      cancelada.SOL_Motivo_Cancelamento__c,
+      'Cancelada por opt-out, não por perda.'
+    );
+    System.assert(
+      cancelada.SOL_Cancelada_Por_Perda__c != true,
+      'A marca de perda não contamina o opt-out.'
+    );
+  }
+
+  /**
+   * (18.4) Combinações incoerentes são bloqueadas pela VR — inclusive quando
+   * quem grava é administrador por Apex, que é o caminho da API. Cobre os cinco
+   * casos exigidos.
+   */
+  @IsTest
+  static void combinacoesIncoerentesDeDesqualificacaoSaoBloqueadas() {
+    Lead a = novoLead(PRODUTO_RT);
+    Lead b = novoLead(PRODUTO_RT);
+    Lead c = novoLead(PRODUTO_RT);
+    Lead d = novoLead(PRODUTO_ART);
+
+    Test.startTest();
+    // (i) Desqualificado + "Opt-out" sem a flag ligada.
+    Boolean bloqueouOptOutSemFlag = false;
+    try {
+      update new Lead(
+        Id = a.Id,
+        Status = 'Desqualificado',
+        SOL_Motivo_Desqualificacao__c = 'Opt-out'
+      );
+    } catch (DmlException e) {
+      bloqueouOptOutSemFlag = true;
+    }
+
+    // (ii) Desqualificado + "Negócio perdido" com a flag de opt-out ligada.
+    Boolean bloqueouPerdaComFlag = false;
+    try {
+      update new Lead(
+        Id = b.Id,
+        Status = 'Desqualificado',
+        SOL_Motivo_Desqualificacao__c = MOTIVO_PERDA,
+        SOL_Opt_Out__c = true
+      );
+    } catch (DmlException e) {
+      bloqueouPerdaComFlag = true;
+    }
+
+    // (iii) Desqualificado sem motivo nenhum.
+    Boolean bloqueouSemMotivo = false;
+    try {
+      update new Lead(Id = c.Id, Status = 'Desqualificado');
+    } catch (DmlException e) {
+      bloqueouSemMotivo = true;
+    }
+
+    // (iv) Flag de opt-out ligada com outro motivo, sem desqualificar.
+    Boolean bloqueouFlagComOutroMotivo = false;
+    try {
+      update new Lead(
+        Id = d.Id,
+        SOL_Opt_Out__c = true,
+        SOL_Motivo_Desqualificacao__c = MOTIVO_PERDA
+      );
+    } catch (DmlException e) {
+      bloqueouFlagComOutroMotivo = true;
+    }
+
+    // (v) Flag de opt-out ligada sem motivo algum.
+    Boolean bloqueouFlagSemMotivo = false;
+    try {
+      update new Lead(Id = d.Id, SOL_Opt_Out__c = true);
+    } catch (DmlException e) {
+      bloqueouFlagSemMotivo = true;
+    }
+    Test.stopTest();
+
+    System.assert(bloqueouOptOutSemFlag, '(i) Motivo "Opt-out" exige a flag ligada.');
+    System.assert(bloqueouPerdaComFlag, '(ii) "Negócio perdido" exige a flag desligada.');
+    System.assert(bloqueouSemMotivo, '(iii) Desqualificar exige um motivo válido.');
+    System.assert(
+      bloqueouFlagComOutroMotivo,
+      '(iv) Flag de opt-out com outro motivo é incoerente.'
+    );
+    System.assert(bloqueouFlagSemMotivo, '(v) Flag de opt-out sem motivo é incoerente.');
+
+    // Nenhum dos leads ficou num estado incoerente.
+    for (Lead l : [
+      SELECT Status, SOL_Motivo_Desqualificacao__c, SOL_Opt_Out__c
+      FROM Lead
+      WHERE Id IN (:a.Id, :b.Id, :c.Id, :d.Id)
+    ]) {
+      System.assert(
+        l.Status != 'Desqualificado',
+        'Nenhuma das gravações incoerentes passou.'
+      );
+      System.assert(l.SOL_Opt_Out__c != true, 'A flag não foi ligada à força.');
+    }
+  }
+
+  /**
+   * (18.5) A VR é do Record Type SOL. Leads de outras unidades continuam
+   * podendo ser desqualificados sem os campos da jornada SOL.
+   */
+  @IsTest
+  static void novaRegraNaoAfetaOutrosRecordTypes() {
+    Lead fora = new Lead(
+      LastName = 'Fora SOL ' + rnd(),
+      Company = 'Outra BU ' + rnd(),
+      Status = 'Captação - Contato'
+    );
+    insert fora;
+
+    Test.startTest();
+    update new Lead(Id = fora.Id, Status = 'Desqualificado');
+    Test.stopTest();
+
+    Lead depois = [
+      SELECT Status, RecordTypeId, SOL_Motivo_Desqualificacao__c
+      FROM Lead
+      WHERE Id = :fora.Id
+    ];
+    System.assertEquals(
+      'Desqualificado',
+      depois.Status,
+      'Fora do Record Type SOL a regra não se aplica.'
+    );
+    System.assertNotEquals(
+      rtLeadSOL(),
+      depois.RecordTypeId,
+      'O lead do cenário não é do Record Type SOL.'
+    );
+  }
+
+  /**
+   * (18.6) FLS efetiva do motivo depois da correção: o VENDEDOR edita, o GESTOR
+   * só lê. E os campos de opt-out seguem somente leitura para os dois — quem os
+   * grava é a automação.
+   */
+  @IsTest
+  static void flsDoMotivoVendedorEditaGestorSoLe() {
+    User vCom = vendedor('d2c' + rnd().left(3));
+    User vAdm = vendedor('d2g' + rnd().left(3));
+    System.runAs(contextoAtual()) {
+      insert new List<User>{ vCom, vAdm };
+      insert new List<PermissionSetAssignment>{
+        new PermissionSetAssignment(
+          AssigneeId = vCom.Id,
+          PermissionSetId = [
+            SELECT Id
+            FROM PermissionSet
+            WHERE Name = 'PS_SOL_Comercial'
+            LIMIT 1
+          ]
+          .Id
+        ),
+        new PermissionSetAssignment(
+          AssigneeId = vAdm.Id,
+          PermissionSetId = [
+            SELECT Id
+            FROM PermissionSet
+            WHERE Name = 'PS_SOL_Distribuicao_Admin'
+            LIMIT 1
+          ]
+          .Id
+        )
+      };
+    }
+
+    Test.startTest();
+    System.runAs(new User(Id = vCom.Id)) {
+      Schema.DescribeFieldResult motivo = Lead.SOL_Motivo_Desqualificacao__c.getDescribe();
+      System.assert(motivo.isAccessible(), 'Vendedor lê o motivo.');
+      System.assert(
+        motivo.isUpdateable(),
+        'Vendedor EDITA o motivo — é a correção do D2.'
+      );
+      System.assert(
+        !Lead.SOL_Opt_Out__c.getDescribe().isUpdateable(),
+        'Vendedor não edita a flag de opt-out.'
+      );
+      System.assert(
+        !Lead.SOL_Data_Opt_Out__c.getDescribe().isUpdateable(),
+        'Vendedor não edita a data do opt-out.'
+      );
+    }
+    System.runAs(new User(Id = vAdm.Id)) {
+      Schema.DescribeFieldResult motivo = Lead.SOL_Motivo_Desqualificacao__c.getDescribe();
+      System.assert(motivo.isAccessible(), 'Gestor lê o motivo.');
+      System.assert(
+        !motivo.isUpdateable(),
+        'Gestor só lê: quem executa a perda é o vendedor.'
+      );
+    }
+    Test.stopTest();
+  }
+
+  /** (18.7) O permission set do gestor não passou a conceder edição do motivo. */
+  @IsTest
+  static void psDoGestorSegueSemEdicaoDoMotivo() {
+    List<FieldPermissions> fp = [
+      SELECT PermissionsRead, PermissionsEdit
+      FROM FieldPermissions
+      WHERE
+        Field = 'Lead.SOL_Motivo_Desqualificacao__c'
+        AND Parent.Name = 'PS_SOL_Distribuicao_Admin'
+    ];
+    System.assertEquals(1, fp.size(), 'O gestor declara o campo.');
+    System.assert(fp[0].PermissionsRead, 'Gestor lê.');
+    System.assert(!fp[0].PermissionsEdit, 'Gestor não edita.');
+
+    List<FieldPermissions> vend = [
+      SELECT PermissionsRead, PermissionsEdit
+      FROM FieldPermissions
+      WHERE
+        Field = 'Lead.SOL_Motivo_Desqualificacao__c'
+        AND Parent.Name = 'PS_SOL_Comercial'
+    ];
+    System.assertEquals(1, vend.size(), 'O vendedor declara o campo.');
+    System.assert(vend[0].PermissionsRead && vend[0].PermissionsEdit, 'Vendedor lê e edita.');
+  }
+
+  // ============================== 19. D3 — CANCELAMENTO DA TASK DE FECHAMENTO
+  //
+  // A homologação E2E conseguiu cancelar à mão uma tarefa de Fechamento com
+  // motivo "Contato efetivado", contornando a garantia de encerramento
+  // automático. A VR SOL_Fechamento_Exige_Encerramento_Auto passou a cobrir o
+  // cancelamento além da conclusão.
+
+  /** Tarefa de Fechamento aberta, pendurada numa Oportunidade SOL. */
+  private static Task tarefaDeFechamento(Id oppId, Id owner) {
+    return tarefa(null, oppId, owner, 'Fechamento');
+  }
+
+  /**
+   * (19.1) Cancelamento manual em UPDATE: bloqueado em todas as combinações que
+   * não sejam o sinal completo de perda — inclusive o caso exato observado na
+   * homologação (Fechamento + Cancelada + "Contato efetivado").
+   */
+  @IsTest
+  static void fechamentoNaoCancelaSemOSinalDePerda_update() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+
+    Task caso1 = tarefaDeFechamento(oppId, vs[0]);
+    Task caso2 = tarefaDeFechamento(oppId, vs[0]);
+    Task caso3 = tarefaDeFechamento(oppId, vs[0]);
+
+    Test.startTest();
+    // (a) o desvio da homologação: motivo de outro fluxo, sem flag.
+    Boolean bloqueouContatoEfetivado = false;
+    try {
+      update new Task(
+        Id = caso1.Id,
+        Status = 'Cancelada',
+        SOL_Motivo_Cancelamento__c = 'Contato efetivado'
+      );
+    } catch (DmlException e) {
+      bloqueouContatoEfetivado = true;
+    }
+
+    // (b) motivo certo, flag ausente.
+    Boolean bloqueouSemFlag = false;
+    try {
+      update new Task(
+        Id = caso2.Id,
+        Status = 'Cancelada',
+        SOL_Motivo_Cancelamento__c = MOTIVO_PERDA
+      );
+    } catch (DmlException e) {
+      bloqueouSemFlag = true;
+    }
+
+    // (c) flag certa, motivo de outro fluxo.
+    Boolean bloqueouFlagComOutroMotivo = false;
+    try {
+      update new Task(
+        Id = caso3.Id,
+        Status = 'Cancelada',
+        SOL_Cancelada_Por_Perda__c = true,
+        SOL_Motivo_Cancelamento__c = 'Contato efetivado'
+      );
+    } catch (DmlException e) {
+      bloqueouFlagComOutroMotivo = true;
+    }
+    Test.stopTest();
+
+    System.assert(
+      bloqueouContatoEfetivado,
+      'Fechamento + Cancelada + "Contato efetivado" tem de ser bloqueado.'
+    );
+    System.assert(bloqueouSemFlag, 'Sem a flag de perda o cancelamento é manual.');
+    System.assert(
+      bloqueouFlagComOutroMotivo,
+      'A flag sozinha não autoriza: o motivo tem de ser "Negócio perdido".'
+    );
+    for (Id t : new List<Id>{ caso1.Id, caso2.Id, caso3.Id }) {
+      System.assertEquals(
+        'Open',
+        recarregar(t).Status,
+        'Nenhuma das tentativas manuais encerrou a tarefa.'
+      );
+    }
+  }
+
+  /** (19.2) O mesmo bloqueio no INSERT — nascer cancelada também é desvio. */
+  @IsTest
+  static void fechamentoNaoNasceCanceladoSemOSinalDePerda_insert() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+
+    Test.startTest();
+    Boolean bloqueou = false;
+    try {
+      insert new Task(
+        Subject = 'T ' + rnd(),
+        WhatId = oppId,
+        OwnerId = vs[0],
+        Status = 'Cancelada',
+        ActivityDate = Date.today(),
+        SOL_Tipo_Tarefa__c = 'Fechamento',
+        SOL_Motivo_Cancelamento__c = 'Contato efetivado'
+      );
+    } catch (DmlException e) {
+      bloqueou = true;
+    }
+    Test.stopTest();
+
+    System.assert(bloqueou, 'Fechamento não pode nascer cancelado à mão.');
+    System.assertEquals(
+      0,
+      [
+        SELECT COUNT()
+        FROM Task
+        WHERE WhatId = :oppId AND SOL_Tipo_Tarefa__c = 'Fechamento'
+      ],
+      'Nenhuma tarefa de fechamento foi criada.'
+    );
+  }
+
+  /**
+   * (19.3) Com o sinal completo de perda, o cancelamento é permitido — é assim
+   * que o 9425 encerra a tarefa de fechamento. Vale em insert e em update.
+   */
+  @IsTest
+  static void fechamentoCancelaComOSinalCompletoDePerda() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Task porUpdate = tarefaDeFechamento(oppId, vs[0]);
+
+    Test.startTest();
+    update new Task(
+      Id = porUpdate.Id,
+      Status = 'Cancelada',
+      SOL_Cancelada_Por_Perda__c = true,
+      SOL_Motivo_Cancelamento__c = MOTIVO_PERDA
+    );
+    Task porInsert = new Task(
+      Subject = 'T ' + rnd(),
+      WhatId = oppId,
+      OwnerId = vs[0],
+      Status = 'Cancelada',
+      ActivityDate = Date.today(),
+      SOL_Tipo_Tarefa__c = 'Fechamento',
+      SOL_Cancelada_Por_Perda__c = true,
+      SOL_Motivo_Cancelamento__c = MOTIVO_PERDA
+    );
+    insert porInsert;
+    Test.stopTest();
+
+    assertCanceladaPorPerda(porUpdate.Id, 'fechamento cancelado por update');
+    assertCanceladaPorPerda(porInsert.Id, 'fechamento cancelado por insert');
+  }
+
+  /**
+   * (19.4) A regra reforçada não atrapalha o caminho de verdade: a Oportunidade
+   * indo para "Perdido" cancela a tarefa de fechamento pelo Flow do 9425.
+   */
+  @IsTest
+  static void oportunidadePerdidaAindaCancelaOFechamento() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Task fechamento = tarefaDeFechamento(oppId, vs[0]);
+
+    Test.startTest();
+    perderOpp(oppId);
+    Test.stopTest();
+
+    assertCanceladaPorPerda(fechamento.Id, 'fechamento encerrado pela perda da Opp');
+    System.assertEquals(
+      'Perdido',
+      opp(oppId).StageName,
+      'A Oportunidade ficou perdida.'
+    );
+  }
+
+  /**
+   * (19.5) Manutenção posterior de registro histórico válido: numa tarefa de
+   * fechamento já cancelada pela perda, editar outro campo não reabre a regra.
+   */
+  @IsTest
+  static void manutencaoDeFechamentoJaCanceladoContinuaPermitida() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Task fechamento = tarefaDeFechamento(oppId, vs[0]);
+    update new Task(
+      Id = fechamento.Id,
+      Status = 'Cancelada',
+      SOL_Cancelada_Por_Perda__c = true,
+      SOL_Motivo_Cancelamento__c = MOTIVO_PERDA
+    );
+
+    Test.startTest();
+    update new Task(Id = fechamento.Id, Description = 'Anotação posterior do gestor.');
+    Test.stopTest();
+
+    Task depois = recarregar(fechamento.Id);
+    System.assertEquals(
+      'Cancelada',
+      depois.Status,
+      'O status histórico foi preservado.'
+    );
+    System.assertEquals(
+      'Anotação posterior do gestor.',
+      [SELECT Description FROM Task WHERE Id = :fechamento.Id].Description,
+      'A manutenção do registro histórico continua possível.'
+    );
+  }
+
+  /**
+   * (19.6) A conclusão pela automação de Ganho (9423) segue funcionando, e a
+   * conclusão manual segue bloqueada — a regra ganhou um caso, não trocou de
+   * comportamento.
+   */
+  @IsTest
+  static void ganhoAindaConcluiOFechamentoEManualSegueBloqueado() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Task fechamento = tarefaDeFechamento(oppId, vs[0]);
+
+    Test.startTest();
+    Boolean bloqueouManual = false;
+    try {
+      update new Task(Id = fechamento.Id, Status = 'Completed');
+    } catch (DmlException e) {
+      bloqueouManual = true;
+    }
+    update new Task(Id = fechamento.Id, SOL_Encerrado_Pela_Oportunidade__c = true, Status = 'Completed');
+    Test.stopTest();
+
+    System.assert(bloqueouManual, 'Conclusão manual do fechamento segue bloqueada.');
+    Task depois = recarregar(fechamento.Id);
+    System.assertEquals('Completed', depois.Status, 'A automação conclui.');
+    System.assert(
+      depois.SOL_Cancelada_Por_Perda__c != true,
+      'Concluir por Ganho não marca cancelamento por perda.'
+    );
+  }
+
+  // ============== 20. D3 — NÃO SE DESFAZ O SINAL DEPOIS DE ENCERRAR
+  //
+  // Enquanto a regra só reavaliava em ISNEW() e ISCHANGED(Status), bastava
+  // encerrar a tarefa corretamente e, numa SEGUNDA gravação, mexer só no motivo
+  // ou só numa das flags: o estado protegido saía do ar sem a regra reabrir.
+  // Agora ela reavalia a cada mudança de Status, tipo, motivo ou das duas flags.
+
+  /** (20.1) Cancelou certo; trocar SÓ o motivo depois é bloqueado. */
+  @IsTest
+  static void naoTrocaOMotivoDeUmFechamentoJaCancelado() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Task fechamento = tarefaDeFechamento(oppId, vs[0]);
+    update new Task(
+      Id = fechamento.Id,
+      Status = 'Cancelada',
+      SOL_Cancelada_Por_Perda__c = true,
+      SOL_Motivo_Cancelamento__c = MOTIVO_PERDA
+    );
+
+    Test.startTest();
+    Boolean bloqueou = false;
+    try {
+      update new Task(
+        Id = fechamento.Id,
+        SOL_Motivo_Cancelamento__c = 'Contato efetivado'
+      );
+    } catch (DmlException e) {
+      bloqueou = true;
+    }
+    Test.stopTest();
+
+    System.assert(bloqueou, 'Trocar só o motivo depois do cancelamento é bypass.');
+    assertCanceladaPorPerda(fechamento.Id, 'fechamento cancelado por perda');
+  }
+
+  /** (20.2) Cancelou certo; desligar SÓ a flag de perda depois é bloqueado. */
+  @IsTest
+  static void naoDesligaAFlagDePerdaDeUmFechamentoJaCancelado() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Task fechamento = tarefaDeFechamento(oppId, vs[0]);
+    update new Task(
+      Id = fechamento.Id,
+      Status = 'Cancelada',
+      SOL_Cancelada_Por_Perda__c = true,
+      SOL_Motivo_Cancelamento__c = MOTIVO_PERDA
+    );
+
+    Test.startTest();
+    Boolean bloqueou = false;
+    try {
+      update new Task(Id = fechamento.Id, SOL_Cancelada_Por_Perda__c = false);
+    } catch (DmlException e) {
+      bloqueou = true;
+    }
+    Test.stopTest();
+
+    System.assert(bloqueou, 'Desligar só a flag de perda é bypass.');
+    assertCanceladaPorPerda(fechamento.Id, 'fechamento cancelado por perda');
+  }
+
+  /**
+   * (20.3) Concluiu certo pela automação de Ganho; desligar SÓ a flag de
+   * encerramento depois é bloqueado.
+   */
+  @IsTest
+  static void naoDesligaAFlagDeEncerramentoDeUmFechamentoJaConcluido() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Task fechamento = tarefaDeFechamento(oppId, vs[0]);
+    update new Task(
+      Id = fechamento.Id,
+      SOL_Encerrado_Pela_Oportunidade__c = true,
+      Status = 'Completed'
+    );
+
+    Test.startTest();
+    Boolean bloqueou = false;
+    try {
+      update new Task(
+        Id = fechamento.Id,
+        SOL_Encerrado_Pela_Oportunidade__c = false
+      );
+    } catch (DmlException e) {
+      bloqueou = true;
+    }
+    Test.stopTest();
+
+    System.assert(bloqueou, 'Desligar só a flag de encerramento é bypass.');
+    Task depois = recarregar(fechamento.Id);
+    System.assertEquals('Completed', depois.Status, 'Segue concluída.');
+    System.assertEquals(
+      true,
+      depois.SOL_Encerrado_Pela_Oportunidade__c,
+      'A marca do encerramento automático continua de pé.'
+    );
+  }
+
+  /**
+   * (20.4) Caminho de fora: uma tarefa de OUTRO tipo, cancelada legitimamente
+   * com outro motivo, não pode virar "Fechamento" depois — seria uma tarefa de
+   * fechamento encerrada sem o sinal de perda.
+   */
+  @IsTest
+  static void naoTransformaTarefaJaCanceladaEmFechamento() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Task contato = tarefa(null, oppId, vs[0], 'Contato');
+    update new Task(
+      Id = contato.Id,
+      Status = 'Cancelada',
+      SOL_Motivo_Cancelamento__c = 'Contato efetivado'
+    );
+
+    Test.startTest();
+    Boolean bloqueou = false;
+    try {
+      update new Task(Id = contato.Id, SOL_Tipo_Tarefa__c = 'Fechamento');
+    } catch (DmlException e) {
+      bloqueou = true;
+    }
+    Test.stopTest();
+
+    System.assert(
+      bloqueou,
+      'Virar "Fechamento" depois de cancelada por outro motivo é bypass.'
+    );
+    Task depois = recarregar(contato.Id);
+    System.assertEquals(
+      'Contato',
+      depois.SOL_Tipo_Tarefa__c,
+      'O tipo original foi preservado.'
+    );
+    System.assertEquals(
+      'Contato efetivado',
+      depois.SOL_Motivo_Cancelamento__c,
+      'O cancelamento legítimo de contato não foi tocado.'
+    );
+  }
+
+  /**
+   * (20.5) O gatilho novo não engessa o registro: editar campo alheio ao estado
+   * protegido segue permitido, nos DOIS estados válidos de encerramento.
+   */
+  @IsTest
+  static void editarCampoAlheioSeguePermitidoNosEstadosValidos() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+
+    Task cancelada = tarefaDeFechamento(oppId, vs[0]);
+    update new Task(
+      Id = cancelada.Id,
+      Status = 'Cancelada',
+      SOL_Cancelada_Por_Perda__c = true,
+      SOL_Motivo_Cancelamento__c = MOTIVO_PERDA
+    );
+    Task concluida = tarefaDeFechamento(oppId, vs[0]);
+    update new Task(
+      Id = concluida.Id,
+      SOL_Encerrado_Pela_Oportunidade__c = true,
+      Status = 'Completed'
+    );
+
+    Test.startTest();
+    update new List<Task>{
+      new Task(Id = cancelada.Id, Description = 'Nota do gestor na cancelada.'),
+      new Task(Id = concluida.Id, Description = 'Nota do gestor na concluída.')
+    };
+    Test.stopTest();
+
+    Map<Id, Task> porId = new Map<Id, Task>(
+      [
+        SELECT Id, Status, Description, SOL_Cancelada_Por_Perda__c, SOL_Encerrado_Pela_Oportunidade__c
+        FROM Task
+        WHERE Id IN (:cancelada.Id, :concluida.Id)
+      ]
+    );
+    System.assertEquals(
+      'Nota do gestor na cancelada.',
+      porId.get(cancelada.Id).Description,
+      'Manutenção da cancelada válida segue permitida.'
+    );
+    System.assertEquals(
+      'Cancelada',
+      porId.get(cancelada.Id).Status,
+      'O estado da cancelada não mudou.'
+    );
+    System.assertEquals(
+      'Nota do gestor na concluída.',
+      porId.get(concluida.Id).Description,
+      'Manutenção da concluída válida segue permitida.'
+    );
+    System.assertEquals(
+      'Completed',
+      porId.get(concluida.Id).Status,
+      'O estado da concluída não mudou.'
+    );
+  }
+
+  // ============== 21. D3 — OS DOIS SINAIS SÃO MUTUAMENTE EXCLUSIVOS
+  //
+  // Não basta exigir o sinal certo para cada status: os dois sinais não podem
+  // coexistir, nem ficar pré-preenchidos numa tarefa ainda aberta, nem sobrar
+  // de um estado anterior numa transição. A regra passou a descrever os três
+  // estados válidos da tarefa Fechamento — concluída pelo Ganho, cancelada pela
+  // perda, ou em andamento sem sinal nenhum — e recusa todo o resto.
+
+  /** Tenta uma gravação e devolve se ela foi barrada, sem sujar o registro. */
+  private static Boolean barrado(Task patch) {
+    Savepoint sp = Database.setSavepoint();
+    try {
+      update patch;
+      Database.rollback(sp);
+      return false;
+    } catch (DmlException e) {
+      Database.rollback(sp);
+      return true;
+    }
+  }
+
+  /** Fechamento já concluída pelo Ganho, no estado válido. */
+  private static Id fechamentoConcluido(Id oppId, Id owner) {
+    Task t = tarefaDeFechamento(oppId, owner);
+    update new Task(
+      Id = t.Id,
+      SOL_Encerrado_Pela_Oportunidade__c = true,
+      Status = 'Completed'
+    );
+    return t.Id;
+  }
+
+  /** Fechamento já cancelada pela perda, no estado válido. */
+  private static Id fechamentoCancelado(Id oppId, Id owner) {
+    Task t = tarefaDeFechamento(oppId, owner);
+    update new Task(
+      Id = t.Id,
+      Status = 'Cancelada',
+      SOL_Cancelada_Por_Perda__c = true,
+      SOL_Motivo_Cancelamento__c = MOTIVO_PERDA
+    );
+    return t.Id;
+  }
+
+  /** (21.1) Concluída pelo Ganho não aceita flag de perda nem motivo. */
+  @IsTest
+  static void concluidaNaoAceitaSinalDePerda() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Id t = fechamentoConcluido(oppId, vs[0]);
+
+    Test.startTest();
+    Boolean comFlagDePerda = barrado(
+      new Task(Id = t, SOL_Cancelada_Por_Perda__c = true)
+    );
+    Boolean comMotivo = barrado(
+      new Task(Id = t, SOL_Motivo_Cancelamento__c = MOTIVO_PERDA)
+    );
+    Boolean comMotivoDeOutroFluxo = barrado(
+      new Task(Id = t, SOL_Motivo_Cancelamento__c = 'Contato efetivado')
+    );
+    Test.stopTest();
+
+    System.assert(comFlagDePerda, 'Concluída não pode carregar a flag de perda.');
+    System.assert(comMotivo, 'Concluída não pode ter motivo de cancelamento.');
+    System.assert(
+      comMotivoDeOutroFluxo,
+      'Concluída não pode ter motivo de cancelamento nenhum.'
+    );
+    Task depois = recarregar(t);
+    System.assertEquals('Completed', depois.Status, 'Estado válido preservado.');
+    System.assertEquals(
+      true,
+      depois.SOL_Encerrado_Pela_Oportunidade__c,
+      'A marca do Ganho continua de pé.'
+    );
+  }
+
+  /** (21.2) Cancelada pela perda não aceita a flag de encerramento por Ganho. */
+  @IsTest
+  static void canceladaNaoAceitaFlagDeGanho() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Id t = fechamentoCancelado(oppId, vs[0]);
+
+    Test.startTest();
+    Boolean comFlagDeGanho = barrado(
+      new Task(Id = t, SOL_Encerrado_Pela_Oportunidade__c = true)
+    );
+    Test.stopTest();
+
+    System.assert(
+      comFlagDeGanho,
+      'Cancelada por perda não pode carregar a marca do Ganho.'
+    );
+    assertCanceladaPorPerda(t, 'fechamento cancelado por perda');
+    System.assert(
+      recarregar(t).SOL_Encerrado_Pela_Oportunidade__c != true,
+      'A marca do Ganho continua desligada.'
+    );
+  }
+
+  /**
+   * (21.3) Tarefa ainda aberta não aceita nenhum dos sinais pré-preenchido —
+   * nem no insert, nem depois.
+   */
+  @IsTest
+  static void abertaNaoAceitaSinalPrePreenchido() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Task aberta = tarefaDeFechamento(oppId, vs[0]);
+
+    Test.startTest();
+    Boolean flagDePerda = barrado(
+      new Task(Id = aberta.Id, SOL_Cancelada_Por_Perda__c = true)
+    );
+    Boolean flagDeGanho = barrado(
+      new Task(Id = aberta.Id, SOL_Encerrado_Pela_Oportunidade__c = true)
+    );
+    Boolean motivo = barrado(
+      new Task(Id = aberta.Id, SOL_Motivo_Cancelamento__c = MOTIVO_PERDA)
+    );
+
+    // E o mesmo no nascimento da tarefa.
+    Boolean nasceComFlag = false;
+    try {
+      insert new Task(
+        Subject = 'T ' + rnd(),
+        WhatId = oppId,
+        OwnerId = vs[0],
+        Status = 'Open',
+        ActivityDate = Date.today(),
+        SOL_Tipo_Tarefa__c = 'Fechamento',
+        SOL_Encerrado_Pela_Oportunidade__c = true
+      );
+    } catch (DmlException e) {
+      nasceComFlag = true;
+    }
+    Test.stopTest();
+
+    System.assert(flagDePerda, 'Aberta não pode receber a flag de perda.');
+    System.assert(flagDeGanho, 'Aberta não pode receber a marca do Ganho.');
+    System.assert(motivo, 'Aberta não pode receber motivo de cancelamento.');
+    System.assert(nasceComFlag, 'Aberta não pode nascer com a marca do Ganho.');
+    Task depois = recarregar(aberta.Id);
+    System.assertEquals('Open', depois.Status, 'Segue aberta.');
+    System.assert(
+      depois.SOL_Encerrado_Pela_Oportunidade__c != true &&
+      depois.SOL_Cancelada_Por_Perda__c != true &&
+      String.isBlank(depois.SOL_Motivo_Cancelamento__c),
+      'Sem nenhum sinal de encerramento.'
+    );
+  }
+
+  /**
+   * (21.4) Trocar de um estado válido para o outro sem limpar o sinal anterior
+   * é bloqueado nos dois sentidos — é assim que os dois sinais coexistiriam.
+   */
+  @IsTest
+  static void transicaoEntreEstadosSemLimparOSinalAnteriorEhBloqueada() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Id concluida = fechamentoConcluido(oppId, vs[0]);
+    Id cancelada = fechamentoCancelado(oppId, vs[0]);
+
+    Test.startTest();
+    // Concluída -> Cancelada mantendo a marca do Ganho.
+    Boolean ganhoParaPerda = barrado(
+      new Task(
+        Id = concluida,
+        Status = 'Cancelada',
+        SOL_Cancelada_Por_Perda__c = true,
+        SOL_Motivo_Cancelamento__c = MOTIVO_PERDA
+      )
+    );
+    // Cancelada -> Completed mantendo flag e motivo da perda.
+    Boolean perdaParaGanho = barrado(
+      new Task(
+        Id = cancelada,
+        Status = 'Completed',
+        SOL_Encerrado_Pela_Oportunidade__c = true
+      )
+    );
+    // E, limpando o sinal anterior na mesma gravação, a transição é aceita.
+    Savepoint sp = Database.setSavepoint();
+    update new Task(
+      Id = concluida,
+      Status = 'Cancelada',
+      SOL_Encerrado_Pela_Oportunidade__c = false,
+      SOL_Cancelada_Por_Perda__c = true,
+      SOL_Motivo_Cancelamento__c = MOTIVO_PERDA
+    );
+    Boolean transicaoLimpaAceita = recarregar(concluida).Status == 'Cancelada';
+    Database.rollback(sp);
+    Test.stopTest();
+
+    System.assert(
+      ganhoParaPerda,
+      'Virar cancelada sem apagar a marca do Ganho deixaria os dois sinais juntos.'
+    );
+    System.assert(
+      perdaParaGanho,
+      'Virar concluída sem apagar o sinal da perda deixaria os dois sinais juntos.'
+    );
+    System.assert(
+      transicaoLimpaAceita,
+      'Com o sinal anterior limpo na mesma gravação, a transição é válida.'
+    );
+    System.assertEquals(
+      'Completed',
+      recarregar(concluida).Status,
+      'O rollback devolveu a concluída ao estado original.'
+    );
+  }
+
+  /**
+   * (21.5) O caminho de verdade continua inteiro: Ganho conclui, perda cancela,
+   * e editar só a Description segue permitido nos dois estados.
+   */
+  @IsTest
+  static void ganhoPerdaEManutencaoContinuamFuncionando() {
+    List<Id> vs = montarFila(2);
+    Id oppGanho = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Id oppPerda = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Task tGanho = tarefaDeFechamento(oppGanho, vs[0]);
+    Task tPerda = tarefaDeFechamento(oppPerda, vs[0]);
+
+    Test.startTest();
+    // Pelos eventos funcionais, não chamando os serviços: a Oportunidade muda
+    // de etapa e os Flows do 9423 e do 9425 fazem o encerramento.
+    update new Opportunity(Id = oppGanho, StageName = 'Ganho');
+    perderOpp(oppPerda);
+    // Manutenção de campo alheio nos dois estados resultantes.
+    update new List<Task>{
+      new Task(Id = tGanho.Id, Description = 'Nota na concluída.'),
+      new Task(Id = tPerda.Id, Description = 'Nota na cancelada.')
+    };
+    Test.stopTest();
+
+    Task depoisGanho = recarregar(tGanho.Id);
+    System.assertEquals(
+      'Completed',
+      depoisGanho.Status,
+      'Ganho concluiu a tarefa de fechamento.'
+    );
+    System.assertEquals(
+      true,
+      depoisGanho.SOL_Encerrado_Pela_Oportunidade__c,
+      'Com a marca do encerramento automático.'
+    );
+    System.assert(
+      depoisGanho.SOL_Cancelada_Por_Perda__c != true &&
+      String.isBlank(depoisGanho.SOL_Motivo_Cancelamento__c),
+      'E sem nenhum sinal de perda.'
+    );
+
+    assertCanceladaPorPerda(tPerda.Id, 'fechamento encerrado pela perda');
+    System.assert(
+      recarregar(tPerda.Id).SOL_Encerrado_Pela_Oportunidade__c != true,
+      'A cancelada por perda não recebe a marca do Ganho.'
+    );
+
+    Map<Id, Task> notas = new Map<Id, Task>(
+      [
+        SELECT Id, Description
+        FROM Task
+        WHERE Id IN (:tGanho.Id, :tPerda.Id)
+      ]
+    );
+    System.assertEquals(
+      'Nota na concluída.',
+      notas.get(tGanho.Id).Description,
+      'Manutenção da concluída segue permitida.'
+    );
+    System.assertEquals(
+      'Nota na cancelada.',
+      notas.get(tPerda.Id).Description,
+      'Manutenção da cancelada segue permitida.'
     );
   }
 }

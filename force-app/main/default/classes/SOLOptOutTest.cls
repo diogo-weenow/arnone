@@ -296,13 +296,17 @@ private class SOLOptOutTest {
     Test.startTest();
     Boolean bloqueou = false;
     try {
-      // Perda manual, sem opt-out e sem compromisso: a regra anterior vale.
+      // Perda manual, sem opt-out e sem compromisso: segue bloqueada. Desde o
+      // D2 da homologação E2E duas regras cobrem este mesmo desvio — a de
+      // compromisso (CLICKUP-9418) e a de coerência do motivo (D2) —, e a
+      // mensagem devolvida é a da primeira que a plataforma reportar.
       update new Lead(Id = l.Id, Status = 'Desqualificado');
     } catch (DmlException e) {
       bloqueou = true;
       System.assert(
-        e.getMessage().contains('compromisso registrado'),
-        'Mensagem da VR SOL_Recuperacao_Exige_Compromisso: ' + e.getMessage()
+        e.getMessage().contains('compromisso registrado') ||
+        e.getMessage().contains('Motivo da desqualificação incoerente'),
+        'Mensagem inesperada: ' + e.getMessage()
       );
     }
     Test.stopTest();

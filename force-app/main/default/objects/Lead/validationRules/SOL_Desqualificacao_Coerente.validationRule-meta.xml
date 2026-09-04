@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Desqualificacao_Coerente</fullName>
+    <active>true</active>
+    <description>D2 da homologação E2E: com o motivo editável pelo vendedor, garante coerência no Lead SOL. Opt-out exige a flag ligada; Negócio perdido exige a flag desligada; Desqualificado exige motivo. Só dispara na criação ou mudança desses campos.</description>
+    <errorConditionFormula>AND(
+  RecordType.DeveloperName = &quot;SOL&quot;,
+  OR(
+    ISNEW(),
+    ISCHANGED( Status ),
+    ISCHANGED( SOL_Motivo_Desqualificacao__c ),
+    ISCHANGED( SOL_Opt_Out__c )
+  ),
+  OR(
+    ISPICKVAL( SOL_Motivo_Desqualificacao__c , &quot;Opt-out&quot; ) &lt;&gt; SOL_Opt_Out__c,
+    AND(
+      ISPICKVAL( Status , &quot;Desqualificado&quot; ),
+      ISBLANK( TEXT( SOL_Motivo_Desqualificacao__c ) )
+    )
+  )
+)</errorConditionFormula>
+    <errorDisplayField>SOL_Motivo_Desqualificacao__c</errorDisplayField>
+    <errorMessage>Motivo da desqualificação incoerente. Use "Negócio perdido" para perda comercial (sem opt-out) ou deixe a automação registrar "Opt-out" quando o lead pedir para não ser contatado. Desqualificar exige um destes dois motivos.</errorMessage>
+</ValidationRule>

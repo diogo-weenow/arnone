@@ -34,6 +34,17 @@ private class SOL_ConverterLeadTest {
     Database.DMLOptions opcoes = new Database.DMLOptions();
     opcoes.duplicateRuleHeader.allowSave = true;
     Database.insert(l, opcoes);
+    // A distribuição do CLICKUP-9394 roda no after-save. Sem roster ativo nesta
+    // transação ela cai no fallback e estaciona o lead na FILA — e a plataforma
+    // não converte registro de fila ("Converted objects can only be owned by
+    // users"). Em produção o round-robin entrega a um vendedor de verdade; aqui
+    // o dono precisa ser reposto à mão para o cenário ser o real.
+    l.OwnerId = UserInfo.getUserId();
+    // O CLICKUP-9419 exige reunião comercial realizada para converter. A tela
+    // registra isso concluindo a tarefa de reunião; a fixture grava o marco
+    // direto, no mesmo espírito com que já grava o status da procuração.
+    l.SOL_Data_Reuniao_Realizada__c = Datetime.now().addDays(-1);
+    update l;
     return l;
   }
 
@@ -117,22 +128,35 @@ private class SOL_ConverterLeadTest {
     );
   }
 
+  /**
+   * A VR SOL_Lead_Exige_CNPJ não deixa gravar lead SOL sem CNPJ, então esse
+   * estado não existe no banco — e a fixture antiga tentava criá-lo, falhando
+   * com MISSING_ARGUMENT porque o insert nem chegava a ter Id. O portão do
+   * conversor continua valendo a pena testar: ele é a segunda barreira, para o
+   * caso de o dado chegar por integração. Testamos o portão direto, com o CNPJ
+   * apagado só em memória — o registro no banco segue íntegro.
+   */
   @IsTest
   static void naoConverteSemCnpj() {
-    Lead l = novoLead('Recuperação Tributária', null);
-    l.SOL_Status_Procuracao__c = 'Recebida';
-    update l;
-    anexar(l.Id);
+    Lead l = leadComProcuracao();
+    Id leadId = l.Id;
 
     Test.startTest();
-    SOL_PrepararConversao.Preparo p = SOL_PrepararConversao.preparar(
-      new List<Id>{ l.Id }
-    )[0];
+    Lead emMemoria = Database.query(
+      'SELECT ' + SOL_ConverterLead.CAMPOS_LEAD + ' FROM Lead WHERE Id = :leadId'
+    );
+    emMemoria.CNPJ__c = null;
+    String impedimento = SOL_ConverterLead.impedimentoPara(emMemoria, 1);
     Test.stopTest();
 
+    Assert.isNotNull(impedimento, 'Sem CNPJ o portão tem de impedir.');
     Assert.isTrue(
-      p.impedimento.contains('CNPJ'),
-      'Sem CNPJ não há como evitar duplicata: ' + p.impedimento
+      impedimento.contains('CNPJ'),
+      'Sem CNPJ não há como evitar duplicata: ' + impedimento
+    );
+    Assert.isNotNull(
+      [SELECT CNPJ__c FROM Lead WHERE Id = :leadId].CNPJ__c,
+      'O registro gravado continua com o CNPJ: só a cópia em memória foi alterada.'
     );
   }
 
@@ -261,10 +285,14 @@ private class SOL_ConverterLeadTest {
     )[0];
     Test.stopTest();
 
+    // O Id tem de ir tipado: ContentDocumentLink só aceita filtro por Id, e
+    // ligar a String de `oportunidadeId` faz a consulta ser recusada com
+    // "Implementation restriction".
+    Id oportunidadeId = r.oportunidadeId;
     List<ContentDocumentLink> naOportunidade = [
       SELECT Id
       FROM ContentDocumentLink
-      WHERE LinkedEntityId = :r.oportunidadeId
+      WHERE LinkedEntityId = :oportunidadeId
     ];
     Assert.isFalse(
       naOportunidade.isEmpty(),
@@ -526,6 +554,190 @@ private class SOL_ConverterLeadTest {
       insert u;
     }
     return u;
+  }
+
+  /**
+   * D1 da homologação E2E: o vendedor SOL de verdade — perfil Standard, sem
+   * "Modify All Data", e com um único permission set: o PS_SOL_Comercial que a
+   * mensagem SEM_PERMISSAO manda pedir ao administrador. Nada de PS_Comercial
+   * nem de permissão de outras BUs.
+   */
+  private static User vendedorSOL() {
+    Profile p = [
+      SELECT Id
+      FROM Profile
+      WHERE UserType = 'Standard' AND PermissionsModifyAllData = FALSE
+      LIMIT 1
+    ];
+    User u = new User(
+      ProfileId = p.Id,
+      LastName = 'Vendedor SOL',
+      Alias = 'vendsol',
+      Email = 'vendedor.sol@exemplo.com',
+      Username = 'vendedor.sol.' +
+        DateTime.now().getTime() +
+        '@exemplo.com.teste',
+      TimeZoneSidKey = 'America/Sao_Paulo',
+      LocaleSidKey = 'pt_BR',
+      EmailEncodingKey = 'UTF-8',
+      LanguageLocaleKey = 'pt_BR'
+    );
+    System.runAs(new User(Id = UserInfo.getUserId())) {
+      insert u;
+      insert new PermissionSetAssignment(
+        AssigneeId = u.Id,
+        PermissionSetId = [
+          SELECT Id
+          FROM PermissionSet
+          WHERE Name = 'PS_SOL_Comercial'
+          LIMIT 1
+        ]
+        .Id
+      );
+    }
+    return u;
+  }
+
+  /**
+   * D1 da homologação E2E: antes da correção, este caminho morria em
+   * "fields being inaccessible on Sobject Account … CNPJ__c,
+   * Unidades_Atendidas__c", porque o PS_SOL_Comercial não concedia edição
+   * nesses dois campos e o conversor os grava ao criar a Conta. Uma vendedora
+   * ativa no roster (só com esse PS) não conseguia converter os leads que o
+   * round-robin lhe entregava.
+   */
+  @IsTest
+  static void vendedorComApenasOPsComercialConverte() {
+    Lead l = leadComProcuracao();
+    User vendedor = vendedorSOL();
+    // O lead nasce do round-robin já na mão do vendedor. A fixture é montada
+    // como admin de propósito: só a conversão roda no contexto restrito.
+    l.OwnerId = vendedor.Id;
+    update l;
+
+    SOL_ConverterLead.Resultado r;
+    Test.startTest();
+    System.runAs(vendedor) {
+      r = SOL_ConverterLead.converter(
+        new List<SOL_ConverterLead.Pedido>{ pedidoDe(l.Id, null) }
+      )[0];
+    }
+    Test.stopTest();
+
+    Assert.isTrue(
+      r.convertido,
+      'O vendedor com apenas PS_SOL_Comercial deveria converter. Mensagem: ' +
+        r.mensagem
+    );
+    Assert.isNotNull(r.contaId, 'Conta deveria ter sido criada.');
+    Assert.isNotNull(r.contatoId, 'Contato deveria ter sido criado.');
+    Assert.isNotNull(
+      r.oportunidadeId,
+      'Oportunidade deveria ter sido criada.'
+    );
+
+    Lead depois = [
+      SELECT IsConverted, ConvertedAccountId, ConvertedContactId, ConvertedOpportunityId
+      FROM Lead
+      WHERE Id = :l.Id
+    ];
+    Assert.isTrue(depois.IsConverted, 'O lead deveria estar convertido.');
+    Assert.areEqual(
+      r.contaId,
+      String.valueOf(depois.ConvertedAccountId),
+      'A Conta do resultado é a Conta da conversão.'
+    );
+    Assert.areEqual(
+      r.contatoId,
+      String.valueOf(depois.ConvertedContactId),
+      'O Contato do resultado é o Contato da conversão.'
+    );
+    Assert.areEqual(
+      r.oportunidadeId,
+      String.valueOf(depois.ConvertedOpportunityId),
+      'A Oportunidade do resultado é a da conversão.'
+    );
+
+    // O CNPJ é justamente o campo que faltava: tem de chegar gravado na Conta.
+    Account conta = [
+      SELECT CNPJ__c, Name
+      FROM Account
+      WHERE Id = :depois.ConvertedAccountId
+    ];
+    Assert.isNotNull(
+      conta.CNPJ__c,
+      'O CNPJ tem de chegar gravado na Conta nova — é o campo que faltava no PS.'
+    );
+    Assert.isTrue(
+      SOL_ConverterLead.variantesDe(CNPJ_CRU).contains(conta.CNPJ__c),
+      'O CNPJ da Conta é o do lead, numa das duas grafias: ' + conta.CNPJ__c
+    );
+  }
+
+  /**
+   * D1, reaproveitamento: quando a Conta do CNPJ já existe, o vendedor com
+   * apenas PS_SOL_Comercial precisa conseguir reaproveitá-la — o conversor
+   * também grava campos de Account nesse caminho.
+   */
+  @IsTest
+  static void vendedorComApenasOPsComercialReaproveitaConta() {
+    Lead l = leadComProcuracao();
+    User vendedor = vendedorSOL();
+    // A Conta preexistente fica com o vendedor: o que o D1 corrige é FLS, não
+    // compartilhamento. Achar Conta de OUTRA unidade depende do modelo de
+    // sharing de Account da org, que esta correção não altera.
+    Account existente = new Account(
+      Name = 'Industria Teste LTDA',
+      CNPJ__c = CNPJ_CRU,
+      OwnerId = vendedor.Id
+    );
+    insert existente;
+
+    l.OwnerId = vendedor.Id;
+    update l;
+
+    // O caminho real da tela: preparar sugere a Conta do CNPJ, converter recebe
+    // a sugestão. As duas etapas rodam no contexto do vendedor, e é `preparar`
+    // que consulta Account.CNPJ__c — justamente o campo do D1.
+    SOL_PrepararConversao.Preparo p;
+    SOL_ConverterLead.Resultado r;
+    Test.startTest();
+    System.runAs(vendedor) {
+      p = SOL_PrepararConversao.preparar(new List<Id>{ l.Id })[0];
+      r = SOL_ConverterLead.converter(
+        new List<SOL_ConverterLead.Pedido>{
+          pedidoDe(l.Id, (Id) p.contaSugeridaId)
+        }
+      )[0];
+    }
+    Test.stopTest();
+
+    Assert.areEqual(
+      existente.Id,
+      (Id) p.contaSugeridaId,
+      'O vendedor precisa achar a Conta pelo CNPJ normalizado. Impedimento: ' +
+        p.impedimento
+    );
+    Assert.isTrue(r.convertido, 'Deveria converter. Mensagem: ' + r.mensagem);
+    Assert.areEqual(
+      existente.Id,
+      Id.valueOf(r.contaId),
+      'Deveria reaproveitar a Conta do mesmo CNPJ, não criar outra.'
+    );
+    Assert.areEqual(
+      1,
+      [
+        SELECT COUNT()
+        FROM Account
+        WHERE CNPJ__c IN :SOL_ConverterLead.variantesDe(CNPJ_CRU)
+      ],
+      'Nenhuma Conta duplicada foi criada.'
+    );
+    Assert.isNotNull(r.contatoId, 'Contato deveria ter sido criado.');
+    Assert.isNotNull(
+      r.oportunidadeId,
+      'Oportunidade deveria ter sido criada.'
+    );
   }
 
   // ------------------------------------------------------------- normalização
