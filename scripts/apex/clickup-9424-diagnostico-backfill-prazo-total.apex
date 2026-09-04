@@ -28,6 +28,10 @@
  *     do SOLPrazoTotalBatch, que continua idempotente.
  *   - allOrNone = false: um registro inválido não bloqueia os demais.
  *   - Rodar de novo é seguro: só toca Oportunidades ainda sem os dois campos.
+ *   - NÃO sobrescreve em silêncio: se só um dos dois campos já estiver
+ *     preenchido, valida a consistência contra a régua determinística e LISTA
+ *     as divergências para tratamento manual — grava só o campo que falta
+ *     quando o que já existe bate com a régua.
  */
 Boolean SIMULAR = true;
 
@@ -74,23 +78,83 @@ if (bhId == null) {
   return;
 }
 
+// REGRA (revisão do PR #15): quando SÓ UM dos dois campos de prazo já está
+// preenchido, NADA é sobrescrito em silêncio. O script valida a consistência
+// contra a régua determinística (Lead convertido + 30 dias úteis) e LISTA as
+// divergências para tratamento manual. Só grava:
+//   (a) os dois campos, quando AMBOS estão vazios; ou
+//   (b) o campo que falta, quando o que já existe BATE com a régua.
 List<Opportunity> paraGravar = new List<Opportunity>();
+List<String> divergencias = new List<String>();
 Integer jaVencidos = 0;
+Integer completados = 0;
+Integer consistentesSemAcao = 0;
+
 for (Id oppId : contatoPorOpp.keySet()) {
-  Datetime inicio = contatoPorOpp.get(oppId);
-  Datetime prazo = SOLPrazoTotalService.calcularPrazoTotal(inicio);
-  if (prazo <= System.now()) {
-    jaVencidos++;
+  Opportunity atual = porId.get(oppId);
+  Datetime inicioRegua = contatoPorOpp.get(oppId);
+  Datetime prazoRegua = SOLPrazoTotalService.calcularPrazoTotal(inicioRegua);
+
+  Datetime inicioAtual = atual.SOL_Data_Inicio_Ciclo_Comercial__c;
+  Datetime prazoAtual = atual.SOL_Prazo_Total_Comercial__c;
+
+  Boolean inicioDiverge = inicioAtual != null && inicioAtual != inicioRegua;
+  Boolean prazoDiverge = prazoAtual != null && prazoAtual != prazoRegua;
+
+  if (inicioDiverge || prazoDiverge) {
+    divergencias.add(
+      oppId +
+        ' (' + atual.Name + '): ' +
+        (inicioDiverge
+          ? 'início gravado ' + inicioAtual + ' ≠ régua ' + inicioRegua + '; '
+          : '') +
+        (prazoDiverge
+          ? 'prazo gravado ' + prazoAtual + ' ≠ régua ' + prazoRegua
+          : '')
+    );
+    continue; // NÃO sobrescreve
   }
-  paraGravar.add(
-    new Opportunity(
-      Id = oppId,
-      SOL_Data_Inicio_Ciclo_Comercial__c = inicio,
-      SOL_Prazo_Total_Comercial__c = prazo
-    )
-  );
+
+  if (inicioAtual == null && prazoAtual == null) {
+    // Caso (a): ambos vazios — grava os dois.
+    paraGravar.add(
+      new Opportunity(
+        Id = oppId,
+        SOL_Data_Inicio_Ciclo_Comercial__c = inicioRegua,
+        SOL_Prazo_Total_Comercial__c = prazoRegua
+      )
+    );
+    if (prazoRegua <= System.now()) {
+      jaVencidos++;
+    }
+  } else if (inicioAtual != null && prazoAtual == null) {
+    // Caso (b): início consistente, só falta o limite.
+    paraGravar.add(
+      new Opportunity(Id = oppId, SOL_Prazo_Total_Comercial__c = prazoRegua)
+    );
+    completados++;
+    if (prazoRegua <= System.now()) {
+      jaVencidos++;
+    }
+  } else if (inicioAtual == null && prazoAtual != null) {
+    // Prazo preenchido sem início: estado inconsistente mesmo "batendo" — não
+    // dá para confirmar a origem. Lista para tratamento manual.
+    divergencias.add(
+      oppId + ' (' + atual.Name + '): prazo preenchido sem data de início de ciclo.'
+    );
+  } else {
+    consistentesSemAcao++;
+  }
 }
-System.debug(LoggingLevel.ERROR, 'A gravar: ' + paraGravar.size() + ' (já vencidos, entrarão na varredura: ' + jaVencidos + ')');
+
+System.debug(LoggingLevel.ERROR, 'A gravar: ' + paraGravar.size()
+  + ' (ambos vazios + apenas-limite=' + completados
+  + ' | já vencidos, entrarão na varredura: ' + jaVencidos
+  + ' | já consistentes, sem ação: ' + consistentesSemAcao + ')');
+System.debug(LoggingLevel.ERROR, 'DIVERGÊNCIAS (tratamento manual, NÃO sobrescritas): ' + divergencias.size());
+for (String d : divergencias) {
+  System.debug(LoggingLevel.ERROR, '  - ' + d);
+}
 
 if (SIMULAR) {
   System.debug(LoggingLevel.ERROR, 'SIMULAÇÃO — nada foi gravado. Ajuste SIMULAR = false para aplicar.');

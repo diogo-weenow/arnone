@@ -6,6 +6,22 @@
  * reatribuídas por prazo, e delega a SOLPrazoTotalService — sem duplicar a
  * lógica de fila/roster/ponteiro.
  *
+ * LOTE = 1 (SOLPrazoTotalScheduler.TAMANHO_LOTE): uma Oportunidade por
+ * transação do Batch. Assim a falha de um registro (ex.: uma Task que não pode
+ * ser transferida) fica isolada NA SUA transação — as demais Oportunidades
+ * vencidas são varridas em transações próprias e reatribuídas normalmente.
+ * Impacto de volume avaliado no PR: a varredura só enxerga Oportunidades já
+ * vencidas e ainda não reatribuídas (SOL_Qtd_Reatribuicoes_Prazo__c nulo/≤0),
+ * um conjunto pequeno e decrescente; o custo são algumas transações curtas por
+ * hora.
+ *
+ * OBSERVABILIDADE DA FALHA (revisão do PR #15): quando o serviço devolve
+ * r.comErro > 0, `execute()` LANÇA. A exceção não fica só em System.debug: o
+ * AsyncApexJob do lote passa a registrar NumberOfErrors > 0 e ExtendedStatus
+ * com o motivo — a falha é visível em Setup ▸ Apex Jobs e por SOQL. O lote 1
+ * garante que só a Oportunidade problemática é revertida; ela volta ao filtro
+ * na varredura seguinte.
+ *
  * Salvaguardas:
  * - Só age se o singleton estiver ATIVO (kill-switch) e houver ao menos um
  *   vendedor direto ativo na fila; caso contrário `start()` devolve um
@@ -14,13 +30,14 @@
  * - Nunca recalcula o prazo: o filtro apenas LÊ SOL_Prazo_Total_Comercial__c.
  * - Oportunidades sem data de início / sem prazo calculado ficam de fora, sem
  *   inferência por CreatedDate.
- * - Uma falha em um lote não compromete os lotes já concluídos; o serviço tem
- *   Savepoint/rollback próprio e a varredura é idempotente
- *   (SOL_Qtd_Reatribuicoes_Prazo__c > 0 marca como processada).
  * - Executa em contexto de sistema; não depende de permission set.
  */
 public without sharing class SOLPrazoTotalBatch implements Database.Batchable<SObject> {
   private Datetime limite;
+
+  /** Lote com ao menos uma Oportunidade que falhou — evidencia no AsyncApexJob. */
+  public class LoteComFalhaException extends Exception {
+  }
 
   public Database.QueryLocator start(Database.BatchableContext bc) {
     SOL_Distribuicao_Estado__c estado = SOLDistribuicaoService.lerEstado();
@@ -55,10 +72,45 @@ public without sharing class SOLPrazoTotalBatch implements Database.Batchable<SO
   public void execute(Database.BatchableContext bc, List<Opportunity> escopo) {
     // Sem SOQL/DML no laço: extrai os Ids e delega ao serviço uma única vez.
     List<Id> ids = new List<Id>(new Map<Id, Opportunity>(escopo).keySet());
-    SOLPrazoTotalService.reatribuirPorPrazoTotal(ids);
+    SOLPrazoTotalService.ResultadoPrazoTotal r = SOLPrazoTotalService.reatribuirPorPrazoTotal(ids);
+
+    if (r.comErro > 0) {
+      // Faz o AsyncApexJob registrar a falha (NumberOfErrors / ExtendedStatus).
+      // Com lote = 1, reverte só a Oportunidade problemática desta transação; as
+      // já reatribuídas em outras transações permanecem. A Opp revertida volta
+      // ao filtro na próxima varredura.
+      String detalhe = r.mensagens.isEmpty()
+        ? SOLPrazoTotalService.MSG_ERRO_GENERICO
+        : String.join(r.mensagens, ' | ');
+      throw new LoteComFalhaException(
+        'CLICKUP-9424 — ' +
+          r.comErro +
+          ' Oportunidade(s) não reatribuída(s) neste lote: ' +
+          detalhe
+      );
+    }
   }
 
   public void finish(Database.BatchableContext bc) {
-    System.debug(LoggingLevel.INFO, 'SOLPrazoTotalBatch concluído: ' + bc.getJobId());
+    AsyncApexJob job = [
+      SELECT Status, JobItemsProcessed, TotalJobItems, NumberOfErrors, ExtendedStatus
+      FROM AsyncApexJob
+      WHERE Id = :bc.getJobId()
+    ];
+    System.debug(
+      (job.NumberOfErrors > 0 ? LoggingLevel.ERROR : LoggingLevel.INFO),
+      'SOLPrazoTotalBatch concluído: ' +
+        bc.getJobId() +
+        ' status=' +
+        job.Status +
+        ' itens=' +
+        job.JobItemsProcessed +
+        '/' +
+        job.TotalJobItems +
+        ' erros=' +
+        job.NumberOfErrors +
+        ' detalhe=' +
+        job.ExtendedStatus
+    );
   }
 }

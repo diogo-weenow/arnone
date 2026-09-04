@@ -33,7 +33,9 @@
  * SEM OUTRO VENDEDOR ATIVO: o proprietário NÃO é alterado e a Oportunidade NÃO
  * é marcada como processada (a contagem não é incrementada). Fica registrada a
  * situação controlada em SOL_Status_Reatribuicao_Prazo__c = "Sem outro
- * vendedor" e a próxima execução do Batch tenta de novo.
+ * vendedor" — mas SÓ quando status/motivo ainda não estão nesse valor, para não
+ * gerar uma gravação idêntica a cada varredura. A próxima execução do Batch
+ * tenta de novo.
  *
  * REAPROVEITA a fila, o roster de usuários diretos ativos, o ponteiro global e a
  * seleção round-robin de SOLDistribuicaoService (bloquearSingleton,
@@ -41,13 +43,26 @@
  * proximoVendedorExcluindo) — o algoritmo NÃO é duplicado. Respeita o
  * kill-switch do singleton (Ativo__c = false ⇒ nada é tocado).
  *
- * CONCORRÊNCIA E ATOMICIDADE: o singleton é travado com FOR UPDATE (serializa
- * com a distribuição inicial e com a reatribuição por falta de contato) e as
- * Oportunidades e Tasks também são lidas com FOR UPDATE. Um Savepoint envolve
- * toda a execução: proprietário, Tasks abertas, auditoria e ponteiro nunca
- * ficam parcialmente atualizados. A atualização das Oportunidades usa
- * allOrNone = false para que uma Opp inválida não bloqueie as demais; o
- * ponteiro só reflete a última troca EFETIVADA.
+ * ATOMICIDADE POR OPORTUNIDADE (revisão do PR #15): cada Oportunidade é gravada
+ * dentro do SEU PRÓPRIO Savepoint — proprietário + Tasks abertas + auditoria
+ * num bloco só. Se a transferência de uma Task falhar, o rollback desfaz APENAS
+ * aquela Oportunidade (r.comErro++), e as demais elegíveis seguem reatribuídas
+ * normalmente. A Oportunidade que falhou continua com
+ * SOL_Qtd_Reatribuicoes_Prazo__c nulo/0 e volta na próxima varredura. O ponteiro
+ * global só reflete as trocas EFETIVADAS e é persistido no fim, em bloco
+ * próprio. O resultado devolve r.comErro > 0 quando algo falhou — o
+ * SOLPrazoTotalBatch converte isso em falha visível do AsyncApexJob.
+ *
+ * CONCORRÊNCIA: o singleton é travado com FOR UPDATE (serializa com a
+ * distribuição inicial e com a reatribuição por falta de contato); as
+ * Oportunidades e as Tasks também são lidas com FOR UPDATE.
+ *
+ * VOLUME: o serviço faz SOQL/DML proporcional ao número de Oportunidades JÁ
+ * VENCIDAS e ainda não reatribuídas de uma varredura — conjunto pequeno e
+ * decrescente (cada uma sai do filtro após a 1ª reatribuição). O
+ * SOLPrazoTotalScheduler dispara o Batch com lote = 1, então em produção cada
+ * transação processa UMA Oportunidade. Chamadas diretas em massa (testes, E2E)
+ * ficam muito abaixo dos limites de governança.
  *
  * NÃO altera proprietário de Conta nem de Contato. NÃO antecipa o CLICKUP-9425.
  */
@@ -99,7 +114,8 @@ public without sharing class SOLPrazoTotalService {
    * Limite de 30 dias ÚTEIS a partir de `inicio`, pela régua compartilhada.
    *
    * @throws SOLBusinessHoursHelper.CalendarioIndisponivelException calendário
-   *   ausente/inativo — o chamador decide se aborta ou apenas não grava o prazo.
+   *   ausente/inativo. SOL_ConverterLead aborta a conversão inteira nesse caso —
+   *   uma Oportunidade com contato efetivado NÃO pode nascer sem este prazo.
    */
   public static Datetime calcularPrazoTotal(Datetime inicio) {
     if (inicio == null) {
@@ -117,7 +133,9 @@ public without sharing class SOLPrazoTotalService {
    * úteis venceu e que continuam abertas.
    *
    * @param opportunityIds Ids candidatos (qualquer origem; filtrados aqui).
-   * @return contagens controladas — nunca lança para o chamador.
+   * @return contagens controladas — nunca lança para o chamador; r.comErro > 0
+   *   sinaliza que ao menos uma Oportunidade falhou (o Batch torna isso visível
+   *   no AsyncApexJob).
    */
   public static ResultadoPrazoTotal reatribuirPorPrazoTotal(List<Id> opportunityIds) {
     ResultadoPrazoTotal r = new ResultadoPrazoTotal();
@@ -136,11 +154,21 @@ public without sharing class SOLPrazoTotalService {
     }
 
     Datetime agora = System.now();
-    Savepoint sp = Database.setSavepoint();
+
+    // --------------------------------------------------------------- fase 1
+    // Trava do singleton, seleção das candidatas e do roster. Um problema de
+    // configuração aqui (singleton ausente, fila inválida) é situação
+    // controlada: nada foi tocado, devolve MSG_CONFIG.
+    SOL_Distribuicao_Estado__c estado;
+    List<Opportunity> candidatas = new List<Opportunity>();
+    List<User> ativos;
+    Integer cursor = 0;
+    Integer n = 0;
+    Savepoint spFase1 = Database.setSavepoint();
     try {
       // Mesmo lock da distribuição inicial e da reatribuição por falta de
       // contato: serializa o avanço do ponteiro entre transações concorrentes.
-      SOL_Distribuicao_Estado__c estado = SOLDistribuicaoService.bloquearSingleton();
+      estado = SOLDistribuicaoService.bloquearSingleton();
 
       List<Opportunity> carregadas = [
         SELECT
@@ -153,13 +181,13 @@ public without sharing class SOLPrazoTotalService {
           SOL_Data_Inicio_Ciclo_Comercial__c,
           SOL_Prazo_Total_Comercial__c,
           SOL_Qtd_Reatribuicoes_Prazo__c,
-          SOL_Status_Reatribuicao_Prazo__c
+          SOL_Status_Reatribuicao_Prazo__c,
+          SOL_Motivo_Reatribuicao_Prazo__c
         FROM Opportunity
         WHERE Id IN :ids
         FOR UPDATE
       ];
 
-      List<Opportunity> candidatas = new List<Opportunity>();
       Set<Id> encontradas = new Set<Id>();
       for (Opportunity o : carregadas) {
         encontradas.add(o.Id);
@@ -191,11 +219,11 @@ public without sharing class SOLPrazoTotalService {
       // Kill-switch desligado: a reatribuição por prazo também para.
       if (!estado.Ativo__c) {
         r.ignoradas += candidatas.size();
+        candidatas.clear();
         return r;
       }
 
       // Roster: mesmos membros diretos ativos da Fila_Leads_SOL.
-      List<User> ativos;
       try {
         ativos = SOLDistribuicaoService.obterMembrosDiretosAtivos(
           SOLDistribuicaoService.localizarFilaValida().Id
@@ -203,136 +231,25 @@ public without sharing class SOLPrazoTotalService {
       } catch (SOLDistribuicaoService.RosterVazioException e) {
         ativos = new List<User>();
       }
-      Integer n = ativos.size();
+      n = ativos.size();
 
       // Ponto de partida: o próximo após o ponteiro global (User.Id ASC).
-      Integer cursor = 0;
       if (n > 0 && estado.Ultimo_Usuario__c != null) {
         Integer k = SOLDistribuicaoService.indiceDe(ativos, estado.Ultimo_Usuario__c);
         cursor = (k >= 0) ? Math.mod(k + 1, n) : 0;
       }
-
-      List<Opportunity> paraAtualizar = new List<Opportunity>();
-      List<Id> ordemReatribuidas = new List<Id>();
-      Map<Id, Id> novoDonoPorOpp = new Map<Id, Id>();
-      List<Opportunity> semVendedor = new List<Opportunity>();
-
-      for (Opportunity o : candidatas) {
-        Id escolhido = n == 0
-          ? null
-          : SOLDistribuicaoService.proximoVendedorExcluindo(ativos, cursor, o.OwnerId);
-
-        if (escolhido == null) {
-          // Não altera proprietário e NÃO marca como processada: a contagem
-          // fica intacta e a Oportunidade volta na próxima varredura.
-          semVendedor.add(
-            new Opportunity(
-              Id = o.Id,
-              SOL_Status_Reatribuicao_Prazo__c = STATUS_SEM_OUTRO_VENDEDOR,
-              SOL_Motivo_Reatribuicao_Prazo__c = MOTIVO_SEM_OUTRO_VENDEDOR
-            )
-          );
-          r.semOutroVendedor++;
-          continue;
-        }
-
-        // Consome o ponteiro: avança para depois do vendedor escolhido.
-        cursor = Math.mod(SOLDistribuicaoService.indiceDe(ativos, escolhido) + 1, n);
-
-        paraAtualizar.add(
-          new Opportunity(
-            Id = o.Id,
-            OwnerId = escolhido,
-            SOL_Qtd_Reatribuicoes_Prazo__c =
-              (o.SOL_Qtd_Reatribuicoes_Prazo__c == null
-                ? 0
-                : o.SOL_Qtd_Reatribuicoes_Prazo__c) + 1,
-            SOL_Data_Reatribuicao_Prazo__c = agora,
-            SOL_Motivo_Reatribuicao_Prazo__c = MOTIVO_PRAZO_TOTAL,
-            SOL_Status_Reatribuicao_Prazo__c = STATUS_REATRIBUIDO
-          )
-          // Etapa, marcos, datas e o próprio prazo NÃO são tocados.
-        );
-        ordemReatribuidas.add(o.Id);
-        novoDonoPorOpp.put(o.Id, escolhido);
-      }
-
-      // Situações controladas (sem outro vendedor): all-or-none, sem ponteiro.
-      if (!semVendedor.isEmpty()) {
-        update semVendedor;
-      }
-
-      Set<Id> oppsOk = new Set<Id>();
-      if (!paraAtualizar.isEmpty()) {
-        // allOrNone = false: uma Opp inválida não bloqueia as demais do lote.
-        Database.SaveResult[] resultados = Database.update(paraAtualizar, false);
-        for (Integer i = 0; i < resultados.size(); i++) {
-          if (resultados[i].isSuccess()) {
-            oppsOk.add(paraAtualizar[i].Id);
-          } else {
-            r.comErro++;
-            System.debug(
-              LoggingLevel.ERROR,
-              'SOLPrazoTotalService: falha ao reatribuir ' +
-                paraAtualizar[i].Id +
-                ': ' +
-                resultados[i].getErrors()
-            );
-          }
-        }
-        r.reatribuidas = oppsOk.size();
-      }
-
-      // Tasks ABERTAS das Oportunidades que realmente trocaram de dono.
-      // Concluídas/canceladas (IsClosed = true) ficam intactas.
-      if (!oppsOk.isEmpty()) {
-        List<Task> abertas = [
-          SELECT Id, WhatId, OwnerId
-          FROM Task
-          WHERE WhatId IN :oppsOk AND IsClosed = false
-          FOR UPDATE
-        ];
-        List<Task> transferir = new List<Task>();
-        for (Task t : abertas) {
-          Id novoDono = novoDonoPorOpp.get(t.WhatId);
-          if (novoDono != null && t.OwnerId != novoDono) {
-            transferir.add(new Task(Id = t.Id, OwnerId = novoDono));
-          }
-        }
-        if (!transferir.isEmpty()) {
-          // All-or-none: se falhar, o Savepoint desfaz também a troca de dono
-          // das Oportunidades — nada fica parcialmente atualizado.
-          update transferir;
-          r.tarefasTransferidas = transferir.size();
-        }
-      }
-
-      // Ponteiro: última troca EFETIVADA, na ordem de processamento.
-      Id ponteiroNovo = estado.Ultimo_Usuario__c;
-      for (Id oppId : ordemReatribuidas) {
-        if (oppsOk.contains(oppId)) {
-          ponteiroNovo = novoDonoPorOpp.get(oppId);
-        }
-      }
-      if (ponteiroNovo != estado.Ultimo_Usuario__c) {
-        estado.Ultimo_Usuario__c = ponteiroNovo;
-        estado.Data_Ultima_Distribuicao__c = agora;
-        update estado;
-      }
-
-      return r;
     } catch (SOLDistribuicaoService.DistribuicaoException e) {
-      Database.rollback(sp);
-      System.debug(LoggingLevel.ERROR, 'SOLPrazoTotalService: ' + e.getMessage());
+      Database.rollback(spFase1);
+      System.debug(LoggingLevel.ERROR, 'SOLPrazoTotalService (config): ' + e.getMessage());
       ResultadoPrazoTotal erro = new ResultadoPrazoTotal();
       erro.comErro = ids.size();
       erro.mensagens.add(MSG_CONFIG);
       return erro;
     } catch (Exception e) {
-      Database.rollback(sp);
+      Database.rollback(spFase1);
       System.debug(
         LoggingLevel.ERROR,
-        'SOLPrazoTotalService: ' +
+        'SOLPrazoTotalService (fase 1): ' +
           e.getTypeName() +
           ': ' +
           e.getMessage() +
@@ -344,5 +261,129 @@ public without sharing class SOLPrazoTotalService {
       erro.mensagens.add(MSG_ERRO_GENERICO);
       return erro;
     }
+
+    // --------------------------------------------------------------- fase 2
+    // Uma Oportunidade por vez, cada uma no SEU Savepoint. A falha de uma não
+    // desfaz nem impede as outras.
+    Id ponteiro = estado.Ultimo_Usuario__c;
+    Boolean ponteiroMudou = false;
+    List<Opportunity> semVendedorParaGravar = new List<Opportunity>();
+
+    for (Opportunity o : candidatas) {
+      Id escolhido = n == 0
+        ? null
+        : SOLDistribuicaoService.proximoVendedorExcluindo(ativos, cursor, o.OwnerId);
+
+      if (escolhido == null) {
+        // Não altera proprietário e NÃO marca como processada. Só grava a
+        // situação controlada quando ela AINDA NÃO está registrada — evita uma
+        // gravação idêntica a cada varredura.
+        Boolean jaRegistrada =
+          o.SOL_Status_Reatribuicao_Prazo__c == STATUS_SEM_OUTRO_VENDEDOR &&
+          o.SOL_Motivo_Reatribuicao_Prazo__c == MOTIVO_SEM_OUTRO_VENDEDOR;
+        if (!jaRegistrada) {
+          semVendedorParaGravar.add(
+            new Opportunity(
+              Id = o.Id,
+              SOL_Status_Reatribuicao_Prazo__c = STATUS_SEM_OUTRO_VENDEDOR,
+              SOL_Motivo_Reatribuicao_Prazo__c = MOTIVO_SEM_OUTRO_VENDEDOR
+            )
+          );
+        }
+        r.semOutroVendedor++;
+        continue;
+      }
+
+      Integer proxCursor = Math.mod(SOLDistribuicaoService.indiceDe(ativos, escolhido) + 1, n);
+
+      Savepoint spOpp = Database.setSavepoint();
+      try {
+        update new Opportunity(
+          Id = o.Id,
+          OwnerId = escolhido,
+          SOL_Qtd_Reatribuicoes_Prazo__c =
+            (o.SOL_Qtd_Reatribuicoes_Prazo__c == null
+              ? 0
+              : o.SOL_Qtd_Reatribuicoes_Prazo__c) + 1,
+          SOL_Data_Reatribuicao_Prazo__c = agora,
+          SOL_Motivo_Reatribuicao_Prazo__c = MOTIVO_PRAZO_TOTAL,
+          SOL_Status_Reatribuicao_Prazo__c = STATUS_REATRIBUIDO
+        );
+        // Etapa, marcos, datas e o próprio prazo NÃO são tocados.
+
+        // Tasks ABERTAS desta Oportunidade. Concluídas/canceladas (IsClosed =
+        // true) ficam intactas. All-or-none: dentro do escopo de UMA Opp, ou
+        // todas as Tasks vão junto com o proprietário, ou a Opp inteira volta.
+        List<Task> abertas = [
+          SELECT Id, OwnerId
+          FROM Task
+          WHERE WhatId = :o.Id AND IsClosed = false
+          FOR UPDATE
+        ];
+        List<Task> transferir = new List<Task>();
+        for (Task t : abertas) {
+          if (t.OwnerId != escolhido) {
+            transferir.add(new Task(Id = t.Id, OwnerId = escolhido));
+          }
+        }
+        if (!transferir.isEmpty()) {
+          update transferir;
+        }
+
+        r.reatribuidas++;
+        r.tarefasTransferidas += transferir.size();
+        // Só consome o ponteiro quando a troca foi EFETIVADA.
+        cursor = proxCursor;
+        ponteiro = escolhido;
+        ponteiroMudou = true;
+      } catch (Exception e) {
+        // Desfaz APENAS esta Oportunidade. As demais seguem. A Opp fica
+        // elegível para a próxima varredura (contagem intacta).
+        Database.rollback(spOpp);
+        r.comErro++;
+        r.mensagens.add('Oportunidade ' + o.Id + ': ' + e.getMessage());
+        System.debug(
+          LoggingLevel.ERROR,
+          'SOLPrazoTotalService: falha ao reatribuir a Oportunidade ' +
+            o.Id +
+            ': ' +
+            e.getMessage() +
+            '\n' +
+            e.getStackTraceString()
+        );
+      }
+    }
+
+    // Situações controladas (sem outro vendedor) que mudaram de valor.
+    if (!semVendedorParaGravar.isEmpty()) {
+      Savepoint spSem = Database.setSavepoint();
+      try {
+        update semVendedorParaGravar;
+      } catch (Exception e) {
+        Database.rollback(spSem);
+        r.comErro++;
+        r.mensagens.add('Falha ao registrar "sem outro vendedor": ' + e.getMessage());
+        System.debug(LoggingLevel.ERROR, 'SOLPrazoTotalService (sem vendedor): ' + e.getMessage());
+      }
+    }
+
+    // Ponteiro: uma gravação, no seu Savepoint. Se falhar, as reatribuições já
+    // efetivadas permanecem — só o ponteiro global não avança.
+    if (ponteiroMudou && ponteiro != estado.Ultimo_Usuario__c) {
+      Savepoint spPont = Database.setSavepoint();
+      try {
+        estado.Ultimo_Usuario__c = ponteiro;
+        estado.Data_Ultima_Distribuicao__c = agora;
+        update estado;
+      } catch (Exception e) {
+        Database.rollback(spPont);
+        r.mensagens.add(
+          'Reatribuições efetivadas, mas o ponteiro global não avançou: ' + e.getMessage()
+        );
+        System.debug(LoggingLevel.ERROR, 'SOLPrazoTotalService (ponteiro): ' + e.getMessage());
+      }
+    }
+
+    return r;
   }
 }

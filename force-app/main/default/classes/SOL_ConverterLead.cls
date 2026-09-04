@@ -37,6 +37,13 @@ public with sharing class SOL_ConverterLead {
 
   public static final String SEM_PERMISSAO = 'Você não tem acesso aos campos da Arnone Soluções. Peça ao administrador o conjunto de permissões "Arnone Soluções — Comercial" antes de usar esta ação.';
 
+  // CLICKUP-9424 — se o Lead tem contato efetivado registrado, o prazo total de
+  // 30 dias úteis é obrigatório na Oportunidade. Sem o calendário "Arnone
+  // Soluções - Horário Comercial" ativo não há como calcular esse limite, e
+  // deixar a Oportunidade nascer sem ele quebra a reatribuição automática. A
+  // conversão é abortada por inteiro — nada de Lead convertido pela metade.
+  public static final String CALENDARIO_INDISPONIVEL = 'A conversão foi cancelada: o calendário "Arnone Soluções - Horário Comercial" está inativo ou ausente, e sem ele não é possível calcular o prazo comercial de 30 dias úteis a partir do contato efetivado. Peça ao administrador para reativar o calendário e converta o lead de novo — nenhum registro foi criado.';
+
   public static final String CAMPOS_LEAD =
     'Id, Name, FirstName, LastName, Company, Email, Phone, IsConverted, ' +
     'CNPJ__c, RecordType.DeveloperName, SOL_Produto_Interesse__c, ' +
@@ -312,6 +319,12 @@ public with sharing class SOL_ConverterLead {
       ok.contatoId = r.getContactId();
       ok.oportunidadeId = r.getOpportunityId();
       return ok;
+    } catch (SOLBusinessHoursHelper.CalendarioIndisponivelException e) {
+      // CLICKUP-9424 — o prazo total não pôde ser calculado. A conversão volta
+      // ao ponto anterior ao savepoint: o Lead continua não convertido e a
+      // Oportunidade não chega a existir. A mensagem diz o que corrigir.
+      Database.rollback(sp);
+      return new Resultado(false, CALENDARIO_INDISPONIVEL);
     } catch (Exception e) {
       Database.rollback(sp);
       return new Resultado(false, explicar(e.getMessage()));
@@ -396,26 +409,35 @@ public with sharing class SOL_ConverterLead {
     // aqui, na conversão, e nunca é recalculada depois (nem por CreatedDate,
     // nem por mudança de etapa, nem por reatribuição). Vale para Recuperação
     // Tributária e ART 360.
-    if (l.SOL_Data_Contato_Efetivado__c != null) {
-      nascimento.SOL_Data_Inicio_Ciclo_Comercial__c = l.SOL_Data_Contato_Efetivado__c;
-      try {
-        nascimento.SOL_Prazo_Total_Comercial__c = SOLPrazoTotalService.calcularPrazoTotal(
-          l.SOL_Data_Contato_Efetivado__c
-        );
-      } catch (SOLBusinessHoursHelper.CalendarioIndisponivelException e) {
-        // Calendário indisponível não pode derrubar a conversão. A data de
-        // início fica gravada e o limite permanece vazio — o diagnóstico /
-        // backfill do CLICKUP-9424 recalcula pelo Lead convertido, sem inferir
-        // nada a partir de CreatedDate.
-        System.debug(
-          LoggingLevel.ERROR,
-          'SOL_ConverterLead: prazo total não calculado (calendário indisponível): ' +
-            e.getMessage()
-        );
-      }
-    }
+    //
+    // O limite é calculado ANTES de qualquer gravação: se o contato efetivado
+    // existe e o calendário está indisponível, calcularPrazoTotal lança
+    // CalendarioIndisponivelException e a conversão inteira é abortada no catch
+    // de converterUm — nada é criado. A Oportunidade não pode nascer sem esse
+    // prazo.
+    Datetime inicioCiclo = l.SOL_Data_Contato_Efetivado__c;
+    Datetime prazoTotal = inicioCiclo == null
+      ? null
+      : SOLPrazoTotalService.calcularPrazoTotal(inicioCiclo);
 
     update nascimento;
+
+    // Os campos de prazo são SOMENTE LEITURA para o Comercial (FLS nos dois
+    // permission sets). É a automação da conversão que os grava — em modo de
+    // sistema, porque quem dispara a conversão não tem edição nesses campos
+    // técnicos.
+    if (inicioCiclo != null) {
+      Database.update(
+        new List<Opportunity>{
+          new Opportunity(
+            Id = oportunidadeId,
+            SOL_Data_Inicio_Ciclo_Comercial__c = inicioCiclo,
+            SOL_Prazo_Total_Comercial__c = prazoTotal
+          )
+        },
+        AccessLevel.SYSTEM_MODE
+      );
+    }
 
     String destino = l.SOL_Produto_Interesse__c == PRODUTO_ART
       ? ETAPA_ART

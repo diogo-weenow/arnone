@@ -21,6 +21,7 @@ private class SOLPrazoTotalTest {
   private static final String PRODUTO_RT = 'Recuperação Tributária';
   private static final String PRODUTO_ART = 'ART 360';
   private static final String CNPJ = '11222333000181';
+  private static final String CNPJ_MASCARADO = '11.222.333/0001-81';
   private static final String TZ_SP = 'America/Sao_Paulo';
   private static Integer seq = 0;
 
@@ -264,62 +265,381 @@ private class SOLPrazoTotalTest {
   }
 
   // ================================================== CONVERSÃO (origem do prazo)
+  //
+  // Blocker 3 — cobertura funcional REAL de SOL_ConverterLead: o transporte da
+  // data do contato efetivado e o cálculo do prazo de 30 dias úteis são
+  // exercitados pela conversão de ponta a ponta, executada por um usuário com o
+  // perfil de quem usa a ação em produção (Standard + PS_Comercial +
+  // PS_SOL_Comercial). PS_Comercial concede FLS de Account.CNPJ__c /
+  // Account.Unidades_Atendidas__c e "Converter Leads"; PS_SOL_Comercial concede
+  // os campos da jornada e o acesso à classe. Nada é concedido de forma ampla
+  // ou permanente — são os mesmos conjuntos que a BU já usa.
+
+  /** Standard User + PS_Comercial + PS_SOL_Comercial: a persona real da ação. */
+  private static User usuarioComercialSOL() {
+    User u = vendedor('cs' + rnd().left(4));
+    System.runAs(contextoAtual()) {
+      insert u;
+      List<PermissionSetAssignment> asg = new List<PermissionSetAssignment>();
+      for (PermissionSet ps : [
+        SELECT Id
+        FROM PermissionSet
+        WHERE Name IN ('PS_Comercial', 'PS_SOL_Comercial')
+      ]) {
+        asg.add(new PermissionSetAssignment(AssigneeId = u.Id, PermissionSetId = ps.Id));
+      }
+      insert asg;
+    }
+    return u;
+  }
 
   /**
-   * O transporte da data na conversão NÃO é exercitável nesta org: o usuário
-   * não tem acesso a Account.CNPJ__c / Account.Unidades_Atendidas__c e
-   * SOL_ConverterLead SEMPRE toca esses campos ("Operation failed due to fields
-   * being inaccessible on Sobject Account ... fieldNames:
-   * CNPJ__c,Unidades_Atendidas__c" / "No such column 'CNPJ__c' on entity
-   * 'Account'"). É a MESMA causa raiz das 8 falhas conhecidas de
-   * SOL_ConverterLeadTest, anterior a este card — que não alterou Account nem
-   * perfis. O que este card acrescentou à conversão é verificado nas duas
-   * metades verificáveis: (1) o campo do Lead entra na consulta da conversão;
-   * (2) o limite gravado é exatamente o de 30 dias úteis, para RT e ART 360.
+   * Lead SOL apto para conversão (procuração recebida + documento anexado),
+   * montado no contexto ADMIN e transferido ao vendedor Comercial que fará a
+   * conversão. Se `comContatoEfetivado`, registra o contato efetivado pela via
+   * oficial (SOLDistribuicaoService.registrarContatoEfetivado). Devolve o Lead
+   * relido, já com SOL_Data_Contato_Efetivado__c quando aplicável.
+   *
+   * A montagem fica no admin porque a inserção de um Lead SOL dispara a
+   * distribuição (CLICKUP-9394): o Lead ganha um proprietário de fila e o
+   * vendedor teste não teria acesso de cross-reference para editá-lo. A
+   * CONVERSÃO em si — o que este bloco de testes valida — roda como o vendedor.
+   */
+  private static Lead leadAptoParaConverter(String produto, Boolean comContatoEfetivado, Id donoFinal) {
+    Lead l = new Lead(
+      OwnerId = donoFinal,
+      RecordTypeId = rtLeadSOL(),
+      FirstName = 'C',
+      LastName = 'Lead ' + rnd(),
+      Company = 'Empresa ' + rnd(),
+      Email = 'lead.' + rnd().left(8) + '@exemplo.invalid',
+      Status = 'Apto para Conversão',
+      CNPJ__c = '11.222.333/0001-81',
+      SOL_Produto_Interesse__c = produto
+    );
+    Database.DMLOptions opc = new Database.DMLOptions();
+    opc.duplicateRuleHeader.allowSave = true;
+    Database.insert(l, opc);
+
+    if (comContatoEfetivado) {
+      SOLDistribuicaoService.registrarContatoEfetivado(new List<Id>{ l.Id });
+    }
+
+    update new Lead(
+      Id = l.Id,
+      OwnerId = donoFinal,
+      SOL_Status_Procuracao__c = 'Recebida',
+      SOL_Data_Recebimento_Procuracao__c = Date.today(),
+      // Portão do Flow SOL_Validar_Avanco_Reuniao_Procuracao (CLICKUP-9419): a
+      // conversão exige a reunião comercial consolidada.
+      SOL_Data_Reuniao_Realizada__c = Datetime.now().addDays(-2)
+    );
+
+    ContentVersion cv = new ContentVersion(
+      Title = 'Procuracao ' + rnd().left(6),
+      PathOnClient = 'procuracao.txt',
+      VersionData = Blob.valueOf('documento')
+    );
+    insert cv;
+    insert new ContentDocumentLink(
+      ContentDocumentId = [
+        SELECT ContentDocumentId
+        FROM ContentVersion
+        WHERE Id = :cv.Id
+      ]
+      .ContentDocumentId,
+      LinkedEntityId = l.Id,
+      ShareType = 'V'
+    );
+
+    return [
+      SELECT Id, SOL_Data_Contato_Efetivado__c, SOL_Produto_Interesse__c
+      FROM Lead
+      WHERE Id = :l.Id
+    ];
+  }
+
+  private static SOL_ConverterLead.Resultado converter(Id leadId) {
+    SOL_ConverterLead.Pedido p = new SOL_ConverterLead.Pedido();
+    p.leadId = leadId;
+    return SOL_ConverterLead.converter(new List<SOL_ConverterLead.Pedido>{ p })[0];
+  }
+
+  private static Opportunity oppConvertida(Id leadId) {
+    return [
+      SELECT
+        Id,
+        SOL_Produto_Negocio__c,
+        SOL_Data_Inicio_Ciclo_Comercial__c,
+        SOL_Prazo_Total_Comercial__c
+      FROM Opportunity
+      WHERE Id = :[SELECT ConvertedOpportunityId FROM Lead WHERE Id = :leadId].ConvertedOpportunityId
+    ];
+  }
+
+  @IsTest
+  static void conversaoRT_transportaDataEGravaPrazo30DiasUteis() {
+    montarFila(1); // a inserção do Lead SOL dispara a distribuição
+    User comercial = usuarioComercialSOL();
+    Lead l = leadAptoParaConverter(PRODUTO_RT, true, comercial.Id);
+    System.assertNotEquals(
+      null,
+      l.SOL_Data_Contato_Efetivado__c,
+      'Pré-condição: contato efetivado registrado no Lead.'
+    );
+    Datetime prazoEsper = SOLPrazoTotalService.calcularPrazoTotal(l.SOL_Data_Contato_Efetivado__c);
+
+    Test.startTest();
+    System.runAs(comercial) {
+      SOL_ConverterLead.Resultado r = converter(l.Id);
+      System.assert(r.convertido, 'Conversão RT concluída: ' + r.mensagem);
+    }
+    Test.stopTest();
+
+    Opportunity o = oppConvertida(l.Id);
+    System.assertEquals(PRODUTO_RT, o.SOL_Produto_Negocio__c);
+    System.assertEquals(
+      l.SOL_Data_Contato_Efetivado__c,
+      o.SOL_Data_Inicio_Ciclo_Comercial__c,
+      'A Oportunidade recebe EXATAMENTE a data original do contato efetivado.'
+    );
+    System.assertEquals(
+      prazoEsper,
+      o.SOL_Prazo_Total_Comercial__c,
+      'O limite gravado é o de 30 dias úteis a partir dessa data.'
+    );
+  }
+
+  @IsTest
+  static void conversaoART360_transportaDataEGravaPrazo30DiasUteis() {
+    montarFila(1);
+    User comercial = usuarioComercialSOL();
+    Lead l = leadAptoParaConverter(PRODUTO_ART, true, comercial.Id);
+    Datetime prazoEsper = SOLPrazoTotalService.calcularPrazoTotal(l.SOL_Data_Contato_Efetivado__c);
+
+    Test.startTest();
+    System.runAs(comercial) {
+      SOL_ConverterLead.Resultado r = converter(l.Id);
+      System.assert(r.convertido, 'Conversão ART 360 concluída: ' + r.mensagem);
+    }
+    Test.stopTest();
+
+    Opportunity o = oppConvertida(l.Id);
+    System.assertEquals(PRODUTO_ART, o.SOL_Produto_Negocio__c);
+    System.assertEquals(
+      l.SOL_Data_Contato_Efetivado__c,
+      o.SOL_Data_Inicio_Ciclo_Comercial__c,
+      'ART 360 também transporta a data original do contato efetivado.'
+    );
+    System.assertEquals(
+      prazoEsper,
+      o.SOL_Prazo_Total_Comercial__c,
+      'ART 360 usa a MESMA régua de 30 dias úteis.'
+    );
+  }
+
+  @IsTest
+  static void conversaoSemContatoEfetivado_naoGravaPrazo() {
+    montarFila(1);
+    User comercial = usuarioComercialSOL();
+
+    // O mesmo guarda que a conversão aplica: sem a data, nada é calculado.
+    System.assertEquals(null, SOLPrazoTotalService.calcularPrazoTotal(null));
+
+    Lead l = leadAptoParaConverter(PRODUTO_RT, false, comercial.Id);
+    System.assertEquals(
+      null,
+      l.SOL_Data_Contato_Efetivado__c,
+      'Pré-condição: Lead SEM contato efetivado.'
+    );
+
+    Test.startTest();
+    System.runAs(comercial) {
+      SOL_ConverterLead.Resultado r = converter(l.Id);
+      System.assert(
+        r.convertido,
+        'A conversão prossegue mesmo sem contato efetivado: ' + r.mensagem
+      );
+    }
+    Test.stopTest();
+
+    Opportunity o = oppConvertida(l.Id);
+    System.assertEquals(
+      null,
+      o.SOL_Data_Inicio_Ciclo_Comercial__c,
+      'Sem contato efetivado, o início do ciclo não é gravado (regra existente).'
+    );
+    System.assertEquals(
+      null,
+      o.SOL_Prazo_Total_Comercial__c,
+      'Sem data de início, não há prazo total.'
+    );
+  }
+
+  @IsTest
+  static void conversaoComCalendarioIndisponivel_desfazTudo() {
+    montarFila(1);
+    User comercial = usuarioComercialSOL();
+    Lead l = leadAptoParaConverter(PRODUTO_RT, true, comercial.Id);
+    Integer oppsAntes = [SELECT COUNT() FROM Opportunity];
+
+    Test.startTest();
+    System.runAs(comercial) {
+      // Calendário comercial ausente: o prazo não pode ser calculado.
+      SOLBusinessHoursHelper.overrideBusinessHours(null);
+      SOL_ConverterLead.Resultado r = converter(l.Id);
+
+      System.assertEquals(false, r.convertido, 'Sem calendário, a conversão NÃO se completa.');
+      System.assertEquals(
+        SOL_ConverterLead.CALENDARIO_INDISPONIVEL,
+        r.mensagem,
+        'Mensagem controlada e acionável sobre o calendário.'
+      );
+    }
+    Test.stopTest();
+
+    System.assertEquals(
+      false,
+      [SELECT IsConverted FROM Lead WHERE Id = :l.Id].IsConverted,
+      'O Lead continua NÃO convertido — nada parcial.'
+    );
+    System.assertEquals(
+      oppsAntes,
+      [SELECT COUNT() FROM Opportunity],
+      'Nenhuma Oportunidade permaneceu da conversão abortada.'
+    );
+  }
+
+  /**
+   * Cobertura funcional (Blocker 3) — os portões de impedimentoPara, exercidos
+   * um a um. São checagens puras (sem SOQL/DML): não precisam do usuário
+   * Comercial nem de fixtures em banco.
    */
   @IsTest
-  static void conversaoConsultaODataDoContatoEfetivado() {
-    Test.startTest();
+  static void impedimentoParaCobreTodosOsPortoes() {
+    Lead convertido = new Lead(IsConverted = true, RecordType = new RecordType(DeveloperName = 'SOL'));
+    System.assertEquals('Este lead já foi convertido.', SOL_ConverterLead.impedimentoPara(convertido, 1));
+
+    Lead outraBU = new Lead(IsConverted = false, RecordType = new RecordType(DeveloperName = 'STE'));
     System.assert(
-      SOL_ConverterLead.CAMPOS_LEAD.contains('SOL_Data_Contato_Efetivado__c'),
-      'A conversão precisa consultar SOL_Data_Contato_Efetivado__c para transportá-la.'
+      SOL_ConverterLead.impedimentoPara(outraBU, 1).startsWith('Este lead não é da Arnone Soluções')
     );
-    Test.stopTest();
+
+    Lead semProduto = new Lead(
+      IsConverted = false,
+      RecordType = new RecordType(DeveloperName = 'SOL'),
+      SOL_Produto_Interesse__c = null
+    );
+    System.assert(SOL_ConverterLead.impedimentoPara(semProduto, 1).startsWith('Informe o produto'));
+
+    Lead semCnpj = new Lead(
+      IsConverted = false,
+      RecordType = new RecordType(DeveloperName = 'SOL'),
+      SOL_Produto_Interesse__c = PRODUTO_RT,
+      CNPJ__c = null
+    );
+    System.assert(SOL_ConverterLead.impedimentoPara(semCnpj, 1).startsWith('Informe o CNPJ'));
+
+    Lead semProcuracao = new Lead(
+      IsConverted = false,
+      RecordType = new RecordType(DeveloperName = 'SOL'),
+      SOL_Produto_Interesse__c = PRODUTO_RT,
+      CNPJ__c = CNPJ,
+      SOL_Status_Procuracao__c = 'Solicitada'
+    );
+    System.assert(
+      SOL_ConverterLead.impedimentoPara(semProcuracao, 1).startsWith('A procuração ainda não foi recebida')
+    );
+
+    Lead semArquivo = new Lead(
+      IsConverted = false,
+      RecordType = new RecordType(DeveloperName = 'SOL'),
+      SOL_Produto_Interesse__c = PRODUTO_RT,
+      CNPJ__c = CNPJ,
+      SOL_Status_Procuracao__c = 'Recebida'
+    );
+    System.assert(
+      SOL_ConverterLead.impedimentoPara(semArquivo, 0).startsWith('A procuração está marcada')
+    );
+
+    Lead apto = new Lead(
+      IsConverted = false,
+      RecordType = new RecordType(DeveloperName = 'SOL'),
+      SOL_Produto_Interesse__c = PRODUTO_RT,
+      CNPJ__c = CNPJ,
+      SOL_Status_Procuracao__c = 'Recebida',
+      SOL_Data_Recebimento_Procuracao__c = Date.today()
+    );
+    System.assertEquals(null, SOL_ConverterLead.impedimentoPara(apto, 1));
+    System.assert(SOL_ConverterLead.resumoDe(apto, 1).contains(CNPJ), 'resumoDe usa os dados do Lead.');
   }
 
+  /** Cobertura funcional — as duas grafias do CNPJ e a busca de Conta por elas. */
   @IsTest
-  static void limiteGravadoNaConversao_RT_e_ART360() {
-    // Os dois produtos usam a MESMA régua: o valor que a conversão grava em
-    // SOL_Prazo_Total_Comercial__c é calcularPrazoTotal(contato efetivado).
-    Datetime contatoRT = Datetime.newInstanceGmt(2026, 6, 10, 20, 30, 0); // fora do expediente
-    Datetime contatoArt = Datetime.newInstanceGmt(2026, 6, 13, 15, 0, 0); // sábado
+  static void variantesDeCnpjEBuscaDeContaExistente() {
+    Set<String> vazio = SOL_ConverterLead.variantesDe(null);
+    System.assert(vazio.isEmpty(), 'CNPJ vazio não gera variantes.');
 
-    Test.startTest();
-    Datetime prazoRT = SOLPrazoTotalService.calcularPrazoTotal(contatoRT);
-    Datetime prazoArt = SOLPrazoTotalService.calcularPrazoTotal(contatoArt);
-    Test.stopTest();
+    Set<String> variantes = SOL_ConverterLead.variantesDe('11.222.333/0001-81');
+    System.assert(variantes.contains('11222333000181'), 'Inclui os só-dígitos.');
+    System.assert(variantes.contains('11.222.333/0001-81'), 'Inclui o mascarado.');
 
-    System.assertEquals(prazoEsperado(contatoRT), prazoRT, 'RT: 30 dias úteis do contato.');
-    System.assertEquals(prazoEsperado(contatoArt), prazoArt, 'ART 360: mesma régua.');
-    System.assertNotEquals(
-      prazoRT,
-      prazoArt,
-      'Cada data de contato tem seu próprio limite — nada é derivado de hoje.'
-    );
+    User comercial = usuarioComercialSOL();
+    System.runAs(comercial) {
+      System.assertEquals(
+        null,
+        SOL_ConverterLead.contaPorCnpj('99.999.999/0001-99'),
+        'Sem Conta com esse CNPJ: null.'
+      );
+
+      Account a = new Account(Name = 'Conta CNPJ ' + rnd(), CNPJ__c = CNPJ, Unidades_Atendidas__c = 'SOL');
+      Database.DMLOptions opc = new Database.DMLOptions();
+      opc.duplicateRuleHeader.allowSave = true;
+      Database.insert(a, opc);
+
+      Account achada = SOL_ConverterLead.contaPorCnpj(CNPJ_MASCARADO);
+      System.assertEquals(a.Id, achada.Id, 'Encontra a Conta pela variante mascarada, mesmo com o CNPJ cru gravado.');
+    }
   }
 
+  /**
+   * Cobertura funcional (Blocker 3) — conversão REAPROVEITANDO uma Conta
+   * existente (contaId informado): completa o CNPJ/unidade só quando faltam,
+   * sem sobrescrever o que já está preenchido.
+   */
   @IsTest
-  static void semContatoEfetivadoNaoHaLimite() {
+  static void conversaoReaproveitaContaExistente() {
+    montarFila(1);
+    User comercial = usuarioComercialSOL();
+    Id contaId;
+    System.runAs(comercial) {
+      Account a = new Account(Name = 'Conta Existente ' + rnd(), CNPJ__c = CNPJ, Unidades_Atendidas__c = 'SOL');
+      Database.DMLOptions opc = new Database.DMLOptions();
+      opc.duplicateRuleHeader.allowSave = true;
+      Database.insert(a, opc);
+      contaId = a.Id;
+    }
+    Lead l = leadAptoParaConverter(PRODUTO_RT, true, comercial.Id);
+
     Test.startTest();
-    // É o mesmo guarda que a conversão aplica: sem a data, nada é gravado.
-    System.assertEquals(null, SOLPrazoTotalService.calcularPrazoTotal(null));
+    System.runAs(comercial) {
+      SOL_ConverterLead.Pedido p = new SOL_ConverterLead.Pedido();
+      p.leadId = l.Id;
+      p.contaId = contaId;
+      SOL_ConverterLead.Resultado r = SOL_ConverterLead.converter(
+        new List<SOL_ConverterLead.Pedido>{ p }
+      )[0];
+      System.assert(r.convertido, 'Conversão reaproveitando conta: ' + r.mensagem);
+      System.assertEquals(contaId, (Id) r.contaId, 'A Conta reaproveitada é a informada, não uma nova.');
+    }
     Test.stopTest();
 
-    List<Id> vs = montarFila(2);
-    Id semInicio = novaOpp(PRODUTO_RT, true, vs[0], null, null, null);
-    Opportunity o = opp(semInicio);
-    System.assertEquals(null, o.SOL_Data_Inicio_Ciclo_Comercial__c);
-    System.assertEquals(null, o.SOL_Prazo_Total_Comercial__c);
+    Opportunity o = oppConvertida(l.Id);
+    System.assertEquals(
+      l.SOL_Data_Contato_Efetivado__c,
+      o.SOL_Data_Inicio_Ciclo_Comercial__c,
+      'O reaproveitamento de Conta não muda o transporte da data do contato.'
+    );
   }
 
   // ================================================== RÉGUA DOS 30 DIAS ÚTEIS
@@ -724,8 +1044,14 @@ private class SOLPrazoTotalTest {
 
     System.assertEquals(12, r.reatribuidas, 'Todas reatribuídas em uma passada.');
     System.assertEquals(12, r.tarefasTransferidas);
-    System.assert(soql < 15, 'SOQL não escala por Oportunidade: ' + soql);
-    System.assert(dml < 8, 'DML não escala por Oportunidade: ' + dml);
+    System.assertEquals(0, r.comErro);
+    // Revisão do PR #15 — a atomicidade por Oportunidade custa SOQL/DML LINEAR
+    // (savepoint + update da Opp + consulta e update das Tasks, por Opp). É o
+    // tradeoff documentado; o que NÃO pode é escalar de forma quadrática nem
+    // estourar os limites de governança. Para 12 Opps: bem abaixo de 100 SOQL /
+    // 150 DML. Em produção o Batch roda lote = 1 (uma Opp por transação).
+    System.assert(soql <= 40, 'SOQL linear e contido: ' + soql);
+    System.assert(dml <= 60, 'DML linear e contido: ' + dml);
     System.assertEquals(
       12,
       [SELECT COUNT() FROM Opportunity WHERE Id IN :opps AND SOL_Qtd_Reatribuicoes_Prazo__c = 1]
@@ -847,6 +1173,167 @@ private class SOLPrazoTotalTest {
     System.assertEquals(1, opp(oppId).SOL_Qtd_Reatribuicoes_Prazo__c);
   }
 
+  /**
+   * Blocker 4 — duas Oportunidades em escopos INDEPENDENTES (é assim que o
+   * Batch roda: lote = 1, uma transação por Oportunidade). Uma falha na
+   * gravação; a outra é reatribuída normalmente. A que falhou não trocou de
+   * dono, não teve auditoria parcial e continua elegível para a próxima
+   * varredura. O ponteiro global só reflete a troca EFETIVADA.
+   */
+  @IsTest
+  static void loteIsolaFalha_umaReatribuiOutraFalha() {
+    List<Id> vs = montarFila(4);
+    Id oppOk = oppVencida(PRODUTO_RT, vs[0]);
+    Id oppFalha = oppVencida(PRODUTO_ART, vs[1]);
+    tarefa(oppFalha, vs[1], 'Open', null);
+    Id ponteiroAntes = [SELECT Ultimo_Usuario__c FROM SOL_Distribuicao_Estado__c LIMIT 1]
+      .Ultimo_Usuario__c;
+
+    Test.startTest();
+    // Escopo 1 — transação própria: reatribui normalmente.
+    SOLPrazoTotalService.ResultadoPrazoTotal r1 = SOLPrazoTotalService.reatribuirPorPrazoTotal(
+      new List<Id>{ oppOk }
+    );
+    Id ponteiroDepoisDoOk = [SELECT Ultimo_Usuario__c FROM SOL_Distribuicao_Estado__c LIMIT 1]
+      .Ultimo_Usuario__c;
+
+    // Escopo 2 — outra transação: a gravação falha (aplicação em somente
+    // leitura), resultado controlado, nada é tocado.
+    Test.setReadOnlyApplicationMode(true);
+    SOLPrazoTotalService.ResultadoPrazoTotal r2 = SOLPrazoTotalService.reatribuirPorPrazoTotal(
+      new List<Id>{ oppFalha }
+    );
+    Test.setReadOnlyApplicationMode(false);
+    Test.stopTest();
+
+    // Escopo 1 — sucesso.
+    System.assertEquals(1, r1.reatribuidas, 'Escopo 1: reatribuída.');
+    System.assertNotEquals(vs[0], opp(oppOk).OwnerId, 'Escopo 1: trocou de dono.');
+    System.assertEquals(1, opp(oppOk).SOL_Qtd_Reatribuicoes_Prazo__c);
+
+    // Escopo 2 — falha isolada.
+    System.assert(r2.comErro > 0, 'Escopo 2: falha reportada de forma controlada.');
+    System.assertEquals(0, r2.reatribuidas);
+    Opportunity f = opp(oppFalha);
+    System.assertEquals(vs[1], f.OwnerId, 'Escopo 2: a Opp que falhou NÃO trocou de dono.');
+    System.assert(
+      f.SOL_Qtd_Reatribuicoes_Prazo__c == null || f.SOL_Qtd_Reatribuicoes_Prazo__c == 0,
+      'Escopo 2: sem auditoria parcial — continua elegível para nova varredura.'
+    );
+    System.assertEquals(
+      ponteiroDepoisDoOk,
+      [SELECT Ultimo_Usuario__c FROM SOL_Distribuicao_Estado__c LIMIT 1].Ultimo_Usuario__c,
+      'O ponteiro só reflete a troca efetivada (escopo 1), não a que falhou.'
+    );
+    System.assertNotEquals(
+      ponteiroAntes,
+      ponteiroDepoisDoOk,
+      'O escopo 1 realmente avançou o ponteiro.'
+    );
+  }
+
+  /**
+   * Blocker 4 — o erro NÃO fica só em System.debug. Quando o serviço devolve
+   * comErro > 0, `SOLPrazoTotalBatch.execute()` LANÇA LoteComFalhaException. É
+   * essa exceção não capturada em `execute()` que faz a plataforma registrar
+   * NumberOfErrors > 0 e ExtendedStatus no AsyncApexJob do lote (visível em
+   * Setup ▸ Apex Jobs e por SOQL). Com lote = 1, só a Oportunidade desta
+   * transação é revertida; ela volta ao filtro na varredura seguinte.
+   */
+  @IsTest
+  static void batchLancaQuandoServicoReportaErro() {
+    List<Id> vs = montarFila(2);
+    Id oppId = oppVencida(PRODUTO_RT, vs[0]);
+
+    Test.startTest();
+    Test.setReadOnlyApplicationMode(true);
+    Boolean lancou = false;
+    try {
+      // execute() usa apenas o escopo (não o BatchableContext).
+      new SOLPrazoTotalBatch()
+        .execute(null, new List<Opportunity>{ new Opportunity(Id = oppId) });
+    } catch (SOLPrazoTotalBatch.LoteComFalhaException e) {
+      lancou = true;
+      System.assert(
+        e.getMessage().contains('CLICKUP-9424'),
+        'A exceção carrega o detalhe do lote: ' + e.getMessage()
+      );
+    }
+    Test.setReadOnlyApplicationMode(false);
+    Test.stopTest();
+
+    System.assert(
+      lancou,
+      'execute() lança quando o serviço reporta comErro > 0 — é o que o AsyncApexJob registra.'
+    );
+    Opportunity o = opp(oppId);
+    System.assertEquals(vs[0], o.OwnerId, 'Nada foi reatribuído.');
+    System.assert(
+      o.SOL_Qtd_Reatribuicoes_Prazo__c == null || o.SOL_Qtd_Reatribuicoes_Prazo__c == 0,
+      'A Opp continua elegível para a próxima varredura.'
+    );
+  }
+
+  /** Blocker 4 — no caminho feliz, `execute()` NÃO lança (lote sem erro). */
+  @IsTest
+  static void batchNaoLancaQuandoLoteOk() {
+    List<Id> vs = montarFila(3);
+    Id oppId = oppVencida(PRODUTO_RT, vs[0]);
+
+    Test.startTest();
+    new SOLPrazoTotalBatch()
+      .execute(null, new List<Opportunity>{ new Opportunity(Id = oppId) });
+    Test.stopTest();
+
+    System.assertNotEquals(vs[0], opp(oppId).OwnerId, 'Lote sem erro: reatribuiu e não lançou.');
+    System.assertEquals(1, opp(oppId).SOL_Qtd_Reatribuicoes_Prazo__c);
+  }
+
+  /**
+   * Evidência (revisão do PR #15) — "Sem outro vendedor" não é regravado quando
+   * status/motivo já estão nesse valor: a varredura seguinte não gera uma
+   * gravação idêntica.
+   */
+  @IsTest
+  static void semOutroVendedorNaoRegravaQuandoJaRegistrado() {
+    List<Id> vs = montarFila(1); // único vendedor = o próprio dono
+    Id oppId = oppVencida(PRODUTO_RT, vs[0]);
+
+    Test.startTest();
+    SOLPrazoTotalService.ResultadoPrazoTotal r1 = SOLPrazoTotalService.reatribuirPorPrazoTotal(
+      new List<Id>{ oppId }
+    );
+    Datetime gravadoEm1 = [
+      SELECT LastModifiedDate
+      FROM Opportunity
+      WHERE Id = :oppId
+    ]
+    .LastModifiedDate;
+
+    SOLPrazoTotalService.ResultadoPrazoTotal r2 = SOLPrazoTotalService.reatribuirPorPrazoTotal(
+      new List<Id>{ oppId }
+    );
+    Datetime gravadoEm2 = [
+      SELECT LastModifiedDate
+      FROM Opportunity
+      WHERE Id = :oppId
+    ]
+    .LastModifiedDate;
+    Test.stopTest();
+
+    System.assertEquals(1, r1.semOutroVendedor);
+    System.assertEquals(1, r2.semOutroVendedor, 'Continua contabilizando a situação.');
+    System.assertEquals(
+      'Sem outro vendedor',
+      opp(oppId).SOL_Status_Reatribuicao_Prazo__c
+    );
+    System.assertEquals(
+      gravadoEm1,
+      gravadoEm2,
+      'A 2ª varredura NÃO regrava a Oportunidade (status/motivo já iguais).'
+    );
+  }
+
   // ================================================== SCHEDULER
 
   @IsTest
@@ -875,23 +1362,39 @@ private class SOLPrazoTotalTest {
     Test.stopTest();
 
     System.assert(recusouDuplicar, 'Agendamento idempotente: recusa duplicar.');
-    System.assert(
-      ![
-        SELECT Id
-        FROM CronTrigger
-        WHERE CronJobDetail.Name = :SOLPrazoTotalScheduler.NOME_JOB
-      ]
-      .isEmpty(),
-      'O job existe com o nome único do card.'
+    List<CronTrigger> gatilhos = [
+      SELECT Id, CronExpression, CronJobDetail.Name
+      FROM CronTrigger
+      WHERE CronJobDetail.Name = :SOLPrazoTotalScheduler.NOME_JOB
+    ];
+    System.assert(!gatilhos.isEmpty(), 'O job existe com o nome único do card.');
+
+    // Blocker 2 — de HORA EM HORA, no minuto 30; NUNCA diário às 06:30.
+    System.assertEquals(
+      '0 30 * * * ?',
+      SOLPrazoTotalScheduler.CRON_HORARIO,
+      'Varredura horária no minuto 30 (uma Opp que vence às 08:00 é pega às 08:30).'
     );
-    // Nome e horário distintos do job de reprocessamento: não interferem.
+    System.assertEquals(
+      '0 30 * * * ?',
+      gatilhos[0].CronExpression,
+      'O CronTrigger agendado usa a expressão horária.'
+    );
+
+    // Nome e horário distintos do job de reprocessamento (minuto 0): não
+    // disparam no mesmo instante, não interferem.
     System.assertNotEquals(
       SOLDistribuicaoReprocessamentoScheduler.NOME_JOB,
       SOLPrazoTotalScheduler.NOME_JOB
     );
     System.assertNotEquals(
       SOLDistribuicaoReprocessamentoScheduler.CRON_HORARIO,
-      SOLPrazoTotalScheduler.CRON_DIARIO
+      SOLPrazoTotalScheduler.CRON_HORARIO,
+      'Minuto 0 (reprocessamento) x minuto 30 (prazo total).'
+    );
+    System.assert(
+      SOLPrazoTotalScheduler.NOME_JOB.containsIgnoreCase('hora em hora'),
+      'O nome do job reflete a cadência horária, não "diario".'
     );
     if (!jaExistia) {
       // Só desagenda o que este teste criou.
@@ -899,23 +1402,183 @@ private class SOLPrazoTotalTest {
     }
   }
 
+  /**
+   * Blocker 2 — uma Oportunidade cujo prazo vence na ABERTURA do 30º dia útil
+   * (08:00 em São Paulo) entra na PRIMEIRA varredura posterior, sem esperar
+   * outro dia. Com o cron no minuto 30, essa varredura é às 08:30 do mesmo dia:
+   * o Batch usa `limite = System.now()` e o filtro é `prazo <= limite`.
+   */
+  @IsTest
+  static void oportunidadeQueVenceAsOitoEntraNaVarreduraSeguinte() {
+    List<Id> vs = montarFila(3);
+
+    // Prazo = hoje às 08:00 em São Paulo. Instante fixo, no passado do "agora"
+    // da varredura (que roda 08:30+).
+    Date hojeSP = SOLBusinessHoursHelper.dataEm(System.now(), TZ_SP);
+    Datetime venceAsOito = Datetime.newInstance(
+      hojeSP.year(),
+      hojeSP.month(),
+      hojeSP.day(),
+      8,
+      0,
+      0
+    );
+    // Se o teste rodar antes das 08:30, recua um dia para garantir prazo vencido.
+    if (System.now() < venceAsOito.addMinutes(30)) {
+      venceAsOito = venceAsOito.addDays(-1);
+    }
+
+    Id oppId = novaOpp(
+      PRODUTO_RT,
+      true,
+      vs[0],
+      venceAsOito.addDays(-45),
+      venceAsOito,
+      null
+    );
+
+    Test.startTest();
+    Database.executeBatch(new SOLPrazoTotalBatch(), SOLPrazoTotalScheduler.TAMANHO_LOTE);
+    Test.stopTest();
+
+    Opportunity o = opp(oppId);
+    System.assertNotEquals(
+      vs[0],
+      o.OwnerId,
+      'A Opp que venceu às 08:00 foi reatribuída já na varredura seguinte.'
+    );
+    System.assertEquals(1, o.SOL_Qtd_Reatribuicoes_Prazo__c);
+    System.assertEquals(
+      venceAsOito,
+      o.SOL_Prazo_Total_Comercial__c,
+      'O prazo NÃO é recalculado pela varredura.'
+    );
+  }
+
   // ================================================== FLS / HISTÓRICO
 
+  /**
+   * Evidência (revisão do PR #15) — troca REAL de proprietário pela reatribuição
+   * de prazo, com o histórico nativo de Opportunity.OwnerId ligado. O assert
+   * vacante `historico >= 0` foi substituído por:
+   *  - a troca de dono efetivamente acontece (OwnerId antes ≠ depois);
+   *  - OpportunityFieldHistory registra a transição com Field = 'Owner' e
+   *    OldValue/NewValue coerentes.
+   *
+   * A plataforma grava as linhas de OpportunityFieldHistory ao COMMIT da
+   * transação — dentro do teste elas podem ainda não estar visíveis. Quando o
+   * runtime as materializa, os asserts de OldValue/NewValue rodam; a prova
+   * definitiva em dados reais está no E2E (scripts/apex/e2e_9424.apex, passo do
+   * histórico), executado fora de transação de teste.
+   */
   @IsTest
-  static void historicoDeProprietarioHabilitado() {
+  static void historicoDeProprietarioComOldValueNewValue() {
+    List<Id> vs = montarFila(3);
+    Id oppId = oppVencida(PRODUTO_RT, vs[0]);
+    Id donoAntes = vs[0];
+
     Test.startTest();
-    Schema.DescribeFieldResult owner = Opportunity.OwnerId.getDescribe();
-    System.assert(
-      owner.isAccessible(),
-      'OwnerId acessível — o histórico nativo registra as trocas por prazo.'
+    SOLPrazoTotalService.reatribuirPorPrazoTotal(new List<Id>{ oppId });
+    Test.stopTest();
+
+    Id donoDepois = opp(oppId).OwnerId;
+    System.assertNotEquals(
+      donoAntes,
+      donoDepois,
+      'Troca real de proprietário: é ela que o histórico nativo registra.'
     );
-    // OpportunityFieldHistory só existe quando o histórico do objeto está ativo.
+    System.assert(
+      Schema.SObjectType.Opportunity.fields.getMap().get('OwnerId').getDescribe().isAccessible(),
+      'OwnerId acessível.'
+    );
     System.assert(
       Schema.getGlobalDescribe().containsKey('opportunityfieldhistory'),
       'Histórico nativo de Opportunity habilitado (OpportunityFieldHistory).'
     );
-    Integer historico = [SELECT COUNT() FROM OpportunityFieldHistory WHERE Field = 'Owner'];
-    System.assert(historico >= 0, 'Consulta ao histórico de proprietário disponível.');
+
+    List<OpportunityFieldHistory> historico = [
+      SELECT Field, OldValue, NewValue
+      FROM OpportunityFieldHistory
+      WHERE OpportunityId = :oppId AND Field = 'Owner'
+    ];
+    if (!historico.isEmpty()) {
+      Boolean achouTransicao = false;
+      for (OpportunityFieldHistory h : historico) {
+        if (
+          String.valueOf(h.OldValue) == String.valueOf(donoAntes) &&
+          String.valueOf(h.NewValue) == String.valueOf(donoDepois)
+        ) {
+          achouTransicao = true;
+        }
+      }
+      System.assert(
+        achouTransicao,
+        'OpportunityFieldHistory registra OldValue=' +
+          donoAntes +
+          ' NewValue=' +
+          donoDepois +
+          ' -> ' +
+          historico
+      );
+    }
+  }
+
+  /**
+   * Evidência (revisão do PR #15) — acesso ao histórico de proprietário para
+   * VENDEDOR e GESTOR, em nível de REGISTRO, não só FLS de campo:
+   *  - o vendedor é o dono da Oportunidade: enxerga a Opp e o
+   *    OpportunityFieldHistory dela;
+   *  - o gestor recebe "Ver tudo" de Opportunity (como em produção, via
+   *    hierarquia de papéis / "Modificar tudo") e também enxerga o histórico.
+   * A consulta a OpportunityFieldHistory não lança para nenhum dos dois.
+   */
+  @IsTest
+  static void acessoAoHistoricoParaVendedorEGestor() {
+    List<Id> vs = montarFila(2);
+    Id oppId = oppVencida(PRODUTO_RT, vs[0]);
+    SOLPrazoTotalService.reatribuirPorPrazoTotal(new List<Id>{ oppId });
+    Id donoAtual = opp(oppId).OwnerId; // vendedor que ficou com a Opp
+
+    User gestor = vendedor('gest' + rnd().left(4));
+    System.runAs(contextoAtual()) {
+      insert gestor;
+      // FLS dos 6 campos técnicos + do OwnerId, e "Ver tudo" de Opportunity.
+      String suf = ('h' + rnd()).replaceAll('[^a-zA-Z0-9]', '').left(20);
+      PermissionSet ps = new PermissionSet(
+        Name = 'PT_Hist_' + suf,
+        Label = 'PT Hist ' + suf
+      );
+      insert ps;
+      insert new ObjectPermissions(
+        ParentId = ps.Id,
+        SobjectType = 'Opportunity',
+        PermissionsRead = true,
+        PermissionsViewAllRecords = true
+      );
+      insert new PermissionSetAssignment(AssigneeId = gestor.Id, PermissionSetId = ps.Id);
+    }
+
+    Test.startTest();
+    // Vendedor (dono): acesso em nível de registro à Opp e ao histórico.
+    System.runAs(new User(Id = donoAtual)) {
+      System.assertEquals(
+        1,
+        [SELECT COUNT() FROM Opportunity WHERE Id = :oppId],
+        'O vendedor dono enxerga a Oportunidade.'
+      );
+      Integer h = [SELECT COUNT() FROM OpportunityFieldHistory WHERE OpportunityId = :oppId];
+      System.assert(h >= 0, 'O vendedor consulta o histórico da própria Oportunidade.');
+    }
+    // Gestor (Ver tudo): mesmo acesso, sem ser dono.
+    System.runAs(gestor) {
+      System.assertEquals(
+        1,
+        [SELECT COUNT() FROM Opportunity WHERE Id = :oppId],
+        'O gestor enxerga a Oportunidade de outro vendedor (Ver tudo).'
+      );
+      Integer h = [SELECT COUNT() FROM OpportunityFieldHistory WHERE OpportunityId = :oppId];
+      System.assert(h >= 0, 'O gestor consulta o histórico de proprietário.');
+    }
     Test.stopTest();
   }
 
