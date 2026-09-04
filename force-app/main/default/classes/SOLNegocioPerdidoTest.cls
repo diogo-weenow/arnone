@@ -2625,4 +2625,285 @@ private class SOLNegocioPerdidoTest {
       'O estado da concluída não mudou.'
     );
   }
+
+  // ============== 21. D3 — OS DOIS SINAIS SÃO MUTUAMENTE EXCLUSIVOS
+  //
+  // Não basta exigir o sinal certo para cada status: os dois sinais não podem
+  // coexistir, nem ficar pré-preenchidos numa tarefa ainda aberta, nem sobrar
+  // de um estado anterior numa transição. A regra passou a descrever os três
+  // estados válidos da tarefa Fechamento — concluída pelo Ganho, cancelada pela
+  // perda, ou em andamento sem sinal nenhum — e recusa todo o resto.
+
+  /** Tenta uma gravação e devolve se ela foi barrada, sem sujar o registro. */
+  private static Boolean barrado(Task patch) {
+    Savepoint sp = Database.setSavepoint();
+    try {
+      update patch;
+      Database.rollback(sp);
+      return false;
+    } catch (DmlException e) {
+      Database.rollback(sp);
+      return true;
+    }
+  }
+
+  /** Fechamento já concluída pelo Ganho, no estado válido. */
+  private static Id fechamentoConcluido(Id oppId, Id owner) {
+    Task t = tarefaDeFechamento(oppId, owner);
+    update new Task(
+      Id = t.Id,
+      SOL_Encerrado_Pela_Oportunidade__c = true,
+      Status = 'Completed'
+    );
+    return t.Id;
+  }
+
+  /** Fechamento já cancelada pela perda, no estado válido. */
+  private static Id fechamentoCancelado(Id oppId, Id owner) {
+    Task t = tarefaDeFechamento(oppId, owner);
+    update new Task(
+      Id = t.Id,
+      Status = 'Cancelada',
+      SOL_Cancelada_Por_Perda__c = true,
+      SOL_Motivo_Cancelamento__c = MOTIVO_PERDA
+    );
+    return t.Id;
+  }
+
+  /** (21.1) Concluída pelo Ganho não aceita flag de perda nem motivo. */
+  @IsTest
+  static void concluidaNaoAceitaSinalDePerda() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Id t = fechamentoConcluido(oppId, vs[0]);
+
+    Test.startTest();
+    Boolean comFlagDePerda = barrado(
+      new Task(Id = t, SOL_Cancelada_Por_Perda__c = true)
+    );
+    Boolean comMotivo = barrado(
+      new Task(Id = t, SOL_Motivo_Cancelamento__c = MOTIVO_PERDA)
+    );
+    Boolean comMotivoDeOutroFluxo = barrado(
+      new Task(Id = t, SOL_Motivo_Cancelamento__c = 'Contato efetivado')
+    );
+    Test.stopTest();
+
+    System.assert(comFlagDePerda, 'Concluída não pode carregar a flag de perda.');
+    System.assert(comMotivo, 'Concluída não pode ter motivo de cancelamento.');
+    System.assert(
+      comMotivoDeOutroFluxo,
+      'Concluída não pode ter motivo de cancelamento nenhum.'
+    );
+    Task depois = recarregar(t);
+    System.assertEquals('Completed', depois.Status, 'Estado válido preservado.');
+    System.assertEquals(
+      true,
+      depois.SOL_Encerrado_Pela_Oportunidade__c,
+      'A marca do Ganho continua de pé.'
+    );
+  }
+
+  /** (21.2) Cancelada pela perda não aceita a flag de encerramento por Ganho. */
+  @IsTest
+  static void canceladaNaoAceitaFlagDeGanho() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Id t = fechamentoCancelado(oppId, vs[0]);
+
+    Test.startTest();
+    Boolean comFlagDeGanho = barrado(
+      new Task(Id = t, SOL_Encerrado_Pela_Oportunidade__c = true)
+    );
+    Test.stopTest();
+
+    System.assert(
+      comFlagDeGanho,
+      'Cancelada por perda não pode carregar a marca do Ganho.'
+    );
+    assertCanceladaPorPerda(t, 'fechamento cancelado por perda');
+    System.assert(
+      recarregar(t).SOL_Encerrado_Pela_Oportunidade__c != true,
+      'A marca do Ganho continua desligada.'
+    );
+  }
+
+  /**
+   * (21.3) Tarefa ainda aberta não aceita nenhum dos sinais pré-preenchido —
+   * nem no insert, nem depois.
+   */
+  @IsTest
+  static void abertaNaoAceitaSinalPrePreenchido() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Task aberta = tarefaDeFechamento(oppId, vs[0]);
+
+    Test.startTest();
+    Boolean flagDePerda = barrado(
+      new Task(Id = aberta.Id, SOL_Cancelada_Por_Perda__c = true)
+    );
+    Boolean flagDeGanho = barrado(
+      new Task(Id = aberta.Id, SOL_Encerrado_Pela_Oportunidade__c = true)
+    );
+    Boolean motivo = barrado(
+      new Task(Id = aberta.Id, SOL_Motivo_Cancelamento__c = MOTIVO_PERDA)
+    );
+
+    // E o mesmo no nascimento da tarefa.
+    Boolean nasceComFlag = false;
+    try {
+      insert new Task(
+        Subject = 'T ' + rnd(),
+        WhatId = oppId,
+        OwnerId = vs[0],
+        Status = 'Open',
+        ActivityDate = Date.today(),
+        SOL_Tipo_Tarefa__c = 'Fechamento',
+        SOL_Encerrado_Pela_Oportunidade__c = true
+      );
+    } catch (DmlException e) {
+      nasceComFlag = true;
+    }
+    Test.stopTest();
+
+    System.assert(flagDePerda, 'Aberta não pode receber a flag de perda.');
+    System.assert(flagDeGanho, 'Aberta não pode receber a marca do Ganho.');
+    System.assert(motivo, 'Aberta não pode receber motivo de cancelamento.');
+    System.assert(nasceComFlag, 'Aberta não pode nascer com a marca do Ganho.');
+    Task depois = recarregar(aberta.Id);
+    System.assertEquals('Open', depois.Status, 'Segue aberta.');
+    System.assert(
+      depois.SOL_Encerrado_Pela_Oportunidade__c != true &&
+      depois.SOL_Cancelada_Por_Perda__c != true &&
+      String.isBlank(depois.SOL_Motivo_Cancelamento__c),
+      'Sem nenhum sinal de encerramento.'
+    );
+  }
+
+  /**
+   * (21.4) Trocar de um estado válido para o outro sem limpar o sinal anterior
+   * é bloqueado nos dois sentidos — é assim que os dois sinais coexistiriam.
+   */
+  @IsTest
+  static void transicaoEntreEstadosSemLimparOSinalAnteriorEhBloqueada() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Id concluida = fechamentoConcluido(oppId, vs[0]);
+    Id cancelada = fechamentoCancelado(oppId, vs[0]);
+
+    Test.startTest();
+    // Concluída -> Cancelada mantendo a marca do Ganho.
+    Boolean ganhoParaPerda = barrado(
+      new Task(
+        Id = concluida,
+        Status = 'Cancelada',
+        SOL_Cancelada_Por_Perda__c = true,
+        SOL_Motivo_Cancelamento__c = MOTIVO_PERDA
+      )
+    );
+    // Cancelada -> Completed mantendo flag e motivo da perda.
+    Boolean perdaParaGanho = barrado(
+      new Task(
+        Id = cancelada,
+        Status = 'Completed',
+        SOL_Encerrado_Pela_Oportunidade__c = true
+      )
+    );
+    // E, limpando o sinal anterior na mesma gravação, a transição é aceita.
+    Savepoint sp = Database.setSavepoint();
+    update new Task(
+      Id = concluida,
+      Status = 'Cancelada',
+      SOL_Encerrado_Pela_Oportunidade__c = false,
+      SOL_Cancelada_Por_Perda__c = true,
+      SOL_Motivo_Cancelamento__c = MOTIVO_PERDA
+    );
+    Boolean transicaoLimpaAceita = recarregar(concluida).Status == 'Cancelada';
+    Database.rollback(sp);
+    Test.stopTest();
+
+    System.assert(
+      ganhoParaPerda,
+      'Virar cancelada sem apagar a marca do Ganho deixaria os dois sinais juntos.'
+    );
+    System.assert(
+      perdaParaGanho,
+      'Virar concluída sem apagar o sinal da perda deixaria os dois sinais juntos.'
+    );
+    System.assert(
+      transicaoLimpaAceita,
+      'Com o sinal anterior limpo na mesma gravação, a transição é válida.'
+    );
+    System.assertEquals(
+      'Completed',
+      recarregar(concluida).Status,
+      'O rollback devolveu a concluída ao estado original.'
+    );
+  }
+
+  /**
+   * (21.5) O caminho de verdade continua inteiro: Ganho conclui, perda cancela,
+   * e editar só a Description segue permitido nos dois estados.
+   */
+  @IsTest
+  static void ganhoPerdaEManutencaoContinuamFuncionando() {
+    List<Id> vs = montarFila(2);
+    Id oppGanho = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Id oppPerda = novaOpp(PRODUTO_RT, true, vs[0], 'Negociação');
+    Task tGanho = tarefaDeFechamento(oppGanho, vs[0]);
+    Task tPerda = tarefaDeFechamento(oppPerda, vs[0]);
+
+    Test.startTest();
+    // Pelos eventos funcionais, não chamando os serviços: a Oportunidade muda
+    // de etapa e os Flows do 9423 e do 9425 fazem o encerramento.
+    update new Opportunity(Id = oppGanho, StageName = 'Ganho');
+    perderOpp(oppPerda);
+    // Manutenção de campo alheio nos dois estados resultantes.
+    update new List<Task>{
+      new Task(Id = tGanho.Id, Description = 'Nota na concluída.'),
+      new Task(Id = tPerda.Id, Description = 'Nota na cancelada.')
+    };
+    Test.stopTest();
+
+    Task depoisGanho = recarregar(tGanho.Id);
+    System.assertEquals(
+      'Completed',
+      depoisGanho.Status,
+      'Ganho concluiu a tarefa de fechamento.'
+    );
+    System.assertEquals(
+      true,
+      depoisGanho.SOL_Encerrado_Pela_Oportunidade__c,
+      'Com a marca do encerramento automático.'
+    );
+    System.assert(
+      depoisGanho.SOL_Cancelada_Por_Perda__c != true &&
+      String.isBlank(depoisGanho.SOL_Motivo_Cancelamento__c),
+      'E sem nenhum sinal de perda.'
+    );
+
+    assertCanceladaPorPerda(tPerda.Id, 'fechamento encerrado pela perda');
+    System.assert(
+      recarregar(tPerda.Id).SOL_Encerrado_Pela_Oportunidade__c != true,
+      'A cancelada por perda não recebe a marca do Ganho.'
+    );
+
+    Map<Id, Task> notas = new Map<Id, Task>(
+      [
+        SELECT Id, Description
+        FROM Task
+        WHERE Id IN (:tGanho.Id, :tPerda.Id)
+      ]
+    );
+    System.assertEquals(
+      'Nota na concluída.',
+      notas.get(tGanho.Id).Description,
+      'Manutenção da concluída segue permitida.'
+    );
+    System.assertEquals(
+      'Nota na cancelada.',
+      notas.get(tPerda.Id).Description,
+      'Manutenção da cancelada segue permitida.'
+    );
+  }
 }

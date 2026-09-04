@@ -2,7 +2,7 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Fechamento_Exige_Encerramento_Auto</fullName>
     <active>true</active>
-    <description>CLICKUP-9423: a tarefa &quot;Fechamento&quot; só conclui pela automação de Ganho. D3 do E2E: só cancela pelo encerramento por perda (CLICKUP-9425), com flag e motivo juntos. Reavalia a cada mudança do estado protegido, para não deixar desfazer o sinal depois.</description>
+    <description>CLICKUP-9423 e D3 do E2E: estados mutuamente exclusivos da tarefa Fechamento. Completed exige a flag do Ganho, sem sinal de perda; Cancelada exige flag e motivo de perda, sem a flag do Ganho; qualquer outro status exige as duas flags e o motivo vazios.</description>
     <errorConditionFormula>AND(
   ISPICKVAL( SOL_Tipo_Tarefa__c , &quot;Fechamento&quot; ),
   OR(
@@ -13,22 +13,30 @@
     ISCHANGED( SOL_Cancelada_Por_Perda__c ),
     ISCHANGED( SOL_Motivo_Cancelamento__c )
   ),
-  OR(
-    AND(
-      ISPICKVAL( Status , &quot;Completed&quot; ),
-      NOT( SOL_Encerrado_Pela_Oportunidade__c )
-    ),
-    AND(
-      ISPICKVAL( Status , &quot;Cancelada&quot; ),
-      NOT(
-        AND(
-          SOL_Cancelada_Por_Perda__c,
-          ISPICKVAL( SOL_Motivo_Cancelamento__c , &quot;Negócio perdido&quot; )
-        )
+  NOT(
+    OR(
+      AND(
+        ISPICKVAL( Status , &quot;Completed&quot; ),
+        SOL_Encerrado_Pela_Oportunidade__c,
+        NOT( SOL_Cancelada_Por_Perda__c ),
+        ISBLANK( TEXT( SOL_Motivo_Cancelamento__c ) )
+      ),
+      AND(
+        ISPICKVAL( Status , &quot;Cancelada&quot; ),
+        SOL_Cancelada_Por_Perda__c,
+        ISPICKVAL( SOL_Motivo_Cancelamento__c , &quot;Negócio perdido&quot; ),
+        NOT( SOL_Encerrado_Pela_Oportunidade__c )
+      ),
+      AND(
+        NOT( ISPICKVAL( Status , &quot;Completed&quot; ) ),
+        NOT( ISPICKVAL( Status , &quot;Cancelada&quot; ) ),
+        NOT( SOL_Encerrado_Pela_Oportunidade__c ),
+        NOT( SOL_Cancelada_Por_Perda__c ),
+        ISBLANK( TEXT( SOL_Motivo_Cancelamento__c ) )
       )
     )
   )
 )</errorConditionFormula>
     <errorDisplayField>Status</errorDisplayField>
-    <errorMessage>Esta tarefa de fechamento é concluída automaticamente quando a Oportunidade vira Ganho e cancelada automaticamente quando vira Perdido. Encerre o negócio na Oportunidade — o encerramento dela não pode ser feito nem desfeito à mão.</errorMessage>
+    <errorMessage>Esta tarefa de fechamento é concluída automaticamente quando a Oportunidade vira Ganho e cancelada automaticamente quando vira Perdido. Os dois sinais são exclusivos: nenhum pode ser preenchido, misturado ou desfeito à mão.</errorMessage>
 </ValidationRule>
