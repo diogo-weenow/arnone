@@ -2,7 +2,7 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Fechamento_Exige_Encerramento_Auto</fullName>
     <active>true</active>
-    <description>CLICKUP-9423: a tarefa tipo "Fechamento" só conclui pela automação (Ganho/Perdido marca o checkbox). OR(ISNEW(), ISCHANGED(Status)) cobre a criação já concluída sem bloquear manutenção de registros históricos. Sem exceção por Subject/perfil.</description>
+    <description>CLICKUP-9423: a tarefa &quot;Fechamento&quot; só conclui pela automação (Ganho marca o checkbox). OR(ISNEW(), ISCHANGED(Status)) cobre a criação já concluída. CLICKUP-9425: em &quot;Perdido&quot; ela é CANCELADA, não concluída. Sem exceção por Subject/perfil.</description>
     <errorConditionFormula>AND(
   ISPICKVAL( SOL_Tipo_Tarefa__c , &quot;Fechamento&quot; ),
   ISPICKVAL( Status , &quot;Completed&quot; ),
@@ -10,5 +10,5 @@
   NOT( SOL_Encerrado_Pela_Oportunidade__c )
 )</errorConditionFormula>
     <errorDisplayField>Status</errorDisplayField>
-    <errorMessage>Esta tarefa de fechamento é concluída automaticamente quando a Oportunidade vira Ganho ou Perdido. Encerre o negócio na Oportunidade.</errorMessage>
+    <errorMessage>Esta tarefa de fechamento é concluída automaticamente quando a Oportunidade vira Ganho — e cancelada automaticamente quando vira Perdido. Encerre o negócio na Oportunidade.</errorMessage>
 </ValidationRule>

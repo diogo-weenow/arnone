@@ -6,7 +6,7 @@
  *    cria UMA Task "Realizar fechamento" (vencimento 7 dias úteis após a reunião),
  *    sem mudar a etapa da Oportunidade (fica em "Negociação").
  *  - SOL_Encerrar_Fechamento_Ganho_Perdido (Opportunity): quando a Oportunidade
- *    SOL / Recuperação Tributária vira "Ganho" ou "Perdido", conclui todas as
+ *    SOL / Recuperação Tributária vira "Ganho", conclui todas as
  *    Tasks abertas do tipo "Fechamento" dela — atômico com a mudança da Opp.
  *
  * A maioria dos testes dispara os Flows pela transição real (update). Alguns
@@ -439,8 +439,15 @@ private class SOLFechamentoTest {
     System.assertEquals('Ganho', opp(oppId).StageName);
   }
 
+  /**
+   * CLICKUP-9425 mudou a precedência em "Perdido": este Evento 2 não conclui
+   * mais a tarefa de fechamento lá. Quem age é SOLNegocioPerdidoService, que a
+   * deixa CANCELADA com motivo "Negócio perdido" e SOL_Cancelada_Por_Perda__c —
+   * nunca "Completed", para não parecer executada num negócio perdido. O
+   * comportamento de "Ganho" segue coberto por conclusaoAutomaticaAoVirarGanho.
+   */
   @IsTest
-  static void conclusaoAutomaticaAoVirarPerdido() {
+  static void aoVirarPerdidoATarefaEhCanceladaNaoConcluida() {
     Id oppId = oppNegociacao();
     Task f = fechamentoAberto(oppId, Date.today().addDays(-3));
 
@@ -453,15 +460,20 @@ private class SOLFechamentoTest {
     Test.stopTest();
 
     Task depois = [
-      SELECT Status, SOL_Encerrado_Pela_Oportunidade__c
+      SELECT Status, SOL_Encerrado_Pela_Oportunidade__c, SOL_Motivo_Cancelamento__c,
+             SOL_Cancelada_Por_Perda__c
       FROM Task
       WHERE Id = :f.Id
     ];
-    System.assertEquals('Completed', depois.Status);
-    System.assert(
+    System.assertEquals('Cancelada', depois.Status, 'Em perda a tarefa é CANCELADA.');
+    System.assertNotEquals('Completed', depois.Status, 'E nunca aparece como executada.');
+    System.assertEquals(
+      false,
       depois.SOL_Encerrado_Pela_Oportunidade__c,
-      'O checkbox técnico é marcado junto com a conclusão automática.'
+      'O checkbox do 9423 NÃO é marcado em perda.'
     );
+    System.assertEquals('Negócio perdido', depois.SOL_Motivo_Cancelamento__c);
+    System.assertEquals(true, depois.SOL_Cancelada_Por_Perda__c);
     System.assertEquals('Perdido', opp(oppId).StageName);
   }
 
@@ -480,12 +492,11 @@ private class SOLFechamentoTest {
     );
     insert reuniao;
 
+    // CLICKUP-9425: o escopo restrito do Evento 2 ("só a tarefa de fechamento")
+    // é verificado em GANHO. Em "Perdido" o 9425 encerra TODAS as abertas — o
+    // que é coberto por SOLNegocioPerdidoTest.
     Test.startTest();
-    update new Opportunity(
-      Id = oppId,
-      StageName = 'Perdido',
-      SOL_Motivo_Perda__c = 'Sem retorno'
-    );
+    update new Opportunity(Id = oppId, StageName = 'Ganho');
     Test.stopTest();
 
     System.assertEquals('Completed', [SELECT Status FROM Task WHERE Id = :f.Id].Status);
@@ -671,7 +682,9 @@ private class SOLFechamentoTest {
   @IsTest
   static void encerramentoAutomaticoContinuaGravandoCheckbox() {
     // Após a mudança para OR(ISNEW(), ISCHANGED(Status)), o Evento 2 segue
-    // gravando Completed + checkbox verdadeiro, em Ganho e em Perdido.
+    // gravando Completed + checkbox verdadeiro em GANHO. CLICKUP-9425 retirou
+    // "Perdido" deste evento: lá a tarefa é CANCELADA (ver
+    // aoVirarPerdidoATarefaEhCanceladaNaoConcluida).
     Id oppGanho = oppNegociacao();
     Task fGanho = fechamentoAberto(oppGanho, Date.today().addDays(-3));
     Id oppPerdido = oppNegociacao();
@@ -686,14 +699,23 @@ private class SOLFechamentoTest {
     );
     Test.stopTest();
 
-    for (Task t : [
-      SELECT Id, Status, SOL_Encerrado_Pela_Oportunidade__c
+    Task tGanho = [
+      SELECT Status, SOL_Encerrado_Pela_Oportunidade__c
       FROM Task
-      WHERE Id IN (:fGanho.Id, :fPerdido.Id)
-    ]) {
-      System.assertEquals('Completed', t.Status, 'Task ' + t.Id);
-      System.assert(t.SOL_Encerrado_Pela_Oportunidade__c, 'Checkbox marcado na Task ' + t.Id);
-    }
+      WHERE Id = :fGanho.Id
+    ];
+    System.assertEquals('Completed', tGanho.Status, 'Ganho conclui.');
+    System.assert(tGanho.SOL_Encerrado_Pela_Oportunidade__c, 'Ganho marca o checkbox.');
+
+    Task tPerdido = [
+      SELECT Status, SOL_Encerrado_Pela_Oportunidade__c, SOL_Cancelada_Por_Perda__c
+      FROM Task
+      WHERE Id = :fPerdido.Id
+    ];
+    System.assertEquals('Cancelada', tPerdido.Status, 'Perdido CANCELA (CLICKUP-9425).');
+    System.assertEquals(false, tPerdido.SOL_Encerrado_Pela_Oportunidade__c);
+    System.assertEquals(true, tPerdido.SOL_Cancelada_Por_Perda__c);
+
     System.assertEquals('Ganho', opp(oppGanho).StageName);
     System.assertEquals('Perdido', opp(oppPerdido).StageName);
   }
@@ -718,11 +740,11 @@ private class SOLFechamentoTest {
       );
     }
     insert fechs;
+    // CLICKUP-9425: o lote do Evento 2 é medido em GANHO — em "Perdido" quem
+    // encerra é o 9425 (bulk coberto em SOLNegocioPerdidoTest.processamentoBulk).
     List<Opportunity> encerrar = new List<Opportunity>();
     for (Id oppId : opps) {
-      encerrar.add(
-        new Opportunity(Id = oppId, StageName = 'Perdido', SOL_Motivo_Perda__c = 'Sem retorno')
-      );
+      encerrar.add(new Opportunity(Id = oppId, StageName = 'Ganho'));
     }
 
     Test.startTest();
@@ -880,14 +902,12 @@ private class SOLFechamentoTest {
     );
     insert f;
 
+    // CLICKUP-9425: a atomicidade do Evento 2 é exercitada em GANHO (em
+    // "Perdido" a atomicidade é do 9425, coberta em SOLNegocioPerdidoTest).
     Test.startTest();
     Boolean bloqueou = false;
     try {
-      update new Opportunity(
-        Id = oppId,
-        StageName = 'Perdido',
-        SOL_Motivo_Perda__c = 'Não houve acordo na negociação'
-      );
+      update new Opportunity(Id = oppId, StageName = 'Ganho');
     } catch (DmlException e) {
       bloqueou = true;
       System.assert(
@@ -905,7 +925,8 @@ private class SOLFechamentoTest {
   @IsTest
   static void falhaNoEncerramento_servicoAbortaAtomicamente() {
     Id oppId = oppNegociacao();
-    update new Opportunity(Id = oppId, StageName = 'Perdido', SOL_Motivo_Perda__c = 'Sem retorno');
+    // CLICKUP-9425: etapa de encerramento do Evento 2 passou a ser só "Ganho".
+    update new Opportunity(Id = oppId, StageName = 'Ganho');
     Task f = new Task(
       Subject = SUBJECT_FECHAMENTO,
       WhatId = oppId,
@@ -1085,12 +1106,9 @@ private class SOLFechamentoTest {
 
     // Operação real 2: o mesmo usuário encerra o negócio pela Oportunidade e a
     // automação conclui a tarefa marcando o checkbox técnico.
+    // CLICKUP-9425: a conclusão automática do Evento 2 é em "Ganho".
     System.runAs(new User(Id = u.Id)) {
-      update new Opportunity(
-        Id = oppId,
-        StageName = 'Perdido',
-        SOL_Motivo_Perda__c = 'Sem retorno'
-      );
+      update new Opportunity(Id = oppId, StageName = 'Ganho');
     }
     Task depois = [
       SELECT Status, SOL_Encerrado_Pela_Oportunidade__c
@@ -1106,7 +1124,7 @@ private class SOLFechamentoTest {
       depois.SOL_Encerrado_Pela_Oportunidade__c,
       psName + ': checkbox técnico marcado pela automação.'
     );
-    System.assertEquals('Perdido', opp(oppId).StageName);
+    System.assertEquals('Ganho', opp(oppId).StageName);
   }
 
   @IsTest

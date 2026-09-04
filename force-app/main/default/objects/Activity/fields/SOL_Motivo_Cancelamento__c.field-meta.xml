@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Motivo_Cancelamento__c</fullName>
-    <description>Motivo do cancelamento automático de uma tarefa de automação SOL (Status = Cancelada). Permite distinguir uma tarefa cancelada pelo sistema de uma tarefa "não realizada". "Contato efetivado" = o contato com o Lead foi efetivado (CLICKUP-9417). "Opt-out" = o Lead pediu para não ser mais contatado (CLICKUP-9418).</description>
+    <description>Motivo do cancelamento automático de uma tarefa de automação SOL (Status = Cancelada). Permite distinguir uma tarefa cancelada pelo sistema de uma tarefa "não realizada". "Contato efetivado" = o contato com o Lead foi efetivado (CLICKUP-9417). "Opt-out" = o Lead pediu para não ser mais contatado (CLICKUP-9418). "Negócio perdido" = o negócio foi perdido — Lead desqualificado com esse motivo (sem opt-out) ou Oportunidade em "Perdido" — e todas as tarefas abertas foram encerradas, inclusive as manuais sem tipo; nesse caso vem sempre acompanhado de SOL_Cancelada_Por_Perda__c (CLICKUP-9425).</description>
     <label>Motivo do cancelamento SOL</label>
     <required>false</required>
     <type>Picklist</type>
@@ -18,6 +18,11 @@
                 <fullName>Opt-out</fullName>
                 <default>false</default>
                 <label>Opt-out</label>
+            </value>
+            <value>
+                <fullName>Negócio perdido</fullName>
+                <default>false</default>
+                <label>Negócio perdido</label>
             </value>
         </valueSetDefinition>
     </valueSet>

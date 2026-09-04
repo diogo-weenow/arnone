@@ -20,7 +20,7 @@
  *   abortando a transação — inclusive a conclusão da Task de reunião final.
  *
  * EVENTO 2 — encerrarTarefasFechamento(opportunityIds):
- *   Quando a Oportunidade muda REALMENTE para "Ganho" ou "Perdido", conclui
+ *   Quando a Oportunidade muda REALMENTE para "Ganho", conclui
  *   automaticamente TODAS as Tasks abertas do tipo "Fechamento" dela, gravando
  *   Status = "Completed" e SOL_Encerrado_Pela_Oportunidade__c = true
  *   na MESMA atualização. É esse checkbox técnico que autoriza a transição na VR
@@ -32,6 +32,13 @@
  *   ATÔMICO: se a conclusão das Tasks falhar, o Savepoint é desfeito e o método
  *   RELANÇA FechamentoException; o Invocable propaga ao Flow (CurrentTransaction),
  *   abortando a mudança da Oportunidade com mensagem controlada.
+ *
+ *   CLICKUP-9425 — PRECEDÊNCIA EM "PERDIDO": este evento NÃO age mais em
+ *   "Perdido". Lá quem age é SOLNegocioPerdidoService, que CANCELA todas as
+ *   Tasks abertas da Oportunidade (inclusive a de fechamento e as manuais), com
+ *   motivo "Negócio perdido" e SOL_Cancelada_Por_Perda__c. Assim a tarefa de
+ *   fechamento de um negócio perdido nunca aparece como "executada". O
+ *   comportamento de "Ganho" segue idêntico ao do CLICKUP-9423.
  *
  * Bulk-safe: nenhuma consulta/DML em laço. FOR UPDATE nas Tasks e Oportunidades.
  * NÃO apaga registros. NÃO antecipa reatribuição de 30 dias, cancelamento geral
@@ -56,8 +63,15 @@ public without sharing class SOLFechamentoService {
   private static final String TASK_STATUS_ABERTO = 'Open';
   @TestVisible
   private static final Integer DIAS_UTEIS_PRAZO = 7;
+  /**
+   * Etapa que CONCLUI a tarefa de fechamento. CLICKUP-9425 removeu "Perdido"
+   * daqui: em perda a tarefa passou a ser CANCELADA por
+   * SOLNegocioPerdidoService (Status "Cancelada" + motivo "Negócio perdido" +
+   * SOL_Cancelada_Por_Perda__c), nunca concluída. "Ganho" mantém integralmente o
+   * comportamento do CLICKUP-9423.
+   */
   @TestVisible
-  private static final Set<String> ETAPAS_ENCERRAMENTO = new Set<String>{ 'Ganho', 'Perdido' };
+  private static final Set<String> ETAPAS_ENCERRAMENTO = new Set<String>{ 'Ganho' };
 
   /** Falha ao criar a tarefa de fechamento (a transação deve ser abortada). */
   public static final String MSG_FALHA_CRIAR = 'Não foi possível criar a tarefa de fechamento. Nenhuma alteração foi salva — conclua a reunião final novamente.';
@@ -166,6 +180,8 @@ public without sharing class SOLFechamentoService {
           o.RecordType.DeveloperName == RECORD_TYPE_SOL &&
           o.SOL_Produto_Negocio__c == PRODUTO_RECUPERACAO &&
           o.IsClosed == false &&
+          // (CLICKUP-9425) explícito: negócio perdido não avança mais.
+          !SOLNegocioPerdidoService.oportunidadePerdida(o) &&
           o.StageName == ETAPA_NEGOCIACAO;
         if (!elegivel || jaExiste.contains(chave(oppId, reuniao))) {
           r.ignorados++;
@@ -245,7 +261,9 @@ public without sharing class SOLFechamentoService {
 
   /**
    * Conclui todas as Tasks abertas do tipo "Fechamento" das Oportunidades que
-   * acabaram de virar "Ganho" ou "Perdido".
+   * acabaram de virar "Ganho".
+   *
+   * CLICKUP-9425: "Perdido" não entra mais aqui — ver ETAPAS_ENCERRAMENTO.
    *
    * @param opportunityIds Ids de Opportunity (qualquer origem; filtrados aqui).
    * @throws FechamentoException falha ao concluir as Tasks (aborta a mudança da

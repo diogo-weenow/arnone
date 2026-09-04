@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Chamar_Encerrar_Tarefas_Oportunidade_Perdida</name>
+        <label>Encerrar tarefas da Oportunidade perdida SOL</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <actionName>SOLNegocioPerdidoOportunidadeInvocable</actionName>
+        <actionType>apex</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>opportunityId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>SOLNegocioPerdidoOportunidadeInvocable</nameSegment>
+    </actionCalls>
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>CLICKUP-9425 — Card 14, perda DEPOIS da conversão. Quando uma Oportunidade SOL (Recuperação Tributária ou ART 360) muda REALMENTE para "Perdido", aciona SOLNegocioPerdidoOportunidadeInvocable para cancelar TODAS as Tasks abertas dela (WhatId), em qualquer etapa e de qualquer tipo, inclusive as manuais sem tipo. Precedência sobre o CLICKUP-9423: em "Perdido" a Task "Fechamento" fica Cancelada por aqui, não Completed — o Flow SOL_Encerrar_Fechamento_Ganho_Perdido passou a agir somente em "Ganho". doesRequireRecordChangedToMeetCriteria=true garante a transição real e evita replay. O Flow é after-save: as Validation Rules de Perdido já foram aplicadas. Atomicidade: se o cancelamento falhar, a mudança para "Perdido" é abortada (CurrentTransaction) com mensagem controlada. Outras BUs e outros produtos ficam intactos.</description>
+    <environments>Default</environments>
+    <interviewLabel>SOL_Encerrar_Tarefas_Oportunidade_Perdida {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL_Encerrar_Tarefas_Oportunidade_Perdida</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Chamar_Encerrar_Tarefas_Oportunidade_Perdida</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &apos;SOL&apos;,
+  OR(
+    ISPICKVAL({!$Record.SOL_Produto_Negocio__c}, &apos;Recuperação Tributária&apos;),
+    ISPICKVAL({!$Record.SOL_Produto_Negocio__c}, &apos;ART 360&apos;)
+  ),
+  ISPICKVAL({!$Record.StageName}, &apos;Perdido&apos;)
+)</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Chamar_Encerrar_Tarefas_Lead_Perdido</name>
+        <label>Encerrar tarefas do lead perdido SOL</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <actionName>SOLNegocioPerdidoLeadInvocable</actionName>
+        <actionType>apex</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>leadId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>SOLNegocioPerdidoLeadInvocable</nameSegment>
+    </actionCalls>
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>CLICKUP-9425 — Card 14, perda ANTES da conversão. Quando um Lead SOL (Recuperação Tributária ou ART 360) muda REALMENTE para "Desqualificado" com SOL_Motivo_Desqualificacao__c = "Negócio perdido" E SOL_Opt_Out__c falso, aciona SOLNegocioPerdidoLeadInvocable para cancelar TODAS as Tasks abertas do Lead (WhoId), inclusive as manuais sem tipo. O sinal é EXATO e composto: nem todo "Desqualificado" é perda — o opt-out do CLICKUP-9418 desqualifica com motivo "Opt-out" e SOL_Opt_Out__c verdadeiro, então nunca entra aqui e os dois fluxos ficam isolados. doesRequireRecordChangedToMeetCriteria=true garante a transição real e evita replay. O Flow é after-save: as Validation Rules do Lead já foram aplicadas. Atomicidade: se o cancelamento falhar, a desqualificação é abortada (CurrentTransaction) com mensagem controlada. Outras BUs e outros produtos ficam intactos.</description>
+    <environments>Default</environments>
+    <interviewLabel>SOL_Encerrar_Tarefas_Lead_Perdido {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL_Encerrar_Tarefas_Lead_Perdido</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Chamar_Encerrar_Tarefas_Lead_Perdido</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &apos;SOL&apos;,
+  OR(
+    ISPICKVAL({!$Record.SOL_Produto_Interesse__c}, &apos;Recuperação Tributária&apos;),
+    ISPICKVAL({!$Record.SOL_Produto_Interesse__c}, &apos;ART 360&apos;)
+  ),
+  ISPICKVAL({!$Record.Status}, &apos;Desqualificado&apos;),
+  ISPICKVAL({!$Record.SOL_Motivo_Desqualificacao__c}, &apos;Negócio perdido&apos;),
+  NOT({!$Record.SOL_Opt_Out__c}),
+  NOT({!$Record.IsConverted})
+)</filterFormula>
+        <object>Lead</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

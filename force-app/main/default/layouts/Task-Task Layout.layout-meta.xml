@@ -123,6 +123,10 @@
                 <behavior>Readonly</behavior>
                 <field>SOL_Encerrado_Pela_Oportunidade__c</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>SOL_Cancelada_Por_Perda__c</field>
+            </layoutItems>
         </layoutColumns>
         <style>TwoColumnsLeftToRight</style>
     </layoutSections>

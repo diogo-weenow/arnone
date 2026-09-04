@@ -163,6 +163,8 @@ public without sharing class SOLReuniaoFinalService {
           o.RecordType.DeveloperName == RECORD_TYPE_SOL &&
           o.SOL_Produto_Negocio__c == PRODUTO_RECUPERACAO &&
           o.IsClosed == false &&
+          // (CLICKUP-9425) explícito: negócio perdido não avança mais.
+          !SOLNegocioPerdidoService.oportunidadePerdida(o) &&
           o.StageName == ETAPA_ORIGEM;
         if (!elegivel || jaExiste.contains(chave(oppId, receb))) {
           r.ignorados++;

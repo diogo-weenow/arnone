@@ -2,14 +2,22 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Cancelada_Exige_Classificacao</fullName>
     <active>true</active>
-    <description>CLICKUP-9417: o status global "Cancelada" só pode ser usado em tarefas de automação Arnone Soluções — exige SOL_Tipo_Tarefa__c e SOL_Motivo_Cancelamento__c preenchidos. Protege as demais BUs de usar esse status.</description>
+    <description>CLICKUP-9417: &quot;Cancelada&quot; é exclusivo das tarefas de automação SOL — exige tipo e motivo. CLICKUP-9425: única exceção, só para o TIPO, quando SOL_Cancelada_Por_Perda__c e motivo &quot;Negócio perdido&quot; vêm juntos (tarefa manual). O motivo segue obrigatório.</description>
     <errorConditionFormula>AND(
   ISPICKVAL( Status , &quot;Cancelada&quot; ),
   OR(
-    ISBLANK( TEXT( SOL_Tipo_Tarefa__c ) ),
-    ISBLANK( TEXT( SOL_Motivo_Cancelamento__c ) )
+    ISBLANK( TEXT( SOL_Motivo_Cancelamento__c ) ),
+    AND(
+      ISBLANK( TEXT( SOL_Tipo_Tarefa__c ) ),
+      NOT(
+        AND(
+          SOL_Cancelada_Por_Perda__c,
+          ISPICKVAL( SOL_Motivo_Cancelamento__c , &quot;Negócio perdido&quot; )
+        )
+      )
+    )
   )
 )</errorConditionFormula>
     <errorDisplayField>Status</errorDisplayField>
-    <errorMessage>O status "Cancelada" é exclusivo das tarefas de automação Arnone Soluções (tipo e motivo do cancelamento obrigatórios).</errorMessage>
+    <errorMessage>O status "Cancelada" é exclusivo das tarefas de automação Arnone Soluções (tipo e motivo do cancelamento obrigatórios). Tarefa sem tipo só é cancelada pelo encerramento automático por perda do negócio.</errorMessage>
 </ValidationRule>

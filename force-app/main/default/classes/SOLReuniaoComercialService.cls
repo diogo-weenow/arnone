@@ -89,7 +89,8 @@ public without sharing class SOLReuniaoComercialService {
           IsConverted,
           SOL_Opt_Out__c,
           SOL_Produto_Interesse__c,
-          RecordType.DeveloperName
+          RecordType.DeveloperName,
+          SOL_Motivo_Desqualificacao__c
         FROM Lead
         WHERE Id IN :ids
         FOR UPDATE
@@ -102,6 +103,9 @@ public without sharing class SOLReuniaoComercialService {
         Boolean elegivel =
           l.RecordType.DeveloperName == RECORD_TYPE_SOL &&
           l.Status == STATUS_REUNIAO_SQL &&
+          // (CLICKUP-9425) e o negócio ainda não foi perdido.
+          !SOLNegocioPerdidoService.leadPerdido(l) &&
+
           l.IsConverted == false &&
           l.SOL_Opt_Out__c != true &&
           (l.SOL_Produto_Interesse__c == PRODUTO_RECUPERACAO ||
