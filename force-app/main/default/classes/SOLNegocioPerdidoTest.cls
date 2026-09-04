@@ -1214,9 +1214,11 @@ private class SOLNegocioPerdidoTest {
   // ============================================ 17. FLS EFETIVA
 
   /**
-   * (17) FLS EFETIVA em System.runAs, para o vendedor (PS_SOL_Comercial) e o
-   * gestor (PS_SOL_Distribuicao_Admin): os campos técnicos do card são
-   * LEGÍVEIS e NÃO editáveis para os dois papéis.
+   * (17) FLS EFETIVA em System.runAs, com usuários Standard — um por permission
+   * set. Vendedor (PS_SOL_Comercial) e gestor (PS_SOL_Distribuicao_Admin)
+   * precisam LER os dois campos que distinguem uma Task cancelada por perda de
+   * uma Task realizada ou cancelada por outro motivo, e nenhum dos dois pode
+   * EDITÁ-LOS: são campos técnicos, escritos só pela automação.
    */
   @IsTest
   static void flsEfetiva_vendedorEGestor() {
@@ -1243,52 +1245,67 @@ private class SOLNegocioPerdidoTest {
     }
 
     Test.startTest();
-    // O campo técnico DO CARD: legível e não editável para os DOIS papéis.
     for (User u : new List<User>{ vCom, vAdm }) {
       String papel = u.Id == vCom.Id ? 'PS_SOL_Comercial' : 'PS_SOL_Distribuicao_Admin';
       System.runAs(new User(Id = u.Id)) {
-        Schema.DescribeFieldResult d = Task.SOL_Cancelada_Por_Perda__c.getDescribe();
-        System.assert(d.isAccessible(), papel + ': SOL_Cancelada_Por_Perda__c é legível.');
-        System.assert(
-          !d.isUpdateable(),
-          papel + ': SOL_Cancelada_Por_Perda__c NÃO é editável (campo técnico).'
-        );
+        for (
+          Schema.SObjectField f : new List<Schema.SObjectField>{
+            Task.SOL_Cancelada_Por_Perda__c,
+            Task.SOL_Motivo_Cancelamento__c
+          }
+        ) {
+          Schema.DescribeFieldResult d = f.getDescribe();
+          System.assert(
+            d.isAccessible(),
+            papel + ': ' + d.getName() + ' é legível — é o que distingue a perda.'
+          );
+          System.assert(
+            !d.isUpdateable(),
+            papel + ': ' + d.getName() + ' NÃO é editável (campo técnico).'
+          );
+        }
       }
     }
-    // Os campos de classificação/motivo (CLICKUP-9417/9418) já eram somente
-    // leitura para o Comercial — este card não os alterou. PS_SOL_Distribuicao_Admin
-    // nunca os concedeu, e o card deliberadamente NÃO amplia esse permission set
-    // (ver riscos do PR); por isso a checagem abaixo é só do papel Comercial.
+    // O tipo da tarefa já era somente leitura para o Comercial (CLICKUP-9417);
+    // este card não o alterou.
     System.runAs(vCom) {
-      for (
-        Schema.SObjectField f : new List<Schema.SObjectField>{
-          Task.SOL_Motivo_Cancelamento__c,
-          Task.SOL_Tipo_Tarefa__c
-        }
-      ) {
-        Schema.DescribeFieldResult d = f.getDescribe();
-        System.assert(d.isAccessible(), 'Comercial: ' + d.getName() + ' é legível.');
-        System.assert(!d.isUpdateable(), 'Comercial: ' + d.getName() + ' NÃO é editável.');
-      }
+      Schema.DescribeFieldResult d = Task.SOL_Tipo_Tarefa__c.getDescribe();
+      System.assert(d.isAccessible(), 'Comercial: SOL_Tipo_Tarefa__c é legível.');
+      System.assert(!d.isUpdateable(), 'Comercial: SOL_Tipo_Tarefa__c NÃO é editável.');
     }
     Test.stopTest();
   }
 
-  /** A FLS DECLARADA nos dois permission sets, medida no metadado. */
+  /**
+   * Verificação ESTRUTURAL: os dois campos que distinguem a perda têm FLS
+   * declarada — legível e não editável — nos DOIS permission sets.
+   */
   @IsTest
   static void flsDeclaradaNosDoisPermissionSets() {
+    Set<String> campos = new Set<String>{
+      'Task.SOL_Cancelada_Por_Perda__c',
+      'Task.SOL_Motivo_Cancelamento__c'
+    };
     for (String ps : new List<String>{ 'PS_SOL_Comercial', 'PS_SOL_Distribuicao_Admin' }) {
-      List<FieldPermissions> fps = [
+      Set<String> vistos = new Set<String>();
+      for (FieldPermissions fp : [
         SELECT Field, PermissionsRead, PermissionsEdit
         FROM FieldPermissions
-        WHERE
-          Parent.Name = :ps
-          AND SobjectType = 'Task'
-          AND Field = 'Task.SOL_Cancelada_Por_Perda__c'
-      ];
-      System.assertEquals(1, fps.size(), ps + ' declara FLS de SOL_Cancelada_Por_Perda__c.');
-      System.assert(fps[0].PermissionsRead, ps + ': legível.');
-      System.assertEquals(false, fps[0].PermissionsEdit, ps + ': somente leitura.');
+        WHERE Parent.Name = :ps AND SobjectType = 'Task' AND Field IN :campos
+      ]) {
+        vistos.add(fp.Field);
+        System.assert(fp.PermissionsRead, ps + ' — ' + fp.Field + ': legível.');
+        System.assertEquals(
+          false,
+          fp.PermissionsEdit,
+          ps + ' — ' + fp.Field + ': somente leitura.'
+        );
+      }
+      System.assertEquals(
+        campos,
+        vistos,
+        ps + ' declara FLS dos dois campos que distinguem a perda.'
+      );
     }
   }
 
