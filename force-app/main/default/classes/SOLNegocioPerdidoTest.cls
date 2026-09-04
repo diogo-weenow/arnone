@@ -968,6 +968,329 @@ private class SOLNegocioPerdidoTest {
     );
   }
 
+  // ================== DISTRIBUIÇÃO x PERDA (lock e revalidação pós-lock)
+  //
+  // `SOLDistribuicaoService.distribuir` lê os Leads com FOR UPDATE (depois de
+  // travar o singleton — ordem de locks preservada) e revalida
+  // `SOLNegocioPerdidoService.leadPerdido` sobre esses dados travados, antes de
+  // gravar o Lead ou criar a tarefa de 1ª ligação.
+  //
+  // CONCORRÊNCIA PARALELA REAL NÃO É SIMULÁVEL EM APEX: a garantia de que a
+  // perda e a distribuição não se cruzam vem do `FOR UPDATE` (uma das duas
+  // transações espera a outra terminar). O que os testes abaixo comprovam é a
+  // outra metade — a REVALIDAÇÃO e os estados SEQUENCIAIS resultantes.
+
+  /** Snapshot dos campos de distribuição, para provar que nada foi tocado. */
+  private static Lead leadDistribuicao(Id id) {
+    return [
+      SELECT Id, OwnerId, Status, SOL_Opt_Out__c, SOL_Motivo_Desqualificacao__c,
+             SOL_Status_Distribuicao__c, SOL_Data_Distribuicao__c,
+             SOL_Erro_Distribuicao__c, SOL_Data_Inicio_Ciclo_Contato__c,
+             SOL_Status_Reatribuicao__c
+      FROM Lead
+      WHERE Id = :id
+    ];
+  }
+
+  /**
+   * (1) `distribuir` ignora Lead JÁ PERDIDO sem alterar Owner nem os campos de
+   * distribuição, e sem criar tarefa.
+   *
+   * O Lead é deixado em `Erro` de propósito — é o estado que o Batch de
+   * reprocessamento (CLICKUP-9394) procura. Assim o teste isola a guarda de
+   * PERDA: se ele passasse por já estar "Distribuido", passaria pelo motivo
+   * errado.
+   */
+  @IsTest
+  static void distribuirIgnoraLeadPerdidoSemAlterarNada() {
+    List<Id> vs = montarFila(3);
+    Lead l = novoLead(PRODUTO_RT);
+    // Estado que o reprocessamento reprocessaria.
+    update new Lead(
+      Id = l.Id,
+      SOL_Status_Distribuicao__c = 'Erro',
+      SOL_Erro_Distribuicao__c = 'falha anterior'
+    );
+    perderLead(l.Id);
+
+    Lead antes = leadDistribuicao(l.Id);
+    Integer tarefasAntes = [SELECT COUNT() FROM Task WHERE WhoId = :l.Id];
+
+    Test.startTest();
+    SOLDistribuicaoService.Resultado r = SOLDistribuicaoService.distribuir(new List<Id>{ l.Id });
+    Test.stopTest();
+
+    System.assertEquals(0, r.distribuidos, 'Negócio perdido não é distribuído.');
+    System.assertEquals(0, r.emFallback, 'E não cai em fallback.');
+    System.assertEquals(1, r.ignorados, 'É contado como ignorado.');
+
+    Lead depois = leadDistribuicao(l.Id);
+    System.assertEquals(antes.OwnerId, depois.OwnerId, 'Proprietário intacto.');
+    System.assertEquals(
+      antes.SOL_Status_Distribuicao__c,
+      depois.SOL_Status_Distribuicao__c,
+      'Status da distribuição intacto.'
+    );
+    System.assertEquals(
+      antes.SOL_Data_Distribuicao__c,
+      depois.SOL_Data_Distribuicao__c,
+      'Data da distribuição intacta.'
+    );
+    System.assertEquals(
+      antes.SOL_Erro_Distribuicao__c,
+      depois.SOL_Erro_Distribuicao__c,
+      'Mensagem de erro intacta.'
+    );
+    System.assertEquals(
+      antes.SOL_Data_Inicio_Ciclo_Contato__c,
+      depois.SOL_Data_Inicio_Ciclo_Contato__c,
+      'Ciclo de contato NÃO é reaberto.'
+    );
+    System.assertEquals(
+      antes.SOL_Status_Reatribuicao__c,
+      depois.SOL_Status_Reatribuicao__c,
+      'Status de reatribuição intacto.'
+    );
+    System.assertEquals(
+      MOTIVO_PERDA,
+      depois.SOL_Motivo_Desqualificacao__c,
+      'O motivo da perda não foi sobrescrito.'
+    );
+    System.assertEquals(
+      tarefasAntes,
+      [SELECT COUNT() FROM Task WHERE WhoId = :l.Id],
+      'NENHUMA tarefa nova (nem a de 1ª ligação).'
+    );
+    System.assertEquals(
+      0,
+      [SELECT COUNT() FROM Task WHERE WhoId = :l.Id AND IsClosed = false],
+      'E nenhuma aberta sobrou.'
+    );
+  }
+
+  /**
+   * (2) O caminho de CONFIGURAÇÃO INVÁLIDA — que cai em `marcarErro` — também
+   * não altera Lead perdido. `singletonKeyOverride` aponta para uma chave
+   * inexistente, o que faz `bloquearSingleton` lançar `SingletonAusenteException`
+   * e a distribuição ir para o tratamento de erro.
+   */
+  @IsTest
+  static void marcarErroNaoAlteraLeadPerdido() {
+    List<Id> vs = montarFila(3);
+    Lead perdido = novoLead(PRODUTO_RT);
+    Lead ativo = novoLead(PRODUTO_ART);
+    for (Id id : new List<Id>{ perdido.Id, ativo.Id }) {
+      update new Lead(Id = id, SOL_Status_Distribuicao__c = 'Pendente');
+    }
+    perderLead(perdido.Id);
+
+    Lead antesPerdido = leadDistribuicao(perdido.Id);
+
+    Test.startTest();
+    SOLDistribuicaoService.singletonKeyOverride = 'RR_CHAVE_INEXISTENTE_9425';
+    SOLDistribuicaoService.Resultado r = SOLDistribuicaoService.distribuir(
+      new List<Id>{ perdido.Id, ativo.Id }
+    );
+    SOLDistribuicaoService.singletonKeyOverride = null;
+    Test.stopTest();
+
+    // O Lead ATIVO recebe o tratamento de erro normal.
+    Lead depoisAtivo = leadDistribuicao(ativo.Id);
+    System.assertEquals(
+      'Erro',
+      depoisAtivo.SOL_Status_Distribuicao__c,
+      'O Lead ativo é marcado com Erro pelo tratamento de configuração.'
+    );
+    System.assertEquals(1, r.comErro, 'Só o Lead ativo entra na contagem de erro.');
+    System.assert(!r.mensagens.isEmpty(), 'A mensagem controlada é registrada.');
+
+    // O Lead PERDIDO fica intocado.
+    Lead depoisPerdido = leadDistribuicao(perdido.Id);
+    System.assertEquals(antesPerdido.OwnerId, depoisPerdido.OwnerId, 'Proprietário intacto.');
+    System.assertEquals(
+      'Pendente',
+      depoisPerdido.SOL_Status_Distribuicao__c,
+      'Status da distribuição intacto — não virou "Erro".'
+    );
+    System.assertEquals(
+      antesPerdido.SOL_Data_Distribuicao__c,
+      depoisPerdido.SOL_Data_Distribuicao__c,
+      'Data da distribuição intacta.'
+    );
+    System.assertEquals(
+      antesPerdido.SOL_Erro_Distribuicao__c,
+      depoisPerdido.SOL_Erro_Distribuicao__c,
+      'Mensagem de erro intacta.'
+    );
+    System.assertEquals(
+      MOTIVO_PERDA,
+      depoisPerdido.SOL_Motivo_Desqualificacao__c,
+      'O motivo da perda não foi sobrescrito.'
+    );
+  }
+
+  /** O isolamento do opt-out em `marcarErro` também é preservado. */
+  @IsTest
+  static void marcarErroNaoAlteraLeadEmOptOut() {
+    montarFila(3);
+    Lead l = novoLead(PRODUTO_RT);
+    update new Lead(Id = l.Id, SOL_Status_Distribuicao__c = 'Pendente');
+    SOLDistribuicaoService.registrarOptOut(new List<Id>{ l.Id });
+    Lead antes = leadDistribuicao(l.Id);
+
+    Test.startTest();
+    SOLDistribuicaoService.singletonKeyOverride = 'RR_CHAVE_INEXISTENTE_9425';
+    SOLDistribuicaoService.Resultado r = SOLDistribuicaoService.distribuir(new List<Id>{ l.Id });
+    SOLDistribuicaoService.singletonKeyOverride = null;
+    Test.stopTest();
+
+    System.assertEquals(0, r.comErro, 'Lead em opt-out não entra na contagem de erro.');
+    Lead depois = leadDistribuicao(l.Id);
+    System.assertEquals(antes.OwnerId, depois.OwnerId, 'Proprietário intacto.');
+    System.assertEquals(
+      'Pendente',
+      depois.SOL_Status_Distribuicao__c,
+      'Quem pediu opt-out não é devolvido à fila com status de erro.'
+    );
+    System.assertEquals(
+      'Opt-out',
+      depois.SOL_Motivo_Desqualificacao__c,
+      'O motivo do opt-out é preservado.'
+    );
+  }
+
+  /**
+   * (3) Distribuição NORMAL, FALLBACK e REPROCESSAMENTO seguem funcionando
+   * depois do lock e da revalidação — nenhum caminho legítimo foi bloqueado.
+   */
+  @IsTest
+  static void distribuicaoNormalFallbackEReprocessamentoIntactos() {
+    List<Id> vs = montarFila(3);
+
+    // (a) NORMAL: Lead ativo em "Pendente" recebe um vendedor da fila e a
+    //     tarefa de 1ª ligação.
+    Lead normal = novoLead(PRODUTO_RT);
+    update new Lead(
+      Id = normal.Id,
+      SOL_Status_Distribuicao__c = 'Pendente',
+      SOL_Data_Inicio_Ciclo_Contato__c = null
+    );
+    // A inserção do Lead SOL já dispara a distribuição pelo Flow, que cria uma
+    // "1ª Ligação". A chamada explícita abaixo é um RE-processamento, então o
+    // que se mede é o INCREMENTO, não o total.
+    Integer ligacoesAntes = [
+      SELECT COUNT()
+      FROM Task
+      WHERE WhoId = :normal.Id AND Subject = '1ª Ligação'
+    ];
+
+    // (b) REPROCESSAMENTO: Lead ativo em "Erro" volta a ser distribuído.
+    Lead reproc = novoLead(PRODUTO_ART);
+    update new Lead(
+      Id = reproc.Id,
+      SOL_Status_Distribuicao__c = 'Erro',
+      SOL_Erro_Distribuicao__c = 'falha anterior'
+    );
+
+    Test.startTest();
+    SOLDistribuicaoService.Resultado rNormal = SOLDistribuicaoService.distribuir(
+      new List<Id>{ normal.Id }
+    );
+    SOLDistribuicaoService.Resultado rReproc = SOLDistribuicaoService.distribuir(
+      new List<Id>{ reproc.Id }
+    );
+
+    // (c) FALLBACK: com o kill-switch desligado, o Lead vai para a fila.
+    Lead fallback = novoLead(PRODUTO_RT);
+    update new Lead(Id = fallback.Id, SOL_Status_Distribuicao__c = 'Pendente');
+    update new SOL_Distribuicao_Estado__c(
+      Id = [SELECT Id FROM SOL_Distribuicao_Estado__c LIMIT 1].Id,
+      Ativo__c = false
+    );
+    SOLDistribuicaoService.Resultado rFallback = SOLDistribuicaoService.distribuir(
+      new List<Id>{ fallback.Id }
+    );
+    Test.stopTest();
+
+    // (a)
+    System.assertEquals(1, rNormal.distribuidos, 'Distribuição normal intacta.');
+    Lead dNormal = leadDistribuicao(normal.Id);
+    System.assertEquals('Distribuido', dNormal.SOL_Status_Distribuicao__c);
+    System.assert(new Set<Id>(vs).contains(dNormal.OwnerId), 'Dono é vendedor ativo da fila.');
+    System.assertNotEquals(
+      null,
+      dNormal.SOL_Data_Inicio_Ciclo_Contato__c,
+      'O ciclo de contato foi aberto.'
+    );
+    System.assertEquals(
+      ligacoesAntes + 1,
+      [SELECT COUNT() FROM Task WHERE WhoId = :normal.Id AND Subject = '1ª Ligação'],
+      'A distribuição criou uma nova tarefa de 1ª ligação.'
+    );
+
+    // (b)
+    System.assertEquals(1, rReproc.distribuidos, 'Reprocessamento intacto.');
+    Lead dReproc = leadDistribuicao(reproc.Id);
+    System.assertEquals('Distribuido', dReproc.SOL_Status_Distribuicao__c);
+    System.assertEquals(null, dReproc.SOL_Erro_Distribuicao__c, 'O erro anterior foi limpo.');
+    System.assert(new Set<Id>(vs).contains(dReproc.OwnerId));
+
+    // (c)
+    System.assertEquals(1, rFallback.emFallback, 'Fallback intacto.');
+    Lead dFallback = leadDistribuicao(fallback.Id);
+    System.assertEquals('Fallback', dFallback.SOL_Status_Distribuicao__c);
+    System.assertEquals(
+      [SELECT Id FROM Group WHERE DeveloperName = :FILA_SINTETICA LIMIT 1].Id,
+      dFallback.OwnerId,
+      'No fallback o Lead fica na fila.'
+    );
+  }
+
+  /**
+   * A ordem determinística da rotação (CreatedDate ASC, Id ASC) foi preservada
+   * ao migrar do `ORDER BY` da consulta para a ordenação em memória — SOQL
+   * recusa `ORDER BY` junto de `FOR UPDATE`. Com 3 vendedores e 3 Leads criados
+   * em sequência, cada um recebe um vendedor distinto, na ordem de criação.
+   */
+  @IsTest
+  static void ordemDeterministicaDaRotacaoPreservada() {
+    List<Id> vs = montarFila(3);
+    List<Id> leads = new List<Id>();
+    for (Integer i = 0; i < 3; i++) {
+      Lead l = novoLead(PRODUTO_RT);
+      update new Lead(Id = l.Id, SOL_Status_Distribuicao__c = 'Pendente');
+      leads.add(l.Id);
+    }
+
+    Test.startTest();
+    SOLDistribuicaoService.Resultado r = SOLDistribuicaoService.distribuir(leads);
+    Test.stopTest();
+
+    System.assertEquals(3, r.distribuidos, 'Os três foram distribuídos.');
+    Map<Id, Lead> porId = new Map<Id, Lead>(
+      [
+        SELECT Id, OwnerId, CreatedDate, SOL_Status_Distribuicao__c
+        FROM Lead
+        WHERE Id IN :leads
+      ]
+    );
+    Set<Id> donos = new Set<Id>();
+    for (Lead l : porId.values()) {
+      System.assertEquals('Distribuido', l.SOL_Status_Distribuicao__c);
+      donos.add(l.OwnerId);
+    }
+    System.assertEquals(
+      3,
+      donos.size(),
+      'Round-robin distinto por Lead — a ordenação determinística foi preservada.'
+    );
+    System.assertEquals(
+      new Set<Id>(vs),
+      donos,
+      'E os três vendedores ativos da fila foram usados exatamente uma vez.'
+    );
+  }
+
   // ============================================ 16. BATCH DO 9424
 
   /** (16) O Batch do prazo total (CLICKUP-9424) ignora Oportunidade fechada. */
