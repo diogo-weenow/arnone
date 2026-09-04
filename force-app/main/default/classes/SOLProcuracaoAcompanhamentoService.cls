@@ -109,7 +109,9 @@ public without sharing class SOLProcuracaoAcompanhamentoService {
           SOL_Produto_Interesse__c,
           SOL_Status_Procuracao__c,
           SOL_Data_Solicitacao_Procuracao__c,
-          RecordType.DeveloperName
+          RecordType.DeveloperName,
+          SOL_Motivo_Desqualificacao__c,
+          SOL_Opt_Out__c
         FROM Lead
         WHERE Id IN :ids
         FOR UPDATE
@@ -123,6 +125,9 @@ public without sharing class SOLProcuracaoAcompanhamentoService {
         Boolean solicitacaoValida =
           l.RecordType.DeveloperName == RECORD_TYPE_SOL &&
           l.IsConverted == false &&
+          // (CLICKUP-9425) e o negócio ainda não foi perdido.
+          !SOLNegocioPerdidoService.leadPerdido(l) &&
+
           l.Status == STATUS_PROCURACAO_SOLICITADA &&
           l.SOL_Status_Procuracao__c == STATUS_PROC_CAMPO_SOLICITADA &&
           l.SOL_Data_Solicitacao_Procuracao__c != null &&

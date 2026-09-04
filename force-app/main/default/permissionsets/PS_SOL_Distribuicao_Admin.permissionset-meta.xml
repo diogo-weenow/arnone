@@ -108,6 +108,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Task.SOL_Cancelada_Por_Perda__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Task.SOL_Data_Recebimento_Calculo_Ref__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -139,6 +144,11 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Task.SOL_Data_Solicitacao_Ref__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Task.SOL_Motivo_Cancelamento__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

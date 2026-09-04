@@ -258,21 +258,38 @@ public without sharing class SOLDistribuicaoService {
       // (3) trava o singleton: serializa o avanço do ponteiro entre transações.
       SOL_Distribuicao_Estado__c estado = bloquearSingleton();
 
-      // (7) Leads em ordem determinística, relidos DEPOIS da trava — assim uma
-      // execução concorrente enxerga o status já gravado pela outra e não
-      // redistribui. Só não convertidos: um Lead convertido já tem dono final.
-      List<Lead> carregados = [
+      // (7) Leads relidos DEPOIS da trava do singleton — assim uma execução
+      // concorrente enxerga o status já gravado pela outra e não redistribui.
+      // Só não convertidos: um Lead convertido já tem dono final.
+      //
+      // (CLICKUP-9425) FOR UPDATE também nos LEADS. Sem o lock havia uma janela
+      // real: a distribuição lia o Lead ativo, a perda confirmava em OUTRA
+      // transação e a distribuição sobrescrevia proprietário/status ou criava a
+      // tarefa de 1ª ligação num negócio já perdido. Com o lock, ou a perda
+      // commita antes (e a leitura abaixo já a enxerga) ou espera esta
+      // transação terminar. ORDEM DOS LOCKS PRESERVADA: singleton primeiro,
+      // Leads depois — a mesma de `reatribuirPorFaltaDeContato` e de
+      // `SOLPrazoTotalService`, o que evita deadlock entre eles.
+      //
+      // SOQL recusa `ORDER BY` junto de `FOR UPDATE` ("Explicit ORDER BY not
+      // allowed when locking rows"), então a ordenação determinística que a
+      // rotação exige — CreatedDate ASC, Id ASC — é aplicada em memória logo
+      // abaixo, com exatamente o mesmo critério de antes.
+      List<Lead> travados = [
         SELECT
           Id,
           OwnerId,
           CreatedDate,
           RecordType.DeveloperName,
           SOL_Status_Distribuicao__c,
-          SOL_Opt_Out__c
+          SOL_Opt_Out__c,
+          Status,
+          SOL_Motivo_Desqualificacao__c
         FROM Lead
         WHERE Id IN :ids AND IsConverted = false
-        ORDER BY CreatedDate ASC, Id ASC
+        FOR UPDATE
       ];
+      List<Lead> carregados = ordenarPorCriacao(travados);
 
       // (8)(13) filtra em memória: só Record Type SOL ainda não Distribuido.
       List<Lead> elegiveis = new List<Lead>();
@@ -289,6 +306,16 @@ public without sharing class SOLDistribuicaoService {
         }
         // (CLICKUP-9418) opt-out: não distribui nem cria tarefa de contato.
         if (l.SOL_Opt_Out__c == true) {
+          r.ignorados++;
+          continue;
+        }
+        // (CLICKUP-9425) REVALIDAÇÃO PÓS-LOCK: negócio já perdido não é
+        // redistribuído e não recebe a tarefa de 1ª ligação. Os campos vêm da
+        // leitura COM FOR UPDATE acima, então este é o estado confirmado do
+        // banco — o bloqueio vale para replay do Flow, para o Batch de
+        // reprocessamento (que chama este método com Leads antigos) e para uma
+        // perda concorrente que tenha commitado antes do nosso lock.
+        if (SOLNegocioPerdidoService.leadPerdido(l)) {
           r.ignorados++;
           continue;
         }
@@ -398,6 +425,11 @@ public without sharing class SOLDistribuicaoService {
    * nela (OwnerId da fila) com status Erro, data e mensagem controlada. Se a
    * fila estiver indisponível, grava só os campos possíveis. Nunca relança e
    * nunca toca Leads de outro Record Type.
+   *
+   * (CLICKUP-9425) Relê os Leads com FOR UPDATE e projeta Status,
+   * SOL_Motivo_Desqualificacao__c e SOL_Opt_Out__c: negócio PERDIDO e Lead em
+   * OPT-OUT ficam de fora — não têm proprietário, status, data nem mensagem de
+   * erro alterados, e não entram na contagem de `comErro`.
    */
   private static void marcarErro(
     Set<Id> ids,
@@ -415,8 +447,14 @@ public without sharing class SOLDistribuicaoService {
       // best-effort: seguir sem a fila.
     }
 
-    List<Lead> paraErro = [
-      SELECT Id
+    // (CLICKUP-9425) Releitura COM FOR UPDATE e com os campos da perda e do
+    // opt-out projetados: este método roda DEPOIS do rollback, então precisa do
+    // estado atual do banco, não do que a transação abortada tinha em memória.
+    // Sem o lock, uma perda concorrente poderia commitar entre esta leitura e o
+    // update abaixo, e o Lead perdido acabaria movido para a fila com status de
+    // erro.
+    List<Lead> candidatos = [
+      SELECT Id, Status, SOL_Motivo_Desqualificacao__c, SOL_Opt_Out__c
       FROM Lead
       WHERE
         Id IN :ids
@@ -424,14 +462,29 @@ public without sharing class SOLDistribuicaoService {
         AND IsConverted = false
         AND (SOL_Status_Distribuicao__c = null
         OR SOL_Status_Distribuicao__c != :STATUS_DISTRIBUIDO)
+      FOR UPDATE
     ];
-    for (Lead l : paraErro) {
+
+    List<Lead> paraErro = new List<Lead>();
+    for (Lead l : candidatos) {
+      // (CLICKUP-9425) negócio já perdido: NÃO altera proprietário, status,
+      // data nem mensagem de erro da distribuição. Um Lead perdido não volta
+      // para a fila e não é rotulado como falha de distribuição.
+      if (SOLNegocioPerdidoService.leadPerdido(l)) {
+        continue;
+      }
+      // (CLICKUP-9418) mesmo isolamento do opt-out que a distribuição aplica:
+      // quem pediu para não ser contatado também não é devolvido à fila.
+      if (l.SOL_Opt_Out__c == true) {
+        continue;
+      }
       if (filaId != null) {
         l.OwnerId = filaId;
       }
       l.SOL_Status_Distribuicao__c = STATUS_ERRO;
       l.SOL_Erro_Distribuicao__c = mensagem;
       l.SOL_Data_Distribuicao__c = agora;
+      paraErro.add(l);
     }
     if (!paraErro.isEmpty()) {
       // best-effort: marcar o erro nunca deve relançar nem bloquear a criação.
@@ -439,6 +492,41 @@ public without sharing class SOLDistribuicaoService {
     }
     r.comErro = paraErro.size();
     r.mensagens.add(mensagem);
+  }
+
+  /**
+   * Ordem determinística da rotação: CreatedDate ASC, Id ASC — exatamente o
+   * `ORDER BY` que a consulta usava antes do CLICKUP-9425. Passou para memória
+   * porque SOQL não aceita `ORDER BY` junto de `FOR UPDATE`. Função pura.
+   */
+  private static List<Lead> ordenarPorCriacao(List<Lead> entrada) {
+    List<LeadPorCriacao> envelopes = new List<LeadPorCriacao>();
+    for (Lead l : entrada) {
+      envelopes.add(new LeadPorCriacao(l));
+    }
+    envelopes.sort();
+    List<Lead> saida = new List<Lead>();
+    for (LeadPorCriacao e : envelopes) {
+      saida.add(e.registro);
+    }
+    return saida;
+  }
+
+  /** Envelope só para ordenar Leads por CreatedDate e, no empate, por Id. */
+  private class LeadPorCriacao implements Comparable {
+    private final Lead registro;
+
+    private LeadPorCriacao(Lead registro) {
+      this.registro = registro;
+    }
+
+    public Integer compareTo(Object outro) {
+      Lead b = ((LeadPorCriacao) outro).registro;
+      if (registro.CreatedDate != b.CreatedDate) {
+        return registro.CreatedDate < b.CreatedDate ? -1 : 1;
+      }
+      return String.valueOf(registro.Id).compareTo(String.valueOf(b.Id));
+    }
   }
 
   /**
@@ -494,6 +582,10 @@ public without sharing class SOLDistribuicaoService {
       // própria reatribuição entre transações concorrentes.
       SOL_Distribuicao_Estado__c estado = bloquearSingleton();
 
+      // (CLICKUP-9425) FOR UPDATE: este caminho roda por Flow e por varredura,
+      // sobre Leads antigos, e concorre com a desqualificação por perda — que
+      // também trava o Lead. O lock serializa os dois e garante que o estado
+      // lido abaixo é o atual.
       List<Lead> carregados = [
         SELECT
           Id,
@@ -501,9 +593,12 @@ public without sharing class SOLDistribuicaoService {
           RecordType.DeveloperName,
           SOL_Data_Inicio_Ciclo_Contato__c,
           SOL_Quantidade_Reatribuicoes__c,
-          SOL_Opt_Out__c
+          SOL_Opt_Out__c,
+          Status,
+          SOL_Motivo_Desqualificacao__c
         FROM Lead
         WHERE Id IN :ids AND IsConverted = false
+        FOR UPDATE
       ];
 
       // Só Record Type SOL e com ciclo de contato já iniciado (distribuição
@@ -523,6 +618,11 @@ public without sharing class SOLDistribuicaoService {
         // (CLICKUP-9418) opt-out: Lead desqualificado não é reatribuído e não
         // recebe nova tarefa de contato.
         if (l.SOL_Opt_Out__c == true) {
+          r.ignorados++;
+          continue;
+        }
+        // (CLICKUP-9425) negócio já perdido: não reatribui e não cria tarefa.
+        if (SOLNegocioPerdidoService.leadPerdido(l)) {
           r.ignorados++;
           continue;
         }
@@ -802,7 +902,10 @@ public without sharing class SOLDistribuicaoService {
           Id,
           RecordType.DeveloperName,
           SOL_Contato_Efetivado__c,
-          SOL_Data_Contato_Efetivado__c
+          SOL_Data_Contato_Efetivado__c,
+          Status,
+          SOL_Motivo_Desqualificacao__c,
+          SOL_Opt_Out__c
         FROM Lead
         WHERE Id IN :ids AND IsConverted = false
         FOR UPDATE
@@ -814,6 +917,13 @@ public without sharing class SOLDistribuicaoService {
       for (Lead l : carregados) {
         encontrados.add(l.Id);
         if (l.RecordType.DeveloperName != RECORD_TYPE_DEVELOPER_NAME) {
+          r.ignorados++;
+          continue;
+        }
+        // (CLICKUP-9425) negócio já perdido: não sinaliza contato efetivado nem
+        // mexe nas tarefas. SOL_Data_Contato_Efetivado__c alimenta o prazo de 30
+        // dias úteis (CLICKUP-9424) e não pode nascer depois da perda.
+        if (SOLNegocioPerdidoService.leadPerdido(l)) {
           r.ignorados++;
           continue;
         }
@@ -927,7 +1037,12 @@ public without sharing class SOLDistribuicaoService {
       sp = Database.setSavepoint();
       // Trava os Leads: serializa dois opt-outs concorrentes do mesmo Lead.
       List<Lead> carregados = [
-        SELECT Id, RecordType.DeveloperName, SOL_Opt_Out__c
+        SELECT
+          Id,
+          RecordType.DeveloperName,
+          SOL_Opt_Out__c,
+          Status,
+          SOL_Motivo_Desqualificacao__c
         FROM Lead
         WHERE Id IN :ids AND IsConverted = false
         FOR UPDATE
@@ -939,6 +1054,14 @@ public without sharing class SOLDistribuicaoService {
       for (Lead l : carregados) {
         encontrados.add(l.Id);
         if (l.RecordType.DeveloperName != RECORD_TYPE_DEVELOPER_NAME) {
+          r.ignorados++;
+          continue;
+        }
+        // (CLICKUP-9425) o Lead já foi perdido como negócio: o opt-out NÃO
+        // sobrescreve esse registro (motivo "Negócio perdido" seria trocado por
+        // "Opt-out") e não há tarefa aberta para cancelar — o encerramento por
+        // perda já fechou todas. Os dois fluxos permanecem isolados.
+        if (SOLNegocioPerdidoService.leadPerdido(l)) {
           r.ignorados++;
           continue;
         }

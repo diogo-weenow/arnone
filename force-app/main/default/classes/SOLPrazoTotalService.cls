@@ -201,6 +201,8 @@ public without sharing class SOLPrazoTotalService {
           PRODUTOS_NO_ESCOPO.contains(o.SOL_Produto_Negocio__c) &&
           // Ganho e Perdido têm IsClosed = true: nunca são reatribuídas.
           o.IsClosed == false &&
+          // (CLICKUP-9425) explícito: negócio perdido não avança mais.
+          !SOLNegocioPerdidoService.oportunidadePerdida(o) &&
           // Sem data de início ou sem prazo calculado: nenhuma inferência.
           o.SOL_Data_Inicio_Ciclo_Comercial__c != null &&
           o.SOL_Prazo_Total_Comercial__c != null &&

@@ -107,6 +107,8 @@ public with sharing class SOLSolicitarCalculoService {
           o.RecordType.DeveloperName == RT_OPP &&
           o.SOL_Produto_Negocio__c == PRODUTO_RECUPERACAO &&
           o.IsClosed == false &&
+          // (CLICKUP-9425) explícito: negócio perdido não avança mais.
+          !SOLNegocioPerdidoService.oportunidadePerdida(o) &&
           o.StageName == ETAPA_DIAGNOSTICO
         ) {
           elegiveis.add(oid);
