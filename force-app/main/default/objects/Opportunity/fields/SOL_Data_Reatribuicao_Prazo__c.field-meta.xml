@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Reatribuicao_Prazo__c</fullName>
+    <description>Data/hora em que a Oportunidade foi reatribuída por estouro do prazo total de 30 dias úteis (CLICKUP-9424). Gravada por SOLPrazoTotalService junto com o novo proprietário, o motivo e a contagem, na mesma transação. Campo técnico, somente leitura.</description>
+    <label>Data da reatribuição por prazo</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <type>DateTime</type>
+</CustomField>
