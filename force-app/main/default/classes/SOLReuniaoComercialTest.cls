@@ -306,7 +306,13 @@ private class SOLReuniaoComercialTest {
   static void leadComOptOutNaoCria() {
     Cenario c = montarCenario(2);
     Lead l = novoLeadSOL('S7', 'ART 360');
-    update new Lead(Id = l.Id, SOL_Opt_Out__c = true);
+    // Flag e motivo andam juntos: desde o D2 da homologação E2E a VR
+    // SOL_Desqualificacao_Coerente não deixa a flag de opt-out existir sozinha.
+    update new Lead(
+      Id = l.Id,
+      SOL_Opt_Out__c = true,
+      SOL_Motivo_Desqualificacao__c = 'Opt-out'
+    );
 
     Test.startTest();
     promoverParaSQL(l.Id);

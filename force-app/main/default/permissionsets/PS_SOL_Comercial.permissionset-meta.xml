@@ -55,6 +55,21 @@
     <description>Acesso aos campos da jornada da Arnone Soluções (Recuperação Tributária e ART 360). Atribuir apenas a quem atende essa BU — os campos ficam invisíveis para as demais unidades.</description>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Account.CNPJ__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.CNPJ__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Account.Unidades_Atendidas__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Event.SOL_Resultado_Reuniao__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -114,7 +129,7 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Lead.SOL_Motivo_Desqualificacao__c</field>
         <readable>true</readable>
     </fieldPermissions>

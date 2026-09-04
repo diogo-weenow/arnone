@@ -223,7 +223,7 @@
                 <field>SOL_Data_Opt_Out__c</field>
             </layoutItems>
             <layoutItems>
-                <behavior>Readonly</behavior>
+                <behavior>Edit</behavior>
                 <field>SOL_Motivo_Desqualificacao__c</field>
             </layoutItems>
         </layoutColumns>

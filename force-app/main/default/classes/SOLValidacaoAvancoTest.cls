@@ -389,12 +389,39 @@ private class SOLValidacaoAvancoTest {
 
   // ============================================================ PERMITIDOS
 
+  /**
+   * Desqualificar não é avanço de etapa: a validação de reunião/procuração do
+   * CLICKUP-9419 não se mete nisso. Desde o D2 da homologação E2E o motivo da
+   * desqualificação é obrigatório (VR SOL_Desqualificacao_Coerente), então o
+   * cenário legítimo passou a ser "desqualificar COM motivo" — e este teste
+   * segue provando que quem não barra é a validação de avanço.
+   */
   @IsTest
-  static void desqualificacaoSemprePermitida() {
+  static void desqualificacaoComMotivoSemprePermitida() {
     Lead l = novoLead('Recuperação Tributária');
     Test.startTest();
-    System.assertEquals(null, tentar(l.Id, new Lead(Status = 'Desqualificado')), 'Desqualificar sempre permitido.');
+    System.assertEquals(
+      null,
+      tentar(
+        l.Id,
+        new Lead(
+          Status = 'Desqualificado',
+          SOL_Motivo_Desqualificacao__c = 'Negócio perdido'
+        )
+      ),
+      'Desqualificar com motivo não passa pela validação de avanço.'
+    );
     Test.stopTest();
+  }
+
+  /** O motivo é obrigatório para desqualificar — quem barra é a VR do D2. */
+  @IsTest
+  static void desqualificacaoSemMotivoEhBloqueada() {
+    Lead l = novoLead('Recuperação Tributária');
+    Test.startTest();
+    String erro = tentar(l.Id, new Lead(Status = 'Desqualificado'));
+    Test.stopTest();
+    System.assertNotEquals(null, erro, 'Desqualificar sem motivo tem de falhar.');
   }
 
   @IsTest

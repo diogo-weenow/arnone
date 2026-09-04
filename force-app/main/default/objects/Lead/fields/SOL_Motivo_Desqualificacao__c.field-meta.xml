@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Motivo_Desqualificacao__c</fullName>
-    <description>Motivo estruturado da desqualificação (perda) do Lead na jornada Arnone Soluções — visível para vendedor e gestor. "Opt-out" = o Lead pediu para não ser mais contatado durante a cadência; escrito pela automação de opt-out (CLICKUP-9418). "Negócio perdido" = o negócio foi perdido antes da conversão; preenchido pelo vendedor junto de Status "Desqualificado" e SEM opt-out, é o sinal exato que aciona o encerramento automático de todas as tarefas abertas do Lead (CLICKUP-9425). Desqualificação sem um destes motivos NÃO dispara automação.</description>
+    <description>Motivo estruturado da desqualificação (perda) do Lead na jornada Arnone Soluções — visível para vendedor e gestor. "Opt-out" = o Lead pediu para não ser mais contatado durante a cadência; escrito pela automação de opt-out (CLICKUP-9418), nunca à mão. "Negócio perdido" = o negócio foi perdido antes da conversão; é o vendedor que preenche, junto de Status "Desqualificado" e SEM opt-out, e é o sinal exato que aciona o encerramento automático de todas as tarefas abertas do Lead (CLICKUP-9425). O campo é editável no PS_SOL_Comercial e somente leitura no PS_SOL_Distribuicao_Admin; a coerência entre motivo e flag de opt-out é garantida pela regra SOL_Desqualificacao_Coerente. Desqualificação sem um destes motivos é bloqueada.</description>
     <label>Motivo da desqualificação (SOL)</label>
     <required>false</required>
     <type>Picklist</type>

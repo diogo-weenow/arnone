@@ -2,13 +2,26 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Fechamento_Exige_Encerramento_Auto</fullName>
     <active>true</active>
-    <description>CLICKUP-9423: a tarefa &quot;Fechamento&quot; só conclui pela automação (Ganho marca o checkbox). OR(ISNEW(), ISCHANGED(Status)) cobre a criação já concluída. CLICKUP-9425: em &quot;Perdido&quot; ela é CANCELADA, não concluída. Sem exceção por Subject/perfil.</description>
+    <description>CLICKUP-9423: a tarefa &quot;Fechamento&quot; só conclui pela automação de Ganho. D3 da homologação E2E: também só CANCELA pelo encerramento por perda (CLICKUP-9425), com flag e motivo na mesma gravação. Sem exceção por Subject, perfil ou API.</description>
     <errorConditionFormula>AND(
   ISPICKVAL( SOL_Tipo_Tarefa__c , &quot;Fechamento&quot; ),
-  ISPICKVAL( Status , &quot;Completed&quot; ),
   OR( ISNEW(), ISCHANGED( Status ) ),
-  NOT( SOL_Encerrado_Pela_Oportunidade__c )
+  OR(
+    AND(
+      ISPICKVAL( Status , &quot;Completed&quot; ),
+      NOT( SOL_Encerrado_Pela_Oportunidade__c )
+    ),
+    AND(
+      ISPICKVAL( Status , &quot;Cancelada&quot; ),
+      NOT(
+        AND(
+          SOL_Cancelada_Por_Perda__c,
+          ISPICKVAL( SOL_Motivo_Cancelamento__c , &quot;Negócio perdido&quot; )
+        )
+      )
+    )
+  )
 )</errorConditionFormula>
     <errorDisplayField>Status</errorDisplayField>
-    <errorMessage>Esta tarefa de fechamento é concluída automaticamente quando a Oportunidade vira Ganho — e cancelada automaticamente quando vira Perdido. Encerre o negócio na Oportunidade.</errorMessage>
+    <errorMessage>Esta tarefa de fechamento é concluída automaticamente quando a Oportunidade vira Ganho e cancelada automaticamente quando vira Perdido. Encerre o negócio na Oportunidade — ela não pode ser concluída nem cancelada à mão.</errorMessage>
 </ValidationRule>
