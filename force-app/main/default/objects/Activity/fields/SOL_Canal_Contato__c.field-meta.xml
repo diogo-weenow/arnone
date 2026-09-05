@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Canal_Contato__c</fullName>
+    <description>Canal da tarefa de contato da cadência Arnone Soluções. Classificador ESTRUTURADO, gravado só pelas automações SOL — nunca o Subject, que é editável pelo vendedor. Combinado com SOL_Tipo_Tarefa__c = "Contato", SOL_Ciclo_Contato__c e SOL_Dia_Cadencia__c forma a chave lógica (Lead + ciclo + canal + dia) que garante no máximo uma tarefa por dia ativo da cadência. "Ligação" = tarefa de ligação criada por SOLCadenciaContatoService (CLICKUP-9434); "E-mail" e "WhatsApp" ficam reservados para os cards de e-mail e WhatsApp da mesma cadência, que reutilizam este mesmo campo em vez de criar flags soltas por canal. Vazio nas tarefas de contato anteriores ao CLICKUP-9434 e nas tarefas manuais.</description>
+    <label>Canal do contato SOL</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Ligação</fullName>
+                <default>false</default>
+                <label>Ligação</label>
+            </value>
+            <value>
+                <fullName>E-mail</fullName>
+                <default>false</default>
+                <label>E-mail</label>
+            </value>
+            <value>
+                <fullName>WhatsApp</fullName>
+                <default>false</default>
+                <label>WhatsApp</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

@@ -181,6 +181,21 @@
         <field>SOL_Distribuicao_Estado__c.Ultimo_Usuario__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Task.SOL_Canal_Contato__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Task.SOL_Ciclo_Contato__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Task.SOL_Dia_Cadencia__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Distribuição SOL — Operação do Estado</label>
     <objectPermissions>

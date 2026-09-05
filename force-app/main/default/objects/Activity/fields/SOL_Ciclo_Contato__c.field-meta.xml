@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Ciclo_Contato__c</fullName>
+    <description>Ciclo de contato do vendedor a que esta tarefa pertence: cópia de Lead.SOL_Data_Inicio_Ciclo_Contato__c no instante em que a tarefa foi criada. Gravado só pelas automações SOL. Como a reatribuição por falta de contato reinicia aquele campo no Lead (CLICKUP-9400), o valor congelado aqui identifica de forma estável a QUAL ciclo/vendedor a tarefa pertence, mesmo depois do Lead trocar de dono — e é o que permite recomeçar a cadência do dia 1 num novo ciclo sem colidir com as tarefas do ciclo anterior. Junto de SOL_Canal_Contato__c e SOL_Dia_Cadencia__c forma a chave de idempotência. Vazio nas tarefas anteriores ao CLICKUP-9434 e nas manuais. CLICKUP-9434.</description>
+    <label>Ciclo de contato SOL</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>DateTime</type>
+</CustomField>

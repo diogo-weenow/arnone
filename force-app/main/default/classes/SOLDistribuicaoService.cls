@@ -81,13 +81,9 @@ public without sharing class SOLDistribuicaoService {
   private static final String MOTIVO_SEM_OUTRO_VENDEDOR = 'Não havia outro vendedor ativo disponível na fila.';
 
   // ---- CLICKUP-9396: Task "1ª Ligação" + prazo em horário comercial ----
-
-  /** Assunto da Task criada após toda atribuição bem-sucedida. */
-  @TestVisible
-  private static final String SUBJECT_PRIMEIRA_LIGACAO = '1ª Ligação';
-  /** Valor de Status aberto válido na org (TaskStatus IsClosed = false). */
-  @TestVisible
-  private static final String TASK_STATUS_ABERTO = 'Open';
+  // (CLICKUP-9434) O assunto, o Status inicial e o cálculo do prazo saíram
+  // daqui: a "1ª Ligação" é o dia 1 da cadência e é montada por
+  // `SOLCadenciaContatoService`, que também atende os dias 2 e 3.
 
   // ---- CLICKUP-9417: classificação e cancelamento de tarefas de contato ----
 
@@ -115,15 +111,6 @@ public without sharing class SOLDistribuicaoService {
   /** Status de perda do Lead na org (já existente). */
   @TestVisible
   private static final String LEAD_STATUS_DESQUALIFICADO = 'Desqualificado';
-  /** Business Hours para o cálculo do prazo (etapa controlada de implantação). */
-  @TestVisible
-  private static final String BUSINESS_HOURS_NAME = 'Arnone Soluções - Horário Comercial';
-  /** Prazo operacional: 5 minutos ÚTEIS após a atribuição. */
-  @TestVisible
-  private static final Long PRAZO_CONTATO_MS = 5L * 60L * 1000L;
-
-  private static Id bhCache;
-  private static Boolean bhResolvido = false;
 
   /** Mensagens controladas — sem detalhe técnico sensível. */
   @TestVisible
@@ -362,7 +349,6 @@ public without sharing class SOLDistribuicaoService {
       }
 
       // (9) atribui em memória; um único update depois do laço.
-      Map<Id, Id> donoPorLead = new Map<Id, Id>();
       for (Integer i = 0; i < elegiveis.size(); i++) {
         Lead l = elegiveis[i];
         l.OwnerId = ativos[Math.mod(inicio + i, n)].Id;
@@ -372,14 +358,16 @@ public without sharing class SOLDistribuicaoService {
         // CLICKUP-9400: abre o ciclo de contato do vendedor que recebeu o Lead.
         l.SOL_Data_Inicio_Ciclo_Contato__c = agora;
         l.SOL_Status_Reatribuicao__c = REATRIB_EM_ACOMPANHAMENTO;
-        donoPorLead.put(l.Id, l.OwnerId);
       }
       update elegiveis;
 
       // (CLICKUP-9396) Task "1ª Ligação" — uma por atribuição bem-sucedida.
+      // (CLICKUP-9434) É o DIA 1 da cadência; o ciclo gravado na tarefa é o que
+      // acabou de ser aberto acima, então a chave Lead+ciclo+canal+dia é inédita
+      // por construção e a distribuição não pode duplicar a ligação.
       // Dentro do try/Savepoint: se a criação falhar, o rollback desfaz o Owner
       // e o ponteiro NÃO avança (nenhuma inconsistência).
-      List<Task> tarefasLigacao = montarTasksPrimeiraLigacao(donoPorLead, agora);
+      List<Task> tarefasLigacao = montarTasksPrimeiraLigacao(elegiveis, agora);
       if (!tarefasLigacao.isEmpty()) {
         insert tarefasLigacao;
       }
@@ -731,7 +719,7 @@ public without sharing class SOLDistribuicaoService {
 
       Id ponteiroNovo = estado.Ultimo_Usuario__c;
       List<Lead> leadsAlterados = new List<Lead>();
-      Map<Id, Id> donoPorLeadReatribuido = new Map<Id, Id>();
+      List<Lead> reatribuidos = new List<Lead>();
 
       for (Lead l : paraReatribuir) {
         Id escolhido = proximoVendedorExcluindo(ativos, cursor, l.OwnerId);
@@ -780,18 +768,18 @@ public without sharing class SOLDistribuicaoService {
         leadsAlterados.add(l);
         ponteiroNovo = escolhido;
         r.reatribuidos++;
-        donoPorLeadReatribuido.put(l.Id, escolhido);
+        reatribuidos.add(l);
       }
 
       if (!leadsAlterados.isEmpty()) {
         update leadsAlterados;
       }
       // (CLICKUP-9396) Task "1ª Ligação" — uma por reatribuição efetivada.
+      // (CLICKUP-9434) É o DIA 1 do NOVO ciclo: cada Lead leva consigo o
+      // `novoCiclo` gravado acima, então a tarefa nasce com o ciclo correto e
+      // não colide com as ligações do ciclo do vendedor anterior.
       // Dentro do try/Savepoint: falha aqui faz rollback e o ponteiro não avança.
-      List<Task> tarefasNovas = montarTasksPrimeiraLigacao(
-        donoPorLeadReatribuido,
-        agora
-      );
+      List<Task> tarefasNovas = montarTasksPrimeiraLigacao(reatribuidos, agora);
       if (!tarefasNovas.isEmpty()) {
         insert tarefasNovas;
       }
@@ -1131,68 +1119,31 @@ public without sharing class SOLDistribuicaoService {
   /**
    * Monta, em bulk, a Task "1ª Ligação" para cada Lead recém-atribuído.
    * Reutilizada pela distribuição inicial (incl. reprocessamento que distribui)
-   * e pela reatribuição por falta de contato. NÃO faz SOQL/DML em laço — o
-   * Business Hours é resolvido uma única vez. O chamador insere as Tasks dentro
+   * e pela reatribuição por falta de contato. O chamador insere as Tasks dentro
    * da mesma transação/Savepoint do serviço.
    *
-   * Prazo = 5 minutos ÚTEIS após `atribuicao`, calculado com `BusinessHours.add`
-   * sobre o Business Hours "Arnone Soluções - Horário Comercial": se a
-   * atribuição cai fora do expediente a contagem começa no próximo período
-   * útil; se o expediente encerra no meio dos 5 minutos, o saldo segue no
-   * próximo período. Sem cálculo manual de fim de semana.
+   * (CLICKUP-9434) A montagem em si vive agora em `SOLCadenciaContatoService`:
+   * a "1ª Ligação" é o DIA 1 da cadência de contato e sai de lá já classificada
+   * como canal Ligação, dia 1 e ciclo do vendedor. O prazo continua sendo de 5
+   * minutos ÚTEIS após `atribuicao`. Este método permanece como o ÚNICO ponto
+   * de criação no caminho da distribuição — não há automação concorrente.
    *
-   * @param donoPorLead Lead Id -> OwnerId (vendedor que recebeu o Lead)
-   * @param atribuicao  instante da atribuição/reatribuição
+   * Cada Lead de `atribuidos` já traz, em memória, o `OwnerId` e o
+   * `SOL_Data_Inicio_Ciclo_Contato__c` do ciclo que acabou de ser aberto (na
+   * reatribuição o ciclo não é necessariamente `atribuicao`).
+   *
+   * @param atribuidos Leads que receberam dono nesta transação
+   * @param atribuicao instante da atribuição/reatribuição
    */
   @TestVisible
   private static List<Task> montarTasksPrimeiraLigacao(
-    Map<Id, Id> donoPorLead,
+    List<Lead> atribuidos,
     Datetime atribuicao
   ) {
-    List<Task> tarefas = new List<Task>();
-    if (donoPorLead == null || donoPorLead.isEmpty()) {
-      return tarefas;
-    }
-    Id bhId = businessHoursComercialId();
-    for (Id leadId : donoPorLead.keySet()) {
-      Datetime prazo = (bhId != null)
-        ? BusinessHours.add(bhId, atribuicao, PRAZO_CONTATO_MS)
-        : atribuicao.addMinutes(5);
-      tarefas.add(
-        new Task(
-          Subject = SUBJECT_PRIMEIRA_LIGACAO,
-          WhoId = leadId,
-          OwnerId = donoPorLead.get(leadId),
-          Status = TASK_STATUS_ABERTO,
-          ActivityDate = prazo.dateGmt(),
-          SOL_Prazo_Contato__c = prazo,
-          // CLICKUP-9417: classificador técnico (o Subject é editável e não deve
-          // ser a identificação da tarefa de contato).
-          SOL_Tipo_Tarefa__c = TIPO_TAREFA_CONTATO
-          // SOL_Resultado_Contato__c fica vazio (preenchido pelo vendedor).
-        )
-      );
-    }
-    return tarefas;
-  }
-
-  /**
-   * Id do Business Hours "Arnone Soluções - Horário Comercial" (ativo), ou null
-   * se ainda não foi criado. Resolvido uma única vez por transação.
-   */
-  @TestVisible
-  private static Id businessHoursComercialId() {
-    if (!bhResolvido) {
-      List<BusinessHours> bhs = [
-        SELECT Id
-        FROM BusinessHours
-        WHERE Name = :BUSINESS_HOURS_NAME AND IsActive = true
-        LIMIT 1
-      ];
-      bhCache = bhs.isEmpty() ? null : bhs[0].Id;
-      bhResolvido = true;
-    }
-    return bhCache;
+    return SOLCadenciaContatoService.montarPrimeirasLigacoes(
+      atribuidos,
+      atribuicao
+    );
   }
 
   // =====================================================================

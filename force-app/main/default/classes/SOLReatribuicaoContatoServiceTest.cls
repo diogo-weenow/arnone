@@ -808,7 +808,9 @@ private class SOLReatribuicaoContatoServiceTest {
     Datetime atribuicao = d.SOL_Data_Ultima_Reatribuicao__c;
     System.assertNotEquals(null, pl[0].SOL_Prazo_Contato__c);
 
-    Id bhId = SOLDistribuicaoService.businessHoursComercialId();
+    // (CLICKUP-9434) O calendário passou a ser resolvido pela fonte única
+    // `SOLBusinessHoursHelper`; o wrapper duplicado do serviço foi removido.
+    Id bhId = SOLBusinessHoursHelper.businessHoursId();
     System.assertNotEquals(
       null,
       bhId,

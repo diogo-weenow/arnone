@@ -46,3 +46,6 @@ $RECYCLE.BIN/
 **/__pycache__/
 **/.venv/
 **/venv/
+
+# Contratos e respostas operacionais dos agentes (registro local, não versionado)
+.agent-handoffs/
