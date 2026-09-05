@@ -1841,8 +1841,11 @@ private class SOLCadenciaContatoTest {
 
   // ------------------------- conclusão e isolamento dos dois resultados
   //
-  //  Duas VRs novas, cada uma com um recorte próprio:
-  //  SOL_Resultado_Envio_Obrigatorio  — não conclui e-mail sem resultado;
+  //  Duas VRs novas, ambas recortadas pela CLASSIFICAÇÃO da tarefa
+  //  (Tipo = Contato + Canal = E-mail), nunca pela origem automática:
+  //  SOL_Resultado_Envio_Obrigatorio  — nenhuma tarefa de e-mail entra em
+  //                                     Completed sem resultado do envio,
+  //                                     com ou sem dia de cadência;
   //  SOL_Email_Sem_Resultado_Ligacao  — e-mail nunca recebe resultado de
   //                                     ligação, que é o gatilho de contato
   //                                     efetivado, opt-out e reatribuição.
@@ -2044,17 +2047,16 @@ private class SOLCadenciaContatoTest {
   }
 
   /**
-   * (8) A VR de envio é isolada pelo canal E pelo dia: uma tarefa de contato
-   * sem os classificadores da cadência não é alcançada.
+   * (8) A VR de envio alcança QUALQUER tarefa classificada como e-mail, tenha
+   * ou não dia de cadência: o que a define é a CLASSIFICAÇÃO (Tipo = Contato,
+   * Canal = E-mail), não a origem automática. Uma tarefa de e-mail criada à
+   * mão exige o resultado do envio do mesmo jeito.
    */
   @IsTest
-  static void vrDeEnvioSoAlcancaEmailDaCadencia() {
+  static void emailSemDiaDeCadenciaTambemExigeResultado() {
     montarCenario(1);
     Lead l = leadsDistribuidos(1)[0];
-
-    Test.startTest();
-    // Tarefa de e-mail SEM dia de cadência: fora do escopo da regra.
-    Task solta = new Task(
+    Task manual = new Task(
       Subject = 'E-mail manual',
       WhoId = l.Id,
       OwnerId = l.OwnerId,
@@ -2062,14 +2064,137 @@ private class SOLCadenciaContatoTest {
       SOL_Tipo_Tarefa__c = TIPO_CONTATO,
       SOL_Canal_Contato__c = CANAL_EMAIL
     );
-    insert solta;
-    update new Task(Id = solta.Id, Status = STATUS_CONCLUIDO);
+    insert manual;
+    System.assertEquals(
+      null,
+      [SELECT SOL_Dia_Cadencia__c FROM Task WHERE Id = :manual.Id]
+        .SOL_Dia_Cadencia__c,
+      'Pré-condição: esta tarefa NÃO tem dia de cadência.'
+    );
+
+    Test.startTest();
+    String erro = '';
+    try {
+      update new Task(Id = manual.Id, Status = STATUS_CONCLUIDO);
+    } catch (DmlException e) {
+      erro = e.getMessage();
+    }
+    // E com o resultado preenchido conclui normalmente.
+    update new Task(
+      Id = manual.Id,
+      SOL_Resultado_Envio__c = RES_ENVIADO,
+      Status = STATUS_CONCLUIDO
+    );
     Test.stopTest();
 
+    System.assert(
+      erro.contains('resultado do envio'),
+      'Sem dia de cadência a regra continua valendo: é o canal que a define. Recebido: ' +
+        erro
+    );
+    Task depois = [
+      SELECT Status, SOL_Resultado_Envio__c, SOL_Dia_Cadencia__c
+      FROM Task
+      WHERE Id = :manual.Id
+    ];
+    System.assertEquals(STATUS_CONCLUIDO, depois.Status, 'Com resultado, conclui.');
+    System.assertEquals(RES_ENVIADO, depois.SOL_Resultado_Envio__c, 'Resultado gravado.');
+    System.assertEquals(
+      null,
+      depois.SOL_Dia_Cadencia__c,
+      'E segue sem dia de cadência — o dia nunca foi condição da regra.'
+    );
+  }
+
+  /**
+   * (8) Limpar o dia da cadência NA MESMA gravação em que se conclui não burla
+   * a regra. Enquanto a condição do dia existia, esta era a rota de fuga: a VR
+   * avalia o registro DEPOIS da alteração, então zerar o dia junto com o
+   * Status desligava a regra e fechava a tarefa sem resultado.
+   */
+  @IsTest
+  static void limparODiaNaMesmaGravacaoNaoBurlaARegra() {
+    montarCenario(1);
+    Lead l = leadsDistribuidos(1)[0];
+    criarEmail(
+      new List<SOLCadenciaContatoService.Solicitacao>{
+        pedido(l.Id, 2, Date.today().addDays(4))
+      }
+    );
+    Id emailId = emailsDoDia(l.Id, 2)[0].Id;
+
+    Test.startTest();
+    String erro = '';
+    try {
+      update new Task(
+        Id = emailId,
+        SOL_Dia_Cadencia__c = null,
+        Status = STATUS_CONCLUIDO
+      );
+    } catch (DmlException e) {
+      erro = e.getMessage();
+    }
+    Test.stopTest();
+
+    System.assert(
+      erro.contains('resultado do envio'),
+      'Zerar o dia junto com a conclusão tem de continuar bloqueado. Recebido: ' +
+        erro
+    );
+    Task depois = [
+      SELECT Status, SOL_Dia_Cadencia__c, SOL_Resultado_Envio__c
+      FROM Task
+      WHERE Id = :emailId
+    ];
+    System.assertEquals(STATUS_ABERTO, depois.Status, 'A tarefa continua aberta.');
+    System.assertEquals(
+      2,
+      depois.SOL_Dia_Cadencia__c.intValue(),
+      'E a gravação inteira foi desfeita: o dia não foi apagado.'
+    );
+    System.assertEquals(null, depois.SOL_Resultado_Envio__c, 'Sem resultado.');
+  }
+
+  /**
+   * (8) Tarefa comum, sem o canal E-mail, segue INTEIRAMENTE fora da regra —
+   * a VR não pode virar uma obrigação genérica sobre as tarefas da org.
+   */
+  @IsTest
+  static void tarefaComumSegueForaDaRegraDoEnvio() {
+    montarCenario(1);
+    Lead l = leadsDistribuidos(1)[0];
+
+    Test.startTest();
+    // Sem tipo e sem canal: uma tarefa manual qualquer.
+    Task comum = new Task(
+      Subject = 'Retornar ligação do financeiro',
+      WhoId = l.Id,
+      OwnerId = l.OwnerId,
+      Status = STATUS_ABERTO
+    );
+    insert comum;
+    update new Task(Id = comum.Id, Status = STATUS_CONCLUIDO);
+    Test.stopTest();
+
+    Task depois = [
+      SELECT Status, SOL_Resultado_Envio__c, SOL_Canal_Contato__c
+      FROM Task
+      WHERE Id = :comum.Id
+    ];
     System.assertEquals(
       STATUS_CONCLUIDO,
-      [SELECT Status FROM Task WHERE Id = :solta.Id].Status,
-      'Sem dia de cadência a VR de envio não se aplica: a regra é da tarefa DIÁRIA.'
+      depois.Status,
+      'Tarefa sem canal E-mail conclui sem resultado do envio.'
+    );
+    System.assertEquals(
+      null,
+      depois.SOL_Canal_Contato__c,
+      'Pré-condição: ela não é do canal E-mail.'
+    );
+    System.assertEquals(
+      null,
+      depois.SOL_Resultado_Envio__c,
+      'E não ganha resultado do envio nenhum.'
     );
   }
 

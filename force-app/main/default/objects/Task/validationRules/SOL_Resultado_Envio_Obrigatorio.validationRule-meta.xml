@@ -2,11 +2,10 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Resultado_Envio_Obrigatorio</fullName>
     <active>true</active>
-    <description>CLICKUP-9435: exige o resultado do envio para concluir a tarefa de e-mail da cadência SOL (Tipo=Contato, Canal=E-mail, com dia de cadência). Só em Completed — cancelamento por contato efetivado, opt-out ou perda fecha a tarefa sem resultado.</description>
+    <description>CLICKUP-9435: exige o resultado do envio para concluir QUALQUER tarefa classificada como e-mail SOL (Tipo=Contato, Canal=E-mail), tenha ou não dia de cadência. Só em Completed: cancelamento por contato efetivado, opt-out ou perda fecha sem resultado.</description>
     <errorConditionFormula>AND(
   ISPICKVAL( SOL_Tipo_Tarefa__c , &quot;Contato&quot; ),
   ISPICKVAL( SOL_Canal_Contato__c , &quot;E-mail&quot; ),
-  NOT( ISBLANK( SOL_Dia_Cadencia__c ) ),
   ISPICKVAL( Status , &quot;Completed&quot; ),
   ISBLANK( TEXT( SOL_Resultado_Envio__c ) )
 )</errorConditionFormula>
