@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Activity.SOL_Canal_Contato__c</members>
+        <members>Activity.SOL_Ciclo_Contato__c</members>
+        <members>Activity.SOL_Dia_Cadencia__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>Task.SOL_Resultado_Obrigatorio_Concluir</members>
+        <name>ValidationRule</name>
+    </types>
+    <types>
+        <members>Task-Task Layout</members>
+        <name>Layout</name>
+    </types>
+    <types>
+        <members>PS_SOL_Comercial</members>
+        <members>PS_SOL_Distribuicao_Admin</members>
+        <name>PermissionSet</name>
+    </types>
+    <types>
+        <members>SOLCadenciaContatoService</members>
+        <members>SOLCadenciaContatoTest</members>
+        <members>SOLDistribuicaoService</members>
+        <members>SOLReatribuicaoContatoServiceTest</members>
+        <name>ApexClass</name>
+    </types>
+    <version>66.0</version>
+</Package>
