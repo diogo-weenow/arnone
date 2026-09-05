@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Resultado_Envio__c</fullName>
+    <description>Desfecho do ENVIO na tarefa de cadência da Arnone Soluções — canal E-mail (CLICKUP-9435) e, no futuro, WhatsApp, que reusa este mesmo campo. Preenchido pelo vendedor ao concluir; nasce VAZIO e permanece vazio quando a tarefa é cancelada pela automação. "Enviado" significa apenas que a mensagem SAIU — NÃO que o Lead respondeu; o retorno do Lead é sinal separado e manual, escopo do CLICKUP-9447. Este campo é DELIBERADAMENTE distinto de SOL_Resultado_Contato__c: aquele é de LIGAÇÃO e seus valores acionam contato efetivado (9417), opt-out (9418) e a contagem de 3 tentativas para reatribuição (9400) através de Flows que não filtram canal. Por isso é PROIBIDO acrescentar aqui "Atendeu", "Respondeu", "Opt-out" ou qualquer valor que signifique contato efetivado — misturar os dois resultados recriaria o acoplamento que este campo existe para evitar.</description>
+    <label>Resultado do envio</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Enviado</fullName>
+                <default>false</default>
+                <label>Enviado</label>
+            </value>
+            <value>
+                <fullName>Não enviado</fullName>
+                <default>false</default>
+                <label>Não enviado</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

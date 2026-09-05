@@ -1,12 +1,26 @@
 /**
- * CLICKUP-9434 — Criação da tarefa DIÁRIA de ligação da cadência de contato da
- * Arnone Soluções (Record Type `SOL`).
+ * CLICKUP-9434 / 9435 — Criação das tarefas DIÁRIAS da cadência de contato da
+ * Arnone Soluções (Record Type `SOL`): LIGAÇÃO e E-MAIL.
  *
- * ESCOPO DESTE CARD: o COMPONENTE de criação da tarefa de ligação, com um
- * contrato estável para o motor agendado da cadência (CLICKUP-9398), que será
- * implementado depois e é quem decide QUANDO cada dia ativo vence. Este serviço
- * não agenda nada, não varre Leads e não encerra cadência: ele apenas cria, de
- * forma idempotente, a tarefa de ligação de um dia ativo que lhe for pedido.
+ * ESCOPO: os COMPONENTES de criação, com um contrato estável para o motor
+ * agendado da cadência (CLICKUP-9398), que será implementado depois e é quem
+ * decide QUANDO cada dia ativo vence. Este serviço não agenda nada, não varre
+ * Leads e não encerra cadência: ele apenas cria, de forma idempotente, a tarefa
+ * do dia ativo que lhe for pedido.
+ *
+ * DUAS PORTAS, UM NÚCLEO (CLICKUP-9435) — `criarLigacoes` e `criarEmails` são
+ * fachadas de uma linha sobre `criarTarefasDaCadencia`, que carrega o canal como
+ * parâmetro PRIVADO. O canal viaja por LOTE, nunca dentro da `Solicitacao`:
+ * cada chamada processa um único canal, então a chave de idempotência é sempre
+ * construída com o mesmo canal que filtrou a consulta de chaves existentes, e
+ * "ler a chave de um canal e atribuí-la a outro" é impossível por construção.
+ * O DTO segue cego ao canal e a assinatura de `criarLigacoes` está intacta.
+ *
+ * E-MAIL x LIGAÇÃO — o que difere está isolado em três pontos: o vencimento é
+ * obrigatório em TODOS os dias do e-mail (nada é derivado de prazo), o e-mail
+ * não recebe `SOL_Prazo_Contato__c` e o resultado do envio mora em
+ * `SOL_Resultado_Envio__c`. Ligação e e-mail COEXISTEM no mesmo Lead, ciclo e
+ * dia, porque o canal entra na chave.
  *
  * DIA 1 — a Task "1ª Ligação" que a distribuição e a reatribuição já criavam
  * (CLICKUP-9396 / 9400) passa a ser, formalmente, a ligação do dia 1. A lógica
@@ -28,7 +42,7 @@
  * Reprocessar o mesmo pedido não cria duplicata — inclusive quando a tarefa
  * anterior já foi concluída ou cancelada, porque a checagem ignora o Status.
  *
- * CONCORRÊNCIA — `criarLigacoes` trava os Leads com `FOR UPDATE` ANTES de ler as
+ * CONCORRÊNCIA — o núcleo trava os Leads com `FOR UPDATE` ANTES de ler as
  * tarefas existentes. Duas execuções simultâneas sobre o mesmo Lead são
  * serializadas pelo banco: a segunda só lê depois do commit da primeira e
  * enxerga a tarefa que ela criou. Nenhum lock de singleton é tomado aqui, então
@@ -45,13 +59,19 @@ public without sharing class SOLCadenciaContatoService {
   /** Record Type de Lead atendido — nenhuma outra BU é afetada. */
   public static final String RECORD_TYPE_DEVELOPER_NAME = 'SOL';
 
-  /** Canal desta cadência. Os cards de e-mail e WhatsApp reusam o campo. */
+  /** Canal de LIGAÇÃO da cadência. */
   public static final String CANAL_LIGACAO = 'Ligação';
+
+  /**
+   * Canal de E-MAIL da cadência (CLICKUP-9435). Grafia byte-exata do value set
+   * restrito de `SOL_Canal_Contato__c`: hífen e "E" maiúsculo.
+   */
+  public static final String CANAL_EMAIL = 'E-mail';
 
   /** Primeiro dia ativo: a tarefa que a distribuição/reatribuição já cria. */
   public static final Integer DIA_PRIMEIRA_LIGACAO = 1;
 
-  /** Último dia ativo previsto para a cadência de ligação. */
+  /** Último dia ativo previsto para a cadência, nos dois canais. */
   public static final Integer DIA_MAXIMO = 3;
 
   /** Classificador técnico compartilhado com o CLICKUP-9417 (cancelamentos). */
@@ -77,15 +97,37 @@ public without sharing class SOLCadenciaContatoService {
     3 => '3ª Ligação'
   };
 
+  /**
+   * Rótulo das tarefas de e-mail (CLICKUP-9435). Também é RÓTULO, nunca chave:
+   * o vendedor pode editar o Subject e a idempotência não depende dele.
+   */
+  @TestVisible
+  private static final Map<Integer, String> SUBJECT_EMAIL_POR_DIA = new Map<Integer, String>{
+    1 => '1º E-mail',
+    2 => '2º E-mail',
+    3 => '3º E-mail'
+  };
+
   /** Mensagem controlada — sem detalhe técnico sensível. */
   @TestVisible
   private static final String MSG_ERRO_GENERICO = 'Não foi possível criar as tarefas de ligação agora. Nenhuma alteração foi salva.';
 
+  /** Mensagem controlada do canal e-mail (CLICKUP-9435). */
+  @TestVisible
+  private static final String MSG_ERRO_GENERICO_EMAIL = 'Não foi possível criar as tarefas de e-mail agora. Nenhuma alteração foi salva.';
+
   /**
-   * Pedido de criação de UMA tarefa de ligação, emitido pelo motor da cadência.
+   * Pedido de criação de UMA tarefa de contato, emitido pelo motor da cadência.
    *
-   * `leadId` e `dia` (1..3) são obrigatórios. `vencimento` é obrigatório nos
-   * dias 2 e 3 e IGNORADO no dia 1, cujo prazo são 5 minutos úteis.
+   * `leadId` e `dia` (1..3) são obrigatórios. O significado de `vencimento`
+   * depende da PORTA usada, não de um campo de canal — o DTO é deliberadamente
+   * cego ao canal (CLICKUP-9435):
+   *
+   * - por `criarLigacoes`: obrigatório nos dias 2 e 3 e IGNORADO no dia 1, cujo
+   *   prazo são 5 minutos úteis a partir da atribuição;
+   * - por `criarEmails`: OBRIGATÓRIO em todos os dias, inclusive no dia 1 — não
+   *   existe "e-mail 5 minutos após a atribuição", quem decide o dia útil é o
+   *   motor.
    */
   public class Solicitacao {
     public Id leadId;
@@ -104,9 +146,9 @@ public without sharing class SOLCadenciaContatoService {
 
   /** Resultado controlado. Sem detalhe técnico sensível. */
   public class Resultado {
-    /** Tarefas de ligação efetivamente criadas. */
+    /** Tarefas efetivamente criadas no canal da porta chamada. */
     public Integer criadas = 0;
-    /** Pedidos que já tinham tarefa para o mesmo Lead + ciclo + dia. */
+    /** Pedidos que já tinham tarefa para o mesmo Lead + ciclo + canal + dia. */
     public Integer jaExistentes = 0;
     /** Pedidos inválidos ou de Lead fora do escopo da cadência. */
     public Integer ignoradas = 0;
@@ -137,6 +179,59 @@ public without sharing class SOLCadenciaContatoService {
    * @param solicitacoes pedidos do motor. Nulo/vazio devolve resultado zerado.
    */
   public static Resultado criarLigacoes(List<Solicitacao> solicitacoes) {
+    return criarTarefasDaCadencia(solicitacoes, CANAL_LIGACAO);
+  }
+
+  /**
+   * Cria, em bulk e de forma idempotente, a tarefa de E-MAIL de cada pedido
+   * (CLICKUP-9435). Porta gêmea de `criarLigacoes`: mesmo núcleo de
+   * elegibilidade, lock, idempotência e atomicidade; o que muda é o CANAL, que
+   * viaja por LOTE e não dentro da `Solicitacao` — nenhum parâmetro público de
+   * canal é exposto.
+   *
+   * Diferenças de contrato em relação à ligação, todas derivadas do card:
+   *
+   * - `vencimento` é OBRIGATÓRIO em TODOS os dias, inclusive o dia 1. Não há
+   *   "e-mail 5 minutos úteis após a atribuição": quem calcula o dia útil é o
+   *   motor, e o valor recebido é gravado em `ActivityDate` como está;
+   * - `SOL_Prazo_Contato__c` fica NULO — aquele campo é o SLA de 5 minutos da
+   *   primeira LIGAÇÃO e é o que ativa o primeiro ramo da VR
+   *   `SOL_Resultado_Obrigatorio_Concluir`. Deixá-lo nulo é o que mantém a VR de
+   *   ligação inerte sobre a tarefa de e-mail, cuja obrigatoriedade de resultado
+   *   é imposta pela VR própria `SOL_Resultado_Envio_Obrigatorio`;
+   * - o resultado do envio mora em `SOL_Resultado_Envio__c`, JAMAIS em
+   *   `SOL_Resultado_Contato__c` — a VR `SOL_Email_Sem_Resultado_Ligacao`
+   *   bloqueia essa mistura, porque os três Flows de contato efetivado, opt-out
+   *   e reatribuição disparam por VALOR daquele campo e são cegos ao canal.
+   *
+   * Um pedido é IGNORADO (sem erro) pelas mesmas razões da ligação, mais a
+   * ausência de vencimento em qualquer dia.
+   *
+   * @param solicitacoes pedidos do motor. Nulo/vazio devolve resultado zerado.
+   */
+  public static Resultado criarEmails(List<Solicitacao> solicitacoes) {
+    return criarTarefasDaCadencia(solicitacoes, CANAL_EMAIL);
+  }
+
+  // =====================================================================
+  //  NÚCLEO PRIVADO COMPARTILHADO PELAS DUAS PORTAS (CLICKUP-9435)
+  // =====================================================================
+
+  /**
+   * Corpo único de criação, parametrizado pelo canal do LOTE. Extraído de
+   * `criarLigacoes` sem alterar uma linha do comportamento de ligação: a única
+   * generalização é o canal, que entra na chave de idempotência, no filtro e na
+   * projeção da consulta de chaves, no Subject e no campo gravado.
+   *
+   * O canal é privado de propósito: cada porta pública processa UM canal por
+   * chamada, então a chave é sempre construída com o mesmo canal que filtrou a
+   * consulta — o defeito de "ler chave de um canal e atribuí-la a outro" é
+   * impossível por construção, e não apenas evitado por cuidado.
+   */
+  private static Resultado criarTarefasDaCadencia(
+    List<Solicitacao> solicitacoes,
+    String canal
+  ) {
     Resultado r = new Resultado();
     if (solicitacoes == null || solicitacoes.isEmpty()) {
       return r;
@@ -146,7 +241,7 @@ public without sharing class SOLCadenciaContatoService {
     List<Solicitacao> validas = new List<Solicitacao>();
     Set<Id> leadIds = new Set<Id>();
     for (Solicitacao s : solicitacoes) {
-      if (!solicitacaoValida(s)) {
+      if (!solicitacaoValida(s, canal)) {
         r.ignoradas++;
         continue;
       }
@@ -163,9 +258,14 @@ public without sharing class SOLCadenciaContatoService {
       Map<Id, Lead> elegiveis = carregarLeadsElegiveis(leadIds);
 
       // (3) chaves já materializadas — lidas DEPOIS do lock, uma única vez.
-      Set<String> chavesOcupadas = chavesExistentes(elegiveis.keySet());
+      Set<String> chavesOcupadas = chavesExistentes(elegiveis.keySet(), canal);
 
-      Id bhId = SOLBusinessHoursHelper.businessHoursId();
+      // O calendário só é resolvido no caminho que realmente usa prazo em
+      // minutos úteis. O e-mail não tem SLA de minutos e não paga essa consulta.
+      Boolean usaPrazoDeAtribuicao = CANAL_LIGACAO.equals(canal);
+      Id bhId = usaPrazoDeAtribuicao
+        ? SOLBusinessHoursHelper.businessHoursId()
+        : null;
       Datetime agora = System.now();
 
       List<Task> novas = new List<Task>();
@@ -178,6 +278,7 @@ public without sharing class SOLCadenciaContatoService {
         String chave = chaveCadencia(
           l.Id,
           l.SOL_Data_Inicio_Ciclo_Contato__c,
+          canal,
           s.dia
         );
         // Cobre a duplicata já gravada E a duplicata dentro do próprio lote.
@@ -189,7 +290,7 @@ public without sharing class SOLCadenciaContatoService {
 
         Datetime prazoContato = null;
         Date vencimento = s.vencimento;
-        if (s.dia == DIA_PRIMEIRA_LIGACAO) {
+        if (usaPrazoDeAtribuicao && s.dia == DIA_PRIMEIRA_LIGACAO) {
           prazoContato = prazoPrimeiraLigacao(bhId, agora);
           vencimento = prazoContato.dateGmt();
         }
@@ -197,6 +298,7 @@ public without sharing class SOLCadenciaContatoService {
           montarTarefa(
             l.Id,
             l.OwnerId,
+            canal,
             s.dia,
             l.SOL_Data_Inicio_Ciclo_Contato__c,
             vencimento,
@@ -214,7 +316,9 @@ public without sharing class SOLCadenciaContatoService {
       Database.rollback(sp);
       System.debug(
         LoggingLevel.ERROR,
-        'SOLCadenciaContatoService.criarLigacoes: ' +
+        'SOLCadenciaContatoService.criarTarefasDaCadencia(' +
+          canal +
+          '): ' +
           e.getTypeName() +
           ': ' +
           e.getMessage() +
@@ -224,7 +328,9 @@ public without sharing class SOLCadenciaContatoService {
       // Resultado NOVO: as contagens parciais acima foram desfeitas.
       Resultado erro = new Resultado();
       erro.comErro = validas.size();
-      erro.mensagens.add(MSG_ERRO_GENERICO);
+      erro.mensagens.add(
+        CANAL_LIGACAO.equals(canal) ? MSG_ERRO_GENERICO : MSG_ERRO_GENERICO_EMAIL
+      );
       return erro;
     }
   }
@@ -273,6 +379,9 @@ public without sharing class SOLCadenciaContatoService {
         montarTarefa(
           l.Id,
           l.OwnerId,
+          // A distribuição só cria LIGAÇÃO: não existe "e-mail 5 minutos úteis
+          // após a atribuição", e o e-mail entra apenas pelo motor.
+          CANAL_LIGACAO,
           DIA_PRIMEIRA_LIGACAO,
           l.SOL_Data_Inicio_Ciclo_Contato__c,
           prazo.dateGmt(),
@@ -300,27 +409,45 @@ public without sharing class SOLCadenciaContatoService {
   // =====================================================================
 
   /**
-   * Chave lógica da tarefa: Lead + canal + ciclo + dia. Os milissegundos do
-   * ciclo são descartados porque campos DateTime do Salesforce têm precisão de
-   * SEGUNDO — comparar o valor em memória com o valor relido do banco só é
-   * confiável na mesma granularidade.
+   * Chave lógica da tarefa: Lead + canal + ciclo + dia. O canal passou a ser
+   * PARÂMETRO (CLICKUP-9435): antes era a constante de ligação embutida, o que
+   * fazia ligação e e-mail disputarem a mesma chave. Com o canal recebido, os
+   * dois canais coexistem no mesmo Lead, ciclo e dia sem se bloquearem.
+   *
+   * Os milissegundos do ciclo são descartados porque campos DateTime do
+   * Salesforce têm precisão de SEGUNDO — comparar o valor em memória com o
+   * valor relido do banco só é confiável na mesma granularidade.
    */
   @TestVisible
-  private static String chaveCadencia(Id leadId, Datetime ciclo, Integer dia) {
-    if (leadId == null || ciclo == null || dia == null) {
+  private static String chaveCadencia(
+    Id leadId,
+    Datetime ciclo,
+    String canal,
+    Integer dia
+  ) {
+    if (leadId == null || ciclo == null || dia == null || String.isBlank(canal)) {
       return null;
     }
     return String.valueOf(leadId).left(15) +
       '|' +
-      CANAL_LIGACAO +
+      canal +
       '|' +
       String.valueOf(ciclo.getTime() / 1000) +
       '|' +
       String.valueOf(dia);
   }
 
-  /** Pedido bem formado? Sem acesso ao banco. */
-  private static Boolean solicitacaoValida(Solicitacao s) {
+  /**
+   * Pedido bem formado para o canal do lote? Sem acesso ao banco.
+   *
+   * A exigência de `vencimento` é o único ponto em que o canal muda a
+   * validação, e é por isso que ela recebe o canal (CLICKUP-9435): na ligação o
+   * dia 1 dispensa o vencimento porque ele é DERIVADO dos 5 minutos úteis; no
+   * e-mail nada é derivado, então o vencimento é obrigatório em todos os dias.
+   * Sem esse recorte, um pedido de e-mail de dia 1 sem vencimento passaria a
+   * validação e nasceria uma Task com `ActivityDate` nulo.
+   */
+  private static Boolean solicitacaoValida(Solicitacao s, String canal) {
     if (s == null || s.leadId == null) {
       return false;
     }
@@ -330,8 +457,12 @@ public without sharing class SOLCadenciaContatoService {
     if (s.dia == null || s.dia < DIA_PRIMEIRA_LIGACAO || s.dia > DIA_MAXIMO) {
       return false;
     }
-    // Dias 2 e 3 dependem do dia útil que o motor calcula; sem ele não há
-    // vencimento a gravar e o pedido é inválido (nunca "hoje" por suposição).
+    if (!CANAL_LIGACAO.equals(canal)) {
+      // E-mail: o dia útil vem pronto do motor em TODOS os dias.
+      return s.vencimento != null;
+    }
+    // Ligação, dias 2 e 3: dependem do dia útil que o motor calcula; sem ele não
+    // há vencimento a gravar e o pedido é inválido (nunca "hoje" por suposição).
     return s.dia == DIA_PRIMEIRA_LIGACAO || s.vencimento != null;
   }
 
@@ -383,22 +514,31 @@ public without sharing class SOLCadenciaContatoService {
   }
 
   /**
-   * Chaves de cadência JÁ materializadas para estes Leads. Sem filtro de
-   * Status de propósito: uma ligação daquele dia que já foi concluída ou
-   * cancelada continua ocupando o dia — o reprocessamento não a recria.
+   * Chaves de cadência JÁ materializadas para estes Leads, no canal do lote.
+   *
+   * Sem filtro de Status de propósito: uma tarefa daquele dia que já foi
+   * concluída ou cancelada continua ocupando o dia — o reprocessamento não a
+   * recria.
+   *
+   * O canal entra em DOIS lugares (CLICKUP-9435): no filtro, para não ler as
+   * chaves do outro canal, e na PROJEÇÃO, para que a chave seja montada com o
+   * valor real gravado na linha em vez de uma constante presumida. Projetar é o
+   * que impede o defeito silencioso de marcar toda chave lida com o canal
+   * errado — o que faria as ligações existentes bloquearem a criação dos
+   * e-mails, sem erro e sem rastro.
    */
-  private static Set<String> chavesExistentes(Set<Id> leadIds) {
+  private static Set<String> chavesExistentes(Set<Id> leadIds, String canal) {
     Set<String> chaves = new Set<String>();
-    if (leadIds == null || leadIds.isEmpty()) {
+    if (leadIds == null || leadIds.isEmpty() || String.isBlank(canal)) {
       return chaves;
     }
     for (Task t : [
-      SELECT WhoId, SOL_Ciclo_Contato__c, SOL_Dia_Cadencia__c
+      SELECT WhoId, SOL_Canal_Contato__c, SOL_Ciclo_Contato__c, SOL_Dia_Cadencia__c
       FROM Task
       WHERE
         WhoId IN :leadIds
         AND SOL_Tipo_Tarefa__c = :TIPO_TAREFA_CONTATO
-        AND SOL_Canal_Contato__c = :CANAL_LIGACAO
+        AND SOL_Canal_Contato__c = :canal
         AND SOL_Ciclo_Contato__c != NULL
         AND SOL_Dia_Cadencia__c != NULL
     ]) {
@@ -406,6 +546,7 @@ public without sharing class SOLCadenciaContatoService {
         chaveCadencia(
           t.WhoId,
           t.SOL_Ciclo_Contato__c,
+          t.SOL_Canal_Contato__c,
           t.SOL_Dia_Cadencia__c.intValue()
         )
       );
@@ -427,32 +568,50 @@ public without sharing class SOLCadenciaContatoService {
   }
 
   /**
-   * Task de ligação com a classificação estruturada completa.
-   * `SOL_Resultado_Contato__c` fica VAZIO: quem preenche é o vendedor, e a VR
-   * `SOL_Resultado_Obrigatorio_Concluir` impede concluir sem ele.
+   * Task de contato do canal informado, com a classificação estruturada
+   * completa.
+   *
+   * NENHUM dos dois campos de resultado é gravado aqui: `SOL_Resultado_Contato__c`
+   * (ligação) e `SOL_Resultado_Envio__c` (e-mail) nascem VAZIOS, porque quem
+   * preenche é o vendedor ao concluir — e é exatamente esse vazio que as VRs
+   * `SOL_Resultado_Obrigatorio_Concluir` e `SOL_Resultado_Envio_Obrigatorio`
+   * têm o que bloquear.
+   *
+   * O Subject é RÓTULO por canal e dia, nunca chave: o vendedor pode editá-lo e
+   * a idempotência não olha para ele.
    */
   private static Task montarTarefa(
     Id leadId,
     Id ownerId,
+    String canal,
     Integer dia,
     Datetime ciclo,
     Date vencimento,
     Datetime prazoContato
   ) {
     return new Task(
-      Subject = SUBJECT_POR_DIA.get(dia),
+      Subject = subjectDe(canal, dia),
       WhoId = leadId,
       OwnerId = ownerId,
       Status = TASK_STATUS_ABERTO,
       ActivityDate = vencimento,
       SOL_Prazo_Contato__c = prazoContato,
       // CLICKUP-9417: classificador de tarefa de contato — é o que o
-      // cancelamento por contato efetivado / opt-out / perda já procura.
+      // cancelamento por contato efetivado / opt-out / perda já procura, e é
+      // por ele que a tarefa de e-mail herda os três cancelamentos de graça.
       SOL_Tipo_Tarefa__c = TIPO_TAREFA_CONTATO,
-      // CLICKUP-9434: canal + ciclo + dia = chave lógica da cadência.
-      SOL_Canal_Contato__c = CANAL_LIGACAO,
+      // CLICKUP-9434/9435: canal + ciclo + dia = chave lógica da cadência.
+      SOL_Canal_Contato__c = canal,
       SOL_Ciclo_Contato__c = ciclo,
       SOL_Dia_Cadencia__c = dia
     );
+  }
+
+  /** Rótulo visível ao vendedor, por canal e dia. Nunca chave técnica. */
+  @TestVisible
+  private static String subjectDe(String canal, Integer dia) {
+    return CANAL_LIGACAO.equals(canal)
+      ? SUBJECT_POR_DIA.get(dia)
+      : SUBJECT_EMAIL_POR_DIA.get(dia);
   }
 }
