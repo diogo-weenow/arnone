@@ -82,6 +82,14 @@
         <label>Arnone Soluções</label>
         <layoutColumns>
             <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>SOL_Canal_Contato__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>SOL_Dia_Cadencia__c</field>
+            </layoutItems>
+            <layoutItems>
                 <behavior>Edit</behavior>
                 <field>SOL_Resultado_Contato__c</field>
             </layoutItems>

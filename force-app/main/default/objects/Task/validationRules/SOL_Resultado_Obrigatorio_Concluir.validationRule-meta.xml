@@ -2,9 +2,15 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Resultado_Obrigatorio_Concluir</fullName>
     <active>true</active>
-    <description>CLICKUP-9396: exige SOL_Resultado_Contato__c para CONCLUIR as Tasks automáticas de contato SOL (SOL_Prazo_Contato__c preenchido). Não afeta outras BUs; não bloqueia Task aberta/vencida; permite concluir antes ou depois do prazo.</description>
+    <description>CLICKUP-9396/9434: exige resultado para concluir ligações automáticas SOL. Abrange o dia 1 pelo prazo de contato e os dias 2/3 pelos classificadores Tipo=Contato e Canal=Ligação, sem depender do Subject.</description>
     <errorConditionFormula>AND(
-  NOT(ISBLANK( SOL_Prazo_Contato__c )),
+  OR(
+    NOT(ISBLANK( SOL_Prazo_Contato__c )),
+    AND(
+      ISPICKVAL( SOL_Tipo_Tarefa__c , &quot;Contato&quot; ),
+      ISPICKVAL( SOL_Canal_Contato__c , &quot;Ligação&quot; )
+    )
+  ),
   ISPICKVAL( Status , &quot;Completed&quot; ),
   ISBLANK( TEXT( SOL_Resultado_Contato__c ) )
 )</errorConditionFormula>
