@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Activity.SOL_Resultado_Envio__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>Task.SOL_Resultado_Envio_Obrigatorio</members>
+        <members>Task.SOL_Email_Sem_Resultado_Ligacao</members>
+        <name>ValidationRule</name>
+    </types>
+    <types>
+        <members>PS_SOL_Comercial</members>
+        <members>PS_SOL_Distribuicao_Admin</members>
+        <name>PermissionSet</name>
+    </types>
+    <types>
+        <members>Task-Task Layout</members>
+        <name>Layout</name>
+    </types>
+    <types>
+        <members>SOLCadenciaContatoService</members>
+        <members>SOLCadenciaContatoTest</members>
+        <name>ApexClass</name>
+    </types>
+    <version>66.0</version>
+</Package>

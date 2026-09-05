@@ -95,6 +95,10 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
+                <field>SOL_Resultado_Envio__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
                 <field>SOL_Resultado_Reuniao__c</field>
             </layoutItems>
             <layoutItems>
