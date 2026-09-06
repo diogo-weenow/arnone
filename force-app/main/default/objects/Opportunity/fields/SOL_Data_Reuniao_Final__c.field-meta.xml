@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Reuniao_Final__c</fullName>
+    <description>Consolidação de Task.SOL_Data_Reuniao_Final__c da tarefa de reunião final concluída. Fecha a etapa 5 (recebimento do cálculo - reunião final) e abre a etapa 6. Só é gravado quando está vazio. Consolidado na Oportunidade porque a Task pode ser cancelada ou reaberta. Exclusivo de Recuperação Tributária — em ART 360 permanece vazio. Campo técnico, somente leitura. CLICKUP-9439 / CLICKUP-9429 (absorvido).</description>
+    <label>Data da reunião final (SOL)</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

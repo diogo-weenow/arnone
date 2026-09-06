@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Primeira_Ligacao__c</fullName>
+    <description>CompletedDateTime da PRIMEIRA Task de contato por Ligação concluída deste Lead. Fecha a etapa 1 (distribuição - primeira ligação) e abre a etapa 2 (primeira ligação - contato efetivado). Só é gravado quando está vazio: ligações posteriores não sobrescrevem a primeira. Consolidado no Lead porque as Tasks ficam indisponíveis para consulta durante Database.convertLead e podem ser canceladas depois. Campo técnico, escrito apenas pela automação SOL, somente leitura para todos. CLICKUP-9439 / CLICKUP-9429 (absorvido).</description>
+    <label>Data da primeira ligação concluída (SOL)</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>DateTime</type>
+</CustomField>

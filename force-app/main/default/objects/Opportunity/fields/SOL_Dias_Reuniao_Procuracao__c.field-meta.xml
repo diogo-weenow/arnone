@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Dias_Reuniao_Procuracao__c</fullName>
+    <description>Etapa 3: dias ÚTEIS entre o início do ciclo comercial (exclusivo) e o último dos marcos de reunião e procuração (inclusivo). Mesmo dia útil = 0. Chega copiado do Lead na conversão; se vier vazio, é recalculado aqui a partir dos marcos da própria Oportunidade. Vale para Recuperação Tributária e ART 360. Nunca sobrescrito depois de preenchido. Campo técnico, somente leitura. CLICKUP-9439 / CLICKUP-9429 (absorvido).</description>
+    <label>Dias úteis reunião e procuração (SOL)</label>
+    <externalId>false</externalId>
+    <precision>4</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>
