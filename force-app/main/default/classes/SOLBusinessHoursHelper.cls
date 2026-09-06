@@ -42,14 +42,22 @@ public with sharing class SOLBusinessHoursHelper {
   /**
    * Teto de dias de CALENDÁRIO admitido num único intervalo, e ao mesmo tempo a
    * guarda contra laço infinito de `diasUteisEntre`/`diasUteisNoIntervalo` —
-   * o mesmo papel que o `guarda < 400` cumpre em `prazoEmDiasUteis`.
+   * o MESMO valor do `guarda < 400` que `prazoEmDiasUteis` já usa, para que os
+   * dois digam a mesma coisa em vez de se contradizerem.
    *
-   * 4000 dias são cerca de onze anos: nenhuma etapa da jornada Arnone Soluções
-   * dura isso. Um par de marcos mais distante que esse teto é dado incoerente,
-   * e é tratado como tal (IntervaloInvalidoException), não como calendário
-   * ausente — de novo, para não gerar reprocessamento eterno.
+   * Por que 400 e não um número maior: cada dia percorrido custa uma chamada a
+   * `BusinessHours.nextStartDate`, e `LimitException` de CPU **não é
+   * capturável** — um teto alto transformaria dado incoerente em risco de
+   * derrubar a operação comercial, que é exatamente o contrário da política
+   * deste card. 400 dias são mais de treze meses; a maior distância REAL medida
+   * na ArnoneDev entre dois marcos de uma etapa é de 84 dias, e nenhuma etapa
+   * da jornada Arnone Soluções dura mais que isso.
+   *
+   * Um par de marcos além do teto é tratado como IntervaloInvalidoException —
+   * dado incoerente —, e a verificação acontece ANTES de qualquer consulta ao
+   * calendário: nenhum dia é percorrido.
    */
-  public static final Integer MAX_DIAS_INTERVALO = 4000;
+  public static final Integer MAX_DIAS_INTERVALO = 400;
 
   @TestVisible
   private static Id bhCache;
