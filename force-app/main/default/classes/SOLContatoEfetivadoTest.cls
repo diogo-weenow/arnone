@@ -881,6 +881,8 @@ private class SOLContatoEfetivadoTest {
         SOL_Tipo_Tarefa__c,
         SOL_Dia_Cadencia__c,
         SOL_Resultado_Contato__c,
+        SOL_Resultado_Envio__c,
+        SOL_Contato_Efetivado__c,
         SOL_Motivo_Cancelamento__c
       FROM Task
       WHERE Id = :taskId
@@ -1443,6 +1445,877 @@ private class SOLContatoEfetivadoTest {
       5,
       valores.size(),
       'Cinco valores: os quatro originais mais o novo — nenhum foi removido.'
+    );
+  }
+
+  // ======================================================================
+  //  CLICKUP-9447 — contato efetivado pelo canal E-MAIL
+  //
+  //  O vendedor marca `Task.SOL_Contato_Efetivado__c` para dizer que o lead
+  //  RESPONDEU. É sinal MANUAL e independente de `SOL_Resultado_Envio__c`:
+  //  "Enviado" diz apenas que a mensagem saiu. Não há leitura de caixa de
+  //  e-mail em lugar nenhum.
+  //
+  //  Nenhuma linha de Apex de produção foi escrita para isto: o Flow novo chama
+  //  o MESMO Invocable do CLICKUP-9417, e é o serviço de sempre que sinaliza o
+  //  Lead e cancela as pendentes dos três canais. O que estes testes cobrem é
+  //  o contrato das duas VRs novas e o fato de a automação existente ser
+  //  reaproveitada sem alteração.
+  // ======================================================================
+
+  private static final String MSG_VR_ESTADO = 'só vale numa tarefa de E-MAIL';
+  private static final String MSG_VR_REVERTE = 'não pode ser desfeito';
+
+  /** Tarefa de e-mail concluída e ENVIADA: o estado em que o checkbox é válido. */
+  private static Task emailEnviadoConcluido(Id leadId, Id owner) {
+    Task t = tarefaDeMensagemAberta(leadId, owner, 'E-mail');
+    update new Task(
+      Id = t.Id,
+      Status = 'Completed',
+      SOL_Resultado_Envio__c = 'Enviado'
+    );
+    return t;
+  }
+
+  private static String tentar(Task alteracao) {
+    try {
+      update alteracao;
+      return '';
+    } catch (DmlException e) {
+      return e.getMessage();
+    }
+  }
+
+  /**
+   * (1) e (2) O caminho feliz: marcar a resposta efetiva o contato no Lead,
+   * cancela as pendentes dos TRÊS canais e preserva a tarefa de origem.
+   */
+  @IsTest
+  static void respostaNoEmailEfetivaContatoECancelaOsTresCanais() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9447a', 'Recuperação Tributária');
+    Task origem = emailEnviadoConcluido(l.Id, l.OwnerId);
+    Task ligacao = ligacaoDeCadenciaAberta(l.Id, l.OwnerId, 2);
+    Task outroEmail = tarefaDeMensagemAberta(l.Id, l.OwnerId, 'E-mail');
+    Task whats = tarefaDeMensagemAberta(l.Id, l.OwnerId, 'WhatsApp');
+
+    Test.startTest();
+    update new Task(Id = origem.Id, SOL_Contato_Efetivado__c = true);
+    Test.stopTest();
+
+    Lead d = recarregar(l.Id);
+    System.assertEquals(
+      true,
+      d.SOL_Contato_Efetivado__c,
+      'O Lead é sinalizado pela resposta ao e-mail.'
+    );
+    System.assertNotEquals(
+      null,
+      d.SOL_Data_Contato_Efetivado__c,
+      'Com a data do contato efetivado.'
+    );
+
+    Task depoisOrigem = lerTarefa(origem.Id);
+    System.assertEquals(
+      'Completed',
+      depoisOrigem.Status,
+      'A tarefa de origem NUNCA é cancelada — ela já estava concluída.'
+    );
+    System.assertEquals(
+      true,
+      depoisOrigem.SOL_Contato_Efetivado__c,
+      'E o checkbox permanece marcado nela.'
+    );
+    System.assertEquals(
+      'Enviado',
+      depoisOrigem.SOL_Resultado_Envio__c,
+      'O resultado do envio segue intacto: os dois sinais convivem.'
+    );
+
+    for (Id alvo : new List<Id>{ ligacao.Id, outroEmail.Id, whats.Id }) {
+      Task t = lerTarefa(alvo);
+      System.assertEquals(
+        'Cancelada',
+        t.Status,
+        'A pendente do canal ' + t.SOL_Canal_Contato__c + ' é cancelada.'
+      );
+      System.assertEquals(
+        'Contato efetivado',
+        t.SOL_Motivo_Cancelamento__c,
+        'Com o motivo da automação existente.'
+      );
+    }
+    System.assertEquals(0, abertasDe(l.Id), 'Nenhuma pendente sobra.');
+  }
+
+  /** (3) "Enviado" sozinho não efetiva contato nem cancela nada. */
+  @IsTest
+  static void envioSozinhoNaoEfetivaContatoNemCancela() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9447b', 'Recuperação Tributária');
+    Task pendente = tarefaDeMensagemAberta(l.Id, l.OwnerId, 'WhatsApp');
+
+    Test.startTest();
+    Task email = emailEnviadoConcluido(l.Id, l.OwnerId);
+    Test.stopTest();
+
+    Lead d = recarregar(l.Id);
+    System.assert(
+      d.SOL_Contato_Efetivado__c != true,
+      '"Enviado" significa que a mensagem SAIU, não que o lead respondeu.'
+    );
+    System.assertEquals(null, d.SOL_Data_Contato_Efetivado__c, 'Sem data.');
+    System.assertEquals(
+      false,
+      lerTarefa(email.Id).SOL_Contato_Efetivado__c,
+      'O checkbox nasce falso e ninguém o marcou.'
+    );
+    System.assertEquals(
+      'Open',
+      lerTarefa(pendente.Id).Status,
+      'E a pendente do outro canal continua aberta.'
+    );
+  }
+
+  /** (4) Checkbox sem envio válido — vazio e "Não enviado" — é bloqueado. */
+  @IsTest
+  static void checkboxSemEnvioEnviadoEhBloqueado() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9447c', 'Recuperação Tributária');
+
+    Task naoEnviado = tarefaDeMensagemAberta(l.Id, l.OwnerId, 'E-mail');
+    update new Task(
+      Id = naoEnviado.Id,
+      Status = 'Completed',
+      SOL_Resultado_Envio__c = 'Não enviado'
+    );
+
+    Test.startTest();
+    // Envio "Não enviado": bloqueado.
+    String erroNaoEnviado = tentar(
+      new Task(Id = naoEnviado.Id, SOL_Contato_Efetivado__c = true)
+    );
+    // Envio VAZIO: a VR de envio obrigatório impede concluir sem resultado, então
+    // o caso testável é a tarefa ABERTA e sem resultado, com o checkbox marcado.
+    Task semEnvio = tarefaDeMensagemAberta(l.Id, l.OwnerId, 'E-mail');
+    String erroSemEnvio = tentar(
+      new Task(Id = semEnvio.Id, SOL_Contato_Efetivado__c = true)
+    );
+    Test.stopTest();
+
+    System.assert(
+      erroNaoEnviado.contains(MSG_VR_ESTADO),
+      '"Não enviado" não pode receber a marca de resposta. Recebido: ' +
+        erroNaoEnviado
+    );
+    System.assert(
+      erroSemEnvio.contains(MSG_VR_ESTADO),
+      'Sem resultado de envio também é bloqueado. Recebido: ' + erroSemEnvio
+    );
+    System.assert(
+      recarregar(l.Id).SOL_Contato_Efetivado__c != true,
+      'E o Lead não foi sinalizado por nenhuma das tentativas.'
+    );
+  }
+
+  /** (5) Checkbox em tarefa ABERTA e em tarefa CANCELADA é bloqueado. */
+  @IsTest
+  static void checkboxForaDeTarefaConcluidaEhBloqueado() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9447d', 'Recuperação Tributária');
+
+    Task aberta = tarefaDeMensagemAberta(l.Id, l.OwnerId, 'E-mail');
+    Task cancelada = tarefaDeMensagemAberta(l.Id, l.OwnerId, 'E-mail');
+    update new Task(
+      Id = cancelada.Id,
+      Status = 'Cancelada',
+      SOL_Motivo_Cancelamento__c = 'Contato efetivado'
+    );
+
+    Test.startTest();
+    String erroAberta = tentar(
+      new Task(Id = aberta.Id, SOL_Contato_Efetivado__c = true)
+    );
+    String erroCancelada = tentar(
+      new Task(Id = cancelada.Id, SOL_Contato_Efetivado__c = true)
+    );
+    Test.stopTest();
+
+    System.assert(
+      erroAberta.contains(MSG_VR_ESTADO),
+      'Tarefa aberta não recebe a marca. Recebido: ' + erroAberta
+    );
+    System.assert(
+      erroCancelada.contains(MSG_VR_ESTADO),
+      'Tarefa cancelada tampouco. Recebido: ' + erroCancelada
+    );
+    System.assertEquals(
+      false,
+      lerTarefa(aberta.Id).SOL_Contato_Efetivado__c,
+      'Nada foi gravado na aberta.'
+    );
+    System.assertEquals(
+      false,
+      lerTarefa(cancelada.Id).SOL_Contato_Efetivado__c,
+      'Nem na cancelada.'
+    );
+  }
+
+  /**
+   * (6) Fora do canal E-mail o checkbox não passa: ligação, WhatsApp e tarefa
+   * manual sem classificação são barrados pela VR.
+   *
+   * WhoId de CONTACT e Lead de outra BU são outra história: a VR não os barra —
+   * ela não olha Record Type e, por causa do fallback (ver a VR), também não
+   * exige que o WhoId seja Lead — e quem se recusa a sinalizar é o Apex, que é
+   * onde essa regra sempre morou. O Contact está coberto aqui; a outra BU, no
+   * teste seguinte.
+   */
+  @IsTest
+  static void checkboxForaDoCanalEmailNaoEfetivaContato() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9447e', 'Recuperação Tributária');
+
+    Task ligacao = ligacaoDeCadenciaAberta(l.Id, l.OwnerId, 2);
+    update new Task(
+      Id = ligacao.Id,
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Atendeu_Sem_Conclusao'
+    );
+    Task whats = tarefaDeMensagemAberta(l.Id, l.OwnerId, 'WhatsApp');
+    update new Task(
+      Id = whats.Id,
+      Status = 'Completed',
+      SOL_Resultado_Envio__c = 'Enviado'
+    );
+    Task manual = new Task(
+      Subject = 'Tarefa manual',
+      WhoId = l.Id,
+      OwnerId = l.OwnerId,
+      Status = 'Completed',
+      ActivityDate = Date.today()
+    );
+    insert manual;
+
+    Account conta = new Account(Name = 'Conta 9447');
+    insert conta;
+    Contact contato = new Contact(LastName = 'Contato 9447', AccountId = conta.Id);
+    insert contato;
+    Task deContact = new Task(
+      Subject = 'E-mail para Contact',
+      WhoId = contato.Id,
+      OwnerId = l.OwnerId,
+      Status = 'Completed',
+      ActivityDate = Date.today(),
+      SOL_Tipo_Tarefa__c = 'Contato',
+      SOL_Canal_Contato__c = 'E-mail',
+      SOL_Resultado_Envio__c = 'Enviado'
+    );
+    insert deContact;
+
+    Test.startTest();
+    Map<String, String> erros = new Map<String, String>{
+      'ligação' => tentar(new Task(Id = ligacao.Id, SOL_Contato_Efetivado__c = true)),
+      'whatsapp' => tentar(new Task(Id = whats.Id, SOL_Contato_Efetivado__c = true)),
+      'manual' => tentar(new Task(Id = manual.Id, SOL_Contato_Efetivado__c = true))
+    };
+    // O Contact PASSA na VR (o fallback não checa o tipo do WhoId) e é
+    // descartado pelo Invocable, que só aceita Id de Lead.
+    String erroContact = tentar(
+      new Task(Id = deContact.Id, SOL_Contato_Efetivado__c = true)
+    );
+    Test.stopTest();
+
+    for (String caso : erros.keySet()) {
+      System.assert(
+        erros.get(caso).contains(MSG_VR_ESTADO),
+        'O caso "' + caso + '" tem de ser bloqueado pela VR. Recebido: ' +
+          erros.get(caso)
+      );
+    }
+    System.assertEquals(
+      '',
+      erroContact,
+      'A tarefa de Contact passa na VR: o WhoId não é checado como Lead, para não quebrar a conversão.'
+    );
+    System.assertEquals(
+      true,
+      lerTarefa(deContact.Id).SOL_Contato_Efetivado__c,
+      'A marca é gravada nela...'
+    );
+    System.assert(
+      recarregar(l.Id).SOL_Contato_Efetivado__c != true,
+      '...e nenhum Lead é sinalizado — o Invocable descarta WhoId que não seja Lead.'
+    );
+  }
+
+  /** (6) Lead de OUTRA BU: a VR permite, mas o Apex não sinaliza. */
+  @IsTest
+  static void checkboxEmLeadDeOutraBUNaoSinalizaOLead() {
+    montarCenario(2);
+    Lead outro = new Lead(
+      LastName = 'Fora da BU',
+      Company = 'Outra Empresa',
+      Status = statusLead()
+    );
+    insert outro;
+    Task email = new Task(
+      Subject = 'E-mail de outra BU',
+      WhoId = outro.Id,
+      OwnerId = UserInfo.getUserId(),
+      Status = 'Open',
+      ActivityDate = Date.today(),
+      SOL_Tipo_Tarefa__c = 'Contato',
+      SOL_Canal_Contato__c = 'E-mail'
+    );
+    insert email;
+    update new Task(
+      Id = email.Id,
+      Status = 'Completed',
+      SOL_Resultado_Envio__c = 'Enviado'
+    );
+
+    Test.startTest();
+    // A VR não olha Record Type, então a marcação PASSA...
+    update new Task(Id = email.Id, SOL_Contato_Efetivado__c = true);
+    Test.stopTest();
+
+    System.assertEquals(
+      true,
+      lerTarefa(email.Id).SOL_Contato_Efetivado__c,
+      'A VR não é quem filtra a BU.'
+    );
+    System.assert(
+      [SELECT SOL_Contato_Efetivado__c FROM Lead WHERE Id = :outro.Id]
+        .SOL_Contato_Efetivado__c != true,
+      '...mas o serviço, que filtra Record Type SOL, não sinaliza o Lead de outra BU.'
+    );
+  }
+
+  /**
+   * (7) TESTE CENTRAL — a VR de estado não tem guarda de mudança, então ela
+   * bloqueia toda edição posterior que deixe a tarefa incoerente com o
+   * checkbox: trocar o envio, reabrir, trocar o canal, trocar o tipo ou apagar
+   * o WhoId. Sem isso, marcar corretamente e "consertar" depois seria a rota de
+   * fuga.
+   */
+  @IsTest
+  static void edicaoPosteriorQueQuebraOEstadoEhBloqueada() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9447f', 'Recuperação Tributária');
+    Task email = emailEnviadoConcluido(l.Id, l.OwnerId);
+    update new Task(Id = email.Id, SOL_Contato_Efetivado__c = true);
+    System.assertEquals(
+      true,
+      lerTarefa(email.Id).SOL_Contato_Efetivado__c,
+      'Pré-condição: marcado corretamente.'
+    );
+
+    Test.startTest();
+    Map<String, String> erros = new Map<String, String>{
+      'trocar o envio' => tentar(
+        new Task(Id = email.Id, SOL_Resultado_Envio__c = 'Não enviado')
+      ),
+      'reabrir' => tentar(new Task(Id = email.Id, Status = 'Open')),
+      'trocar o canal' => tentar(
+        new Task(Id = email.Id, SOL_Canal_Contato__c = 'WhatsApp')
+      ),
+      'trocar o tipo' => tentar(
+        new Task(Id = email.Id, SOL_Tipo_Tarefa__c = 'Reunião comercial')
+      ),
+      'apagar o WhoId' => tentar(new Task(Id = email.Id, WhoId = null))
+    };
+    Test.stopTest();
+
+    for (String caso : erros.keySet()) {
+      System.assert(
+        erros.get(caso).contains(MSG_VR_ESTADO),
+        'Depois de marcado, "' +
+          caso +
+          '" tem de ser bloqueado. Recebido: ' +
+          erros.get(caso)
+      );
+    }
+    Task fim = lerTarefa(email.Id);
+    System.assertEquals('Completed', fim.Status, 'O estado final é o original.');
+    System.assertEquals('E-mail', fim.SOL_Canal_Contato__c, 'Canal preservado.');
+    System.assertEquals('Enviado', fim.SOL_Resultado_Envio__c, 'Envio preservado.');
+    System.assertEquals(
+      true,
+      fim.SOL_Contato_Efetivado__c,
+      'E a marca continua lá.'
+    );
+  }
+
+  /** (8) Desmarcar é bloqueado — inclusive junto com outra alteração no mesmo save. */
+  @IsTest
+  static void desmarcarDepoisDeEfetivadoEhBloqueado() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9447g', 'Recuperação Tributária');
+    Task email = emailEnviadoConcluido(l.Id, l.OwnerId);
+    update new Task(Id = email.Id, SOL_Contato_Efetivado__c = true);
+
+    Test.startTest();
+    String soDesmarcar = tentar(
+      new Task(Id = email.Id, SOL_Contato_Efetivado__c = false)
+    );
+    String desmarcarETrocarCanal = tentar(
+      new Task(
+        Id = email.Id,
+        SOL_Contato_Efetivado__c = false,
+        SOL_Canal_Contato__c = 'WhatsApp'
+      )
+    );
+    Test.stopTest();
+
+    System.assert(
+      soDesmarcar.contains(MSG_VR_REVERTE),
+      'Desmarcar é bloqueado pela regra de irreversibilidade. Recebido: ' +
+        soDesmarcar
+    );
+    System.assert(
+      desmarcarETrocarCanal.contains(MSG_VR_REVERTE),
+      'Desmarcar junto com outra alteração também. Recebido: ' +
+        desmarcarETrocarCanal
+    );
+    Task fim = lerTarefa(email.Id);
+    System.assertEquals(
+      true,
+      fim.SOL_Contato_Efetivado__c,
+      'A marca sobrevive às duas tentativas.'
+    );
+    System.assertEquals(
+      'E-mail',
+      fim.SOL_Canal_Contato__c,
+      'E o canal não foi trocado de carona.'
+    );
+  }
+
+  /**
+   * (9) Idempotência: reprocessar não duplica, e num Lead já efetivado pela
+   * LIGAÇÃO o e-mail é no-op — a data do PRIMEIRO contato não é sobrescrita.
+   */
+  @IsTest
+  static void reprocessarEDataDoPrimeiroContatoEfetivado() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9447h', 'Recuperação Tributária');
+    Task ligacao = ligacaoDeCadenciaAberta(l.Id, l.OwnerId, 2);
+    Task email = emailEnviadoConcluido(l.Id, l.OwnerId);
+
+    // Primeiro a ligação efetiva o contato.
+    update new Task(
+      Id = ligacao.Id,
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Atendeu'
+    );
+    Lead aposLigacao = recarregar(l.Id);
+    System.assertEquals(
+      true,
+      aposLigacao.SOL_Contato_Efetivado__c,
+      'Pré-condição: efetivado pela ligação.'
+    );
+    Datetime dataOriginal = aposLigacao.SOL_Data_Contato_Efetivado__c;
+
+    Test.startTest();
+    update new Task(Id = email.Id, SOL_Contato_Efetivado__c = true);
+    SOLDistribuicaoService.registrarContatoEfetivado(new List<Id>{ l.Id });
+    Test.stopTest();
+
+    Lead d = recarregar(l.Id);
+    System.assertEquals(
+      true,
+      d.SOL_Contato_Efetivado__c,
+      'Continua efetivado.'
+    );
+    System.assertEquals(
+      dataOriginal,
+      d.SOL_Data_Contato_Efetivado__c,
+      'A data é a do PRIMEIRO contato efetivado e NÃO é sobrescrita.'
+    );
+    System.assertEquals(
+      0,
+      abertasDe(l.Id),
+      'E nada ficou pendente depois do reprocessamento.'
+    );
+  }
+
+  /**
+   * (10) Lote: duas tarefas de e-mail do MESMO Lead marcadas no MESMO DML não
+   * duplicam nem falham — o Invocable consolida os Ids num Set. No mesmo lote
+   * vai uma tarefa aberta do mesmo Lead sendo atualizada por outro motivo, para
+   * exercitar o FOR UPDATE reentrante do serviço.
+   */
+  @IsTest
+  static void loteDoMesmoLeadNaoDuplicaNemFalha() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9447i', 'Recuperação Tributária');
+    Task email1 = emailEnviadoConcluido(l.Id, l.OwnerId);
+    Task email2 = emailEnviadoConcluido(l.Id, l.OwnerId);
+    Task abertaOutroMotivo = ligacaoDeCadenciaAberta(l.Id, l.OwnerId, 3);
+
+    Test.startTest();
+    update new List<Task>{
+      new Task(Id = email1.Id, SOL_Contato_Efetivado__c = true),
+      new Task(Id = email2.Id, SOL_Contato_Efetivado__c = true),
+      new Task(Id = abertaOutroMotivo.Id, Subject = 'Renomeada no mesmo lote')
+    };
+    Test.stopTest();
+
+    Lead d = recarregar(l.Id);
+    System.assertEquals(true, d.SOL_Contato_Efetivado__c, 'Lead sinalizado.');
+    System.assertNotEquals(null, d.SOL_Data_Contato_Efetivado__c, 'Com data.');
+    System.assertEquals(
+      true,
+      lerTarefa(email1.Id).SOL_Contato_Efetivado__c,
+      'As duas marcas foram gravadas.'
+    );
+    System.assertEquals(true, lerTarefa(email2.Id).SOL_Contato_Efetivado__c);
+    Task terceira = lerTarefa(abertaOutroMotivo.Id);
+    System.assertEquals(
+      'Cancelada',
+      terceira.Status,
+      'A pendente do mesmo lote foi cancelada pelo contato efetivado.'
+    );
+    System.assertEquals(
+      'Renomeada no mesmo lote',
+      terceira.Subject,
+      'E a alteração dela, feita por outro motivo, sobreviveu.'
+    );
+    System.assertEquals(0, abertasDe(l.Id), 'Nada pendente.');
+  }
+
+  /**
+   * (11a) Falha do serviço pelo caminho do e-mail: relança a mensagem
+   * controlada, o Lead não é sinalizado e as pendentes ficam intactas.
+   */
+  @IsTest
+  static void falhaPeloCaminhoDoEmailAbortaComMensagemControlada() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9447j', 'Recuperação Tributária');
+    Task pendente = tarefaDeMensagemAberta(l.Id, l.OwnerId, 'WhatsApp');
+
+    SOLContatoEfetivadoInvocable.Entrada entrada = new SOLContatoEfetivadoInvocable.Entrada();
+    entrada.leadId = l.Id;
+
+    Test.startTest();
+    Test.setReadOnlyApplicationMode(true);
+    Boolean lancou = false;
+    try {
+      SOLContatoEfetivadoInvocable.registrar(
+        new List<SOLContatoEfetivadoInvocable.Entrada>{ entrada }
+      );
+    } catch (SOLDistribuicaoService.ContatoEfetivadoException e) {
+      lancou = true;
+      System.assertEquals(
+        SOLDistribuicaoService.MSG_CONTATO_EFETIVADO_FALHA,
+        e.getMessage(),
+        'Mensagem controlada, sem detalhe técnico.'
+      );
+    }
+    Test.setReadOnlyApplicationMode(false);
+    Test.stopTest();
+
+    System.assert(
+      lancou,
+      'O Invocable relança — é a segunda perna da atomicidade, e o e-mail usa o mesmo caminho.'
+    );
+    System.assertEquals(
+      false,
+      recarregar(l.Id).SOL_Contato_Efetivado__c,
+      'Lead não sinalizado.'
+    );
+    System.assertEquals(
+      'Open',
+      lerTarefa(pendente.Id).Status,
+      'Pendente intacta.'
+    );
+  }
+
+  /**
+   * (11c) O checkbox NÃO persiste quando o save falha.
+   *
+   * LIMITE HONESTO DESTE TESTE: `Test.setReadOnlyApplicationMode(true)` derruba
+   * TODO DML, inclusive o update da própria Task, então ele não distingue
+   * "falhou ao gravar a Task" de "falhou no serviço e a plataforma reverteu".
+   * O que ele fixa é o resultado observável — a marca não fica gravada. A prova
+   * do encadeamento está em (11a), no teste do Invocable que relança, no
+   * metadata do Flow (`CurrentTransaction` presente, `faultConnector` ausente)
+   * e no E2E documentado no PR.
+   */
+  @IsTest
+  static void checkboxNaoPersisteQuandoOSaveFalha() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9447k', 'Recuperação Tributária');
+    Task email = emailEnviadoConcluido(l.Id, l.OwnerId);
+
+    Test.startTest();
+    Test.setReadOnlyApplicationMode(true);
+    Boolean falhou = false;
+    try {
+      update new Task(Id = email.Id, SOL_Contato_Efetivado__c = true);
+    } catch (Exception e) {
+      falhou = true;
+    }
+    Test.setReadOnlyApplicationMode(false);
+    Test.stopTest();
+
+    System.assert(falhou, 'O save não passou.');
+    System.assertEquals(
+      false,
+      lerTarefa(email.Id).SOL_Contato_Efetivado__c,
+      'E a marca não ficou gravada.'
+    );
+    System.assertEquals(
+      false,
+      recarregar(l.Id).SOL_Contato_Efetivado__c,
+      'Nem o Lead foi sinalizado.'
+    );
+  }
+
+  /** (12) Lead efetivado por e-mail sai do motor da cadência e não é reatribuído. */
+  @IsTest
+  static void leadEfetivadoPorEmailFicaForaDoMotorEDaReatribuicao() {
+    montarCenario(3);
+    Lead l = novoLeadSOLDistribuido('S9447l', 'Recuperação Tributária');
+    Id donoOriginal = l.OwnerId;
+    Task email = emailEnviadoConcluido(l.Id, l.OwnerId);
+    update new Task(Id = email.Id, SOL_Contato_Efetivado__c = true);
+
+    // Quarta-feira, 10:00 em São Paulo: dia útil, para o motor poder rodar.
+    SOLCadenciaMotorService.overrideAgora(
+      Datetime.newInstanceGmt(2026, 9, 2, 13, 0, 0)
+    );
+    update new Lead(
+      Id = l.Id,
+      SOL_Data_Inicio_Ciclo_Contato__c = Datetime.newInstanceGmt(2026, 9, 2, 12, 0, 0)
+    );
+
+    Test.startTest();
+    SOLCadenciaMotorService.ResultadoMotor rm = SOLCadenciaMotorService.executar(
+      new List<Id>{ l.Id }
+    );
+    SOLDistribuicaoService.ResultadoReatribuicao rr = SOLDistribuicaoService.reatribuirPorFaltaDeContato(
+      new List<Id>{ l.Id }
+    );
+    Test.stopTest();
+
+    System.assertEquals(
+      0,
+      rm.tarefasCriadas,
+      'O motor não cria mais tarefas para um Lead com contato efetivado.'
+    );
+    System.assertEquals(
+      1,
+      rm.leadsIgnorados,
+      'Ele é ignorado pela varredura.'
+    );
+    System.assertEquals(0, rr.reatribuidos, 'E não é reatribuído.');
+    System.assertEquals(
+      donoOriginal,
+      recarregar(l.Id).OwnerId,
+      'O proprietário não muda.'
+    );
+  }
+
+  /** (13) Recuperação Tributária e ART 360 se comportam igual. */
+  @IsTest
+  static void osDoisProdutosSeComportamIgualNoEmail() {
+    montarCenario(2);
+    Lead rt = novoLeadSOLDistribuido('S9447m', 'Recuperação Tributária');
+    Lead art = novoLeadSOLDistribuido('S9447n', 'ART 360');
+    Map<Id, Id> emailPorLead = new Map<Id, Id>();
+    Map<Id, Id> pendentePorLead = new Map<Id, Id>();
+    for (Lead alvo : new List<Lead>{ rt, art }) {
+      emailPorLead.put(alvo.Id, emailEnviadoConcluido(alvo.Id, alvo.OwnerId).Id);
+      pendentePorLead.put(
+        alvo.Id,
+        tarefaDeMensagemAberta(alvo.Id, alvo.OwnerId, 'WhatsApp').Id
+      );
+    }
+
+    Test.startTest();
+    for (Id leadId : emailPorLead.keySet()) {
+      update new Task(
+        Id = emailPorLead.get(leadId),
+        SOL_Contato_Efetivado__c = true
+      );
+    }
+    Test.stopTest();
+
+    for (Id leadId : emailPorLead.keySet()) {
+      Lead d = recarregar(leadId);
+      System.assertEquals(true, d.SOL_Contato_Efetivado__c, 'Lead sinalizado.');
+      System.assertNotEquals(null, d.SOL_Data_Contato_Efetivado__c, 'Com data.');
+      System.assertEquals(
+        'Cancelada',
+        lerTarefa(pendentePorLead.get(leadId)).Status,
+        'E a pendente cancelada — igual nos dois produtos.'
+      );
+    }
+  }
+
+  /**
+   * (14) FLS do checkbox: estrutural pelos permission sets e efetiva em runtime.
+   * A medição é por `getDescribe()` sob `System.runAs` porque DML de Apex roda
+   * em modo de sistema e não aplica FLS — um `update` daria falso verde.
+   */
+  @IsTest
+  static void flsDoCheckboxDeContatoEfetivado() {
+    Map<String, FieldPermissions> porPs = new Map<String, FieldPermissions>();
+    for (FieldPermissions fp : [
+      SELECT PermissionsRead, PermissionsEdit, Parent.Name
+      FROM FieldPermissions
+      WHERE
+        Field = 'Task.SOL_Contato_Efetivado__c'
+        AND Parent.Name IN ('PS_SOL_Comercial', 'PS_SOL_Distribuicao_Admin')
+    ]) {
+      porPs.put(fp.Parent.Name, fp);
+    }
+
+    System.assert(
+      porPs.containsKey('PS_SOL_Comercial'),
+      'PS_SOL_Comercial declara o checkbox.'
+    );
+    System.assert(porPs.get('PS_SOL_Comercial').PermissionsRead, 'Vendedor lê.');
+    System.assert(
+      porPs.get('PS_SOL_Comercial').PermissionsEdit,
+      'Vendedor EDITA: é ele quem registra que o lead respondeu.'
+    );
+    System.assert(
+      porPs.containsKey('PS_SOL_Distribuicao_Admin'),
+      'PS_SOL_Distribuicao_Admin declara o checkbox.'
+    );
+    System.assert(
+      porPs.get('PS_SOL_Distribuicao_Admin').PermissionsRead,
+      'Gestor lê.'
+    );
+    System.assert(
+      !porPs.get('PS_SOL_Distribuicao_Admin').PermissionsEdit,
+      'Gestor apenas LÊ.'
+    );
+
+    User vendedorStd = usuarioStandard(
+      'e' + String.valueOf(Math.abs(Crypto.getRandomInteger())).left(3)
+    );
+    User gestorStd = usuarioStandard(
+      'a' + String.valueOf(Math.abs(Crypto.getRandomInteger())).left(3)
+    );
+    System.runAs(contextoAtual()) {
+      insert new List<User>{ vendedorStd, gestorStd };
+      insert new List<PermissionSetAssignment>{
+        new PermissionSetAssignment(
+          AssigneeId = vendedorStd.Id,
+          PermissionSetId = permissionSetId('PS_SOL_Comercial')
+        ),
+        new PermissionSetAssignment(
+          AssigneeId = gestorStd.Id,
+          PermissionSetId = permissionSetId('PS_SOL_Distribuicao_Admin')
+        )
+      };
+    }
+
+    Test.startTest();
+    System.runAs(new User(Id = vendedorStd.Id)) {
+      Schema.DescribeFieldResult f = Task.SOL_Contato_Efetivado__c.getDescribe();
+      System.assert(f.isAccessible(), 'Vendedor lê o checkbox.');
+      System.assert(f.isUpdateable(), 'Vendedor EDITA o checkbox.');
+    }
+    System.runAs(new User(Id = gestorStd.Id)) {
+      Schema.DescribeFieldResult f = Task.SOL_Contato_Efetivado__c.getDescribe();
+      System.assert(f.isAccessible(), 'Gestor lê o checkbox.');
+      System.assert(!f.isUpdateable(), 'Gestor NÃO edita o checkbox.');
+    }
+    Test.stopTest();
+  }
+
+  /**
+   * (16) CONVERSÃO DE LEAD — `Database.convertLead` REAPONTA o WhoId das
+   * atividades para o Contact criado. Uma tarefa de e-mail com o checkbox
+   * marcado passa a ter WhoId "003", o que contraria a VR de estado. Se a
+   * plataforma avaliasse a VR nesse reparenting, a conversão quebraria — e
+   * converter é etapa obrigatória da jornada SOL.
+   */
+  @IsTest
+  static void conversaoDeLeadSobreviveAoCheckboxMarcado() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9447o', 'Recuperação Tributária');
+    Task email = emailEnviadoConcluido(l.Id, l.OwnerId);
+    update new Task(Id = email.Id, SOL_Contato_Efetivado__c = true);
+    System.assertEquals(
+      true,
+      lerTarefa(email.Id).SOL_Contato_Efetivado__c,
+      'Pré-condição: a tarefa de e-mail está marcada.'
+    );
+    // Pré-requisitos do CLICKUP-9419 para converter um Lead com produto de
+    // interesse: reunião comercial realizada, procuração recebida com data e ao
+    // menos um arquivo. É o caminho do projeto — sem eles a conversão é barrada
+    // por uma regra ANTERIOR a este card, e o teste não provaria nada sobre a VR
+    // do 9447.
+    Task reuniao = new Task(
+      Subject = 'Reunião comercial',
+      WhoId = l.Id,
+      OwnerId = l.OwnerId,
+      Status = 'Open',
+      ActivityDate = Date.today(),
+      SOL_Tipo_Tarefa__c = 'Reunião comercial'
+    );
+    insert reuniao;
+    update new Task(
+      Id = reuniao.Id,
+      Status = 'Completed',
+      SOL_Resultado_Reuniao__c = 'Realizada'
+    );
+    update new Lead(
+      Id = l.Id,
+      SOL_Status_Procuracao__c = 'Recebida',
+      SOL_Data_Recebimento_Procuracao__c = Date.today()
+    );
+    ContentVersion cv = new ContentVersion(
+      Title = 'proc9447',
+      PathOnClient = 'proc.txt',
+      VersionData = Blob.valueOf('doc')
+    );
+    insert cv;
+    insert new ContentDocumentLink(
+      ContentDocumentId = [
+        SELECT ContentDocumentId
+        FROM ContentVersion
+        WHERE Id = :cv.Id
+      ]
+      .ContentDocumentId,
+      LinkedEntityId = l.Id,
+      ShareType = 'V'
+    );
+
+    Test.startTest();
+    Database.LeadConvert lc = new Database.LeadConvert();
+    lc.setLeadId(l.Id);
+    lc.setDoNotCreateOpportunity(true);
+    lc.setConvertedStatus(
+      [SELECT MasterLabel FROM LeadStatus WHERE IsConverted = TRUE LIMIT 1]
+      .MasterLabel
+    );
+    Database.LeadConvertResult lcr = Database.convertLead(lc, false);
+    Test.stopTest();
+
+    System.assert(
+      lcr.isSuccess(),
+      'A conversão do Lead NÃO pode ser quebrada pela VR. Erros: ' + lcr.getErrors()
+    );
+    Task depois = [
+      SELECT Id, WhoId, SOL_Contato_Efetivado__c, Status
+      FROM Task
+      WHERE Id = :email.Id
+    ];
+    System.assertNotEquals(
+      null,
+      depois.Id,
+      'A tarefa sobrevive à conversão.'
+    );
+    System.assertEquals(
+      true,
+      depois.SOL_Contato_Efetivado__c,
+      'E o registro da resposta continua lá.'
     );
   }
 }
