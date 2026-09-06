@@ -1799,6 +1799,88 @@ private class SOLDuracaoEtapaTest {
     );
   }
 
+  /**
+   * A prova literal de que falha analítica não desfaz operação comercial: com a
+   * gravação da medição falhando, a Task continua CONCLUÍDA. O Flow roda em
+   * `CurrentTransaction` e sem fault path — se o serviço lançasse, o próprio
+   * save da tarefa seria desfeito.
+   */
+  @IsTest
+  static void falhaDaMedicaoNaoDesfazAConclusaoDaTarefa() {
+    Lead l = novoLead(PRODUTO_RT);
+    update new Lead(Id = l.Id, SOL_Data_Distribuicao__c = as10(SEGUNDA));
+    delete [SELECT Id FROM Task WHERE WhoId = :l.Id];
+    Task t = tarefaContatoLigacao(l.Id, 'Falha');
+    insert t;
+
+    Test.startTest();
+    SOLDuracaoEtapaService.simularFalhaDeGravacao = true;
+    update new Task(
+      Id = t.Id,
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Não atendeu'
+    );
+    SOLDuracaoEtapaService.simularFalhaDeGravacao = false;
+    Test.stopTest();
+
+    Task depois = [SELECT Id, Status FROM Task WHERE Id = :t.Id];
+    Assert.areEqual(
+      'Completed',
+      depois.Status,
+      'A tarefa continua concluída: a medição falhou e NÃO derrubou a operação comercial.'
+    );
+    Lead lead = lead(l.Id);
+    Assert.isTrue(
+      lead.SOL_Duracao_Pendente__c,
+      'E a falha ficou visível no Lead, em vez de sumir no log.'
+    );
+    Assert.areEqual(
+      SOLDuracaoEtapaService.MOTIVO_FALHA_TECNICA,
+      lead.SOL_Duracao_Pendencia_Motivo__c,
+      'Com o motivo técnico.'
+    );
+  }
+
+  /**
+   * Em transações SEPARADAS o primeiro marco também é preservado — aqui a
+   * cronologia é verificável de verdade, porque `CompletedDateTime` difere
+   * entre as duas conclusões. Duas tarefas concluídas no MESMO DML compartilham
+   * o carimbo da plataforma, então lá a cronologia é degenerada e o que se
+   * prova é a ausência de sobrescrita e o determinismo.
+   */
+  @IsTest
+  static void ligacaoPosteriorNaoSobrescreveAPrimeira() {
+    Lead l = novoLead(PRODUTO_RT);
+    update new Lead(Id = l.Id, SOL_Data_Distribuicao__c = as10(SEGUNDA));
+    delete [SELECT Id FROM Task WHERE WhoId = :l.Id];
+
+    Task primeira = tarefaContatoLigacao(l.Id, 'P1');
+    insert primeira;
+    update new Task(
+      Id = primeira.Id,
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Não atendeu'
+    );
+    Datetime marcoOriginal = lead(l.Id).SOL_Data_Primeira_Ligacao__c;
+
+    Test.startTest();
+    Task segunda = tarefaContatoLigacao(l.Id, 'P2');
+    insert segunda;
+    update new Task(
+      Id = segunda.Id,
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Atendeu'
+    );
+    Test.stopTest();
+
+    Assert.isNotNull(marcoOriginal, 'Pré-condição: a primeira ligação gravou o marco.');
+    Assert.areEqual(
+      marcoOriginal,
+      lead(l.Id).SOL_Data_Primeira_Ligacao__c,
+      'A segunda ligação NÃO reescreve o marco da primeira.'
+    );
+  }
+
   // =============================== pendência após a conversão (bloqueador 2)
 
   /**
