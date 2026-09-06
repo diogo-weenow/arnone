@@ -1115,15 +1115,18 @@ private class SOLCadenciaMotorTest {
    * (11) LOTE MISTO na CHAMADA DIRETA ao serviço — esgotado + ativo, com a
    * criação falhando.
    *
-   * Fixa o primeiro dos dois comportamentos documentados no cabeçalho do
-   * serviço: o Savepoint do motor cobre APENAS os canais, então a reatribuição
-   * concluída na fase anterior sobrevive à falha de criação. É o que se vê
-   * quando alguém chama `executar()` direto (Apex anônimo, retry manual).
+   * Este é o ÚNICO teste de escopo MISTO da suíte, e o que ele prova é duplo:
+   * que um mesmo escopo processa Lead esgotado e Lead em dia ativo na mesma
+   * passagem, e qual é o ALCANCE do Savepoint do serviço — ele cobre apenas os
+   * canais, então a reatribuição concluída na fase anterior sobrevive à falha
+   * de criação. É o que se vê quando alguém chama `executar()` direto (Apex
+   * anônimo, retry manual).
    *
-   * O outro comportamento — pelo Batch, a exceção do `execute` derruba a
-   * transação inteira e leva a reatribuição junto — está em
-   * `loteMistoNoBatchFalhaAltoESeRecuperaNaVarreduraSeguinte`, com a ressalva
-   * de observabilidade explicada lá.
+   * O comportamento do Batch é OUTRO: lá a exceção do `execute` derruba a
+   * transação inteira e leva a reatribuição junto. Isso é garantia transacional
+   * da plataforma, não algo demonstrado por teste — ver
+   * `batchFalhaAltoESeRecuperaNaVarreduraSeguinte`, que cobre apenas a falha
+   * visível e a recuperação idempotente.
    *
    * A falha é natural (proprietário inativo, que `Task.OwnerId` recusa) e
    * atinge só o Lead ativo: o esgotado mantém o dono da fila, então o roster da
@@ -1213,23 +1216,25 @@ private class SOLCadenciaMotorTest {
   }
 
   /**
-   * (11) LOTE MISTO PELO BATCH — o caminho de produção.
+   * (11) FALHA PELO BATCH — o caminho de produção.
    *
-   * O que este teste FIXA: um lote com falha de criação termina LANÇANDO
-   * `LoteComFalhaException`, em vez de terminar em silêncio; e a varredura
-   * seguinte, removida a causa, processa o Lead sem duplicar nada.
+   * ESCOPO DESTE TESTE, e nada além dele: um lote com falha de criação termina
+   * LANÇANDO `LoteComFalhaException`, em vez de terminar em silêncio; nenhum
+   * canal fica gravado; e a varredura seguinte, removida a causa, processa o
+   * Lead sem duplicar nada. O escopo aqui tem UM Lead ativo — quem exercita o
+   * escopo misto é `loteMistoNaChamadaDiretaPreservaAReatribuicao`.
    *
-   * O que este teste NÃO consegue observar, e por quê: em produção essa exceção
-   * fica sem tratamento e a plataforma reverte a transação inteira do escopo —
-   * inclusive a reatribuição. Aqui ela precisa ser CAPTURADA para o método de
-   * teste seguir até as asserções, e capturá-la é exatamente o que impede o
-   * rollback automático. Medido: com a exceção capturada, a reatribuição
-   * persiste. Portanto o rollback do escopo é garantia da plataforma
-   * (exceção não capturada = rollback da transação), não algo que este teste
-   * possa comprovar — e dizer o contrário seria um verde falso.
+   * O que este teste NÃO demonstra, e por quê: em produção essa exceção fica
+   * sem tratamento e a plataforma reverte a transação inteira do escopo —
+   * inclusive uma reatribuição feita no mesmo lote. Aqui ela precisa ser
+   * CAPTURADA para o método de teste seguir até as asserções, e capturá-la é
+   * exatamente o que impede o rollback automático. Medido: com a exceção
+   * capturada, a reatribuição persiste. O rollback integral do escopo é, então,
+   * garantia TRANSACIONAL DA PLATAFORMA (exceção não capturada = rollback da
+   * transação) — dizer que este teste o comprova seria um verde falso.
    */
   @IsTest
-  static void loteMistoNoBatchFalhaAltoESeRecuperaNaVarreduraSeguinte() {
+  static void batchFalhaAltoESeRecuperaNaVarreduraSeguinte() {
     montarCenario(2);
     Lead ativo = leadNoCiclo(emSaoPaulo(QUARTA, 9, 0));
     User descartavel = montarUsuario('inb');
