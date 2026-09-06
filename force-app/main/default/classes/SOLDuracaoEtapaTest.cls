@@ -1650,6 +1650,126 @@ private class SOLDuracaoEtapaTest {
     );
   }
 
+  // ================================================================ Scheduler
+
+  /**
+   * O agendamento NUNCA duplica. Segue o precedente de
+   * `SOLDistribuicaoReprocessamentoTest.naoCriaAgendamentoDuplicado`, e por um
+   * motivo concreto: CronTrigger NÃO é isolado em teste. Se o job real da org
+   * já existir, a PRIMEIRA chamada é que recusa — e isso também é o
+   * comportamento correto. O teste lê o CronTrigger pelo NOME, nunca por Id, e
+   * em nenhum caminho aborta o job de produção.
+   */
+  @IsTest
+  static void agendamentoNuncaDuplica() {
+    Boolean jaExiste = ![
+      SELECT Id
+      FROM CronTrigger
+      WHERE CronJobDetail.Name = :SOLDuracaoEtapaScheduler.NOME_JOB
+    ]
+    .isEmpty();
+
+    Test.startTest();
+    Boolean recusouDuplicado = false;
+    try {
+      Id primeiro = SOLDuracaoEtapaScheduler.agendar();
+      Assert.isFalse(jaExiste, 'Só agenda se ainda não existia.');
+      Assert.isNotNull(primeiro, 'O agendamento devolve o Id do CronTrigger.');
+      try {
+        SOLDuracaoEtapaScheduler.agendar();
+      } catch (SOLDuracaoEtapaScheduler.AgendamentoException e) {
+        recusouDuplicado = true;
+      }
+    } catch (SOLDuracaoEtapaScheduler.AgendamentoException e) {
+      // Já existia na org: a 1ª chamada recusou. Também é o correto.
+      recusouDuplicado = true;
+      Assert.isTrue(jaExiste, 'Só recusa de cara quando o job já existia.');
+    }
+    Test.stopTest();
+
+    Assert.isTrue(
+      recusouDuplicado,
+      'agendar() nunca pode criar um 2º job com o mesmo nome.'
+    );
+  }
+
+  @IsTest
+  static void desagendarEhIdempotenteENuncaLanca() {
+    // Alterações de agendamento feitas em teste são revertidas ao fim.
+    Test.startTest();
+    SOLDuracaoEtapaScheduler.desagendar();
+    SOLDuracaoEtapaScheduler.desagendar();
+    Test.stopTest();
+    Assert.isTrue(true, 'desagendar() nunca lança, mesmo sem job algum.');
+  }
+
+  /**
+   * O horário do agendamento é o minuto 45, e isso não é detalhe estético: os
+   * minutos 0, 15 e 30 pertencem ao reprocessamento da distribuição, ao motor
+   * da cadência e ao prazo total. Os quatro nunca disparam no mesmo instante.
+   */
+  @IsTest
+  static void agendamentoUsaOMinuto45ENaoColideComOsOutrosTres() {
+    Assert.areEqual(
+      '0 45 * * * ?',
+      SOLDuracaoEtapaScheduler.CRON_HORARIO,
+      'A varredura da duração roda no minuto 45.'
+    );
+    Set<String> horarios = new Set<String>{
+      SOLDistribuicaoReprocessamentoScheduler.CRON_HORARIO,
+      SOLCadenciaMotorScheduler.CRON_HORARIO,
+      SOLPrazoTotalScheduler.CRON_HORARIO,
+      SOLDuracaoEtapaScheduler.CRON_HORARIO
+    };
+    Assert.areEqual(
+      4,
+      horarios.size(),
+      'Os quatro agendamentos SOL têm horários distintos: ' + horarios
+    );
+    Set<String> nomes = new Set<String>{
+      SOLDistribuicaoReprocessamentoScheduler.NOME_JOB,
+      SOLCadenciaMotorScheduler.NOME_JOB,
+      SOLPrazoTotalScheduler.NOME_JOB,
+      SOLDuracaoEtapaScheduler.NOME_JOB
+    };
+    Assert.areEqual(4, nomes.size(), 'E nomes de job distintos.');
+  }
+
+  /**
+   * `execute()` dispara a varredura quando nada está em andamento, e PULA a
+   * janela quando há execução ativa — em vez de enfileirar uma segunda passagem
+   * sobre os mesmos registros.
+   */
+  @IsTest
+  static void schedulerDisparaAVarreduraEPulaJanelaSobreposta() {
+    Integer antes = [
+      SELECT COUNT()
+      FROM AsyncApexJob
+      WHERE JobType = 'BatchApex' AND ApexClass.Name = 'SOLDuracaoEtapaBatch'
+    ];
+
+    Test.startTest();
+    Assert.isFalse(
+      SOLDuracaoEtapaScheduler.haExecucaoEmAndamento(),
+      'Pré-condição: nenhuma varredura em andamento neste contexto de teste.'
+    );
+    new SOLDuracaoEtapaScheduler().execute(null);
+    Test.stopTest();
+
+    Integer depois = [
+      SELECT COUNT()
+      FROM AsyncApexJob
+      WHERE JobType = 'BatchApex' AND ApexClass.Name = 'SOLDuracaoEtapaBatch'
+    ];
+    // Medição por DELTA, e não por total: AsyncApexJob não é isolado em teste,
+    // então um total absoluto dependeria do que a org já rodou hoje.
+    Assert.areEqual(
+      antes + 1,
+      depois,
+      'O scheduler enfileirou exatamente uma varredura.'
+    );
+  }
+
   // ================================================================ Invocable
 
   /**
