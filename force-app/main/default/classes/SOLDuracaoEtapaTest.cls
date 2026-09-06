@@ -935,7 +935,7 @@ private class SOLDuracaoEtapaTest {
   // ======================================= conversão e ressincronização
 
   @IsTest
-  static void conversaoLevaOsSeisCamposParaAOportunidade() {
+  static void conversaoLevaAMedicaoCompletaParaAOportunidade() {
     Lead l = novoLead(PRODUTO_RT);
     // O anexo vem ANTES: a VR SOL_Conversao_Exige_Procuracao_Ou_Apto recusa
     // marcar a procuração como recebida sem arquivo no Lead.
@@ -960,6 +960,8 @@ private class SOLDuracaoEtapaTest {
     Test.stopTest();
 
     Assert.isTrue(r.convertido, 'Pré-condição: a conversão precisa acontecer. ' + r.mensagem);
+    // São NOVE campos desde a revisão: 3 marcos (incluindo a origem da etapa 1),
+    // 3 durações e os 3 de pendência.
     Opportunity o = opp((Id) r.oportunidadeId);
     Assert.areEqual(
       antes.SOL_Data_Primeira_Ligacao__c,
@@ -989,6 +991,19 @@ private class SOLDuracaoEtapaTest {
     Assert.isFalse(
       o.SOL_Duracao_Pendente__c,
       'Sem pendência no Lead, a Oportunidade nasce sem pendência.'
+    );
+    Assert.isNull(
+      o.SOL_Duracao_Pendencia_Motivo__c,
+      'Sem pendência não há motivo — e motivo e detalhe passaram a viajar junto do checkbox.'
+    );
+    Assert.isNull(
+      o.SOL_Duracao_Pendencia_Detalhe__c,
+      'Nem detalhe.'
+    );
+    Assert.areEqual(
+      antes.SOL_Data_Distribuicao__c,
+      o.SOL_Data_Distribuicao__c,
+      'A ORIGEM da etapa 1 é espelhada na conversão: sem ela a Oportunidade não sabe avaliar essa etapa.'
     );
     Assert.isNotNull(
       antes.SOL_Dias_Primeira_Ligacao__c,
@@ -1662,7 +1677,7 @@ private class SOLDuracaoEtapaTest {
    * dentro do próprio serviço: fora de teste ele não faz nada.
    */
   @IsTest
-  static void falhaDeGravacaoNaoDesfazOMarcoEVirulaPendenciaTecnica() {
+  static void falhaDeGravacaoNaoDesfazOMarcoEViraPendenciaTecnica() {
     Lead l = novoLead(PRODUTO_RT);
     update new Lead(
       Id = l.Id,
