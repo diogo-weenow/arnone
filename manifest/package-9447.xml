@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Activity.SOL_Contato_Efetivado__c</members>
+        <members>Lead.SOL_Contato_Efetivado__c</members>
+        <members>Lead.SOL_Data_Contato_Efetivado__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>Task.SOL_Contato_Efetivado_Envio_Coerente</members>
+        <members>Task.SOL_Contato_Efetivado_Exige_Lead</members>
+        <members>Task.SOL_Contato_Efetivado_Nao_Reaponta</members>
+        <members>Task.SOL_Contato_Efetivado_Nao_Reverte</members>
+        <name>ValidationRule</name>
+    </types>
+    <types>
+        <members>SOL_Contato_Efetivado_Por_Envio</members>
+        <name>Flow</name>
+    </types>
+    <types>
+        <members>Task-Task Layout</members>
+        <name>Layout</name>
+    </types>
+    <types>
+        <members>PS_SOL_Comercial</members>
+        <members>PS_SOL_Distribuicao_Admin</members>
+        <name>PermissionSet</name>
+    </types>
+    <types>
+        <members>SOLContatoEfetivadoInvocable</members>
+        <members>SOLContatoEfetivadoTest</members>
+        <members>SOLDistribuicaoService</members>
+        <name>ApexClass</name>
+    </types>
+    <version>66.0</version>
+</Package>

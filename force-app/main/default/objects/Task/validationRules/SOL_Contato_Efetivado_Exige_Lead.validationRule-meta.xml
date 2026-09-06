@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Contato_Efetivado_Exige_Lead</fullName>
+    <active>true</active>
+    <description>CLICKUP-9447: só se marca a resposta em tarefa ligada a um LEAD. Vale apenas na TRANSIÇÃO para verdadeiro, por isso não quebra a conversão, que reaponta a tarefa para o Contact quando o checkbox JÁ era verdadeiro. O Record Type é validado no Apex.</description>
+    <errorConditionFormula>AND(
+  SOL_Contato_Efetivado__c,
+  NOT( PRIORVALUE( SOL_Contato_Efetivado__c ) ),
+  LEFT( CASESAFEID( WhoId ) , 3 ) &lt;&gt; &quot;00Q&quot;
+)</errorConditionFormula>
+    <errorDisplayField>SOL_Contato_Efetivado__c</errorDisplayField>
+    <errorMessage>Esta tarefa não está vinculada a um lead, então não é possível registrar que o lead respondeu. Registre a resposta na tarefa de e-mail do próprio lead.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Contato_Efetivado_Nao_Reverte</fullName>
+    <active>true</active>
+    <description>CLICKUP-9447: o sinal de resposta do lead é IRREVERSÍVEL — ao ser marcado já sinalizou o Lead e cancelou as tarefas dos três canais. Regra sobre a TRANSIÇÃO, complementar à VR de estado, que segue sem guarda.</description>
+    <errorConditionFormula>AND(
+  NOT( ISNEW() ),
+  PRIORVALUE( SOL_Contato_Efetivado__c ),
+  NOT( SOL_Contato_Efetivado__c )
+)</errorConditionFormula>
+    <errorDisplayField>SOL_Contato_Efetivado__c</errorDisplayField>
+    <errorMessage>O contato efetivado já foi registrado e não pode ser desfeito: o Lead e as tarefas dos três canais já foram atualizados. Se o registro foi um engano, acione o administrador ou o suporte autorizado.</errorMessage>
+</ValidationRule>

@@ -889,6 +889,14 @@ public without sharing class SOLDistribuicaoService {
    * momento, sem bloqueio por horário/dia (cliente pode retornar no fim de
    * semana).
    *
+   * (CLICKUP-9447) SEGUNDA PORTA DE ENTRADA, sem uma linha de código nova aqui:
+   * o Flow `SOL_Contato_Efetivado_Por_Envio` chama o MESMO Invocable quando o
+   * vendedor marca `Task.SOL_Contato_Efetivado__c` numa tarefa do canal E-MAIL,
+   * registrando que o lead RESPONDEU. As duas portas convergem neste método, e
+   * é a idempotência dele que torna a segunda inofensiva sobre um Lead já
+   * efetivado pela ligação: sem tarefas pendentes e com o flag já marcado, o
+   * reprocessamento é no-op e a data do PRIMEIRO contato não é sobrescrita.
+   *
    * Bulk-safe: nenhuma consulta ou DML dentro de laço. Concorrência: os Leads e
    * as tarefas pendentes são travados com FOR UPDATE, o que serializa dois
    * "Atendeu" simultâneos do mesmo Lead. Idempotente: um 2º disparo não

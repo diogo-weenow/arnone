@@ -99,6 +99,10 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
+                <field>SOL_Contato_Efetivado__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
                 <field>SOL_Resultado_Reuniao__c</field>
             </layoutItems>
             <layoutItems>
