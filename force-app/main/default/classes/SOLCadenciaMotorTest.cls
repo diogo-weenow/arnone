@@ -1063,6 +1063,221 @@ private class SOLCadenciaMotorTest {
     );
   }
 
+  /**
+   * (11) O cenário que a falha "natural" nunca alcança: um canal JÁ GRAVOU e o
+   * seguinte falha. O `pontoDeFalhaDeTeste` do serviço é injetado exatamente
+   * entre a criação da ligação e a do e-mail, então quando ele dispara a
+   * ligação do dia já está no banco — e o Savepoint tem de apagá-la também.
+   *
+   * Sem este teste, "não existe dia com e-mail mas sem WhatsApp" seria só uma
+   * frase no cabeçalho: o teste de proprietário inativo derruba os três canais
+   * de uma vez e jamais exercita o rollback de um canal já gravado.
+   */
+  @IsTest
+  static void falhaDepoisDeUmCanalGravadoApagaODiaInteiro() {
+    montarCenario(1);
+    Lead l = leadNoCiclo(emSaoPaulo(TERCA, 9, 0));
+    agoraEm(QUARTA);
+    SOLCadenciaMotorService.falharDepoisDoPrimeiroCanal = true;
+
+    Test.startTest();
+    SOLCadenciaMotorService.ResultadoMotor r = rodar(l.Id);
+    Test.stopTest();
+
+    System.assert(r.comErro > 0, 'A falha é reportada, não engolida.');
+    System.assertEquals(0, r.tarefasCriadas, 'Nada é contabilizado como criado.');
+    System.assert(!r.mensagens.isEmpty(), 'Com mensagem controlada.');
+    System.assertEquals(
+      0,
+      tarefas(l.Id, CANAL_LIGACAO, 2).size(),
+      'A LIGAÇÃO, que já tinha sido gravada quando a falha aconteceu, foi apagada pelo rollback.'
+    );
+    System.assertEquals(
+      0,
+      tarefas(l.Id, null, null).size(),
+      'E nenhum canal sobrou: sem dia pela metade.'
+    );
+
+    // O retry da varredura seguinte, sem a falha, recompõe o dia inteiro.
+    SOLCadenciaMotorService.falharDepoisDoPrimeiroCanal = false;
+    SOLCadenciaMotorService.ResultadoMotor r2 = rodar(l.Id);
+    System.assertEquals(3, r2.tarefasCriadas, 'O retry cria os três canais.');
+    System.assertEquals(0, r2.comErro, 'E agora sem erro.');
+    System.assertEquals(3, quantasNoDia(l.Id, 2), 'Os três canais do dia 2.');
+    System.assertEquals(
+      3,
+      tarefas(l.Id, null, null).size(),
+      'Sem duplicidade: exatamente três tarefas no total.'
+    );
+  }
+
+  /**
+   * (11) LOTE MISTO na CHAMADA DIRETA ao serviço — esgotado + ativo, com a
+   * criação falhando.
+   *
+   * Fixa o primeiro dos dois comportamentos documentados no cabeçalho do
+   * serviço: o Savepoint do motor cobre APENAS os canais, então a reatribuição
+   * concluída na fase anterior sobrevive à falha de criação. É o que se vê
+   * quando alguém chama `executar()` direto (Apex anônimo, retry manual).
+   *
+   * O outro comportamento — pelo Batch, a exceção do `execute` derruba a
+   * transação inteira e leva a reatribuição junto — está em
+   * `loteMistoNoBatchFalhaAltoESeRecuperaNaVarreduraSeguinte`, com a ressalva
+   * de observabilidade explicada lá.
+   *
+   * A falha é natural (proprietário inativo, que `Task.OwnerId` recusa) e
+   * atinge só o Lead ativo: o esgotado mantém o dono da fila, então o roster da
+   * reatribuição fica intacto.
+   */
+  @IsTest
+  static void loteMistoNaChamadaDiretaPreservaAReatribuicao() {
+    Cenario c = montarCenario(2);
+
+    // (1) Lead ESGOTADO e reatribuível: três negativas e ciclo bem para trás.
+    Lead esgotado = leadsDistribuidos(1)[0];
+    for (Integer i = 0; i < 3; i++) {
+      concluirLigacaoNegativa(esgotado.Id, esgotado.OwnerId);
+    }
+    Id donoAntes = recarregar(esgotado.Id).OwnerId;
+    delete [
+      SELECT Id
+      FROM Task
+      WHERE WhoId = :esgotado.Id AND SOL_Dia_Cadencia__c != NULL
+    ];
+    Datetime cicloAntes = emSaoPaulo(SEXTA_ANTERIOR, 9, 0);
+    update new Lead(
+      Id = esgotado.Id,
+      SOL_Data_Inicio_Ciclo_Contato__c = cicloAntes
+    );
+
+    // (2) Lead ATIVO no dia 1, com um proprietário DESCARTÁVEL que será
+    // desativado — fora da fila, para não mexer no roster do esgotado.
+    Lead ativo = leadNoCiclo(emSaoPaulo(QUARTA, 9, 0));
+    User descartavel = montarUsuario('inat');
+    System.runAs(contextoAtual()) {
+      insert descartavel;
+    }
+    update new Lead(Id = ativo.Id, OwnerId = descartavel.Id);
+    System.runAs(contextoAtual()) {
+      update new User(Id = descartavel.Id, IsActive = false);
+    }
+    System.assertNotEquals(
+      donoAntes,
+      descartavel.Id,
+      'Pré-condição: o dono inativo não é o dono do Lead esgotado.'
+    );
+    agoraEm(QUARTA);
+
+    Test.startTest();
+    SOLCadenciaMotorService.ResultadoMotor r = rodar(
+      new List<Id>{ esgotado.Id, ativo.Id }
+    );
+    Test.stopTest();
+
+    // A criação falhou e foi revertida por inteiro...
+    System.assert(r.comErro > 0, 'A falha de criação é reportada.');
+    System.assertEquals(0, r.tarefasCriadas, 'Nenhum canal contabilizado.');
+    System.assertEquals(
+      0,
+      tarefas(ativo.Id, null, null).size(),
+      'O Lead ativo não ficou com nenhum canal: sem dia pela metade.'
+    );
+
+    // ...e a REATRIBUIÇÃO, feita antes do Savepoint, sobreviveu.
+    System.assertEquals(1, r.leadsEsgotados, 'O outro Lead estava esgotado.');
+    System.assertEquals(1, r.reatribuidos, 'E foi reatribuído.');
+    Lead depois = recarregar(esgotado.Id);
+    System.assertNotEquals(
+      donoAntes,
+      depois.OwnerId,
+      'Na chamada direta, a reatribuição NÃO é desfeita pela falha de canal.'
+    );
+    System.assertNotEquals(
+      cicloAntes,
+      depois.SOL_Data_Inicio_Ciclo_Contato__c,
+      'O ciclo reiniciado também permanece.'
+    );
+    System.assertEquals(
+      1,
+      [
+        SELECT COUNT()
+        FROM Task
+        WHERE
+          WhoId = :esgotado.Id
+          AND SOL_Canal_Contato__c = :CANAL_LIGACAO
+          AND SOL_Dia_Cadencia__c = 1
+          AND Status = :STATUS_ABERTO
+      ],
+      'E a ligação do dia 1 do novo ciclo, criada por quem reatribuiu, também.'
+    );
+  }
+
+  /**
+   * (11) LOTE MISTO PELO BATCH — o caminho de produção.
+   *
+   * O que este teste FIXA: um lote com falha de criação termina LANÇANDO
+   * `LoteComFalhaException`, em vez de terminar em silêncio; e a varredura
+   * seguinte, removida a causa, processa o Lead sem duplicar nada.
+   *
+   * O que este teste NÃO consegue observar, e por quê: em produção essa exceção
+   * fica sem tratamento e a plataforma reverte a transação inteira do escopo —
+   * inclusive a reatribuição. Aqui ela precisa ser CAPTURADA para o método de
+   * teste seguir até as asserções, e capturá-la é exatamente o que impede o
+   * rollback automático. Medido: com a exceção capturada, a reatribuição
+   * persiste. Portanto o rollback do escopo é garantia da plataforma
+   * (exceção não capturada = rollback da transação), não algo que este teste
+   * possa comprovar — e dizer o contrário seria um verde falso.
+   */
+  @IsTest
+  static void loteMistoNoBatchFalhaAltoESeRecuperaNaVarreduraSeguinte() {
+    montarCenario(2);
+    Lead ativo = leadNoCiclo(emSaoPaulo(QUARTA, 9, 0));
+    User descartavel = montarUsuario('inb');
+    System.runAs(contextoAtual()) {
+      insert descartavel;
+    }
+    update new Lead(Id = ativo.Id, OwnerId = descartavel.Id);
+    System.runAs(contextoAtual()) {
+      update new User(Id = descartavel.Id, IsActive = false);
+    }
+    agoraEm(QUARTA);
+
+    String erroDoLote = '';
+    Test.startTest();
+    Database.executeBatch(new SOLCadenciaMotorBatch(), 50);
+    try {
+      Test.stopTest();
+    } catch (Exception e) {
+      erroDoLote = e.getMessage();
+    }
+
+    System.assert(
+      erroDoLote.contains('não atendido'),
+      'O lote com falha termina ALTO, com a mensagem do CLICKUP-9398. Recebido: ' +
+        erroDoLote
+    );
+    System.assertEquals(
+      0,
+      tarefas(ativo.Id, null, null).size(),
+      'E nenhum canal foi gravado para o Lead que falhou.'
+    );
+
+    // Removida a causa, a varredura seguinte faz o trabalho — sem duplicar.
+    System.runAs(contextoAtual()) {
+      update new User(Id = descartavel.Id, IsActive = true);
+    }
+    SOLCadenciaMotorService.ResultadoMotor r = rodar(ativo.Id);
+
+    System.assertEquals(0, r.comErro, 'Sem falha desta vez.');
+    System.assertEquals(3, r.tarefasCriadas, 'Os três canais do dia.');
+    System.assertEquals(
+      3,
+      tarefas(ativo.Id, null, null).size(),
+      'Sem duplicidade: exatamente três tarefas.'
+    );
+    System.assertEquals(3, quantasNoDia(ativo.Id, 1), 'Todas do dia 1.');
+  }
+
   // ==================================================== bulk
 
   /** (12) Lote grande: consultas e DML não escalam com o tamanho. */

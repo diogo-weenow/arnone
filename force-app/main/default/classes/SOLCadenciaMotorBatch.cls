@@ -93,6 +93,16 @@ public without sharing class SOLCadenciaMotorBatch implements Database.Batchable
     );
 
     if (r.comErro > 0) {
+      // Faz o AsyncApexJob registrar a falha (NumberOfErrors / ExtendedStatus).
+      //
+      // ATENÇÃO AO ALCANCE: esta exceção reverte a transação INTEIRA do escopo,
+      // não apenas a criação de tarefas. Uma reatribuição que o serviço tenha
+      // concluído neste mesmo lote também volta atrás — o Savepoint interno do
+      // serviço protege só os canais, e a reatribuição acontece antes dele.
+      // É deliberado: um lote com falha não deixa metade do trabalho feito, e a
+      // varredura seguinte recompõe tudo, porque criação e reatribuição são
+      // idempotentes. Um escopo com Leads esgotados e Leads em dia ativo ao
+      // mesmo tempo é o caso comum, não a exceção.
       String detalhe = r.mensagens.isEmpty()
         ? 'Falha controlada sem mensagem.'
         : String.join(r.mensagens, ' | ');

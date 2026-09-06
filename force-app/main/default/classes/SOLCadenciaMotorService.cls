@@ -56,9 +56,23 @@
  *
  * As três portas são chamadas sob um Savepoint PRÓPRIO do motor, criado depois
  * da reatribuição. Se qualquer canal falhar, tudo o que os canais criaram é
- * revertido: não existe "dia com e-mail mas sem WhatsApp". A reatribuição já
- * concluída NÃO é desfeita — ela tem atomicidade própria e desfazê-la só
- * devolveria o Lead a um vendedor que já perdeu a vez.
+ * revertido: não existe "dia com e-mail mas sem WhatsApp".
+ *
+ * O ALCANCE desse rollback depende de quem chamou, e a diferença é real:
+ *
+ * - CHAMADA DIRETA a este serviço: o Savepoint cobre apenas os canais. Uma
+ *   reatribuição já concluída na mesma transação NÃO é desfeita — ela ficou
+ *   fora do Savepoint, de propósito.
+ * - EXECUÇÃO PELO BATCH, que é o caminho de produção: `SOLCadenciaMotorBatch`
+ *   LANÇA quando o resultado traz `comErro`, e essa exceção derruba a transação
+ *   INTEIRA do escopo — inclusive a reatribuição que este serviço concluiu
+ *   antes de abrir o Savepoint. No lote com falha, nada sobrevive.
+ *
+ * A distinção não é acadêmica: um mesmo escopo costuma MISTURAR Leads esgotados
+ * (que vão para a reatribuição) e Leads em dia ativo (que vão para a criação).
+ * Se a criação de um deles falhar, a reatribuição do outro volta atrás junto.
+ * É o preço de a falha ser visível no AsyncApexJob em vez de silenciosa, e a
+ * varredura seguinte recompõe as duas coisas, porque ambas são idempotentes.
  *
  * ------------------------------------------------- o dia 1 nunca se perde
  *
@@ -325,6 +339,11 @@ public without sharing class SOLCadenciaMotorService {
    * lote poderia terminar com ligação e e-mail criados e o WhatsApp faltando.
    * O rollback interno de uma porta não invalida este savepoint, criado ANTES
    * dela.
+   *
+   * O que este savepoint NÃO cobre é a reatribuição da fase anterior. Numa
+   * chamada direta ao serviço ela sobrevive à falha de canal; numa execução
+   * pelo Batch, a exceção que o `execute` lança depois reverte a transação
+   * inteira e leva a reatribuição junto. Ver o cabeçalho da classe.
    */
   private static void criarDiaCorrente(
     Map<Id, Integer> diaPorLead,
@@ -344,11 +363,13 @@ public without sharing class SOLCadenciaMotorService {
 
     Savepoint sp = Database.setSavepoint();
     try {
-      List<SOLCadenciaContatoService.Resultado> porCanal = new List<SOLCadenciaContatoService.Resultado>{
-        SOLCadenciaContatoService.criarLigacoes(pedidos),
-        SOLCadenciaContatoService.criarEmails(pedidos),
-        SOLCadenciaContatoService.criarWhatsApps(pedidos)
-      };
+      List<SOLCadenciaContatoService.Resultado> porCanal = new List<SOLCadenciaContatoService.Resultado>();
+      porCanal.add(SOLCadenciaContatoService.criarLigacoes(pedidos));
+      // Único ponto de injeção de falha, ATIVO SOMENTE EM TESTE: é aqui que se
+      // prova que o rollback apaga também o que o canal ANTERIOR já gravou.
+      pontoDeFalhaDeTeste();
+      porCanal.add(SOLCadenciaContatoService.criarEmails(pedidos));
+      porCanal.add(SOLCadenciaContatoService.criarWhatsApps(pedidos));
 
       Integer criadas = 0;
       Integer jaExistentes = 0;
@@ -386,6 +407,36 @@ public without sharing class SOLCadenciaMotorService {
       r.tarefasJaExistentes = 0;
       r.comErro += pedidos.size();
       r.mensagens.add(MSG_ERRO_CANAIS);
+    }
+  }
+
+  /** Somente testes: força a falha DEPOIS do primeiro canal ter gravado. */
+  @TestVisible
+  private static Boolean falharDepoisDoPrimeiroCanal = false;
+
+  /** Falha simulada — nunca lançada fora de um teste. */
+  @TestVisible
+  private class FalhaSimuladaDeCanalException extends Exception {
+  }
+
+  /**
+   * SEAM DE TESTE, e nada além disso.
+   *
+   * O cenário que realmente importa na atomicidade é "um canal gravou, o
+   * seguinte falhou, o rollback tem de apagar o que já estava gravado". As
+   * falhas naturais disponíveis — proprietário inativo, por exemplo — derrubam
+   * os TRÊS canais de uma vez e nunca chegam a exercitar esse ponto, então sem
+   * este gancho a garantia ficaria só na documentação.
+   *
+   * Inerte em produção por dupla proteção: a flag nasce falsa e só é gravável
+   * por `@TestVisible`, e `Test.isRunningTest()` barra a execução real mesmo se
+   * alguém conseguisse ligá-la.
+   */
+  private static void pontoDeFalhaDeTeste() {
+    if (Test.isRunningTest() && falharDepoisDoPrimeiroCanal) {
+      throw new FalhaSimuladaDeCanalException(
+        'CLICKUP-9398 — falha simulada de canal (somente teste).'
+      );
     }
   }
 
