@@ -3,8 +3,8 @@
     <actionCalls>
         <name>Chamar_Duracao</name>
         <label>Reavaliar as durações por etapa do Lead</label>
-        <locationX>50</locationX>
-        <locationY>528</locationY>
+        <locationX>176</locationX>
+        <locationY>540</locationY>
         <actionName>SOLDuracaoEtapaInvocable</actionName>
         <actionType>apex</actionType>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
@@ -19,13 +19,13 @@
     <apiVersion>66.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
     <decisions>
-        <name>Lead_SOL_Sem_Data</name>
-        <label>Lead SOL sem a data consolidada?</label>
+        <name>Lead_SOL</name>
+        <label>O WhoId aponta para um Lead da Arnone Soluções?</label>
         <locationX>176</locationX>
         <locationY>288</locationY>
         <defaultConnectorLabel>Não — nada a fazer</defaultConnectorLabel>
         <rules>
-            <name>Consolidar</name>
+            <name>Sim_lead_SOL</name>
             <conditionLogic>and</conditionLogic>
             <conditions>
                 <leftValueReference>Get_Lead</leftValueReference>
@@ -41,23 +41,41 @@
                     <stringValue>SOL</stringValue>
                 </rightValue>
             </conditions>
+            <connector>
+                <targetReference>Marco_Vazio</targetReference>
+            </connector>
+            <label>Sim — é lead da unidade</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Marco_Vazio</name>
+        <label>A primeira ligação ainda não foi registrada?</label>
+        <locationX>176</locationX>
+        <locationY>408</locationY>
+        <defaultConnector>
+            <targetReference>Chamar_Duracao</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Já registrada — preserva a primeira</defaultConnectorLabel>
+        <rules>
+            <name>Gravar_Primeira</name>
+            <conditionLogic>and</conditionLogic>
             <conditions>
-                <leftValueReference>Get_Lead.SOL_Data_Reuniao_Realizada__c</leftValueReference>
+                <leftValueReference>Get_Lead.SOL_Data_Primeira_Ligacao__c</leftValueReference>
                 <operator>IsNull</operator>
                 <rightValue>
                     <booleanValue>true</booleanValue>
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Consolidar_Data</targetReference>
+                <targetReference>Gravar_Marco</targetReference>
             </connector>
-            <label>Consolidar a primeira data</label>
+            <label>Sim — gravar o marco</label>
         </rules>
     </decisions>
-    <description>CLICKUP-9419 — Quando uma Task de &quot;Reunião comercial&quot; é concluída (Status = &quot;Completed&quot;, SOL_Resultado_Reuniao__c = &quot;Realizada&quot;, CompletedDateTime preenchido, WhoId apontando para Lead), copia o CompletedDateTime para Lead.SOL_Data_Reuniao_Realizada__c — mas SÓ se o campo ainda estiver vazio (preserva a PRIMEIRA reunião realizada; reprocessamentos e reuniões posteriores não sobrescrevem). Consolida a evidência da reunião no Lead porque as Tasks ficam indisponíveis para consulta durante Database.convertLead. Não altera a Task. Bulk-safe (Get Records + Update do Flow são bulkificados). CLICKUP-9439 / CLICKUP-9429 (absorvido) — ESTENDIDO: depois de consolidar a data, aciona SOLDuracaoEtapaInvocable para reavaliar as durações por etapa. A reunião é um dos dois insumos da etapa 3 (contato efetivado até o ÚLTIMO de reunião e procuração); o outro insumo é acompanhado por SOL_Duracao_Marcos_Lead. A lógica original NÃO foi alterada: mesmo filtro, mesma decisão, mesma regra de gravar só se o campo estiver vazio. O acionamento fica apenas no caminho que gravou, porque quando a data já existia nada mudou e não há etapa nova para fechar. Sem fault path: o Invocable nunca relança, então nem a falta do Business Hours desfaz a conclusão da tarefa — nesse caso a duração fica vazia e a pendência fica registrada.</description>
+    <description>CLICKUP-9439 / CLICKUP-9429 (absorvido) — quando uma Task de contato do canal Ligação é concluída (Status = &quot;Completed&quot;, CompletedDateTime preenchido, WhoId apontando para Lead), copia o CompletedDateTime para Lead.SOL_Data_Primeira_Ligacao__c — mas SÓ se o campo ainda estiver vazio, preservando a PRIMEIRA ligação. Esse marco fecha a etapa 1 (distribuição até a primeira ligação) e abre a etapa 2 (primeira ligação até o contato efetivado). Consolida no Lead porque as Tasks ficam indisponíveis para consulta durante Database.convertLead e podem ser canceladas depois. Segue o molde de SOL_Consolidar_Reuniao_Realizada. O tipo do WhoId NÃO é validado por Validation Rule nem por fórmula — WhoId é polimórfico, e VR que exige Lead quebra Database.convertLead; quem descarta o que não for Lead da unidade é o Apex. Depois de gravar (ou de constatar que já havia marco), aciona SOLDuracaoEtapaInvocable para reavaliar as durações. Não tem fault path, e aqui isso NÃO é atomicidade: o Invocable nunca relança, por decisão do P.O. — falha analítica não pode desfazer a conclusão da tarefa. Não altera a Task. Bulk-safe.</description>
     <environments>Default</environments>
-    <interviewLabel>SOL_Consolidar_Reuniao_Realizada {!$Flow.CurrentDateTime}</interviewLabel>
-    <label>SOL_Consolidar_Reuniao_Realizada</label>
+    <interviewLabel>SOL_Marco_Primeira_Ligacao {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL_Marco_Primeira_Ligacao</label>
     <processType>AutoLaunchedFlow</processType>
     <recordLookups>
         <name>Get_Lead</name>
@@ -66,7 +84,7 @@
         <locationY>180</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>Lead_SOL_Sem_Data</targetReference>
+            <targetReference>Lead_SOL</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
@@ -81,10 +99,10 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordUpdates>
-        <name>Consolidar_Data</name>
-        <label>Gravar a data no Lead</label>
+        <name>Gravar_Marco</name>
+        <label>Gravar a data da primeira ligação no Lead</label>
         <locationX>50</locationX>
-        <locationY>408</locationY>
+        <locationY>528</locationY>
         <connector>
             <targetReference>Chamar_Duracao</targetReference>
         </connector>
@@ -97,7 +115,7 @@
             </value>
         </filters>
         <inputAssignments>
-            <field>SOL_Data_Reuniao_Realizada__c</field>
+            <field>SOL_Data_Primeira_Ligacao__c</field>
             <value>
                 <elementReference>$Record.CompletedDateTime</elementReference>
             </value>
@@ -112,9 +130,9 @@
         </connector>
         <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
         <filterFormula>AND(
-  TEXT({!$Record.SOL_Tipo_Tarefa__c}) = &apos;Reunião comercial&apos;,
+  TEXT({!$Record.SOL_Tipo_Tarefa__c}) = &apos;Contato&apos;,
+  TEXT({!$Record.SOL_Canal_Contato__c}) = &apos;Ligação&apos;,
   TEXT({!$Record.Status}) = &apos;Completed&apos;,
-  TEXT({!$Record.SOL_Resultado_Reuniao__c}) = &apos;Realizada&apos;,
   NOT(ISBLANK({!$Record.CompletedDateTime})),
   NOT(ISBLANK({!$Record.WhoId}))
 )</filterFormula>

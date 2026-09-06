@@ -48,7 +48,12 @@ public with sharing class SOL_ConverterLead {
     'Id, Name, FirstName, LastName, Company, Email, Phone, IsConverted, ' +
     'CNPJ__c, RecordType.DeveloperName, SOL_Produto_Interesse__c, ' +
     'SOL_Status_Procuracao__c, SOL_Data_Recebimento_Procuracao__c, ' +
-    'SOL_Apto_Conversao__c, SOL_Data_Contato_Efetivado__c';
+    'SOL_Apto_Conversao__c, SOL_Data_Contato_Efetivado__c, ' +
+    // CLICKUP-9439 / CLICKUP-9429 (absorvido) — medicao por etapa. Sao
+    // transportados para a Oportunidade na conversao; ver avancarOportunidade.
+    'SOL_Data_Primeira_Ligacao__c, SOL_Data_Reuniao_Procuracao__c, ' +
+    'SOL_Dias_Primeira_Ligacao__c, SOL_Dias_Contato_Efetivado__c, ' +
+    'SOL_Dias_Reuniao_Procuracao__c, SOL_Duracao_Pendente__c';
 
   // ------------------------------------------------- regras compartilhadas
   //
@@ -426,15 +431,48 @@ public with sharing class SOL_ConverterLead {
     // permission sets). É a automação da conversão que os grava — em modo de
     // sistema, porque quem dispara a conversão não tem edição nesses campos
     // técnicos.
+    //
+    // CLICKUP-9439 / CLICKUP-9429 (absorvido) — a mesma gravação leva também os
+    // seis campos da medição por etapa. É CÓPIA DIRETA, sem cálculo nenhum: não
+    // consulta calendário, não conta dia útil e por isso NÃO introduz caminho de
+    // falha novo na conversão.
+    //
+    // CONTRASTE DELIBERADO, e ele é o ponto: o prazo total acima é OPERACIONAL
+    // — dispara a reatribuição de dono do CLICKUP-9424 —, e sem ele a
+    // Oportunidade não pode nascer; por isso `calcularPrazoTotal` continua
+    // ABORTANDO a conversão inteira quando o calendário falta. As durações são
+    // ANALÍTICAS, e a política do P.O. para elas é a oposta: se não dá para
+    // medir, o negócio segue e a medição fica pendente. Aqui as duas convivem
+    // sem se misturar porque o transporte não calcula nada — se a duração
+    // chegou vazia no Lead, chega vazia na Oportunidade, com a pendência junto,
+    // e SOLDuracaoEtapaService a ressincroniza quando o Lead for corrigido.
+    Opportunity tecnicos = new Opportunity(
+      Id = oportunidadeId,
+      SOL_Data_Primeira_Ligacao__c = l.SOL_Data_Primeira_Ligacao__c,
+      SOL_Data_Reuniao_Procuracao__c = l.SOL_Data_Reuniao_Procuracao__c,
+      SOL_Dias_Primeira_Ligacao__c = l.SOL_Dias_Primeira_Ligacao__c,
+      SOL_Dias_Contato_Efetivado__c = l.SOL_Dias_Contato_Efetivado__c,
+      SOL_Dias_Reuniao_Procuracao__c = l.SOL_Dias_Reuniao_Procuracao__c,
+      SOL_Duracao_Pendente__c = l.SOL_Duracao_Pendente__c == true
+    );
+    Boolean haMedicao =
+      l.SOL_Data_Primeira_Ligacao__c != null ||
+      l.SOL_Data_Reuniao_Procuracao__c != null ||
+      l.SOL_Dias_Primeira_Ligacao__c != null ||
+      l.SOL_Dias_Contato_Efetivado__c != null ||
+      l.SOL_Dias_Reuniao_Procuracao__c != null ||
+      l.SOL_Duracao_Pendente__c == true;
+
     if (inicioCiclo != null) {
+      tecnicos.SOL_Data_Inicio_Ciclo_Comercial__c = inicioCiclo;
+      tecnicos.SOL_Prazo_Total_Comercial__c = prazoTotal;
+    }
+
+    // Sem contato efetivado E sem medição nenhuma no Lead não há o que
+    // transportar: a gravação extra é evitada, como sempre foi.
+    if (inicioCiclo != null || haMedicao) {
       Database.update(
-        new List<Opportunity>{
-          new Opportunity(
-            Id = oportunidadeId,
-            SOL_Data_Inicio_Ciclo_Comercial__c = inicioCiclo,
-            SOL_Prazo_Total_Comercial__c = prazoTotal
-          )
-        },
+        new List<Opportunity>{ tecnicos },
         AccessLevel.SYSTEM_MODE
       );
     }

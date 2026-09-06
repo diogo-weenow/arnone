@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Chamar_Duracao</name>
+        <label>Reavaliar as durações por etapa da Oportunidade</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <actionName>SOLDuracaoEtapaInvocable</actionName>
+        <actionType>apex</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>recordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>SOLDuracaoEtapaInvocable</nameSegment>
+    </actionCalls>
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>CLICKUP-9439 / CLICKUP-9429 (absorvido) — aciona SOLDuracaoEtapaInvocable depois que a Oportunidade da unidade é encerrada em Ganho ou Perdido, para calcular a duração da etapa 6 (reunião final até o encerramento). É o par after-save de SOL_Marco_Encerramento_Oportunidade, que grava a data em before-save. A separação é deliberada: o carimbo do marco não pode depender de Apex nem de calendário, e o cálculo da duração não pode ser feito em before-save porque precisa de outros campos já gravados. Sem fault path — o Invocable nunca relança, então nem a falta do Business Hours nem uma inconsistência de datas impedem o fechamento do negócio; nesse caso a duração fica vazia e a pendência fica registrada e visível. Vale para os dois produtos: em ART 360 não há reunião final, a etapa 6 simplesmente permanece vazia, e nada aqui precisa saber disso.</description>
+    <environments>Default</environments>
+    <interviewLabel>SOL_Duracao_Apos_Encerramento {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL_Duracao_Apos_Encerramento</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Chamar_Duracao</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &apos;SOL&apos;,
+  NOT(ISBLANK({!$Record.SOL_Data_Encerramento__c})),
+  OR(
+    ISPICKVAL({!$Record.StageName}, &apos;Ganho&apos;),
+    ISPICKVAL({!$Record.StageName}, &apos;Perdido&apos;)
+  )
+)</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
