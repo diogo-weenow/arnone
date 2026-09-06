@@ -872,11 +872,14 @@ private class SOLContatoEfetivadoTest {
     return [
       SELECT
         Id,
+        Subject,
         Status,
         IsClosed,
+        ActivityDate,
         SOL_Prazo_Contato__c,
         SOL_Canal_Contato__c,
         SOL_Tipo_Tarefa__c,
+        SOL_Dia_Cadencia__c,
         SOL_Resultado_Contato__c,
         SOL_Motivo_Cancelamento__c
       FROM Task
@@ -1063,6 +1066,237 @@ private class SOLContatoEfetivadoTest {
         null,
         t.SOL_Motivo_Cancelamento__c,
         'E sem motivo de cancelamento.'
+      );
+    }
+  }
+
+  /**
+   * "Atendeu" numa tarefa JÁ CANCELADA é bloqueado, e a gravação recusada não
+   * deixa rastro: status, motivo e o resto dos dados continuam como estavam.
+   *
+   * Era o furo da primeira versão da regra, que isentava "Cancelada" junto com
+   * "Completed": dava para editar uma tarefa cancelada e produzir exatamente o
+   * estado incoerente que este card existe para eliminar — resultado "Atendeu"
+   * sem contato efetivado, porque o Flow SOL_Contato_Efetivado exige
+   * "Completed" e nunca chega a rodar.
+   */
+  @IsTest
+  static void atendeuEmTarefaJaCanceladaEhBloqueadoSemAlterarNada() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9437d', 'Recuperação Tributária');
+    Task ligacao = ligacaoDeCadenciaAberta(l.Id, l.OwnerId, 2);
+    update new Task(
+      Id = ligacao.Id,
+      Status = 'Cancelada',
+      SOL_Motivo_Cancelamento__c = 'Contato efetivado'
+    );
+
+    Task antes = lerTarefa(ligacao.Id);
+    System.assertEquals(
+      'Cancelada',
+      antes.Status,
+      'Pré-condição: a tarefa está cancelada.'
+    );
+    System.assertEquals(
+      null,
+      antes.SOL_Resultado_Contato__c,
+      'Pré-condição: e sem resultado — cancelada não é atendida.'
+    );
+
+    Test.startTest();
+    String erro = '';
+    try {
+      update new Task(Id = ligacao.Id, SOL_Resultado_Contato__c = 'Atendeu');
+    } catch (DmlException e) {
+      erro = e.getMessage();
+    }
+    Test.stopTest();
+
+    System.assert(
+      erro.contains('apenas ao CONCLUIR'),
+      'Gravar "Atendeu" numa tarefa cancelada tem de ser bloqueado. Recebido: ' +
+        erro
+    );
+
+    Task depois = lerTarefa(ligacao.Id);
+    System.assertEquals(
+      null,
+      depois.SOL_Resultado_Contato__c,
+      'O resultado não foi gravado.'
+    );
+    System.assertEquals(antes.Status, depois.Status, 'O status foi preservado.');
+    System.assertEquals(
+      antes.SOL_Motivo_Cancelamento__c,
+      depois.SOL_Motivo_Cancelamento__c,
+      'O motivo do cancelamento foi preservado.'
+    );
+    System.assertEquals(antes.Subject, depois.Subject, 'O assunto foi preservado.');
+    System.assertEquals(
+      antes.ActivityDate,
+      depois.ActivityDate,
+      'O vencimento foi preservado.'
+    );
+    System.assertEquals(
+      antes.SOL_Canal_Contato__c,
+      depois.SOL_Canal_Contato__c,
+      'O canal foi preservado.'
+    );
+    System.assertEquals(
+      antes.SOL_Tipo_Tarefa__c,
+      depois.SOL_Tipo_Tarefa__c,
+      'O tipo foi preservado.'
+    );
+    System.assertEquals(
+      antes.SOL_Dia_Cadencia__c,
+      depois.SOL_Dia_Cadencia__c,
+      'O dia da cadência foi preservado.'
+    );
+    System.assert(
+      recarregar(l.Id).SOL_Contato_Efetivado__c != true,
+      'E o Lead não foi sinalizado por uma tarefa cancelada.'
+    );
+  }
+
+  /**
+   * Cancelar e marcar "Atendeu" na MESMA gravação é bloqueado por inteiro —
+   * mesmo com tipo, canal e motivo válidos, que fariam o cancelamento passar
+   * sozinho. E o contraste: concluir com "Atendeu" segue permitido e efetiva o
+   * contato normalmente.
+   */
+  @IsTest
+  static void cancelarComAtendeuEhBloqueadoMasConcluirComAtendeuPassa() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9437e', 'Recuperação Tributária');
+    Task ligacao = ligacaoDeCadenciaAberta(l.Id, l.OwnerId, 2);
+
+    Test.startTest();
+    String erro = '';
+    try {
+      update new Task(
+        Id = ligacao.Id,
+        Status = 'Cancelada',
+        SOL_Motivo_Cancelamento__c = 'Contato efetivado',
+        SOL_Resultado_Contato__c = 'Atendeu'
+      );
+    } catch (DmlException e) {
+      erro = e.getMessage();
+    }
+
+    Task aposTentativa = lerTarefa(ligacao.Id);
+    System.assert(
+      erro.contains('apenas ao CONCLUIR'),
+      'Cancelar já marcando "Atendeu" tem de ser bloqueado. Recebido: ' + erro
+    );
+    System.assertEquals(
+      'Open',
+      aposTentativa.Status,
+      'A gravação foi desfeita por inteiro: o status não mudou.'
+    );
+    System.assertEquals(
+      null,
+      aposTentativa.SOL_Motivo_Cancelamento__c,
+      'Nem o motivo, que sozinho seria válido, sobreviveu.'
+    );
+    System.assertEquals(
+      null,
+      aposTentativa.SOL_Resultado_Contato__c,
+      'Nem o resultado.'
+    );
+
+    // O caminho legítimo continua aberto.
+    update new Task(
+      Id = ligacao.Id,
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Atendeu'
+    );
+    Test.stopTest();
+
+    Task concluida = lerTarefa(ligacao.Id);
+    System.assertEquals('Completed', concluida.Status, 'Concluir é permitido.');
+    System.assertEquals(
+      'Atendeu',
+      concluida.SOL_Resultado_Contato__c,
+      'Com o resultado gravado.'
+    );
+    Lead d = recarregar(l.Id);
+    System.assertEquals(
+      true,
+      d.SOL_Contato_Efetivado__c,
+      'E o contato é efetivado normalmente.'
+    );
+    System.assertNotEquals(
+      null,
+      d.SOL_Data_Contato_Efetivado__c,
+      'Com a data carimbada.'
+    );
+  }
+
+  /**
+   * Os três cancelamentos automáticos continuam funcionando — e a razão é
+   * simples: nenhum deles grava "Atendeu". Eles gravam Status e motivo, que a
+   * VR não observa. Não foi preciso isentar "Cancelada" para isso.
+   */
+  @IsTest
+  static void cancelamentosAutomaticosContinuamFuncionando() {
+    montarCenario(3);
+    Lead porContato = novoLeadSOLDistribuido('S9437f', 'Recuperação Tributária');
+    Lead porOptOut = novoLeadSOLDistribuido('S9437g', 'Recuperação Tributária');
+    Lead porPerda = novoLeadSOLDistribuido('S9437h', 'Recuperação Tributária');
+
+    Map<Id, Task> mensagemPorLead = new Map<Id, Task>();
+    for (Lead alvo : new List<Lead>{ porContato, porOptOut, porPerda }) {
+      mensagemPorLead.put(
+        alvo.Id,
+        tarefaDeMensagemAberta(alvo.Id, alvo.OwnerId, 'E-mail')
+      );
+    }
+    Map<Id, Id> ligacaoPorLead = new Map<Id, Id>();
+    for (Lead alvo : new List<Lead>{ porContato, porOptOut }) {
+      ligacaoPorLead.put(
+        alvo.Id,
+        ligacaoDeCadenciaAberta(alvo.Id, alvo.OwnerId, 2).Id
+      );
+    }
+
+    Test.startTest();
+    update new Task(
+      Id = ligacaoPorLead.get(porContato.Id),
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Atendeu'
+    );
+    update new Task(
+      Id = ligacaoPorLead.get(porOptOut.Id),
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Opt-out'
+    );
+    update new Lead(
+      Id = porPerda.Id,
+      Status = 'Desqualificado',
+      SOL_Motivo_Desqualificacao__c = 'Negócio perdido'
+    );
+    Test.stopTest();
+
+    Map<Id, String> motivoEsperado = new Map<Id, String>{
+      porContato.Id => 'Contato efetivado',
+      porOptOut.Id => 'Opt-out',
+      porPerda.Id => 'Negócio perdido'
+    };
+    for (Id leadId : motivoEsperado.keySet()) {
+      Task t = lerTarefa(mensagemPorLead.get(leadId).Id);
+      System.assertEquals(
+        'Cancelada',
+        t.Status,
+        'A pendente é cancelada por "' + motivoEsperado.get(leadId) + '".'
+      );
+      System.assertEquals(
+        motivoEsperado.get(leadId),
+        t.SOL_Motivo_Cancelamento__c,
+        'Com o motivo correto.'
+      );
+      System.assertEquals(
+        null,
+        t.SOL_Resultado_Contato__c,
+        'E sem resultado de ligação — é por isso que a VR não alcança o cancelamento automático.'
       );
     }
   }
