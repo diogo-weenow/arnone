@@ -1400,6 +1400,7 @@ private class SOLDuracaoEtapaTest {
       'Lead.SOL_Duracao_Pendente__c',
       'Lead.SOL_Duracao_Pendencia_Motivo__c',
       'Lead.SOL_Duracao_Pendencia_Detalhe__c',
+      'Opportunity.SOL_Data_Distribuicao__c',
       'Opportunity.SOL_Data_Primeira_Ligacao__c',
       'Opportunity.SOL_Data_Reuniao_Procuracao__c',
       'Opportunity.SOL_Data_Recebimento_Calculo__c',
