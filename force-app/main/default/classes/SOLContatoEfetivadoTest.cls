@@ -1749,7 +1749,7 @@ private class SOLContatoEfetivadoTest {
 
   /** (6) Lead de OUTRA BU: a marcação inteira falha e o checkbox não persiste. */
   @IsTest
-  static void checkboxEmLeadDeOutraBUNaoSinalizaOLead() {
+  static void checkboxEmLeadDeOutraBUEhBloqueado() {
     montarCenario(2);
     Lead outro = new Lead(
       LastName = 'Fora da BU',
