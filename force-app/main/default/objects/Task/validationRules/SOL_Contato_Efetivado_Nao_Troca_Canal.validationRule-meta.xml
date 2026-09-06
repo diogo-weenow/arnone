@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Contato_Efetivado_Nao_Troca_Canal</fullName>
+    <active>true</active>
+    <description>CLICKUP-9448: depois de marcada, a tarefa não troca de canal. O canal registra POR ONDE o lead respondeu e sustenta o relatório de efetividade por canal — trocá-lo reescreveria o histórico. Direcional, complementar à VR de estado, que segue sem guarda.</description>
+    <errorConditionFormula>AND(
+  NOT( ISNEW() ),
+  PRIORVALUE( SOL_Contato_Efetivado__c ),
+  SOL_Contato_Efetivado__c,
+  ISCHANGED( SOL_Canal_Contato__c )
+)</errorConditionFormula>
+    <errorDisplayField>SOL_Canal_Contato__c</errorDisplayField>
+    <errorMessage>O canal do contato efetivado é histórico e não pode ser alterado: ele registra por onde o lead respondeu. Se a resposta foi registrada na tarefa errada, acione o administrador ou o suporte autorizado.</errorMessage>
+</ValidationRule>

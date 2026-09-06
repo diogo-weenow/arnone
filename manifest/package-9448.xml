@@ -10,6 +10,7 @@
         <members>Task.SOL_Contato_Efetivado_Envio_Coerente</members>
         <members>Task.SOL_Contato_Efetivado_Exige_Lead</members>
         <members>Task.SOL_Contato_Efetivado_Nao_Reaponta</members>
+        <members>Task.SOL_Contato_Efetivado_Nao_Troca_Canal</members>
         <name>ValidationRule</name>
     </types>
     <types>

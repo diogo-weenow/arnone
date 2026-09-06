@@ -1466,6 +1466,7 @@ private class SOLContatoEfetivadoTest {
 
   private static final String MSG_VR_ESTADO = 'Marque-o apenas quando o lead tiver RESPONDIDO';
   private static final String MSG_VR_REVERTE = 'não pode ser desfeito';
+  private static final String MSG_VR_CANAL = 'canal do contato efetivado é histórico';
 
   /** Tarefa de e-mail concluída e ENVIADA: o estado em que o checkbox é válido. */
   private static Task emailEnviadoConcluido(Id leadId, Id owner) {
@@ -1827,12 +1828,16 @@ private class SOLContatoEfetivadoTest {
         new Task(Id = email.Id, SOL_Resultado_Envio__c = 'Não enviado')
       ),
       'reabrir' => tentar(new Task(Id = email.Id, Status = 'Open')),
-      // (CLICKUP-9448) O alvo passou a ser LIGAÇÃO: trocar de e-mail para
-      // WhatsApp deixou de ser incoerente, porque os dois são canais de
-      // mensagem válidos. O que continua bloqueado é ir para um canal que não
-      // tem resultado de envio.
-      'trocar o canal' => tentar(
+      // (CLICKUP-9448) Depois de marcada, a tarefa não troca de canal — nem
+      // para LIGAÇÃO, que a VR de estado recusa por não ter resultado de
+      // envio, nem para WHATSAPP, que a VR SOL_Contato_Efetivado_Nao_Troca_Canal
+      // recusa porque o canal é HISTÓRICO: ele registra por onde o lead
+      // respondeu. Os dois destinos estão cobertos aqui.
+      'trocar o canal para ligação' => tentar(
         new Task(Id = email.Id, SOL_Canal_Contato__c = 'Ligação')
+      ),
+      'trocar o canal para WhatsApp' => tentar(
+        new Task(Id = email.Id, SOL_Canal_Contato__c = 'WhatsApp')
       ),
       'trocar o tipo' => tentar(
         new Task(Id = email.Id, SOL_Tipo_Tarefa__c = 'Reunião comercial')
@@ -1842,8 +1847,11 @@ private class SOLContatoEfetivadoTest {
     Test.stopTest();
 
     for (String caso : erros.keySet()) {
+      // Duas regras diferentes podem barrar, conforme o caso: a de ESTADO
+      // (tipo, status, resultado, canal sem envio) e a de CANAL HISTÓRICO.
       System.assert(
-        erros.get(caso).contains(MSG_VR_ESTADO),
+        erros.get(caso).contains(MSG_VR_ESTADO) ||
+        erros.get(caso).contains(MSG_VR_CANAL),
         'Depois de marcado, "' +
           caso +
           '" tem de ser bloqueado. Recebido: ' +
@@ -2955,5 +2963,210 @@ private class SOLContatoEfetivadoTest {
       porPs.get('PS_SOL_Distribuicao_Admin'),
       'E uma única em Task no do gestor.'
     );
+  }
+
+  // ======================================================================
+  //  CLICKUP-9448 — o canal do contato efetivado é HISTÓRICO
+  //
+  //  Depois que a resposta é registrada, o canal deixa de ser editável: ele
+  //  diz POR ONDE o lead respondeu, e é isso que sustenta qualquer relatório
+  //  de efetividade por canal. Trocá-lo reescreveria o histórico.
+  //
+  //  A regra é uma VR DIRECIONAL própria — mesmo padrão de
+  //  SOL_Contato_Efetivado_Nao_Reverte e ..._Nao_Reaponta —, e não uma guarda
+  //  dentro da VR de estado, que continua sem guarda alguma. Ela também vale
+  //  para API, integração e contexto de sistema, onde FLS somente leitura não
+  //  protege.
+  // ======================================================================
+
+  /** (1) E-mail marcado não vira WhatsApp. */
+  @IsTest
+  static void canalDoEmailMarcadoNaoViraWhatsapp() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9448k', 'Recuperação Tributária');
+    Task email = mensagemEnviadaConcluida(l.Id, l.OwnerId, 'E-mail');
+    update new Task(Id = email.Id, SOL_Contato_Efetivado__c = true);
+
+    Test.startTest();
+    String erro = tentar(
+      new Task(Id = email.Id, SOL_Canal_Contato__c = 'WhatsApp')
+    );
+    Test.stopTest();
+
+    System.assert(
+      erro.contains(MSG_VR_CANAL),
+      'Trocar o canal depois de marcado tem de ser bloqueado. Recebido: ' + erro
+    );
+    Task fim = lerTarefa(email.Id);
+    System.assertEquals(
+      'E-mail',
+      fim.SOL_Canal_Contato__c,
+      'O canal histórico permanece E-mail.'
+    );
+    System.assertEquals(true, fim.SOL_Contato_Efetivado__c, 'E a marca também.');
+  }
+
+  /** (2) WhatsApp marcado não vira e-mail. */
+  @IsTest
+  static void canalDoWhatsappMarcadoNaoViraEmail() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9448l', 'Recuperação Tributária');
+    Task whats = mensagemEnviadaConcluida(l.Id, l.OwnerId, 'WhatsApp');
+    update new Task(Id = whats.Id, SOL_Contato_Efetivado__c = true);
+
+    Test.startTest();
+    String erro = tentar(
+      new Task(Id = whats.Id, SOL_Canal_Contato__c = 'E-mail')
+    );
+    Test.stopTest();
+
+    System.assert(
+      erro.contains(MSG_VR_CANAL),
+      'A troca inversa também é bloqueada. Recebido: ' + erro
+    );
+    Task fim = lerTarefa(whats.Id);
+    System.assertEquals(
+      'WhatsApp',
+      fim.SOL_Canal_Contato__c,
+      'O canal histórico permanece WhatsApp.'
+    );
+    System.assertEquals(true, fim.SOL_Contato_Efetivado__c, 'E a marca também.');
+  }
+
+  /**
+   * (3) Trocar para LIGAÇÃO continua bloqueado. A partir do CLICKUP-9448 as
+   * DUAS regras alcançam esse caso — a de estado, porque ligação não tem
+   * resultado de envio, e a de canal histórico, porque o canal mudou —, então
+   * a asserção aceita qualquer das duas mensagens.
+   */
+  @IsTest
+  static void trocarParaLigacaoDepoisDeMarcadoContinuaBloqueado() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9448m', 'Recuperação Tributária');
+    Task whats = mensagemEnviadaConcluida(l.Id, l.OwnerId, 'WhatsApp');
+    update new Task(Id = whats.Id, SOL_Contato_Efetivado__c = true);
+
+    Test.startTest();
+    String erro = tentar(
+      new Task(Id = whats.Id, SOL_Canal_Contato__c = 'Ligação')
+    );
+    Test.stopTest();
+
+    System.assert(
+      erro.contains(MSG_VR_ESTADO) || erro.contains(MSG_VR_CANAL),
+      'Ir para um canal sem resultado de envio segue bloqueado. Recebido: ' +
+        erro
+    );
+    System.assertEquals(
+      'WhatsApp',
+      lerTarefa(whats.Id).SOL_Canal_Contato__c,
+      'E o canal não muda.'
+    );
+  }
+
+  /**
+   * (4) A regra é DIRECIONAL: a marcação inicial, nos dois canais, continua
+   * permitida. A VR nova só olha para quem JÁ estava marcado.
+   */
+  @IsTest
+  static void marcacaoInicialContinuaPermitidaNosDoisCanais() {
+    montarCenario(2);
+    Lead porEmail = novoLeadSOLDistribuido('S9448n', 'Recuperação Tributária');
+    Lead porWhats = novoLeadSOLDistribuido('S9448o', 'Recuperação Tributária');
+    Task email = mensagemEnviadaConcluida(porEmail.Id, porEmail.OwnerId, 'E-mail');
+    Task whats = mensagemEnviadaConcluida(porWhats.Id, porWhats.OwnerId, 'WhatsApp');
+
+    Test.startTest();
+    update new Task(Id = email.Id, SOL_Contato_Efetivado__c = true);
+    update new Task(Id = whats.Id, SOL_Contato_Efetivado__c = true);
+    Test.stopTest();
+
+    System.assertEquals(
+      true,
+      recarregar(porEmail.Id).SOL_Contato_Efetivado__c,
+      'A marcação pelo e-mail continua funcionando.'
+    );
+    System.assertEquals(
+      true,
+      recarregar(porWhats.Id).SOL_Contato_Efetivado__c,
+      'E a pelo WhatsApp também.'
+    );
+    System.assertEquals(
+      'E-mail',
+      lerTarefa(email.Id).SOL_Canal_Contato__c,
+      'Cada uma guarda o seu canal.'
+    );
+    System.assertEquals('WhatsApp', lerTarefa(whats.Id).SOL_Canal_Contato__c);
+  }
+
+  /**
+   * (6) Desmarcar E trocar o canal no MESMO save continua bloqueado, por
+   * inteiro: nem a marca cai, nem o canal muda.
+   */
+  @IsTest
+  static void desmarcarETrocarCanalNoMesmoSaveContinuaBloqueado() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9448p', 'Recuperação Tributária');
+    Task whats = mensagemEnviadaConcluida(l.Id, l.OwnerId, 'WhatsApp');
+    update new Task(Id = whats.Id, SOL_Contato_Efetivado__c = true);
+
+    Test.startTest();
+    String erro = tentar(
+      new Task(
+        Id = whats.Id,
+        SOL_Contato_Efetivado__c = false,
+        SOL_Canal_Contato__c = 'E-mail'
+      )
+    );
+    Test.stopTest();
+
+    System.assert(
+      erro.contains(MSG_VR_REVERTE) || erro.contains(MSG_VR_CANAL),
+      'A gravação combinada é bloqueada. Recebido: ' + erro
+    );
+    Task fim = lerTarefa(whats.Id);
+    System.assertEquals(true, fim.SOL_Contato_Efetivado__c, 'A marca fica.');
+    System.assertEquals(
+      'WhatsApp',
+      fim.SOL_Canal_Contato__c,
+      'E o canal também: a gravação inteira foi desfeita.'
+    );
+  }
+
+  /**
+   * (7) A regra é cirúrgica: alterar um campo NÃO protegido de uma tarefa já
+   * marcada continua permitido. Congelar o canal não pode virar congelar a
+   * tarefa.
+   */
+  @IsTest
+  static void alterarCampoNaoProtegidoDeTarefaMarcadaContinuaPermitido() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9448q', 'Recuperação Tributária');
+    Task whats = mensagemEnviadaConcluida(l.Id, l.OwnerId, 'WhatsApp');
+    update new Task(Id = whats.Id, SOL_Contato_Efetivado__c = true);
+
+    Test.startTest();
+    update new Task(
+      Id = whats.Id,
+      Description = 'Cliente respondeu pedindo proposta por escrito.'
+    );
+    Test.stopTest();
+
+    Task fim = [
+      SELECT Description, SOL_Canal_Contato__c, SOL_Contato_Efetivado__c
+      FROM Task
+      WHERE Id = :whats.Id
+    ];
+    System.assertEquals(
+      'Cliente respondeu pedindo proposta por escrito.',
+      fim.Description,
+      'O comentário do vendedor é gravado normalmente.'
+    );
+    System.assertEquals(
+      'WhatsApp',
+      fim.SOL_Canal_Contato__c,
+      'Sem efeito colateral no canal.'
+    );
+    System.assertEquals(true, fim.SOL_Contato_Efetivado__c, 'Nem na marca.');
   }
 }
