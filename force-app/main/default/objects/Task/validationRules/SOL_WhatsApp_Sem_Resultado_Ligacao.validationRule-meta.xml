@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_WhatsApp_Sem_Resultado_Ligacao</fullName>
+    <active>true</active>
+    <description>CLICKUP-9436: isola os resultados por canal. Tarefa de WhatsApp não recebe resultado de LIGAÇÃO, cujos valores acionam contato efetivado, opt-out e a contagem de 3 tentativas por Flows que não filtram canal. Regra gêmea da do e-mail.</description>
+    <errorConditionFormula>AND(
+  ISPICKVAL( SOL_Tipo_Tarefa__c , &quot;Contato&quot; ),
+  ISPICKVAL( SOL_Canal_Contato__c , &quot;WhatsApp&quot; ),
+  NOT( ISBLANK( TEXT( SOL_Resultado_Contato__c ) ) )
+)</errorConditionFormula>
+    <errorDisplayField>SOL_Resultado_Contato__c</errorDisplayField>
+    <errorMessage>Esta é uma tarefa de WhatsApp: use o campo "Resultado do envio". O "Resultado do contato" é exclusivo das tarefas de ligação, porque seus valores acionam contato efetivado, opt-out e reatribuição.</errorMessage>
+</ValidationRule>
