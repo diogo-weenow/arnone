@@ -55,8 +55,23 @@
  * dela ficaria sem duração até o Batch. Quem protege é a idempotência POR
  * ETAPA ("já preenchida, não recalcula"), que não tem esse efeito colateral.
  *
+ * ==========================================
+ * O QUE MAIS ESTA CLASSE FAZ, e por que aqui
+ * ==========================================
+ * `consolidarMarcosDeTarefas` grava os marcos que NASCEM em Task — primeira
+ * ligação, reunião comercial, recebimento do cálculo e reunião final. Isso
+ * morava nos Flows e veio para cá porque o padrão declarativo "Get o pai, se
+ * estiver vazio grava" NÃO é determinístico dentro de uma transação: todos os
+ * Get das interviews rodam antes de qualquer Update. Ver o ApexDoc do método,
+ * que traz a reprodução do defeito.
+ *
+ * `distribuicaoDeLeads` existe por um motivo de FLS, não de desenho: ver o
+ * ApexDoc dele antes de mover essa consulta para qualquer outro lugar.
+ *
  * Bulk-safe: zero SOQL/DML em laço, e o calendário é consultado uma única vez
- * por transação (ver `ContadorDiasUteis`).
+ * por transação (ver `ContadorDiasUteis`). As consultas de Lead e de
+ * Oportunidade usam FOR UPDATE, sempre na ordem Lead -> Oportunidade; nenhum
+ * caminho desta classe trava Oportunidade antes de Lead, então não há ciclo.
  */
 public without sharing class SOLDuracaoEtapaService {
   /** Falha TRANSITÓRIA: é a única que o Batch reprocessa automaticamente. */
