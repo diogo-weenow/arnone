@@ -1250,6 +1250,127 @@ private class SOLDuracaoEtapaTest {
     Assert.areEqual(200, conferidos, 'Todos os 200 foram conferidos.');
   }
 
+  /**
+   * BULK do outro lado: 200 Oportunidades num lote, mesma prova. O acumulado do
+   * calendário é montado UMA vez para as 200, e cada uma recebe a contagem do
+   * SEU par de marcos.
+   */
+  @IsTest
+  static void loteDeDuzentasOportunidadesMontaOCalendarioUmaVezSo() {
+    Account a = new Account(Name = 'Conta bulk ' + rnd());
+    insert a;
+    Id rt = rtOpp();
+    List<Opportunity> opps = new List<Opportunity>();
+    for (Integer i = 0; i < 200; i++) {
+      opps.add(
+        new Opportunity(
+          Name = 'Op bulk ' + i,
+          AccountId = a.Id,
+          RecordTypeId = rt,
+          CloseDate = Date.today().addDays(60),
+          StageName = 'Diagnóstico',
+          SOL_Produto_Negocio__c = PRODUTO_RT,
+          SOL_Data_Solicitacao_Calculo__c = SEGUNDA,
+          SOL_Data_Recebimento_Calculo__c = Math.mod(i, 2) == 0 ? QUARTA : SEXTA
+        )
+      );
+    }
+    insert opps;
+
+    List<Id> ids = new List<Id>(new Map<Id, Opportunity>(opps).keySet());
+
+    Test.startTest();
+    SOLDuracaoEtapaService.zerarInstrumentacao();
+    SOLDuracaoEtapaService.ResultadoDuracao r = SOLDuracaoEtapaService.recalcularOportunidades(
+      ids
+    );
+    Integer consultas = Limits.getQueries();
+    Integer dmls = Limits.getDmlStatements();
+    Test.stopTest();
+
+    Assert.areEqual(
+      1,
+      SOLDuracaoEtapaService.contadoresMontados,
+      'O calendário do lote de Oportunidades também é pré-computado UMA vez.'
+    );
+    Assert.areEqual(200, r.avaliados, 'As 200 Oportunidades foram avaliadas.');
+    Assert.areEqual(
+      200,
+      r.calculadas,
+      'Uma etapa calculada por Oportunidade — as outras quatro estão sem marco.'
+    );
+    Assert.isTrue(
+      consultas <= 10,
+      'Sem SOQL em laço, e foram ' + consultas
+    );
+    Assert.isTrue(dmls <= 5, 'Sem DML em laço, e foram ' + dmls);
+
+    Integer conferidas = 0;
+    for (Opportunity o : [
+      SELECT Id, SOL_Dias_Calculo_Juridico__c
+      FROM Opportunity
+      WHERE Id IN :ids
+    ]) {
+      Assert.isTrue(
+        o.SOL_Dias_Calculo_Juridico__c == 2 || o.SOL_Dias_Calculo_Juridico__c == 4,
+        'Cada Oportunidade recebeu a contagem do SEU par: ' +
+        o.SOL_Dias_Calculo_Juridico__c
+      );
+      conferidas++;
+    }
+    Assert.areEqual(200, conferidas, 'Todas as 200 foram conferidas.');
+  }
+
+  /**
+   * OPT-OUT antes da conversão: o Lead guarda as etapas 1 a 3 que realmente
+   * aconteceram, e as etapas 4 a 6 não existem em lugar nenhum — porque não
+   * existe Oportunidade. Nada vira zero, nada fica pendente.
+   */
+  @IsTest
+  static void optOutAntesDaConversaoNaoProduzEtapasDaOportunidade() {
+    Lead l = novoLead(PRODUTO_RT);
+    update new Lead(
+      Id = l.Id,
+      SOL_Data_Distribuicao__c = as10(SEGUNDA),
+      SOL_Data_Primeira_Ligacao__c = as10(QUARTA),
+      SOL_Data_Contato_Efetivado__c = as10(QUINTA)
+    );
+    recalcularLead(l.Id);
+
+    Test.startTest();
+    // Pelo caminho REAL do CLICKUP-9418: o servico desqualifica o Lead, grava a
+    // data do opt-out e cancela as tarefas pendentes. Marcar o checkbox a mao
+    // seria recusado pela VR SOL_Desqualificacao_Coerente, e com razao.
+    SOLDistribuicaoService.registrarOptOut(new List<Id>{ l.Id });
+    recalcularLead(l.Id);
+    Test.stopTest();
+
+    Lead depois = lead(l.Id);
+    Assert.areEqual(
+      2,
+      depois.SOL_Dias_Primeira_Ligacao__c,
+      'O opt-out não apaga a etapa 1 que já tinha acontecido.'
+    );
+    Assert.areEqual(
+      1,
+      depois.SOL_Dias_Contato_Efetivado__c,
+      'Nem a etapa 2.'
+    );
+    Assert.isNull(
+      depois.SOL_Dias_Reuniao_Procuracao__c,
+      'A etapa 3 não terminou e fica VAZIA — o opt-out não a fecha com zero.'
+    );
+    Assert.isFalse(
+      depois.SOL_Duracao_Pendente__c,
+      'Etapa interrompida por opt-out não é pendência de cálculo.'
+    );
+    Assert.isFalse(depois.IsConverted, 'O Lead não foi convertido.');
+    Assert.isNull(
+      depois.ConvertedOpportunityId,
+      'Sem Oportunidade, as etapas 4 a 6 não existem em lugar nenhum — não são zero, são inexistentes.'
+    );
+  }
+
   // ===================================================================== FLS
 
   @IsTest
