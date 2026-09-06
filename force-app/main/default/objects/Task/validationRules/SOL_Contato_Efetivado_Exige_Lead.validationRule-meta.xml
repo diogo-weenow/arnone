@@ -9,5 +9,5 @@
   LEFT( CASESAFEID( WhoId ) , 3 ) &lt;&gt; &quot;00Q&quot;
 )</errorConditionFormula>
     <errorDisplayField>SOL_Contato_Efetivado__c</errorDisplayField>
-    <errorMessage>Esta tarefa não está vinculada a um lead, então não é possível registrar que o lead respondeu. Registre a resposta na tarefa de e-mail do próprio lead.</errorMessage>
+    <errorMessage>Esta tarefa não está vinculada a um lead, então não é possível registrar que o lead respondeu. Registre a resposta na tarefa de contato do próprio lead.</errorMessage>
 </ValidationRule>

@@ -2,13 +2,16 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Contato_Efetivado_Envio_Coerente</fullName>
     <active>true</active>
-    <description>CLICKUP-9447: o sinal de resposta só vale em tarefa de E-MAIL da cadência, concluída, enviada e com WhoId. Regra de ESTADO, sem guarda. NÃO exige WhoId de Lead: isso quebraria a conversão, que reaponta a Task para o Contact — essa garantia fica no Apex.</description>
+    <description>CLICKUP-9447/9448: o sinal de resposta só vale em tarefa de E-MAIL ou WHATSAPP da cadência, concluída, enviada e com WhoId. Regra de ESTADO, sem guarda: avalia todo save, então trocar canal, tipo ou status depois de marcar também é bloqueado.</description>
     <errorConditionFormula>AND(
   SOL_Contato_Efetivado__c,
   NOT(
     AND(
       ISPICKVAL( SOL_Tipo_Tarefa__c , &quot;Contato&quot; ),
-      ISPICKVAL( SOL_Canal_Contato__c , &quot;E-mail&quot; ),
+      OR(
+        ISPICKVAL( SOL_Canal_Contato__c , &quot;E-mail&quot; ),
+        ISPICKVAL( SOL_Canal_Contato__c , &quot;WhatsApp&quot; )
+      ),
       ISPICKVAL( Status , &quot;Completed&quot; ),
       ISPICKVAL( SOL_Resultado_Envio__c , &quot;Enviado&quot; ),
       NOT( ISBLANK( WhoId ) )
@@ -16,5 +19,5 @@
   )
 )</errorConditionFormula>
     <errorDisplayField>SOL_Contato_Efetivado__c</errorDisplayField>
-    <errorMessage>&quot;Contato efetivado&quot; só vale numa tarefa de E-MAIL da cadência, CONCLUÍDA e com o resultado do envio &quot;Enviado&quot;. Marque-o apenas quando o lead tiver RESPONDIDO — &quot;Enviado&quot; significa somente que a mensagem saiu.</errorMessage>
+    <errorMessage>&quot;Contato efetivado&quot; só vale numa tarefa de E-MAIL ou WHATSAPP da cadência, CONCLUÍDA e com o resultado do envio &quot;Enviado&quot;. Marque-o apenas quando o lead tiver RESPONDIDO — &quot;Enviado&quot; significa somente que a mensagem saiu.</errorMessage>
 </ValidationRule>
