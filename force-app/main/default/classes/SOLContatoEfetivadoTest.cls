@@ -873,6 +873,7 @@ private class SOLContatoEfetivadoTest {
       SELECT
         Id,
         Subject,
+        WhoId,
         Status,
         IsClosed,
         ActivityDate,
@@ -1663,13 +1664,12 @@ private class SOLContatoEfetivadoTest {
 
   /**
    * (6) Fora do canal E-mail o checkbox não passa: ligação, WhatsApp e tarefa
-   * manual sem classificação são barrados pela VR.
+   * manual sem classificação são barrados pela VR de estado, e a tarefa ligada
+   * a um CONTACT é barrada pela VR que exige vínculo com Lead.
    *
-   * WhoId de CONTACT e Lead de outra BU são outra história: a VR não os barra —
-   * ela não olha Record Type e, por causa do fallback (ver a VR), também não
-   * exige que o WhoId seja Lead — e quem se recusa a sinalizar é o Apex, que é
-   * onde essa regra sempre morou. O Contact está coberto aqui; a outra BU, no
-   * teste seguinte.
+   * Nenhum desses casos pode terminar com o checkbox gravado: uma tarefa
+   * afirmando que o lead respondeu, sem lead efetivado, é um dado FALSO
+   * persistido — não uma inofensiva "entrada ignorada".
    */
   @IsTest
   static void checkboxForaDoCanalEmailNaoEfetivaContato() {
@@ -1719,8 +1719,6 @@ private class SOLContatoEfetivadoTest {
       'whatsapp' => tentar(new Task(Id = whats.Id, SOL_Contato_Efetivado__c = true)),
       'manual' => tentar(new Task(Id = manual.Id, SOL_Contato_Efetivado__c = true))
     };
-    // O Contact PASSA na VR (o fallback não checa o tipo do WhoId) e é
-    // descartado pelo Invocable, que só aceita Id de Lead.
     String erroContact = tentar(
       new Task(Id = deContact.Id, SOL_Contato_Efetivado__c = true)
     );
@@ -1733,23 +1731,23 @@ private class SOLContatoEfetivadoTest {
           erros.get(caso)
       );
     }
-    System.assertEquals(
-      '',
-      erroContact,
-      'A tarefa de Contact passa na VR: o WhoId não é checado como Lead, para não quebrar a conversão.'
+    System.assert(
+      erroContact.contains('não está vinculada a um lead'),
+      'A tarefa de Contact é BLOQUEADA, não apenas ignorada. Recebido: ' +
+        erroContact
     );
     System.assertEquals(
-      true,
+      false,
       lerTarefa(deContact.Id).SOL_Contato_Efetivado__c,
-      'A marca é gravada nela...'
+      'E o checkbox NÃO fica gravado nela: nada de dado falso.'
     );
     System.assert(
       recarregar(l.Id).SOL_Contato_Efetivado__c != true,
-      '...e nenhum Lead é sinalizado — o Invocable descarta WhoId que não seja Lead.'
+      'E nenhum Lead é sinalizado.'
     );
   }
 
-  /** (6) Lead de OUTRA BU: a VR permite, mas o Apex não sinaliza. */
+  /** (6) Lead de OUTRA BU: a marcação inteira falha e o checkbox não persiste. */
   @IsTest
   static void checkboxEmLeadDeOutraBUNaoSinalizaOLead() {
     montarCenario(2);
@@ -1776,19 +1774,34 @@ private class SOLContatoEfetivadoTest {
     );
 
     Test.startTest();
-    // A VR não olha Record Type, então a marcação PASSA...
-    update new Task(Id = email.Id, SOL_Contato_Efetivado__c = true);
+    String erro = tentar(new Task(Id = email.Id, SOL_Contato_Efetivado__c = true));
     Test.stopTest();
 
+    System.assert(
+      erro.contains('não está vinculada a um lead da Arnone Soluções'),
+      'Marcar num Lead de outra BU tem de FALHAR, não ser ignorado. Recebido: ' +
+        erro
+    );
+    // A parte que ESTE card controla é de negócio e não tem detalhe técnico. A
+    // moldura em volta ("CANNOT_EXECUTE_FLOW_TRIGGER: An Apex error
+    // occurred...") é da PLATAFORMA, para toda falha de Flow after-save, e só
+    // sumiria com um fault path — que é proibido aqui, porque destruiria a
+    // atomicidade. O que se garante é que não vaza stack trace nem linha de
+    // código.
+    System.assert(
+      !erro.contains('Class.') && !erro.contains('line '),
+      'A mensagem não pode carregar stack trace nem linha de código. Recebido: ' +
+        erro
+    );
     System.assertEquals(
-      true,
+      false,
       lerTarefa(email.Id).SOL_Contato_Efetivado__c,
-      'A VR não é quem filtra a BU.'
+      'O checkbox permanece FALSO: a transação inteira foi desfeita.'
     );
     System.assert(
       [SELECT SOL_Contato_Efetivado__c FROM Lead WHERE Id = :outro.Id]
         .SOL_Contato_Efetivado__c != true,
-      '...mas o serviço, que filtra Record Type SOL, não sinaliza o Lead de outra BU.'
+      'E o Lead de outra BU não foi sinalizado.'
     );
   }
 
@@ -2226,6 +2239,155 @@ private class SOLContatoEfetivadoTest {
       System.assert(!f.isUpdateable(), 'Gestor NÃO edita o checkbox.');
     }
     Test.stopTest();
+  }
+
+  /**
+   * Reapontar uma tarefa JÁ MARCADA para OUTRO lead é bloqueado, atomicamente.
+   * O efeito da marcação (sinalizar o lead, cancelar as pendentes) ficou no
+   * lead anterior; transferir a tarefa produziria um registro que afirma uma
+   * resposta que aquele outro lead nunca deu.
+   */
+  @IsTest
+  static void reapontarTarefaMarcadaParaOutroLeadEhBloqueado() {
+    montarCenario(2);
+    Lead origem = novoLeadSOLDistribuido('S9447p', 'Recuperação Tributária');
+    Lead destino = novoLeadSOLDistribuido('S9447q', 'Recuperação Tributária');
+    Task email = emailEnviadoConcluido(origem.Id, origem.OwnerId);
+    update new Task(Id = email.Id, SOL_Contato_Efetivado__c = true);
+
+    Test.startTest();
+    String erro = tentar(new Task(Id = email.Id, WhoId = destino.Id));
+    Test.stopTest();
+
+    System.assert(
+      erro.contains('não pode ser transferida'),
+      'Transferir uma tarefa já marcada tem de ser bloqueado. Recebido: ' + erro
+    );
+    Task depois = lerTarefa(email.Id);
+    System.assertEquals(
+      origem.Id,
+      depois.WhoId,
+      'A tarefa continua no lead original.'
+    );
+    System.assertEquals(
+      true,
+      depois.SOL_Contato_Efetivado__c,
+      'E a marca permanece.'
+    );
+    System.assert(
+      recarregar(destino.Id).SOL_Contato_Efetivado__c != true,
+      'O lead de destino não foi sinalizado por uma resposta que não é dele.'
+    );
+  }
+
+  /**
+   * Lote com uma entrada válida e uma inválida NÃO produz estado parcial: a
+   * transação inteira falha, e nem a tarefa do Lead SOL fica marcada.
+   */
+  @IsTest
+  static void loteComEntradaInvalidaNaoDeixaEstadoParcial() {
+    montarCenario(2);
+    Lead valido = novoLeadSOLDistribuido('S9447r', 'Recuperação Tributária');
+    Lead outraBU = new Lead(
+      LastName = 'Fora da BU lote',
+      Company = 'Outra Empresa',
+      Status = statusLead()
+    );
+    insert outraBU;
+
+    Task emailValido = emailEnviadoConcluido(valido.Id, valido.OwnerId);
+    Task emailInvalido = new Task(
+      Subject = 'E-mail de outra BU',
+      WhoId = outraBU.Id,
+      OwnerId = UserInfo.getUserId(),
+      Status = 'Open',
+      ActivityDate = Date.today(),
+      SOL_Tipo_Tarefa__c = 'Contato',
+      SOL_Canal_Contato__c = 'E-mail'
+    );
+    insert emailInvalido;
+    update new Task(
+      Id = emailInvalido.Id,
+      Status = 'Completed',
+      SOL_Resultado_Envio__c = 'Enviado'
+    );
+
+    Test.startTest();
+    String erro = '';
+    try {
+      update new List<Task>{
+        new Task(Id = emailValido.Id, SOL_Contato_Efetivado__c = true),
+        new Task(Id = emailInvalido.Id, SOL_Contato_Efetivado__c = true)
+      };
+    } catch (DmlException e) {
+      erro = e.getMessage();
+    }
+    Test.stopTest();
+
+    System.assert(
+      erro.contains('não está vinculada a um lead da Arnone Soluções'),
+      'O lote misto falha com a mensagem controlada. Recebido: ' + erro
+    );
+    System.assertEquals(
+      false,
+      lerTarefa(emailValido.Id).SOL_Contato_Efetivado__c,
+      'Nem a tarefa VÁLIDA do lote ficou marcada: sem estado parcial.'
+    );
+    System.assertEquals(
+      false,
+      lerTarefa(emailInvalido.Id).SOL_Contato_Efetivado__c,
+      'E a inválida, muito menos.'
+    );
+    System.assert(
+      recarregar(valido.Id).SOL_Contato_Efetivado__c != true,
+      'E o Lead válido não foi sinalizado.'
+    );
+  }
+
+  /**
+   * O caminho da LIGAÇÃO (CLICKUP-9417) não passa pela porta estrita e mantém o
+   * comportamento tolerante de sempre — inclusive para Lead de outra BU, onde
+   * ele apenas não sinaliza, sem derrubar a conclusão da tarefa. Regressão do
+   * contraste deliberado entre as duas portas.
+   */
+  @IsTest
+  static void ligacaoContinuaTolerandoLeadForaDoEscopo() {
+    montarCenario(2);
+    Lead outro = new Lead(
+      LastName = 'Fora da BU ligacao',
+      Company = 'Outra Empresa',
+      Status = statusLead()
+    );
+    insert outro;
+    Task ligacao = new Task(
+      Subject = 'Ligação de outra BU',
+      WhoId = outro.Id,
+      OwnerId = UserInfo.getUserId(),
+      Status = 'Open',
+      ActivityDate = Date.today(),
+      SOL_Tipo_Tarefa__c = 'Contato',
+      SOL_Prazo_Contato__c = System.now().addMinutes(5)
+    );
+    insert ligacao;
+
+    Test.startTest();
+    update new Task(
+      Id = ligacao.Id,
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Atendeu'
+    );
+    Test.stopTest();
+
+    System.assertEquals(
+      'Completed',
+      lerTarefa(ligacao.Id).Status,
+      'A ligação conclui normalmente: a porta da ligação continua tolerante.'
+    );
+    System.assert(
+      [SELECT SOL_Contato_Efetivado__c FROM Lead WHERE Id = :outro.Id]
+        .SOL_Contato_Efetivado__c != true,
+      'E o Lead de outra BU segue sem sinalização, como sempre foi.'
+    );
   }
 
   /**

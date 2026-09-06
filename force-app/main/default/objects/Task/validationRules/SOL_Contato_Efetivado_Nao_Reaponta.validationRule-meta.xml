@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Contato_Efetivado_Nao_Reaponta</fullName>
+    <active>true</active>
+    <description>CLICKUP-9447: tarefa já marcada não pode ser reapontada para OUTRO lead — o efeito ficou no lead anterior. Só bloqueia destino com prefixo de Lead: o reapontamento para Contact, que é o da conversão, continua permitido.</description>
+    <errorConditionFormula>AND(
+  SOL_Contato_Efetivado__c,
+  PRIORVALUE( SOL_Contato_Efetivado__c ),
+  ISCHANGED( WhoId ),
+  LEFT( CASESAFEID( WhoId ) , 3 ) = &quot;00Q&quot;
+)</errorConditionFormula>
+    <errorDisplayField>SOL_Contato_Efetivado__c</errorDisplayField>
+    <errorMessage>Esta tarefa já registra a resposta de outro lead e não pode ser transferida. Registre a resposta na tarefa de e-mail do lead correto.</errorMessage>
+</ValidationRule>

@@ -14,11 +14,17 @@
                 <elementReference>$Record.WhoId</elementReference>
             </value>
         </inputParameters>
+        <inputParameters>
+            <name>estrito</name>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </inputParameters>
         <nameSegment>SOLContatoEfetivadoInvocable</nameSegment>
     </actionCalls>
     <apiVersion>66.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
-    <description>CLICKUP-9447 — Aciona SOLContatoEfetivadoInvocable quando o vendedor marca SOL_Contato_Efetivado__c numa tarefa de contato do canal E-MAIL, sinalizando que o lead RESPONDEU. Reusa a automação do CLICKUP-9417 sem uma linha de Apex nova: toda a sinalização do Lead e o cancelamento das tarefas pendentes dos três canais ficam no serviço, que já é bulk, idempotente e transacional. Status e resultado do envio não são repetidos aqui — a VR SOL_Contato_Efetivado_Envio_Coerente já exige o estado completo em toda gravação. flowTransactionModel = CurrentTransaction e a AUSÊNCIA de fault path são deliberados: é o que faz uma falha do serviço abortar a transação inteira e desfazer a marcação do checkbox. Acrescentar um fault path aqui destruiria essa atomicidade em silêncio. Nome genérico (_Por_Envio, não _Email) porque o CLICKUP-9448 estende ESTE Flow para o WhatsApp: dois record-triggered after-save no mesmo objeto teriam ordem não determinística entre si. Não altera campos aqui. Não modifica o Flow SOL_Contato_Efetivado, que segue exclusivo da ligação.</description>
+    <description>CLICKUP-9447 — Aciona SOLContatoEfetivadoInvocable quando o vendedor marca SOL_Contato_Efetivado__c numa tarefa de contato do canal E-MAIL, sinalizando que o lead RESPONDEU. Passa estrito = true ao Invocable: no caminho do checkbox, uma referência que não seja Lead SOL ativo derruba a transação em vez de ser ignorada, para que nunca fique gravada uma tarefa afirmando uma resposta que não efetivou lead nenhum. Reusa a automação do CLICKUP-9417: toda a sinalização do Lead e o cancelamento das tarefas pendentes dos três canais ficam no serviço, que já é bulk, idempotente e transacional. Status e resultado do envio não são repetidos aqui — a VR SOL_Contato_Efetivado_Envio_Coerente já exige o estado completo em toda gravação. flowTransactionModel = CurrentTransaction e a AUSÊNCIA de fault path são deliberados: é o que faz uma falha do serviço abortar a transação inteira e desfazer a marcação do checkbox. Acrescentar um fault path aqui destruiria essa atomicidade em silêncio. Nome genérico (_Por_Envio, não _Email) porque o CLICKUP-9448 estende ESTE Flow para o WhatsApp: dois record-triggered after-save no mesmo objeto teriam ordem não determinística entre si. Não altera campos aqui. Não modifica o Flow SOL_Contato_Efetivado, que segue exclusivo da ligação.</description>
     <environments>Default</environments>
     <interviewLabel>SOL_Contato_Efetivado_Por_Envio {!$Flow.CurrentDateTime}</interviewLabel>
     <label>SOL_Contato_Efetivado_Por_Envio</label>

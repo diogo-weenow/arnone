@@ -8,6 +8,8 @@
     </types>
     <types>
         <members>Task.SOL_Contato_Efetivado_Envio_Coerente</members>
+        <members>Task.SOL_Contato_Efetivado_Exige_Lead</members>
+        <members>Task.SOL_Contato_Efetivado_Nao_Reaponta</members>
         <members>Task.SOL_Contato_Efetivado_Nao_Reverte</members>
         <name>ValidationRule</name>
     </types>
@@ -25,6 +27,7 @@
         <name>PermissionSet</name>
     </types>
     <types>
+        <members>SOLContatoEfetivadoInvocable</members>
         <members>SOLContatoEfetivadoTest</members>
         <members>SOLDistribuicaoService</members>
         <name>ApexClass</name>

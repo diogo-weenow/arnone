@@ -16,6 +16,13 @@
  * Mesmo comportamento em teste e em produção.
  */
 public with sharing class SOLContatoEfetivadoInvocable {
+  /**
+   * (CLICKUP-9447) Mensagem controlada da porta ESTRITA. Sem detalhe técnico:
+   * o vendedor precisa saber que nada foi salvo e por quê, em linguagem de
+   * negócio.
+   */
+  public static final String MSG_VINCULO_INVALIDO = 'Não foi possível registrar a resposta: esta tarefa não está vinculada a um lead da Arnone Soluções. Nenhuma alteração foi salva.';
+
   public class Entrada {
     @InvocableVariable(
       label='Id do Lead (WhoId da Task)'
@@ -23,6 +30,27 @@ public with sharing class SOLContatoEfetivadoInvocable {
       required=true
     )
     public Id leadId;
+
+    /**
+     * (CLICKUP-9447) Porta ESTRITA, usada apenas pelo Flow
+     * SOL_Contato_Efetivado_Por_Envio.
+     *
+     * Sem ela, uma referência que não seja Lead da Arnone Soluções era
+     * simplesmente IGNORADA — e no caminho do checkbox isso deixava um dado
+     * FALSO gravado: a tarefa afirmando que o lead respondeu, sem lead nenhum
+     * efetivado. Com ela, a entrada inválida derruba a transação inteira e o
+     * checkbox não persiste.
+     *
+     * O caminho da LIGAÇÃO (CLICKUP-9417) não informa este campo e mantém o
+     * comportamento tolerante de sempre: lá o resultado "Atendeu" é o registro,
+     * e ignorar um WhoId de Contact nunca gravou nada falso.
+     */
+    @InvocableVariable(
+      label='Exigir vínculo com Lead da Arnone Soluções'
+      description='Quando verdadeiro, uma referência que não seja Lead SOL ativo faz a operação inteira falhar em vez de ser ignorada.'
+      required=false
+    )
+    public Boolean estrito;
   }
 
   @InvocableMethod(
@@ -36,15 +64,33 @@ public with sharing class SOLContatoEfetivadoInvocable {
     }
 
     Set<Id> ids = new Set<Id>();
+    Boolean estrito = false;
+    Boolean houveReferenciaInvalida = false;
     for (Entrada entrada : entradas) {
+      if (entrada == null) {
+        continue;
+      }
+      if (entrada.estrito == true) {
+        estrito = true;
+      }
       if (
-        entrada != null &&
         entrada.leadId != null &&
         entrada.leadId.getSObjectType() == Lead.SObjectType
       ) {
         ids.add(entrada.leadId);
+      } else {
+        houveReferenciaInvalida = true;
       }
     }
+
+    // (CLICKUP-9447) Na porta estrita, qualquer referência fora do escopo
+    // derruba a transação — inclusive quando o resto do lote é válido. É o que
+    // impede um lote misto de terminar pela metade, com a tarefa inválida
+    // marcada e nenhum lead efetivado por ela.
+    if (estrito) {
+      exigirLeadsSOL(ids, houveReferenciaInvalida);
+    }
+
     if (ids.isEmpty()) {
       return;
     }
@@ -65,6 +111,43 @@ public with sharing class SOLContatoEfetivadoInvocable {
       );
       throw new SOLDistribuicaoService.ContatoEfetivadoException(
         SOLDistribuicaoService.MSG_CONTATO_EFETIVADO_FALHA
+      );
+    }
+  }
+
+  /**
+   * (CLICKUP-9447) Porta estrita: TODAS as referências recebidas têm de ser
+   * Leads da Arnone Soluções ainda não convertidos. Qualquer desvio derruba a
+   * transação com mensagem controlada, e o save que originou a chamada — a
+   * marcação do checkbox — é desfeito junto.
+   *
+   * O Record Type é verificado aqui, e não em Validation Rule, porque o WhoId
+   * é polimórfico: uma fórmula não alcança com segurança o Record Type do
+   * registro apontado. A checagem é uma consulta única para o lote inteiro.
+   */
+  private static void exigirLeadsSOL(
+    Set<Id> ids,
+    Boolean houveReferenciaInvalida
+  ) {
+    if (houveReferenciaInvalida || ids.isEmpty()) {
+      throw new SOLDistribuicaoService.ContatoEfetivadoException(
+        MSG_VINCULO_INVALIDO
+      );
+    }
+    Set<Id> elegiveis = new Set<Id>();
+    for (Lead l : [
+      SELECT Id
+      FROM Lead
+      WHERE
+        Id IN :ids
+        AND RecordType.DeveloperName = :SOLDistribuicaoService.RECORD_TYPE_DEVELOPER_NAME
+        AND IsConverted = FALSE
+    ]) {
+      elegiveis.add(l.Id);
+    }
+    if (elegiveis.size() != ids.size()) {
+      throw new SOLDistribuicaoService.ContatoEfetivadoException(
+        MSG_VINCULO_INVALIDO
       );
     }
   }

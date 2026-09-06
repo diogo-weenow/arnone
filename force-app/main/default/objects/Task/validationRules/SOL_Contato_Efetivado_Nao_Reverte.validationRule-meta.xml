@@ -9,5 +9,5 @@
   NOT( SOL_Contato_Efetivado__c )
 )</errorConditionFormula>
     <errorDisplayField>SOL_Contato_Efetivado__c</errorDisplayField>
-    <errorMessage>O contato efetivado já foi registrado e não pode ser desfeito: o Lead e as tarefas dos três canais já foram atualizados. Se o registro foi um engano, acione o gestor.</errorMessage>
+    <errorMessage>O contato efetivado já foi registrado e não pode ser desfeito: o Lead e as tarefas dos três canais já foram atualizados. Se o registro foi um engano, acione o administrador ou o suporte autorizado.</errorMessage>
 </ValidationRule>
