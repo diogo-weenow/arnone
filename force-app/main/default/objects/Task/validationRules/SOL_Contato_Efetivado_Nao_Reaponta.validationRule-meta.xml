@@ -10,5 +10,5 @@
   LEFT( CASESAFEID( WhoId ) , 3 ) = &quot;00Q&quot;
 )</errorConditionFormula>
     <errorDisplayField>SOL_Contato_Efetivado__c</errorDisplayField>
-    <errorMessage>Esta tarefa já registra a resposta de outro lead e não pode ser transferida. Registre a resposta na tarefa de e-mail do lead correto.</errorMessage>
+    <errorMessage>Esta tarefa já registra a resposta de outro lead e não pode ser transferida. Registre a resposta na tarefa de contato do lead correto.</errorMessage>
 </ValidationRule>
