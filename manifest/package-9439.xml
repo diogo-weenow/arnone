@@ -47,6 +47,11 @@
         <name>Flow</name>
     </types>
     <types>
+        <members>Lead.SOL</members>
+        <members>Opportunity.SOL</members>
+        <name>RecordType</name>
+    </types>
+    <types>
         <members>Lead-Lead Layout</members>
         <members>Opportunity-Opportunity Layout</members>
         <name>Layout</name>

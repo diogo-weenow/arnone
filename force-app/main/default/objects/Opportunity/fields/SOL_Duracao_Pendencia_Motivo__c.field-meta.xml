@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Duracao_Pendencia_Motivo__c</fullName>
-    <description>Por que a duracao ficou pendente, e o que fazer. &quot;Calendario indisponivel&quot;: Business Hours ausente ou inativo — falha TRANSITORIA, reprocessada pela varredura. &quot;Falha tecnica&quot;: erro inesperado no calculo ou na gravacao — tambem reprocessado, porque a maioria e transitoria, e deliberadamente visivel para que alguem perceba se persistir. &quot;Intervalo inconsistente&quot;: destino anterior a origem ou distancia acima do teto — DADO invalido, que NAO entra em varredura automatica para nao gerar retry perpetuo; exige corrigir as datas e rodar o Batch sob demanda. Coexistindo mais de um, prevalece o que a varredura consegue resolver. O value set NAO e restrito, de proposito: acrescentar valor a picklist RESTRITA pela Metadata API nao o atribui aos Record Types, e a gravacao passa a ser recusada — medido com &quot;Falha tecnica&quot;. A restricao nao protegia nada aqui: o campo e somente leitura para todos e so a automacao escreve nele, por constante. CLICKUP-9439 / CLICKUP-9429 (absorvido).</description>
+    <description>Por que a duracao ficou pendente, e o que fazer. &quot;Calendario indisponivel&quot;: Business Hours ausente ou inativo — falha TRANSITORIA, reprocessada pela varredura. &quot;Falha tecnica&quot;: erro inesperado no calculo ou na gravacao — tambem reprocessado, porque a maioria e transitoria, e deliberadamente visivel para que alguem perceba se persistir. &quot;Intervalo inconsistente&quot;: destino anterior a origem ou distancia acima do teto — DADO invalido, que NAO entra em varredura automatica para nao gerar retry perpetuo; exige corrigir as datas e rodar o Batch sob demanda. Coexistindo mais de um, prevalece o que a varredura consegue resolver. Value set RESTRITO, com os tres valores atribuidos ao Record Type SOL: acrescentar valor a picklist restrita pela Metadata API NAO o atribui ao Record Type sozinho, e a gravacao passa a ser recusada — por isso campo e Record Type sao implantados juntos. CLICKUP-9439 / CLICKUP-9429 (absorvido).</description>
     <label>Motivo da pendência de duração (SOL)</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
     <trackHistory>false</trackHistory>
     <type>Picklist</type>
     <valueSet>
-        <restricted>false</restricted>
+        <restricted>true</restricted>
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
