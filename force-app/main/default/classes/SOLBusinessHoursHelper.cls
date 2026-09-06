@@ -62,6 +62,49 @@ public with sharing class SOLBusinessHoursHelper {
   }
 
   /**
+   * Abertura EFETIVA do expediente no dia `data` (America/Sao_Paulo), ou null
+   * quando aquele dia não tem expediente algum — fim de semana ou feriado do
+   * calendário.
+   *
+   * (CLICKUP-9398) EXTRAÍDO do miolo de `prazoEmDiasUteis`, sem mudar uma linha
+   * do cálculo: a régua de "este dia é útil?" passa a ter UM dono, consumido
+   * tanto pela contagem para frente (prazos) quanto pelo motor da cadência, que
+   * precisa da mesma régua para andar para trás e para recusar rodar em dia sem
+   * expediente.
+   *
+   * A sonda parte de 00:00 GMT da data — que em São Paulo é a véspera à noite,
+   * sempre fora de expediente —, então `nextStartDate` devolve a próxima
+   * abertura de VERDADE. Se ela cair em outro dia, este dia não tem expediente.
+   */
+  public static Datetime aberturaDoDia(Id bhId, Date data) {
+    if (bhId == null || data == null) {
+      return null;
+    }
+    Datetime antesDaAbertura = Datetime.newInstanceGmt(
+      data,
+      Time.newInstance(0, 0, 0, 0)
+    );
+    Datetime proximaAbertura = BusinessHours.nextStartDate(
+      bhId,
+      antesDaAbertura
+    );
+    return (proximaAbertura != null &&
+      dataEm(proximaAbertura, TZ_SAO_PAULO) == data)
+      ? proximaAbertura
+      : null;
+  }
+
+  /**
+   * Este dia de calendário POSSUI expediente? Fim de semana e feriado: false.
+   * Sem calendário disponível também é false — quem precisa distinguir
+   * "não é dia útil" de "não há calendário" deve checar `businessHoursId()`
+   * antes, porque aqui os dois casos se parecem. CLICKUP-9398.
+   */
+  public static Boolean ehDiaUtil(Id bhId, Date data) {
+    return aberturaDoDia(bhId, data) != null;
+  }
+
+  /**
    * Abertura efetiva do dia útil que fica `dias` dias ÚTEIS depois da DATA
    * (America/Sao_Paulo) de `origem`.
    *
@@ -80,14 +123,9 @@ public with sharing class SOLBusinessHoursHelper {
     Datetime abertura = null;
     while (contados < dias && guarda < 400) {
       data = data.addDays(1);
-      // Instante seguramente ANTERIOR à abertura de `data` em São Paulo
-      // (00:00 UTC de `data` = véspera à noite em SP, sempre fora de expediente).
-      Datetime antesDaAbertura = Datetime.newInstanceGmt(
-        data,
-        Time.newInstance(0, 0, 0, 0)
-      );
-      Datetime proximaAbertura = BusinessHours.nextStartDate(bhId, antesDaAbertura);
-      if (proximaAbertura != null && dataEm(proximaAbertura, TZ_SAO_PAULO) == data) {
+      // Mesma verificação de sempre, agora com um dono só (`aberturaDoDia`).
+      Datetime proximaAbertura = aberturaDoDia(bhId, data);
+      if (proximaAbertura != null) {
         contados++;
         abertura = proximaAbertura;
       }
