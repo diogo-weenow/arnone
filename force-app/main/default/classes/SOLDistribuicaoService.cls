@@ -963,6 +963,18 @@ public without sharing class SOLDistribuicaoService {
           r.ignorados++;
           continue;
         }
+        // (CLICKUP-9449) OPT-OUT já registrado é o outro estado TERMINAL: o lead
+        // pediu para não ser contatado, e sinalizar contato efetivado depois
+        // disso contradiria o próprio registro. Como a perda, é ignorado aqui —
+        // e, na porta ESTRITA, o Invocable transforma esse "ignorado" em falha,
+        // para que a marcação não persista um dado que o serviço recusou.
+        //
+        // A checagem usa o Lead lido com FOR UPDATE, logo é o estado CONFIRMADO
+        // do banco, não uma pré-consulta sem lock.
+        if (l.SOL_Opt_Out__c == true) {
+          r.ignorados++;
+          continue;
+        }
         leadsSOL.add(l.Id);
         // Idempotência: flag e data só são gravados quando ainda faltam, e a
         // data do PRIMEIRO contato efetivado nunca é sobrescrita.

@@ -488,18 +488,20 @@ private class SOLCancelamentoContatoEfetivadoTest {
 
   // ==================================================== fora do escopo
 
-  /** (10) Outra BU, convertido e negócio perdido não são alcançados. */
+  /**
+   * (10) Outra BU não é alcançada: o Flow filtra Record Type SOL e nem dispara,
+   * então a gravação passa e nenhuma tarefa é tocada.
+   */
   @IsTest
-  static void leadsForaDoEscopoNaoSaoAlcancados() {
+  static void leadDeOutraBUNaoEhAlcancado() {
     montarCenario(2);
-
     Lead outraBU = new Lead(
       LastName = 'Fora da BU',
       Company = 'Outra Empresa',
       Status = statusLead()
     );
     insert outraBU;
-    Task tarefaOutraBU = new Task(
+    Task tarefa = new Task(
       Subject = 'Contato de outra BU',
       WhoId = outraBU.Id,
       OwnerId = UserInfo.getUserId(),
@@ -508,36 +510,267 @@ private class SOLCancelamentoContatoEfetivadoTest {
       SOL_Tipo_Tarefa__c = 'Contato',
       SOL_Canal_Contato__c = 'Ligação'
     );
-    insert tarefaOutraBU;
+    insert tarefa;
 
-    Lead perdido = novoLeadSOL('S9449g', 'Recuperação Tributária');
-    Task tarefaPerdido = contatoAberto(perdido, 'E-mail');
+    Test.startTest();
+    update new Lead(Id = outraBU.Id, SOL_Contato_Efetivado__c = true);
+    Test.stopTest();
+
+    System.assertEquals(
+      'Open',
+      lerTarefa(tarefa.Id).Status,
+      'A tarefa do Lead de outra BU continua aberta.'
+    );
+  }
+
+  /**
+   * (10) LEAD JÁ PERDIDO — a marcação direta FALHA e nada persiste.
+   *
+   * Era o furo: o serviço ignorava o Lead terminal e retornava normalmente, e
+   * como nenhuma exceção subia, a gravação original deixava o flag verdadeiro,
+   * sem contato registrado e com a data vazia. "O serviço ignora" não é
+   * proteção — é dado falso persistido.
+   */
+  @IsTest
+  static void leadPerdidoRecusaAMarcacaoDireta() {
+    montarCenario(2);
+    Lead l = novoLeadSOL('S9449k', 'Recuperação Tributária');
+    Task pendente = contatoAberto(l, 'Ligação');
     update new Lead(
-      Id = perdido.Id,
+      Id = l.Id,
+      Status = 'Desqualificado',
+      SOL_Motivo_Desqualificacao__c = 'Negócio perdido'
+    );
+    Task depoisDaPerda = lerTarefa(pendente.Id);
+
+    Test.startTest();
+    String erro = '';
+    try {
+      marcarDireto(l.Id);
+    } catch (DmlException e) {
+      erro = e.getMessage();
+    }
+    Test.stopTest();
+
+    System.assert(
+      erro.contains('não está mais em contato ativo'),
+      'Marcar um Lead perdido tem de FALHAR, não ser ignorado. Recebido: ' + erro
+    );
+    Lead d = [
+      SELECT
+        SOL_Contato_Efetivado__c,
+        SOL_Data_Contato_Efetivado__c,
+        Status,
+        SOL_Motivo_Desqualificacao__c
+      FROM Lead
+      WHERE Id = :l.Id
+    ];
+    System.assertEquals(
+      false,
+      d.SOL_Contato_Efetivado__c,
+      'O flag continua FALSO: a transação inteira foi desfeita.'
+    );
+    System.assertEquals(
+      null,
+      d.SOL_Data_Contato_Efetivado__c,
+      'E a data continua vazia.'
+    );
+    System.assertEquals(
+      'Desqualificado',
+      d.Status,
+      'O estado da perda fica intacto.'
+    );
+    System.assertEquals(
+      'Negócio perdido',
+      d.SOL_Motivo_Desqualificacao__c,
+      'Com o motivo preservado.'
+    );
+    System.assertEquals(
+      depoisDaPerda.Status,
+      lerTarefa(pendente.Id).Status,
+      'E a tarefa fica como o encerramento por perda a deixou.'
+    );
+  }
+
+  /** (10) LEAD JÁ EM OPT-OUT — a marcação direta FALHA e nada persiste. */
+  @IsTest
+  static void leadEmOptOutRecusaAMarcacaoDireta() {
+    montarCenario(2);
+    Lead l = novoLeadSOL('S9449l', 'Recuperação Tributária');
+    Task pendente = contatoAberto(l, 'E-mail');
+    update new Lead(
+      Id = l.Id,
+      SOL_Opt_Out__c = true,
+      SOL_Motivo_Desqualificacao__c = 'Opt-out'
+    );
+    Task depoisDoOptOut = lerTarefa(pendente.Id);
+
+    Test.startTest();
+    String erro = '';
+    try {
+      marcarDireto(l.Id);
+    } catch (DmlException e) {
+      erro = e.getMessage();
+    }
+    Test.stopTest();
+
+    System.assert(
+      erro.contains('não está mais em contato ativo'),
+      'Marcar um Lead em opt-out tem de FALHAR. Recebido: ' + erro
+    );
+    Lead d = [
+      SELECT
+        SOL_Contato_Efetivado__c,
+        SOL_Data_Contato_Efetivado__c,
+        SOL_Opt_Out__c,
+        SOL_Motivo_Desqualificacao__c
+      FROM Lead
+      WHERE Id = :l.Id
+    ];
+    System.assertEquals(
+      false,
+      d.SOL_Contato_Efetivado__c,
+      'O flag de contato continua FALSO.'
+    );
+    System.assertEquals(
+      null,
+      d.SOL_Data_Contato_Efetivado__c,
+      'E a data de contato continua vazia.'
+    );
+    System.assertEquals(true, d.SOL_Opt_Out__c, 'O opt-out fica intacto.');
+    System.assertEquals(
+      'Opt-out',
+      d.SOL_Motivo_Desqualificacao__c,
+      'Com o motivo preservado.'
+    );
+    System.assertEquals(
+      depoisDoOptOut.Status,
+      lerTarefa(pendente.Id).Status,
+      'E a tarefa fica como o opt-out a deixou.'
+    );
+  }
+
+  /**
+   * (10) LOTE ESTRITO MISTO: um Lead ativo e um terminal na MESMA atualização.
+   * A transação inteira é desfeita — nem o Lead ativo fica marcado, nem as
+   * tarefas dele são canceladas. Sem estado parcial.
+   */
+  @IsTest
+  static void loteEstritoMistoNaoDeixaEstadoParcial() {
+    montarCenario(2);
+    Lead ativo = novoLeadSOL('S9449m', 'Recuperação Tributária');
+    Lead terminal = novoLeadSOL('S9449n', 'Recuperação Tributária');
+    Task doAtivo = contatoAberto(ativo, 'WhatsApp');
+    contatoAberto(terminal, 'Ligação');
+    update new Lead(
+      Id = terminal.Id,
       Status = 'Desqualificado',
       SOL_Motivo_Desqualificacao__c = 'Negócio perdido'
     );
 
     Test.startTest();
-    // Outra BU: o Flow nem dispara (filtra Record Type SOL).
-    update new Lead(Id = outraBU.Id, SOL_Contato_Efetivado__c = true);
-    // Lead perdido: o Flow dispara, mas o serviço se recusa a sinalizar.
-    update new Lead(Id = perdido.Id, SOL_Contato_Efetivado__c = true);
+    String erro = '';
+    try {
+      update new List<Lead>{
+        new Lead(Id = ativo.Id, SOL_Contato_Efetivado__c = true),
+        new Lead(Id = terminal.Id, SOL_Contato_Efetivado__c = true)
+      };
+    } catch (DmlException e) {
+      erro = e.getMessage();
+    }
     Test.stopTest();
 
+    System.assert(
+      erro.contains('não está mais em contato ativo'),
+      'O lote misto falha com a mensagem controlada. Recebido: ' + erro
+    );
+    Lead depoisAtivo = recarregar(ativo.Id);
+    System.assertEquals(
+      false,
+      depoisAtivo.SOL_Contato_Efetivado__c,
+      'Nem o Lead ATIVO do lote foi marcado: sem estado parcial.'
+    );
+    System.assertEquals(
+      null,
+      depoisAtivo.SOL_Data_Contato_Efetivado__c,
+      'E sem data.'
+    );
     System.assertEquals(
       'Open',
-      lerTarefa(tarefaOutraBU.Id).Status,
-      'A tarefa do Lead de outra BU continua aberta.'
+      lerTarefa(doAtivo.Id).Status,
+      'E a tarefa dele continua aberta: o cancelamento foi desfeito junto.'
     );
     System.assertEquals(
-      'Cancelada',
-      lerTarefa(tarefaPerdido.Id).Status,
-      'No Lead perdido, o encerramento por perda (CLICKUP-9425) já havia cancelado a tarefa.'
+      false,
+      recarregar(terminal.Id).SOL_Contato_Efetivado__c,
+      'O terminal, muito menos.'
     );
-    System.assert(
-      recarregar(perdido.Id).SOL_Data_Contato_Efetivado__c == null,
-      'E o serviço não estampa data de contato efetivado num negócio perdido.'
+  }
+
+  /**
+   * (10) DIRECIONALIDADE — a proteção impede efetivar DEPOIS do estado
+   * terminal, e não o contrário: um Lead já efetivado pode perfeitamente ser
+   * perdido ou pedir opt-out mais tarde. É o fluxo legítimo do funil, e uma
+   * regra de estado global o quebraria.
+   */
+  @IsTest
+  static void efetivarPrimeiroEPerderOuOptOutDepoisContinuaPermitido() {
+    montarCenario(2);
+    Lead paraPerder = novoLeadSOL('S9449o', 'Recuperação Tributária');
+    Lead paraOptOut = novoLeadSOL('S9449p', 'Recuperação Tributária');
+    contatoAberto(paraPerder, 'Ligação');
+    contatoAberto(paraOptOut, 'E-mail');
+
+    marcarDireto(paraPerder.Id);
+    marcarDireto(paraOptOut.Id);
+    System.assertEquals(
+      true,
+      recarregar(paraPerder.Id).SOL_Contato_Efetivado__c,
+      'Pré-condição: efetivado.'
+    );
+
+    Test.startTest();
+    update new Lead(
+      Id = paraPerder.Id,
+      Status = 'Desqualificado',
+      SOL_Motivo_Desqualificacao__c = 'Negócio perdido'
+    );
+    update new Lead(
+      Id = paraOptOut.Id,
+      SOL_Opt_Out__c = true,
+      SOL_Motivo_Desqualificacao__c = 'Opt-out'
+    );
+    Test.stopTest();
+
+    Lead perdido = [
+      SELECT Status, SOL_Contato_Efetivado__c
+      FROM Lead
+      WHERE Id = :paraPerder.Id
+    ];
+    System.assertEquals(
+      'Desqualificado',
+      perdido.Status,
+      'Perder DEPOIS de efetivar continua permitido.'
+    );
+    System.assertEquals(
+      true,
+      perdido.SOL_Contato_Efetivado__c,
+      'E o histórico do contato efetivado permanece.'
+    );
+    Lead optOut = [
+      SELECT SOL_Opt_Out__c, SOL_Contato_Efetivado__c
+      FROM Lead
+      WHERE Id = :paraOptOut.Id
+    ];
+    System.assertEquals(
+      true,
+      optOut.SOL_Opt_Out__c,
+      'Pedir opt-out DEPOIS de efetivar também.'
+    );
+    System.assertEquals(
+      true,
+      optOut.SOL_Contato_Efetivado__c,
+      'Com o histórico preservado.'
     );
   }
 
