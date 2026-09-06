@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Resultado_Contato__c</fullName>
-    <description>Desfecho da tentativa de contato registrada nesta atividade (só jornada Arnone Soluções). Atendeu = contato efetivado, impede a reatribuição do ciclo atual. Não atendeu / Não foi possível ligar = tentativa sem contato; 3 no mesmo ciclo do vendedor disparam a reatribuição automática do Lead. Opt-out = o lead pediu para não ser mais contatado; o sistema desqualifica o Lead e cancela as tarefas de contato pendentes. Preenchido pelo vendedor ao concluir a tarefa. CLICKUP-9400 / 9396 / 9418.</description>
+    <description>Desfecho da tentativa de contato desta atividade (jornada Arnone Soluções, canal LIGAÇÃO), preenchido pelo vendedor ao concluir. "Atendeu" = contato efetivado: marca SOL_Contato_Efetivado__c e a data no Lead, cancela as pendentes dos três canais e IMPEDE a reatribuição do ciclo. "Atendeu_Sem_Conclusao" (rótulo "Atendeu — sem conclusão", CLICKUP-9437) = houve conversa mas nada avançou: não marca o Lead, não preenche data, não cancela nada e CONTA como tentativa. "Não atendeu" e "Não foi possível ligar" = tentativa sem contato. Três contabilizáveis no mesmo ciclo disparam a reatribuição. "Opt-out" = desqualifica o Lead. O API name é ASCII de propósito e difere do rótulo: TEXT() devolve o API name, usado pelo Apex e pelo filterFormula do Flow — nunca compare pelo rótulo. Exclusivo da ligação; e-mail e WhatsApp usam SOL_Resultado_Envio__c. CLICKUP-9400 / 9396 / 9418 / 9437.</description>
     <label>Resultado do contato</label>
     <required>false</required>
     <type>Picklist</type>
@@ -13,6 +13,11 @@
                 <fullName>Atendeu</fullName>
                 <default>false</default>
                 <label>Atendeu</label>
+            </value>
+            <value>
+                <fullName>Atendeu_Sem_Conclusao</fullName>
+                <default>false</default>
+                <label>Atendeu — sem conclusão</label>
             </value>
             <value>
                 <fullName>Não atendeu</fullName>

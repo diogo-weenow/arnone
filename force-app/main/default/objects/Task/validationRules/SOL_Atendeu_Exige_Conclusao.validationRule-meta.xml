@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Atendeu_Exige_Conclusao</fullName>
+    <active>true</active>
+    <description>CLICKUP-9437: "Atendeu" só ao CONCLUIR a ligação; em tarefa aberta não efetiva contato nem bloqueia reatribuição. Recorte por classificação (prazo legado OU Tipo+Canal). Usa Status, não IsClosed, que em VR de Task não reflete a própria gravação.</description>
+    <errorConditionFormula>AND(
+  OR(
+    NOT( ISBLANK( SOL_Prazo_Contato__c ) ),
+    AND(
+      ISPICKVAL( SOL_Tipo_Tarefa__c , &quot;Contato&quot; ),
+      ISPICKVAL( SOL_Canal_Contato__c , &quot;Ligação&quot; )
+    )
+  ),
+  NOT(
+    OR(
+      ISPICKVAL( Status , &quot;Completed&quot; ),
+      ISPICKVAL( Status , &quot;Cancelada&quot; )
+    )
+  ),
+  ISPICKVAL( SOL_Resultado_Contato__c , &quot;Atendeu&quot; )
+)</errorConditionFormula>
+    <errorDisplayField>SOL_Resultado_Contato__c</errorDisplayField>
+    <errorMessage>Registre &quot;Atendeu&quot; apenas ao CONCLUIR a ligação — é a conclusão que marca o contato efetivado no Lead e cancela as demais tarefas de contato. Se o cliente atendeu mas o assunto não avançou, use &quot;Atendeu — sem conclusão&quot;.</errorMessage>
+</ValidationRule>

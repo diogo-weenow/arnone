@@ -54,16 +54,44 @@ public without sharing class SOLDistribuicaoService {
   @TestVisible
   private static final String RESULTADO_NAO_FOI_POSSIVEL = 'Não foi possível ligar';
 
+  /**
+   * (CLICKUP-9437) Falou com o lead, mas o assunto NÃO avançou. Não é contato
+   * efetivado — não marca o Lead, não preenche data e não cancela tarefa —, mas
+   * CONTA como tentativa na régua de três.
+   *
+   * O valor é o API NAME da picklist, ASCII de propósito: `TEXT()` de picklist
+   * devolve o API name, e é ele que o `filterFormula` do Flow de reatribuição
+   * compara. Rótulo e API name são deliberadamente diferentes; nunca comparar
+   * pelo rótulo ("Atendeu — sem conclusão").
+   */
+  @TestVisible
+  private static final String RESULTADO_ATENDEU_SEM_CONCLUSAO = 'Atendeu_Sem_Conclusao';
+
   /** Resultados que contam como tentativa sem contato. */
   @TestVisible
   private static final Set<String> RESULTADOS_NEGATIVOS = new Set<String>{
+    RESULTADO_ATENDEU_SEM_CONCLUSAO,
     RESULTADO_NAO_ATENDEU,
     RESULTADO_NAO_FOI_POSSIVEL
   };
-  /** Todos os resultados considerados na contagem do ciclo. */
+  /**
+   * Todos os resultados considerados na contagem do ciclo.
+   *
+   * (CLICKUP-9437) `RESULTADO_ATENDEU_SEM_CONCLUSAO` entra nos DOIS Sets, e não
+   * é redundância. `RESULTADOS_NEGATIVOS` decide o que INCREMENTA a contagem;
+   * `RESULTADOS_CONSIDERADOS` é o que vai para o `WHERE ... IN` da consulta de
+   * Tasks e, por consequência, alimenta `ultimaConclusaoNoCiclo` — a base do
+   * novo `SOL_Data_Inicio_Ciclo_Contato__c` ("última conclusão contada + 1s").
+   *
+   * Se o valor ficasse de fora daqui, a tarefa que disparou a troca não entraria
+   * naquele cálculo, o ciclo novo começaria ANTES dela e ela voltaria a contar
+   * na avaliação seguinte — reatribuindo o mesmo Lead em CASCATA. É este Set que
+   * impede o loop.
+   */
   @TestVisible
   private static final Set<String> RESULTADOS_CONSIDERADOS = new Set<String>{
     RESULTADO_ATENDEU,
+    RESULTADO_ATENDEU_SEM_CONCLUSAO,
     RESULTADO_NAO_ATENDEU,
     RESULTADO_NAO_FOI_POSSIVEL
   };
@@ -538,8 +566,15 @@ public without sharing class SOLDistribuicaoService {
   /**
    * Reatribui, em round-robin, os Leads do Record Type SOL cujo ciclo de contato
    * do vendedor atual acumulou {@link #TENTATIVAS_PARA_REATRIBUIR} Tasks
-   * concluídas com resultado "Sem sucesso" — desde que nenhuma Task do ciclo
-   * tenha resultado "Sucesso" (contato efetivado bloqueia a troca do ciclo).
+   * concluídas com resultado CONTABILIZÁVEL — desde que nenhuma Task do ciclo
+   * tenha "Atendeu", que é o único resultado que bloqueia a troca do ciclo.
+   *
+   * (CLICKUP-9437) Contabilizam três resultados: "Atendeu_Sem_Conclusao" (houve
+   * conversa, nada avançou), "Não atendeu" e "Não foi possível ligar". O valor
+   * novo entra em `RESULTADOS_NEGATIVOS` e em `RESULTADOS_CONSIDERADOS`; o
+   * porquê dos dois está documentado na declaração daquele segundo Set — sem
+   * ele, o ciclo reiniciado não excluiria a tarefa que disparou a troca e o
+   * mesmo Lead seria reatribuído em cascata.
    *
    * Bulk-safe: nenhuma consulta ou DML dentro de laço. Transacional: Savepoint /
    * rollback. Usa o MESMO singleton, lock (FOR UPDATE), fila, roster e ponteiro
@@ -643,7 +678,9 @@ public without sharing class SOLDistribuicaoService {
       // contato preenchido, concluídas a partir do corte. Uma única consulta; o
       // corte por Lead é aplicado em memória (varia por Lead). CLICKUP-9396:
       // "Atendeu" = contato efetivado (bloqueia); "Não atendeu" e "Não foi
-      // possível ligar" contam como tentativa negativa.
+      // possível ligar" contam como tentativa negativa. CLICKUP-9437:
+      // "Atendeu_Sem_Conclusao" também conta — houve conversa, mas nada avançou
+      // — e continua NÃO bloqueando, porque o bloqueio é exclusivo de "Atendeu".
       Map<Id, Integer> negativosNoCiclo = new Map<Id, Integer>();
       Set<Id> teveAtendimentoNoCiclo = new Set<Id>();
       // Última conclusão contada por Lead: base para reiniciar o ciclo de forma
@@ -672,6 +709,9 @@ public without sharing class SOLDistribuicaoService {
         ) {
           ultimaConclusaoNoCiclo.put(t.WhoId, t.CompletedDateTime);
         }
+        // Só "Atendeu" bloqueia a troca. "Atendeu_Sem_Conclusao" cai no `else`
+        // e é contado como tentativa — é exatamente essa a diferença entre os
+        // dois (CLICKUP-9437).
         if (t.SOL_Resultado_Contato__c == RESULTADO_ATENDEU) {
           teveAtendimentoNoCiclo.add(t.WhoId);
         } else if (RESULTADOS_NEGATIVOS.contains(t.SOL_Resultado_Contato__c)) {
