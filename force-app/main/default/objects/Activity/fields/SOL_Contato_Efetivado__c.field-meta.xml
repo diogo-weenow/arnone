@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Contato_Efetivado__c</fullName>
+    <description>Sinal MANUAL de que o Lead RESPONDEU à mensagem desta tarefa (CLICKUP-9447). Distinto de SOL_Resultado_Envio__c = "Enviado", que diz apenas que a mensagem SAIU: não há leitura de caixa de e-mail nem integração de mensageria; quem sabe da resposta é o vendedor. Só pode ser verdadeiro com SOL_Tipo_Tarefa__c = "Contato", SOL_Canal_Contato__c = "E-mail", Status = "Completed", SOL_Resultado_Envio__c = "Enviado" e WhoId preenchido — a VR SOL_Contato_Efetivado_Envio_Coerente exige esse estado em TODA gravação, e a SOL_Contato_Efetivado_Nao_Reverte impede desmarcar: o registro é IRREVERSÍVEL, porque já sinalizou o Lead e cancelou as tarefas dos outros canais. A VR não exige WhoId de Lead (quebraria a conversão); quem filtra é o Apex. Aciona o Flow SOL_Contato_Efetivado_Por_Envio, que reusa a automação do CLICKUP-9417. Nasce genérico para o CLICKUP-9448, mas aqui só o canal E-mail o usa. Homônimo de Lead.SOL_Contato_Efetivado__c: sempre qualifique com Task. ou Lead.</description>
+    <label>Contato efetivado (lead respondeu)</label>
+    <defaultValue>false</defaultValue>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>
