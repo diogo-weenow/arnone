@@ -905,4 +905,245 @@ private class SOLReatribuicaoContatoServiceTest {
       'Task vencida conclui normalmente (com resultado).'
     );
   }
+
+  // ======================================================================
+  //  CLICKUP-9437 — "Atendeu — sem conclusão"
+  //
+  //  O valor novo é o estado intermediário que faltava: houve conversa, mas
+  //  nada avançou. Ele NÃO efetiva contato e CONTA como tentativa — a régua de
+  //  três passa a somar três resultados, e só "Atendeu" continua bloqueando.
+  //
+  //  Todas as comparações usam o API NAME (ASCII), nunca o rótulo, porque é o
+  //  API name que `TEXT()` devolve no filterFormula do Flow e o que o Apex
+  //  compara.
+  // ======================================================================
+
+  private static final String RES_SEM_CONCLUSAO = 'Atendeu_Sem_Conclusao';
+
+  /** (5) Três "Atendeu — sem conclusão" no ciclo reatribuem. */
+  @IsTest
+  static void tresAtendeuSemConclusaoReatribuem() {
+    Cenario c = montarCenario(3);
+    Lead l = novoLeadSOLDistribuido('S9437a');
+    Id ownerInicial = l.OwnerId;
+
+    Test.startTest();
+    tasksResultado(l.Id, 3, RES_SEM_CONCLUSAO);
+    SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
+    Test.stopTest();
+
+    Lead d = recarregar(l.Id);
+    System.assertNotEquals(
+      ownerInicial,
+      d.OwnerId,
+      'Conversa sem avanço CONTA: três delas trocam o vendedor.'
+    );
+    System.assertEquals(c.vendedores[1], d.OwnerId, 'Próximo do rodízio.');
+    System.assertEquals(
+      1,
+      d.SOL_Quantidade_Reatribuicoes__c,
+      'Contador de reatribuições incrementado.'
+    );
+    System.assertEquals('Reatribuido', d.SOL_Status_Reatribuicao__c);
+    System.assertEquals(
+      'Sem contato após 3 tentativas',
+      d.SOL_Motivo_Ultima_Reatribuicao__c
+    );
+    System.assertNotEquals(null, d.SOL_Data_Ultima_Reatribuicao__c);
+    System.assertEquals(
+      c.vendedores[1],
+      estado().Ultimo_Usuario__c,
+      'Ponteiro global avançou.'
+    );
+
+    List<Task> pl = primeirasLigacoes(l.Id);
+    System.assertEquals(1, pl.size(), 'Uma "1ª Ligação" para o novo vendedor.');
+    System.assertEquals(d.OwnerId, pl[0].OwnerId, 'Do novo proprietário.');
+  }
+
+  /** (6) Mistura dos três resultados contabilizáveis reatribui igualmente. */
+  @IsTest
+  static void misturaDosTresResultadosContabilizaveisReatribui() {
+    Cenario c = montarCenario(3);
+    Lead l = novoLeadSOLDistribuido('S9437b');
+    Id ownerInicial = l.OwnerId;
+
+    Test.startTest();
+    tasksResultado(l.Id, 1, RES_SEM_CONCLUSAO);
+    tasksResultado(l.Id, 1, 'Não atendeu');
+    tasksResultado(l.Id, 1, 'Não foi possível ligar');
+    SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
+    Test.stopTest();
+
+    Lead d = recarregar(l.Id);
+    System.assertNotEquals(
+      ownerInicial,
+      d.OwnerId,
+      'Os três contabilizáveis somam na MESMA régua.'
+    );
+    System.assertEquals(1, d.SOL_Quantidade_Reatribuicoes__c);
+    System.assertEquals('Reatribuido', d.SOL_Status_Reatribuicao__c);
+  }
+
+  /** (7) Duas ocorrências não bastam. */
+  @IsTest
+  static void duasOcorrenciasSemConclusaoNaoReatribuem() {
+    Cenario c = montarCenario(3);
+    Lead l = novoLeadSOLDistribuido('S9437c');
+    Id ownerInicial = l.OwnerId;
+
+    Test.startTest();
+    tasksResultado(l.Id, 2, RES_SEM_CONCLUSAO);
+    SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
+    Test.stopTest();
+
+    Lead d = recarregar(l.Id);
+    System.assertEquals(ownerInicial, d.OwnerId, 'Duas não trocam o vendedor.');
+    System.assertEquals(0, d.SOL_Quantidade_Reatribuicoes__c);
+    System.assertEquals(
+      'Em acompanhamento',
+      d.SOL_Status_Reatribuicao__c,
+      'O Lead segue com o mesmo vendedor, em acompanhamento.'
+    );
+  }
+
+  /** (8) "Atendeu" no ciclo bloqueia, mesmo com três contabilizáveis. */
+  @IsTest
+  static void atendeuBloqueiaMesmoComTresSemConclusao() {
+    Cenario c = montarCenario(3);
+    Lead l = novoLeadSOLDistribuido('S9437d');
+    Id ownerInicial = l.OwnerId;
+
+    Test.startTest();
+    taskAtendeu(l.Id);
+    tasksResultado(l.Id, 3, RES_SEM_CONCLUSAO);
+    SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
+    Test.stopTest();
+
+    Lead d = recarregar(l.Id);
+    System.assertEquals(
+      ownerInicial,
+      d.OwnerId,
+      '"Atendeu" continua sendo o ÚNICO resultado que impede a troca.'
+    );
+    System.assertEquals(0, d.SOL_Quantidade_Reatribuicoes__c);
+  }
+
+  /**
+   * (9) Reprocessar não reatribui duas vezes nem cria uma segunda "1ª Ligação".
+   *
+   * O que sustenta isso é o ciclo reiniciado para DEPOIS da última conclusão
+   * contada: sem incluir "Atendeu_Sem_Conclusao" em RESULTADOS_CONSIDERADOS, as
+   * tarefas que dispararam a troca ficariam fora desse cálculo, o ciclo novo
+   * começaria antes delas e o mesmo Lead seria reatribuído em cascata.
+   */
+  @IsTest
+  static void reprocessarSemConclusaoNaoReatribuiDuasVezes() {
+    Cenario c = montarCenario(3);
+    Lead l = novoLeadSOLDistribuido('S9437e');
+
+    Test.startTest();
+    tasksResultado(l.Id, 3, RES_SEM_CONCLUSAO);
+    SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
+    Lead aposPrimeira = recarregar(l.Id);
+    SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
+    Test.stopTest();
+
+    Lead d = recarregar(l.Id);
+    System.assertEquals(
+      aposPrimeira.OwnerId,
+      d.OwnerId,
+      'A segunda passagem não troca o vendedor de novo.'
+    );
+    System.assertEquals(
+      1,
+      d.SOL_Quantidade_Reatribuicoes__c,
+      'Uma única reatribuição.'
+    );
+    System.assertEquals(
+      1,
+      primeirasLigacoes(l.Id).size(),
+      'E uma única "1ª Ligação".'
+    );
+
+    Datetime ultimaContada = [
+      SELECT CompletedDateTime
+      FROM Task
+      WHERE
+        WhoId = :l.Id
+        AND SOL_Resultado_Contato__c = :RES_SEM_CONCLUSAO
+        AND IsClosed = TRUE
+      ORDER BY CompletedDateTime DESC
+      LIMIT 1
+    ]
+    .CompletedDateTime;
+    System.assert(
+      d.SOL_Data_Inicio_Ciclo_Contato__c > ultimaContada,
+      'O ciclo novo começa DEPOIS da última conclusão contada — é o que impede a cascata. Ciclo=' +
+        d.SOL_Data_Inicio_Ciclo_Contato__c +
+        ' última=' +
+        ultimaContada
+    );
+  }
+
+  /** (10) Fora do escopo: outra BU, opt-out, negócio perdido e convertido. */
+  @IsTest
+  static void semConclusaoNaoAlcancaLeadsForaDoEscopo() {
+    Cenario c = montarCenario(3);
+
+    Lead outraBU = novoLeadSemRT('S9437f');
+    Lead optOut = novoLeadSOLDistribuido('S9437g');
+    Lead perdido = novoLeadSOLDistribuido('S9437h');
+    Lead convertido = novoLeadSOLDistribuido('S9437i');
+
+    for (Lead alvo : new List<Lead>{ outraBU, optOut, perdido, convertido }) {
+      tasksResultado(alvo.Id, 3, RES_SEM_CONCLUSAO);
+    }
+    Map<Id, Id> donoAntes = new Map<Id, Id>();
+    for (Lead alvo : new List<Lead>{ outraBU, optOut, perdido, convertido }) {
+      donoAntes.put(alvo.Id, recarregar(alvo.Id).OwnerId);
+    }
+
+    update new Lead(
+      Id = optOut.Id,
+      SOL_Opt_Out__c = true,
+      SOL_Motivo_Desqualificacao__c = 'Opt-out'
+    );
+    update new Lead(
+      Id = perdido.Id,
+      SOL_Produto_Interesse__c = 'Recuperação Tributária',
+      Status = 'Desqualificado',
+      SOL_Motivo_Desqualificacao__c = 'Negócio perdido'
+    );
+    update new Lead(Id = convertido.Id, SOL_Status_Procuracao__c = 'Recebida');
+    Database.LeadConvert lc = new Database.LeadConvert();
+    lc.setLeadId(convertido.Id);
+    lc.setDoNotCreateOpportunity(true);
+    lc.setConvertedStatus(
+      [SELECT MasterLabel FROM LeadStatus WHERE IsConverted = TRUE LIMIT 1]
+      .MasterLabel
+    );
+    Database.convertLead(lc);
+
+    Test.startTest();
+    SOLDistribuicaoService.ResultadoReatribuicao r = SOLDistribuicaoService.reatribuirPorFaltaDeContato(
+      new List<Id>{ outraBU.Id, optOut.Id, perdido.Id, convertido.Id }
+    );
+    Test.stopTest();
+
+    System.assertEquals(
+      0,
+      r.reatribuidos,
+      'Nenhum Lead fora do escopo é reatribuído pelo valor novo.'
+    );
+    System.assertEquals(4, r.ignorados, 'Os quatro são ignorados, sem erro.');
+    System.assertEquals(0, r.comErro, 'Ignorar não é erro.');
+    for (Id leadId : donoAntes.keySet()) {
+      System.assertEquals(
+        donoAntes.get(leadId),
+        recarregar(leadId).OwnerId,
+        'O proprietário não muda em Lead fora do escopo.'
+      );
+    }
+  }
 }

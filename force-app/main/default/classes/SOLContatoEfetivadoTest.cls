@@ -817,4 +817,632 @@ private class SOLContatoEfetivadoTest {
       'O Invocable relança a falha para o Flow abortar a transação (a Task não fica concluída).'
     );
   }
+
+  // ======================================================================
+  //  CLICKUP-9437 — "Atendeu — sem conclusão" e a VR SOL_Atendeu_Exige_Conclusao
+  //
+  //  Duas coisas entram aqui. A primeira é o estado intermediário que faltava:
+  //  o vendedor falou com o lead, mas nada avançou — não é contato efetivado e
+  //  não cancela nada, ainda que conte como tentativa. A segunda é o
+  //  fechamento de uma brecha antiga: gravar "Atendeu" numa ligação AINDA
+  //  ABERTA não produzia efeito nenhum (o Flow exige Completed e a contagem só
+  //  lê IsClosed), deixando um Lead com "atendeu" que não efetivava contato nem
+  //  bloqueava a reatribuição.
+  // ======================================================================
+
+  private static final String RES_SEM_CONCLUSAO = 'Atendeu_Sem_Conclusao';
+
+  /**
+   * Ligação dos dias 2/3 (CLICKUP-9434): tipo + canal, e prazo NULO. É o outro
+   * braço do recorte da VR — o primeiro é a tarefa legada, com prazo e sem
+   * canal, que `tarefaContatoAberta` já produz.
+   */
+  private static Task ligacaoDeCadenciaAberta(Id leadId, Id owner, Integer dia) {
+    Task t = new Task(
+      Subject = dia + 'ª Ligação',
+      WhoId = leadId,
+      OwnerId = owner,
+      Status = 'Open',
+      ActivityDate = Date.today(),
+      SOL_Tipo_Tarefa__c = 'Contato',
+      SOL_Canal_Contato__c = 'Ligação',
+      SOL_Dia_Cadencia__c = dia
+    );
+    insert t;
+    return t;
+  }
+
+  /** Tarefa de mensagem aberta (e-mail ou WhatsApp), para provar o cancelamento. */
+  private static Task tarefaDeMensagemAberta(Id leadId, Id owner, String canal) {
+    Task t = new Task(
+      Subject = canal + ' do dia',
+      WhoId = leadId,
+      OwnerId = owner,
+      Status = 'Open',
+      ActivityDate = Date.today(),
+      SOL_Tipo_Tarefa__c = 'Contato',
+      SOL_Canal_Contato__c = canal,
+      SOL_Dia_Cadencia__c = 2
+    );
+    insert t;
+    return t;
+  }
+
+  private static Task lerTarefa(Id taskId) {
+    return [
+      SELECT
+        Id,
+        Subject,
+        Status,
+        IsClosed,
+        ActivityDate,
+        SOL_Prazo_Contato__c,
+        SOL_Canal_Contato__c,
+        SOL_Tipo_Tarefa__c,
+        SOL_Dia_Cadencia__c,
+        SOL_Resultado_Contato__c,
+        SOL_Motivo_Cancelamento__c
+      FROM Task
+      WHERE Id = :taskId
+    ];
+  }
+
+  /**
+   * (1) "Atendeu" em ligação AINDA ABERTA é bloqueado — nos DOIS braços do
+   * recorte: a tarefa legada (prazo preenchido, canal vazio, anterior ao 9434)
+   * e a dos dias 2/3 (tipo + canal, prazo nulo).
+   */
+  @IsTest
+  static void atendeuEmLigacaoAbertaEhBloqueadoNosDoisBracos() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9437a', 'Recuperação Tributária');
+    Task legada = tarefaContatoAberta(l.Id, l.OwnerId);
+    Task dia2 = ligacaoDeCadenciaAberta(l.Id, l.OwnerId, 2);
+
+    // Pré-condições: cada tarefa exercita UM braço, não os dois.
+    Task legadaLida = lerTarefa(legada.Id);
+    System.assertNotEquals(
+      null,
+      legadaLida.SOL_Prazo_Contato__c,
+      'Pré-condição: a legada tem prazo de contato.'
+    );
+    System.assertEquals(
+      null,
+      legadaLida.SOL_Canal_Contato__c,
+      'Pré-condição: e NÃO tem canal — o campo nasceu no CLICKUP-9434.'
+    );
+    Task dia2Lida = lerTarefa(dia2.Id);
+    System.assertEquals(
+      null,
+      dia2Lida.SOL_Prazo_Contato__c,
+      'Pré-condição: o dia 2 não tem prazo em minutos.'
+    );
+    System.assertEquals(
+      'Ligação',
+      dia2Lida.SOL_Canal_Contato__c,
+      'Pré-condição: e é do canal Ligação.'
+    );
+
+    Test.startTest();
+    Map<Id, String> erros = new Map<Id, String>();
+    for (Id alvo : new List<Id>{ legada.Id, dia2.Id }) {
+      try {
+        update new Task(Id = alvo, SOL_Resultado_Contato__c = 'Atendeu');
+        erros.put(alvo, '');
+      } catch (DmlException e) {
+        erros.put(alvo, e.getMessage());
+      }
+    }
+    Test.stopTest();
+
+    for (Id alvo : erros.keySet()) {
+      System.assert(
+        erros.get(alvo).contains('apenas ao CONCLUIR'),
+        'Gravar "Atendeu" sem concluir tem de ser bloqueado. Recebido: ' +
+          erros.get(alvo)
+      );
+      System.assertEquals(
+        null,
+        lerTarefa(alvo).SOL_Resultado_Contato__c,
+        'E o resultado não fica gravado.'
+      );
+      System.assertEquals(
+        'Open',
+        lerTarefa(alvo).Status,
+        'A tarefa continua aberta.'
+      );
+    }
+    System.assert(
+      recarregar(l.Id).SOL_Contato_Efetivado__c != true,
+      'E o Lead não foi sinalizado por uma tarefa que nunca chegou a ser concluída.'
+    );
+  }
+
+  /**
+   * (2) e (3) Concluir com "Atendeu" — Status e resultado no MESMO update —
+   * marca o Lead e cancela as pendentes dos TRÊS canais, enquanto a tarefa de
+   * origem permanece concluída, com o resultado intacto.
+   */
+  @IsTest
+  static void concluirComAtendeuCancelaOsTresCanaisEPreservaAOrigem() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9437b', 'Recuperação Tributária');
+    Task ligacao = ligacaoDeCadenciaAberta(l.Id, l.OwnerId, 2);
+    Task email = tarefaDeMensagemAberta(l.Id, l.OwnerId, 'E-mail');
+    Task whats = tarefaDeMensagemAberta(l.Id, l.OwnerId, 'WhatsApp');
+
+    Test.startTest();
+    update new Task(
+      Id = ligacao.Id,
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Atendeu'
+    );
+    Test.stopTest();
+
+    Lead d = recarregar(l.Id);
+    System.assertEquals(true, d.SOL_Contato_Efetivado__c, 'Lead sinalizado.');
+    System.assertNotEquals(
+      null,
+      d.SOL_Data_Contato_Efetivado__c,
+      'Data do contato efetivado registrada.'
+    );
+
+    Task origem = lerTarefa(ligacao.Id);
+    System.assertEquals(
+      'Completed',
+      origem.Status,
+      'A tarefa de origem permanece CONCLUÍDA, não cancelada.'
+    );
+    System.assertEquals(
+      'Atendeu',
+      origem.SOL_Resultado_Contato__c,
+      'E o resultado dela não é alterado.'
+    );
+
+    for (Id alvo : new List<Id>{ email.Id, whats.Id }) {
+      Task t = lerTarefa(alvo);
+      System.assertEquals(
+        'Cancelada',
+        t.Status,
+        'A pendente do canal ' + t.SOL_Canal_Contato__c + ' é cancelada.'
+      );
+      System.assertEquals(
+        'Contato efetivado',
+        t.SOL_Motivo_Cancelamento__c,
+        'Com o motivo da automação existente.'
+      );
+    }
+    System.assertEquals(
+      0,
+      abertasDe(l.Id),
+      'Nenhuma tarefa de contato pendente sobra, em canal nenhum.'
+    );
+  }
+
+  /**
+   * (4) "Atendeu — sem conclusão" não efetiva contato: não marca a flag, não
+   * preenche a data e não cancela nada. É a diferença inteira entre os dois.
+   */
+  @IsTest
+  static void atendeuSemConclusaoNaoEfetivaContatoNemCancela() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9437c', 'Recuperação Tributária');
+    Task ligacao = ligacaoDeCadenciaAberta(l.Id, l.OwnerId, 2);
+    Task email = tarefaDeMensagemAberta(l.Id, l.OwnerId, 'E-mail');
+    Task whats = tarefaDeMensagemAberta(l.Id, l.OwnerId, 'WhatsApp');
+
+    Test.startTest();
+    update new Task(
+      Id = ligacao.Id,
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = RES_SEM_CONCLUSAO
+    );
+    Test.stopTest();
+
+    Lead d = recarregar(l.Id);
+    System.assert(
+      d.SOL_Contato_Efetivado__c != true,
+      'Conversa sem avanço NÃO é contato efetivado.'
+    );
+    System.assertEquals(
+      null,
+      d.SOL_Data_Contato_Efetivado__c,
+      'E não estampa a data do contato efetivado.'
+    );
+
+    System.assertEquals(
+      RES_SEM_CONCLUSAO,
+      lerTarefa(ligacao.Id).SOL_Resultado_Contato__c,
+      'O resultado é gravado normalmente ao concluir.'
+    );
+    for (Id alvo : new List<Id>{ email.Id, whats.Id }) {
+      Task t = lerTarefa(alvo);
+      System.assertEquals(
+        'Open',
+        t.Status,
+        'A tarefa de ' + t.SOL_Canal_Contato__c + ' continua ABERTA.'
+      );
+      System.assertEquals(
+        null,
+        t.SOL_Motivo_Cancelamento__c,
+        'E sem motivo de cancelamento.'
+      );
+    }
+  }
+
+  /**
+   * "Atendeu" numa tarefa JÁ CANCELADA é bloqueado, e a gravação recusada não
+   * deixa rastro: status, motivo e o resto dos dados continuam como estavam.
+   *
+   * Era o furo da primeira versão da regra, que isentava "Cancelada" junto com
+   * "Completed": dava para editar uma tarefa cancelada e produzir exatamente o
+   * estado incoerente que este card existe para eliminar — resultado "Atendeu"
+   * sem contato efetivado, porque o Flow SOL_Contato_Efetivado exige
+   * "Completed" e nunca chega a rodar.
+   */
+  @IsTest
+  static void atendeuEmTarefaJaCanceladaEhBloqueadoSemAlterarNada() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9437d', 'Recuperação Tributária');
+    Task ligacao = ligacaoDeCadenciaAberta(l.Id, l.OwnerId, 2);
+    update new Task(
+      Id = ligacao.Id,
+      Status = 'Cancelada',
+      SOL_Motivo_Cancelamento__c = 'Contato efetivado'
+    );
+
+    Task antes = lerTarefa(ligacao.Id);
+    System.assertEquals(
+      'Cancelada',
+      antes.Status,
+      'Pré-condição: a tarefa está cancelada.'
+    );
+    System.assertEquals(
+      null,
+      antes.SOL_Resultado_Contato__c,
+      'Pré-condição: e sem resultado — cancelada não é atendida.'
+    );
+
+    Test.startTest();
+    String erro = '';
+    try {
+      update new Task(Id = ligacao.Id, SOL_Resultado_Contato__c = 'Atendeu');
+    } catch (DmlException e) {
+      erro = e.getMessage();
+    }
+    Test.stopTest();
+
+    System.assert(
+      erro.contains('apenas ao CONCLUIR'),
+      'Gravar "Atendeu" numa tarefa cancelada tem de ser bloqueado. Recebido: ' +
+        erro
+    );
+
+    Task depois = lerTarefa(ligacao.Id);
+    System.assertEquals(
+      null,
+      depois.SOL_Resultado_Contato__c,
+      'O resultado não foi gravado.'
+    );
+    System.assertEquals(antes.Status, depois.Status, 'O status foi preservado.');
+    System.assertEquals(
+      antes.SOL_Motivo_Cancelamento__c,
+      depois.SOL_Motivo_Cancelamento__c,
+      'O motivo do cancelamento foi preservado.'
+    );
+    System.assertEquals(antes.Subject, depois.Subject, 'O assunto foi preservado.');
+    System.assertEquals(
+      antes.ActivityDate,
+      depois.ActivityDate,
+      'O vencimento foi preservado.'
+    );
+    System.assertEquals(
+      antes.SOL_Canal_Contato__c,
+      depois.SOL_Canal_Contato__c,
+      'O canal foi preservado.'
+    );
+    System.assertEquals(
+      antes.SOL_Tipo_Tarefa__c,
+      depois.SOL_Tipo_Tarefa__c,
+      'O tipo foi preservado.'
+    );
+    System.assertEquals(
+      antes.SOL_Dia_Cadencia__c,
+      depois.SOL_Dia_Cadencia__c,
+      'O dia da cadência foi preservado.'
+    );
+    System.assert(
+      recarregar(l.Id).SOL_Contato_Efetivado__c != true,
+      'E o Lead não foi sinalizado por uma tarefa cancelada.'
+    );
+  }
+
+  /**
+   * Cancelar e marcar "Atendeu" na MESMA gravação é bloqueado por inteiro —
+   * mesmo com tipo, canal e motivo válidos, que fariam o cancelamento passar
+   * sozinho. E o contraste: concluir com "Atendeu" segue permitido e efetiva o
+   * contato normalmente.
+   */
+  @IsTest
+  static void cancelarComAtendeuEhBloqueadoMasConcluirComAtendeuPassa() {
+    montarCenario(2);
+    Lead l = novoLeadSOLDistribuido('S9437e', 'Recuperação Tributária');
+    Task ligacao = ligacaoDeCadenciaAberta(l.Id, l.OwnerId, 2);
+
+    Test.startTest();
+    String erro = '';
+    try {
+      update new Task(
+        Id = ligacao.Id,
+        Status = 'Cancelada',
+        SOL_Motivo_Cancelamento__c = 'Contato efetivado',
+        SOL_Resultado_Contato__c = 'Atendeu'
+      );
+    } catch (DmlException e) {
+      erro = e.getMessage();
+    }
+
+    Task aposTentativa = lerTarefa(ligacao.Id);
+    System.assert(
+      erro.contains('apenas ao CONCLUIR'),
+      'Cancelar já marcando "Atendeu" tem de ser bloqueado. Recebido: ' + erro
+    );
+    System.assertEquals(
+      'Open',
+      aposTentativa.Status,
+      'A gravação foi desfeita por inteiro: o status não mudou.'
+    );
+    System.assertEquals(
+      null,
+      aposTentativa.SOL_Motivo_Cancelamento__c,
+      'Nem o motivo, que sozinho seria válido, sobreviveu.'
+    );
+    System.assertEquals(
+      null,
+      aposTentativa.SOL_Resultado_Contato__c,
+      'Nem o resultado.'
+    );
+
+    // O caminho legítimo continua aberto.
+    update new Task(
+      Id = ligacao.Id,
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Atendeu'
+    );
+    Test.stopTest();
+
+    Task concluida = lerTarefa(ligacao.Id);
+    System.assertEquals('Completed', concluida.Status, 'Concluir é permitido.');
+    System.assertEquals(
+      'Atendeu',
+      concluida.SOL_Resultado_Contato__c,
+      'Com o resultado gravado.'
+    );
+    Lead d = recarregar(l.Id);
+    System.assertEquals(
+      true,
+      d.SOL_Contato_Efetivado__c,
+      'E o contato é efetivado normalmente.'
+    );
+    System.assertNotEquals(
+      null,
+      d.SOL_Data_Contato_Efetivado__c,
+      'Com a data carimbada.'
+    );
+  }
+
+  /**
+   * Os três cancelamentos automáticos continuam funcionando — e a razão é
+   * simples: nenhum deles grava "Atendeu". Eles gravam Status e motivo, que a
+   * VR não observa. Não foi preciso isentar "Cancelada" para isso.
+   */
+  @IsTest
+  static void cancelamentosAutomaticosContinuamFuncionando() {
+    montarCenario(3);
+    Lead porContato = novoLeadSOLDistribuido('S9437f', 'Recuperação Tributária');
+    Lead porOptOut = novoLeadSOLDistribuido('S9437g', 'Recuperação Tributária');
+    Lead porPerda = novoLeadSOLDistribuido('S9437h', 'Recuperação Tributária');
+
+    Map<Id, Task> mensagemPorLead = new Map<Id, Task>();
+    for (Lead alvo : new List<Lead>{ porContato, porOptOut, porPerda }) {
+      mensagemPorLead.put(
+        alvo.Id,
+        tarefaDeMensagemAberta(alvo.Id, alvo.OwnerId, 'E-mail')
+      );
+    }
+    Map<Id, Id> ligacaoPorLead = new Map<Id, Id>();
+    for (Lead alvo : new List<Lead>{ porContato, porOptOut }) {
+      ligacaoPorLead.put(
+        alvo.Id,
+        ligacaoDeCadenciaAberta(alvo.Id, alvo.OwnerId, 2).Id
+      );
+    }
+
+    Test.startTest();
+    update new Task(
+      Id = ligacaoPorLead.get(porContato.Id),
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Atendeu'
+    );
+    update new Task(
+      Id = ligacaoPorLead.get(porOptOut.Id),
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Opt-out'
+    );
+    update new Lead(
+      Id = porPerda.Id,
+      Status = 'Desqualificado',
+      SOL_Motivo_Desqualificacao__c = 'Negócio perdido'
+    );
+    Test.stopTest();
+
+    Map<Id, String> motivoEsperado = new Map<Id, String>{
+      porContato.Id => 'Contato efetivado',
+      porOptOut.Id => 'Opt-out',
+      porPerda.Id => 'Negócio perdido'
+    };
+    for (Id leadId : motivoEsperado.keySet()) {
+      Task t = lerTarefa(mensagemPorLead.get(leadId).Id);
+      System.assertEquals(
+        'Cancelada',
+        t.Status,
+        'A pendente é cancelada por "' + motivoEsperado.get(leadId) + '".'
+      );
+      System.assertEquals(
+        motivoEsperado.get(leadId),
+        t.SOL_Motivo_Cancelamento__c,
+        'Com o motivo correto.'
+      );
+      System.assertEquals(
+        null,
+        t.SOL_Resultado_Contato__c,
+        'E sem resultado de ligação — é por isso que a VR não alcança o cancelamento automático.'
+      );
+    }
+  }
+
+  // ------------------------------------------------------------------ FLS
+
+  private static Id perfilStandard() {
+    Map<String, Id> porNome = new Map<String, Id>();
+    for (Profile p : [SELECT Id, Name FROM Profile WHERE UserType = 'Standard']) {
+      porNome.put(p.Name, p.Id);
+    }
+    if (porNome.containsKey('Standard User')) {
+      return porNome.get('Standard User');
+    }
+    return porNome.isEmpty() ? UserInfo.getProfileId() : porNome.values()[0];
+  }
+
+  /**
+   * Usuário de perfil STANDARD — e não o de quem roda o teste. FLS efetiva
+   * medida sobre um administrador não mede nada: ele vê tudo pelo perfil.
+   */
+  private static User usuarioStandard(String tag) {
+    return new User(
+      FirstName = 'CEf',
+      LastName = 'Std ' + tag,
+      Alias = ('cs' + tag).left(8),
+      Email = 'cef.std.' + tag + '@arnone.invalid',
+      Username = 'cef.std.' +
+        tag +
+        '.' +
+        String.valueOf(Math.abs(Crypto.getRandomInteger())) +
+        '@arnone.clickup9437.test.invalid',
+      ProfileId = perfilStandard(),
+      TimeZoneSidKey = 'America/Sao_Paulo',
+      LocaleSidKey = 'pt_BR',
+      EmailEncodingKey = 'UTF-8',
+      LanguageLocaleKey = 'pt_BR',
+      IsActive = true
+    );
+  }
+
+  private static Id permissionSetId(String nome) {
+    return [SELECT Id FROM PermissionSet WHERE Name = :nome LIMIT 1].Id;
+  }
+
+  /**
+   * (11) FLS do resultado do contato: ESTRUTURAL, pelo que os permission sets
+   * declaram, e EFETIVA, medida em runtime sobre usuários de perfil Standard.
+   *
+   * A medição efetiva é por `getDescribe()` dentro de `System.runAs` porque é o
+   * único mecanismo válido em Apex: DML de Apex roda em modo de sistema e NÃO
+   * aplica FLS, então um `update` "de verdade" como gestor passaria e daria um
+   * falso verde. Não troque estas asserções por DML.
+   */
+  @IsTest
+  static void flsDoResultadoDoContato() {
+    Map<String, FieldPermissions> porPs = new Map<String, FieldPermissions>();
+    for (FieldPermissions fp : [
+      SELECT PermissionsRead, PermissionsEdit, Parent.Name
+      FROM FieldPermissions
+      WHERE
+        Field = 'Task.SOL_Resultado_Contato__c'
+        AND Parent.Name IN ('PS_SOL_Comercial', 'PS_SOL_Distribuicao_Admin')
+    ]) {
+      porPs.put(fp.Parent.Name, fp);
+    }
+
+    System.assert(
+      porPs.containsKey('PS_SOL_Comercial'),
+      'PS_SOL_Comercial declara o resultado do contato.'
+    );
+    System.assert(
+      porPs.get('PS_SOL_Comercial').PermissionsRead,
+      'Vendedor lê o resultado do contato.'
+    );
+    System.assert(
+      porPs.get('PS_SOL_Comercial').PermissionsEdit,
+      'Vendedor EDITA: é ele quem registra o desfecho da ligação.'
+    );
+    System.assert(
+      porPs.containsKey('PS_SOL_Distribuicao_Admin'),
+      'PS_SOL_Distribuicao_Admin passa a declarar o resultado do contato (CLICKUP-9437).'
+    );
+    System.assert(
+      porPs.get('PS_SOL_Distribuicao_Admin').PermissionsRead,
+      'Gestor lê o resultado do contato.'
+    );
+    System.assert(
+      !porPs.get('PS_SOL_Distribuicao_Admin').PermissionsEdit,
+      'Gestor apenas LÊ: quem registra o desfecho é o vendedor.'
+    );
+
+    User vendedorStd = usuarioStandard('v' + String.valueOf(Math.abs(Crypto.getRandomInteger())).left(3));
+    User gestorStd = usuarioStandard('g' + String.valueOf(Math.abs(Crypto.getRandomInteger())).left(3));
+    System.runAs(contextoAtual()) {
+      insert new List<User>{ vendedorStd, gestorStd };
+      insert new List<PermissionSetAssignment>{
+        new PermissionSetAssignment(
+          AssigneeId = vendedorStd.Id,
+          PermissionSetId = permissionSetId('PS_SOL_Comercial')
+        ),
+        new PermissionSetAssignment(
+          AssigneeId = gestorStd.Id,
+          PermissionSetId = permissionSetId('PS_SOL_Distribuicao_Admin')
+        )
+      };
+    }
+
+    Test.startTest();
+    System.runAs(new User(Id = vendedorStd.Id)) {
+      Schema.DescribeFieldResult res = Task.SOL_Resultado_Contato__c.getDescribe();
+      System.assert(res.isAccessible(), 'Vendedor lê o resultado do contato.');
+      System.assert(res.isUpdateable(), 'Vendedor EDITA o resultado do contato.');
+    }
+    System.runAs(new User(Id = gestorStd.Id)) {
+      Schema.DescribeFieldResult res = Task.SOL_Resultado_Contato__c.getDescribe();
+      System.assert(res.isAccessible(), 'Gestor lê o resultado do contato.');
+      System.assert(
+        !res.isUpdateable(),
+        'Gestor NÃO edita o resultado do contato.'
+      );
+    }
+    Test.stopTest();
+
+    // O valor novo precisa estar ATIVO na picklist restrita, senão nada grava.
+    Set<String> valores = new Set<String>();
+    for (
+      Schema.PicklistEntry pe : Task.SOL_Resultado_Contato__c.getDescribe()
+        .getPicklistValues()
+    ) {
+      if (pe.isActive()) {
+        valores.add(pe.getValue());
+      }
+    }
+    System.assert(
+      valores.contains(RES_SEM_CONCLUSAO),
+      'O API name "Atendeu_Sem_Conclusao" está ativo no value set restrito.'
+    );
+    System.assert(
+      valores.contains('Atendeu'),
+      'E os valores anteriores continuam existindo.'
+    );
+    System.assertEquals(
+      5,
+      valores.size(),
+      'Cinco valores: os quatro originais mais o novo — nenhum foi removido.'
+    );
+  }
 }
