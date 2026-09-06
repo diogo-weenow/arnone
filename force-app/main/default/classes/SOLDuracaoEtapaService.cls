@@ -65,6 +65,23 @@ public without sharing class SOLDuracaoEtapaService {
   /** DADO inválido: fora da varredura automática, exige correção das datas. */
   public static final String MOTIVO_INCONSISTENTE = 'Intervalo inconsistente';
 
+  /**
+   * Erro INESPERADO no cálculo ou na gravação — nem calendário ausente, nem
+   * intervalo incoerente.
+   *
+   * Também é reprocessado pela varredura, porque a maioria das falhas técnicas
+   * é transitória (contenção de lock, limite momentâneo). Se persistir, o
+   * registro continua aparecendo na lista de pendências com este motivo, que é
+   * justamente o sinal para alguém olhar — e o Batch marca o `AsyncApexJob`.
+   */
+  public static final String MOTIVO_FALHA_TECNICA = 'Falha técnica';
+
+  /** Motivos que a varredura automática aceita reprocessar. */
+  public static final Set<String> MOTIVOS_REPROCESSAVEIS = new Set<String>{
+    MOTIVO_CALENDARIO,
+    MOTIVO_FALHA_TECNICA
+  };
+
   @TestVisible
   private static final String RT_SOL = 'SOL';
 
@@ -106,6 +123,10 @@ public without sharing class SOLDuracaoEtapaService {
     public Integer registrosAtualizados = 0;
     public Integer oportunidadesSincronizadas = 0;
     public Integer falhas = 0;
+    /** Falhas que CONSEGUIRAM virar pendência no próprio registro. */
+    public Integer falhasSinalizadas = 0;
+    /** Falhas que NÃO puderam ser gravadas em registro nenhum. */
+    public Integer falhasSemSinal = 0;
 
     public override String toString() {
       return 'avaliados=' +
@@ -127,7 +148,11 @@ public without sharing class SOLDuracaoEtapaService {
         ' oportunidadesSincronizadas=' +
         oportunidadesSincronizadas +
         ' falhas=' +
-        falhas;
+        falhas +
+        ' falhasSinalizadas=' +
+        falhasSinalizadas +
+        ' falhasSemSinal=' +
+        falhasSemSinal;
     }
   }
 
@@ -185,14 +210,25 @@ public without sharing class SOLDuracaoEtapaService {
   };
 
   /**
-   * A etapa 1 NÃO está aqui, de propósito: a origem dela
-   * (`Lead.SOL_Data_Distribuicao__c`) só existe no Lead. Na Oportunidade a
-   * etapa 1 é sempre CÓPIA — transportada por `SOL_ConverterLead` na conversão
-   * e ressincronizada depois por `sincronizarOportunidadesDeLeadsConvertidos`.
-   * As etapas 2 e 3 aparecem aqui porque a Oportunidade tem os dois marcos de
-   * cada uma e consegue recalcular sozinha se a cópia vier vazia.
+   * As CINCO etapas mensuráveis na Oportunidade, mais a etapa 1.
+   *
+   * A etapa 1 PRECISA estar aqui, e o espelho de `SOL_Data_Distribuicao__c`
+   * existe por causa dela. Sem a origem, a Oportunidade não conseguia decidir
+   * se a etapa 1 ainda estava pendente — e `aplicarPendencia`, que recalcula o
+   * estado agregado do zero, APAGARIA uma pendência legítima herdada do Lead na
+   * primeira vez que a Oportunidade fosse reavaliada por qualquer outro motivo.
+   * Com a origem espelhada, a etapa 1 é avaliada como qualquer outra e a
+   * pendência dela sobrevive ao recálculo.
    */
   private static final List<Etapa> ETAPAS_OPORTUNIDADE = new List<Etapa>{
+    new Etapa(
+      '1 - Primeira ligação',
+      'SOL_Data_Distribuicao__c',
+      true,
+      'SOL_Data_Primeira_Ligacao__c',
+      true,
+      'SOL_Dias_Primeira_Ligacao__c'
+    ),
     new Etapa(
       '2 - Contato efetivado',
       'SOL_Data_Primeira_Ligacao__c',
@@ -235,8 +271,18 @@ public without sharing class SOLDuracaoEtapaService {
     )
   };
 
-  /** Espelhos Lead -> Oportunidade: os mesmos campos que a conversão leva. */
+  /**
+   * Espelhos Lead -> Oportunidade dos MARCOS e DURAÇÕES das etapas 1 a 3.
+   *
+   * Os campos de PENDÊNCIA não estão aqui de propósito: a Oportunidade calcula
+   * o estado dela do zero a cada avaliação, agora que consegue avaliar também a
+   * etapa 1. Copiar pendência aqui sobrescreveria um problema das etapas 4 a 6
+   * com o estado do Lead. Na CONVERSÃO é diferente — lá a Oportunidade nasce
+   * sem nunca ter sido avaliada, e por isso `SOL_ConverterLead` transporta
+   * também motivo e detalhe, para que nunca exista pendência sem explicação.
+   */
   private static final Map<String, String> ESPELHOS = new Map<String, String>{
+    'SOL_Data_Distribuicao__c' => 'SOL_Data_Distribuicao__c',
     'SOL_Data_Primeira_Ligacao__c' => 'SOL_Data_Primeira_Ligacao__c',
     'SOL_Data_Reuniao_Procuracao__c' => 'SOL_Data_Reuniao_Procuracao__c',
     'SOL_Dias_Primeira_Ligacao__c' => 'SOL_Dias_Primeira_Ligacao__c',
@@ -280,6 +326,7 @@ public without sharing class SOLDuracaoEtapaService {
           SOL_Duracao_Pendencia_Detalhe__c
         FROM Lead
         WHERE Id IN :ids AND RecordType.DeveloperName = :RT_SOL
+        FOR UPDATE
       ];
       r.foraDoEscopo += (ids.size() - leads.size());
       Set<Id> consolidados = consolidarMarcoDaEtapa3(leads, r);
@@ -306,6 +353,7 @@ public without sharing class SOLDuracaoEtapaService {
       List<Opportunity> opps = [
         SELECT
           Id,
+          SOL_Data_Distribuicao__c,
           SOL_Data_Primeira_Ligacao__c,
           SOL_Data_Inicio_Ciclo_Comercial__c,
           SOL_Data_Reuniao_Procuracao__c,
@@ -324,6 +372,7 @@ public without sharing class SOLDuracaoEtapaService {
           SOL_Duracao_Pendencia_Detalhe__c
         FROM Opportunity
         WHERE Id IN :ids AND RecordType.DeveloperName = :RT_SOL
+        FOR UPDATE
       ];
       r.foraDoEscopo += (ids.size() - opps.size());
       processar(opps, ETAPAS_OPORTUNIDADE, new Set<Id>(), r);
@@ -369,11 +418,24 @@ public without sharing class SOLDuracaoEtapaService {
     Date maior = null;
     for (SObject reg : registros) {
       for (Etapa e : etapas) {
-        if (reg.get(e.campoDuracao) != null) {
+        // A passada 1 é envolvida em try porque uma leitura de campo NÃO
+        // CONSULTADO lança SObjectException — e sem esta rede a exceção subiria
+        // até o catch do método público, abortando a medição do LOTE INTEIRO em
+        // silêncio. Foi exatamente o que aconteceu quando a etapa 1 entrou no
+        // descritor da Oportunidade antes de o campo entrar na projeção: todas
+        // as durações de Oportunidade pararam de ser calculadas de uma vez. Na
+        // passada 2 o mesmo erro vira pendência `Falha técnica` por etapa.
+        Date origem;
+        Date destino;
+        try {
+          if (reg.get(e.campoDuracao) != null) {
+            continue;
+          }
+          origem = comoData(reg.get(e.campoOrigem), e.origemEhDateTime);
+          destino = comoData(reg.get(e.campoDestino), e.destinoEhDateTime);
+        } catch (Exception ex) {
           continue;
         }
-        Date origem = comoData(reg.get(e.campoOrigem), e.origemEhDateTime);
-        Date destino = comoData(reg.get(e.campoDestino), e.destinoEhDateTime);
         if (origem == null || destino == null || destino < origem) {
           continue;
         }
@@ -399,6 +461,7 @@ public without sharing class SOLDuracaoEtapaService {
       List<String> pendencias = new List<String>();
       Boolean haTransitoria = false;
       Boolean haInconsistente = false;
+      Boolean haFalhaTecnica = false;
       Boolean mudou = jaAlterados.contains((Id) reg.get('Id'));
 
       for (Etapa e : etapas) {
@@ -418,6 +481,13 @@ public without sharing class SOLDuracaoEtapaService {
         try {
           Integer dias = contar(bhId, contador, origem, destino);
           reg.put(e.campoDuracao, Decimal.valueOf(dias));
+          // Este `mudou` e o que fica logo abaixo, no bloco da pendência, NÃO
+          // são a mesma coisa e nenhum dos dois é redundante — cobrem mutações
+          // disjuntas. MEDIDO: removendo este, 15 testes quebram, todos de
+          // duração; removendo o da pendência, quebram 6, todos de pendência, e
+          // os dois conjuntos não têm interseção. Um registro cuja ÚNICA
+          // mudança é a duração precisa deste; um cuja única mudança é a
+          // pendência — calendário fora, por exemplo — precisa do outro.
           mudou = true;
           r.calculadas++;
         } catch (SOLBusinessHoursHelper.CalendarioIndisponivelException ex) {
@@ -428,10 +498,41 @@ public without sharing class SOLDuracaoEtapaService {
           haInconsistente = true;
           pendencias.add(e.rotulo + ': intervalo inconsistente');
           r.pendentes++;
+        } catch (Exception ex) {
+          // Falha INESPERADA no cálculo de UMA etapa. Antes, ela subia até o
+          // catch do método público e derrubava a avaliação do LOTE inteiro,
+          // sem deixar rastro em registro nenhum. Agora fica contida na etapa,
+          // vira pendência explícita, e as outras etapas e os outros registros
+          // seguem sendo medidos.
+          haFalhaTecnica = true;
+          pendencias.add(e.rotulo + ': falha técnica (' + ex.getTypeName() + ')');
+          r.pendentes++;
+          r.falhas++;
+          System.debug(
+            LoggingLevel.ERROR,
+            'SOLDuracaoEtapaService: falha inesperada em ' +
+              reg.get('Id') +
+              ' / ' +
+              e.rotulo +
+              ' -> ' +
+              ex.getTypeName() +
+              ': ' +
+              ex.getMessage() +
+              ' | ' +
+              ex.getStackTraceString()
+          );
         }
       }
 
-      if (aplicarPendencia(reg, pendencias, haTransitoria, haInconsistente)) {
+      if (
+        aplicarPendencia(
+          reg,
+          pendencias,
+          haTransitoria,
+          haInconsistente,
+          haFalhaTecnica
+        )
+      ) {
         mudou = true;
       }
       if (mudou) {
@@ -479,17 +580,33 @@ public without sharing class SOLDuracaoEtapaService {
     SObject reg,
     List<String> pendencias,
     Boolean haTransitoria,
-    Boolean haInconsistente
+    Boolean haInconsistente,
+    Boolean haFalhaTecnica
   ) {
-    Boolean pendenteAgora = haTransitoria || haInconsistente;
+    Boolean pendenteAgora = haTransitoria || haInconsistente || haFalhaTecnica;
     String motivoAgora = null;
     String detalheAgora = null;
     if (pendenteAgora) {
-      motivoAgora = haTransitoria ? MOTIVO_CALENDARIO : MOTIVO_INCONSISTENTE;
+      // Precedência: primeiro o que a varredura CONSEGUE resolver. A falha
+      // técnica vem à frente do calendário porque é a que exige olho humano se
+      // persistir; as duas são reprocessáveis, então em qualquer uma delas o
+      // Batch continua alcançando o registro. O motivo permanente fica por
+      // último, e só prevalece quando é o único — senão prenderia um problema
+      // resolvível atrás de um dado ruim.
+      motivoAgora = haFalhaTecnica
+        ? MOTIVO_FALHA_TECNICA
+        : (haTransitoria ? MOTIVO_CALENDARIO : MOTIVO_INCONSISTENTE);
       detalheAgora = String.join(pendencias, ' | ');
       if (detalheAgora.length() > MAX_DETALHE) {
         detalheAgora = detalheAgora.abbreviate(MAX_DETALHE);
       }
+    }
+    // INVARIANTE: nunca existe pendência sem motivo e sem detalhe. Um checkbox
+    // marcado e um motivo vazio seriam uma lacuna sem explicação — pior que não
+    // ter marcado nada, porque parece informação.
+    if (pendenteAgora && (motivoAgora == null || String.isBlank(detalheAgora))) {
+      motivoAgora = MOTIVO_FALHA_TECNICA;
+      detalheAgora = 'Pendência sem detalhe apurado.';
     }
 
     Boolean pendenteAntes = ((Boolean) reg.get(CAMPO_PENDENTE)) == true;
@@ -589,6 +706,7 @@ public without sharing class SOLDuracaoEtapaService {
     for (Opportunity o : [
       SELECT
         Id,
+        SOL_Data_Distribuicao__c,
         SOL_Data_Primeira_Ligacao__c,
         SOL_Data_Reuniao_Procuracao__c,
         SOL_Dias_Primeira_Ligacao__c,
@@ -596,6 +714,7 @@ public without sharing class SOLDuracaoEtapaService {
         SOL_Dias_Reuniao_Procuracao__c
       FROM Opportunity
       WHERE Id IN :porOportunidade.keySet()
+      FOR UPDATE
     ]) {
       Lead l = porOportunidade.get(o.Id);
       Boolean mudou = false;
@@ -616,6 +735,306 @@ public without sharing class SOLDuracaoEtapaService {
     }
     r.oportunidadesSincronizadas += paraAtualizar.size();
     gravar(paraAtualizar, r);
+  }
+
+  // ==================================================================
+  // Consolidação dos marcos que nascem em Task
+  // ==================================================================
+
+  private static final String STATUS_CONCLUIDO = 'Completed';
+  private static final String TIPO_CONTATO = 'Contato';
+  private static final String CANAL_LIGACAO = 'Ligação';
+  private static final String TIPO_REUNIAO_COMERCIAL = 'Reunião comercial';
+  private static final String RESULTADO_REALIZADA = 'Realizada';
+  private static final String TIPO_ACOMPANHAMENTO_CALCULO = 'Acompanhamento do cálculo jurídico';
+  private static final String TIPO_REUNIAO_FINAL = 'Reunião final';
+
+  /**
+   * Consolida no Lead ou na Oportunidade os marcos que nascem em Task, e em
+   * seguida reavalia as durações dos pais afetados.
+   *
+   * ===========================================================
+   * POR QUE ISTO SAIU DO FLOW E VEIO PARA CÁ — defeito medido
+   * ===========================================================
+   * O padrão "Get pai -> decide se está vazio -> Update pai" parece seguro e
+   * NÃO é, dentro de uma única transação: TODOS os Get das interviews rodam
+   * ANTES de qualquer Update. Com duas Tasks qualificadas do MESMO pai
+   * concluídas no mesmo DML, as duas interviews leem o campo vazio, as duas
+   * decidem gravar, e o valor que sobra é o da ÚLTIMA interview processada —
+   * não o primeiro marco cronológico.
+   *
+   * Isso foi reproduzido por teste antes de ser corrigido, com as duas ordens
+   * possíveis da lista: `duasTarefasDeCalculoDaMesmaOportunidadeNoMesmoDml` e
+   * `duasTarefasDeCalculoComAOrdemInvertida` produziam marcos DIFERENTES para
+   * dados equivalentes. Não houve `DUPLICATE_ID_IN_LIST` — a plataforma
+   * consolida os updates repetidos; o defeito é sobrescrita silenciosa por
+   * ordem de lista.
+   *
+   * Aqui o resultado é determinístico: agrupa por pai, escolhe o MENOR marco,
+   * trava os pais com FOR UPDATE e grava UMA vez por pai, só quando o campo
+   * ainda está vazio. Duas Tasks do mesmo pai, em qualquer ordem, produzem
+   * sempre o primeiro marco cronológico.
+   *
+   * ORDEM DE LOCK: Lead antes de Oportunidade, a mesma ordem usada em
+   * `recalcularLeads`. Nenhum caminho deste serviço trava Oportunidade antes de
+   * Lead, então não há ciclo.
+   *
+   * NUNCA lança.
+   */
+  public static ResultadoDuracao consolidarMarcosDeTarefas(List<Id> taskIds) {
+    ResultadoDuracao r = new ResultadoDuracao();
+    Set<Id> ids = idsUteis(taskIds, Task.SObjectType);
+    if (ids.isEmpty()) {
+      return r;
+    }
+    try {
+      // Menor marco por (pai, campo). Marcos de Lead são sempre DateTime e os
+      // de Oportunidade sempre Date — por isso dois mapas, e nenhuma comparação
+      // genérica de Object que pudesse comparar tipos trocados.
+      Map<Id, Map<String, Datetime>> menorNoLead = new Map<Id, Map<String, Datetime>>();
+      Map<Id, Map<String, Date>> menorNaOportunidade = new Map<Id, Map<String, Date>>();
+
+      for (Task t : [
+        SELECT
+          Id,
+          WhoId,
+          WhatId,
+          Status,
+          CompletedDateTime,
+          SOL_Tipo_Tarefa__c,
+          SOL_Canal_Contato__c,
+          SOL_Resultado_Reuniao__c,
+          SOL_Data_Recebimento_Calculo__c,
+          SOL_Data_Reuniao_Final__c
+        FROM Task
+        WHERE Id IN :ids
+      ]) {
+        if (t.Status != STATUS_CONCLUIDO) {
+          r.ignoradas++;
+          continue;
+        }
+        String tipo = t.SOL_Tipo_Tarefa__c;
+
+        if (
+          tipo == TIPO_CONTATO &&
+          t.SOL_Canal_Contato__c == CANAL_LIGACAO &&
+          t.CompletedDateTime != null &&
+          ehDoTipo(t.WhoId, Lead.SObjectType)
+        ) {
+          registrarMenor(
+            menorNoLead,
+            t.WhoId,
+            'SOL_Data_Primeira_Ligacao__c',
+            t.CompletedDateTime
+          );
+          continue;
+        }
+        if (
+          tipo == TIPO_REUNIAO_COMERCIAL &&
+          t.SOL_Resultado_Reuniao__c == RESULTADO_REALIZADA &&
+          t.CompletedDateTime != null &&
+          ehDoTipo(t.WhoId, Lead.SObjectType)
+        ) {
+          registrarMenor(
+            menorNoLead,
+            t.WhoId,
+            'SOL_Data_Reuniao_Realizada__c',
+            t.CompletedDateTime
+          );
+          continue;
+        }
+        if (
+          tipo == TIPO_ACOMPANHAMENTO_CALCULO &&
+          t.SOL_Data_Recebimento_Calculo__c != null &&
+          ehDoTipo(t.WhatId, Opportunity.SObjectType)
+        ) {
+          registrarMenor(
+            menorNaOportunidade,
+            t.WhatId,
+            'SOL_Data_Recebimento_Calculo__c',
+            t.SOL_Data_Recebimento_Calculo__c
+          );
+          continue;
+        }
+        if (
+          tipo == TIPO_REUNIAO_FINAL &&
+          t.SOL_Data_Reuniao_Final__c != null &&
+          ehDoTipo(t.WhatId, Opportunity.SObjectType)
+        ) {
+          registrarMenor(
+            menorNaOportunidade,
+            t.WhatId,
+            'SOL_Data_Reuniao_Final__c',
+            t.SOL_Data_Reuniao_Final__c
+          );
+          continue;
+        }
+        // Tarefa que não alimenta marco nenhum: descartada em silêncio. É o
+        // caso de um WhoId que não é Lead, de outro tipo de tarefa, ou de uma
+        // reunião que não foi realizada.
+        r.ignoradas++;
+      }
+
+      // ---- Leads primeiro (ordem de lock) ----
+      if (!menorNoLead.isEmpty()) {
+        List<Lead> paraAtualizar = new List<Lead>();
+        for (Lead l : [
+          SELECT Id, SOL_Data_Primeira_Ligacao__c, SOL_Data_Reuniao_Realizada__c
+          FROM Lead
+          WHERE Id IN :menorNoLead.keySet() AND RecordType.DeveloperName = :RT_SOL
+          FOR UPDATE
+        ]) {
+          Boolean mudou = false;
+          for (String campo : menorNoLead.get(l.Id).keySet()) {
+            if (l.get(campo) != null) {
+              continue;
+            }
+            l.put(campo, menorNoLead.get(l.Id).get(campo));
+            mudou = true;
+            r.marcosConsolidados++;
+          }
+          if (mudou) {
+            paraAtualizar.add(l);
+          }
+        }
+        gravar(paraAtualizar, r);
+      }
+
+      // ---- Oportunidades depois ----
+      if (!menorNaOportunidade.isEmpty()) {
+        List<Opportunity> paraAtualizar = new List<Opportunity>();
+        for (Opportunity o : [
+          SELECT Id, SOL_Data_Recebimento_Calculo__c, SOL_Data_Reuniao_Final__c
+          FROM Opportunity
+          WHERE
+            Id IN :menorNaOportunidade.keySet()
+            AND RecordType.DeveloperName = :RT_SOL
+          FOR UPDATE
+        ]) {
+          Boolean mudou = false;
+          for (String campo : menorNaOportunidade.get(o.Id).keySet()) {
+            if (o.get(campo) != null) {
+              continue;
+            }
+            o.put(campo, menorNaOportunidade.get(o.Id).get(campo));
+            mudou = true;
+            r.marcosConsolidados++;
+          }
+          if (mudou) {
+            paraAtualizar.add(o);
+          }
+        }
+        gravar(paraAtualizar, r);
+      }
+
+      // ---- e então as durações dos pais afetados ----
+      if (!menorNoLead.isEmpty()) {
+        somar(r, recalcularLeads(new List<Id>(menorNoLead.keySet())));
+      }
+      if (!menorNaOportunidade.isEmpty()) {
+        somar(
+          r,
+          recalcularOportunidades(new List<Id>(menorNaOportunidade.keySet()))
+        );
+      }
+    } catch (Exception e) {
+      registrarFalha('consolidarMarcosDeTarefas', e, r);
+    }
+    return r;
+  }
+
+  /**
+   * A data de distribuição dos Leads informados — a ORIGEM da etapa 1.
+   *
+   * POR QUE ISTO É UM MÉTODO DAQUI, e não uma consulta em `SOL_ConverterLead`:
+   * `Lead.SOL_Data_Distribuicao__c` só tem FLS em `PS_SOL_Distribuicao_Admin`.
+   * Uma consulta a ela dentro da classe de conversão faz a plataforma
+   * re-resolver a query em tempo de execução para quem não enxerga o campo, e a
+   * conversão inteira passa a falhar com `Variable does not exist: tmpVar1` —
+   * medido, não suposto. Aqui, num serviço que já lê o campo em todas as suas
+   * consultas, isso não acontece.
+   *
+   * NUNCA lança: sem a origem, a conversão segue e a etapa 1 fica sem espelho,
+   * que é o comportamento tolerante de sempre.
+   */
+  public static Map<Id, Datetime> distribuicaoDeLeads(Set<Id> leadIds) {
+    Map<Id, Datetime> saida = new Map<Id, Datetime>();
+    if (leadIds == null || leadIds.isEmpty()) {
+      return saida;
+    }
+    try {
+      for (Lead l : [
+        SELECT Id, SOL_Data_Distribuicao__c
+        FROM Lead
+        WHERE Id IN :leadIds
+      ]) {
+        saida.put(l.Id, l.SOL_Data_Distribuicao__c);
+      }
+    } catch (Exception e) {
+      System.debug(
+        LoggingLevel.ERROR,
+        'SOLDuracaoEtapaService.distribuicaoDeLeads: ' +
+          e.getTypeName() +
+          ': ' +
+          e.getMessage()
+      );
+    }
+    return saida;
+  }
+
+  private static Boolean ehDoTipo(Id valor, Schema.SObjectType tipo) {
+    return valor != null && valor.getSObjectType() == tipo;
+  }
+
+  private static void registrarMenor(
+    Map<Id, Map<String, Datetime>> mapa,
+    Id paiId,
+    String campo,
+    Datetime valor
+  ) {
+    if (!mapa.containsKey(paiId)) {
+      mapa.put(paiId, new Map<String, Datetime>());
+    }
+    Datetime atual = mapa.get(paiId).get(campo);
+    if (atual == null || valor < atual) {
+      mapa.get(paiId).put(campo, valor);
+    }
+  }
+
+  private static void registrarMenor(
+    Map<Id, Map<String, Date>> mapa,
+    Id paiId,
+    String campo,
+    Date valor
+  ) {
+    if (!mapa.containsKey(paiId)) {
+      mapa.put(paiId, new Map<String, Date>());
+    }
+    Date atual = mapa.get(paiId).get(campo);
+    if (atual == null || valor < atual) {
+      mapa.get(paiId).put(campo, valor);
+    }
+  }
+
+  /** Acumula o resultado de uma chamada aninhada no resultado externo. */
+  private static void somar(
+    ResultadoDuracao alvo,
+    ResultadoDuracao parcial
+  ) {
+    if (parcial == null) {
+      return;
+    }
+    alvo.avaliados += parcial.avaliados;
+    alvo.foraDoEscopo += parcial.foraDoEscopo;
+    alvo.calculadas += parcial.calculadas;
+    alvo.pendentes += parcial.pendentes;
+    alvo.jaPreenchidas += parcial.jaPreenchidas;
+    alvo.ignoradas += parcial.ignoradas;
+    alvo.marcosConsolidados += parcial.marcosConsolidados;
+    alvo.registrosAtualizados += parcial.registrosAtualizados;
+    alvo.oportunidadesSincronizadas += parcial.oportunidadesSincronizadas;
+    alvo.falhas += parcial.falhas;
+    alvo.falhasSemSinal += parcial.falhasSemSinal;
   }
 
   // ==================================================================
@@ -734,37 +1153,142 @@ public without sharing class SOLDuracaoEtapaService {
   }
 
   /**
-   * Gravação em modo de SISTEMA e com sucesso parcial.
+   * Somente testes: força o caminho de FALHA de gravação, para provar que uma
+   * falha analítica não desfaz o marco comercial e que a pendência técnica
+   * ainda assim fica registrada. Protegido por `Test.isRunningTest()`.
+   */
+  @TestVisible
+  private static Boolean simularFalhaDeGravacao = false;
+
+  /**
+   * Último erro que impediu ATÉ o sinal mínimo de pendência. Existe para que um
+   * teste possa afirmar POR QUE a pendência não coube no registro, em vez de só
+   * constatar que não coube.
+   */
+  @TestVisible
+  private static String ultimoErroDeSinal;
+
+  /**
+   * Gravação em modo de SISTEMA e com sucesso parcial, com sinal de segunda
+   * chance quando algum registro não pôde ser gravado.
    *
-   * Modo de sistema porque são campos técnicos que ninguém edita — FLS somente
-   * leitura nos dois permission sets — e quem dispara a automação não tem
-   * permissão de escrita neles. Sucesso parcial porque a falha de um registro
-   * não pode derrubar a medição dos outros nem a operação comercial que
-   * originou a chamada.
+   * Modo de sistema porque são campos técnicos que ninguém edita. Sucesso
+   * parcial porque a falha de um registro não pode derrubar a medição dos
+   * outros nem a operação comercial que originou a chamada.
+   *
+   * O QUE ACONTECE QUANDO A GRAVAÇÃO FALHA — e o limite honesto disso: não dá
+   * para gravar a pendência no mesmo DML que acabou de ser recusado. O que se
+   * faz é uma SEGUNDA gravação, mínima, tocando SÓ os três campos de pendência.
+   * Ela costuma passar, porque a maioria das recusas vem de outro campo ou de
+   * outra regra do registro. Quando nem ela passa, a pendência NÃO fica no
+   * registro — e isso está contado em `falhasSemSinal`, propagado ao Batch, que
+   * marca o `AsyncApexJob`. Mesmo nesse caso o registro NÃO some da varredura:
+   * ele continua com os dois marcos e a duração vazia, que é exatamente a
+   * cláusula que o Batch procura, então volta a ser tentado na próxima passada.
    */
   private static void gravar(List<SObject> registros, ResultadoDuracao r) {
     if (registros == null || registros.isEmpty()) {
       return;
     }
+    List<SObject> falhados = new List<SObject>();
+    List<String> motivos = new List<String>();
+
+    if (simularFalhaDeGravacao && Test.isRunningTest()) {
+      // Seam mínimo: a gravação principal não acontece, e todo o lote entra no
+      // caminho de falha. Nada aqui roda fora de teste.
+      for (SObject reg : registros) {
+        r.falhas++;
+        falhados.add(reg);
+        motivos.add('falha simulada em teste');
+      }
+    } else {
+      List<Database.SaveResult> resultados = Database.update(
+        registros,
+        false,
+        AccessLevel.SYSTEM_MODE
+      );
+      for (Integer i = 0; i < resultados.size(); i++) {
+        if (resultados[i].isSuccess()) {
+          r.registrosAtualizados++;
+          continue;
+        }
+        r.falhas++;
+        falhados.add(registros[i]);
+        motivos.add(primeiroErro(resultados[i]));
+        System.debug(
+          LoggingLevel.ERROR,
+          'SOLDuracaoEtapaService: falha ao gravar duração em ' +
+            registros[i].get('Id') +
+            ' -> ' +
+            resultados[i].getErrors()
+        );
+      }
+    }
+
+    if (!falhados.isEmpty()) {
+      sinalizarFalhaDeGravacao(falhados, motivos, r);
+    }
+  }
+
+  /**
+   * Segunda chance: grava SÓ os campos de pendência dos registros que a
+   * gravação principal recusou, para que a lacuna não fique invisível.
+   */
+  private static void sinalizarFalhaDeGravacao(
+    List<SObject> falhados,
+    List<String> motivos,
+    ResultadoDuracao r
+  ) {
+    List<SObject> sinais = new List<SObject>();
+    for (Integer i = 0; i < falhados.size(); i++) {
+      Id registroId = (Id) falhados[i].get('Id');
+      if (registroId == null) {
+        r.falhasSemSinal++;
+        continue;
+      }
+      SObject sinal = registroId.getSObjectType().newSObject(registroId);
+      String detalhe = 'Falha ao gravar a medição: ' + motivos[i];
+      if (detalhe.length() > MAX_DETALHE) {
+        detalhe = detalhe.abbreviate(MAX_DETALHE);
+      }
+      sinal.put(CAMPO_PENDENTE, true);
+      sinal.put(CAMPO_MOTIVO, MOTIVO_FALHA_TECNICA);
+      sinal.put(CAMPO_DETALHE, detalhe);
+      sinais.add(sinal);
+    }
+    if (sinais.isEmpty()) {
+      return;
+    }
     List<Database.SaveResult> resultados = Database.update(
-      registros,
+      sinais,
       false,
       AccessLevel.SYSTEM_MODE
     );
     for (Integer i = 0; i < resultados.size(); i++) {
       if (resultados[i].isSuccess()) {
-        r.registrosAtualizados++;
+        r.falhasSinalizadas++;
         continue;
       }
-      r.falhas++;
+      // Nem o sinal mínimo passou. É o único caso em que a falha NÃO fica no
+      // registro, e ele está contado para o Batch marcar o job.
+      r.falhasSemSinal++;
+      ultimoErroDeSinal = String.valueOf(resultados[i].getErrors());
       System.debug(
         LoggingLevel.ERROR,
-        'SOLDuracaoEtapaService: falha ao gravar duração em ' +
-          registros[i].get('Id') +
+        'SOLDuracaoEtapaService: não foi possível sequer sinalizar a pendência em ' +
+          sinais[i].get('Id') +
           ' -> ' +
           resultados[i].getErrors()
       );
     }
+  }
+
+  private static String primeiroErro(Database.SaveResult resultado) {
+    List<Database.Error> erros = resultado.getErrors();
+    if (erros == null || erros.isEmpty()) {
+      return 'erro não detalhado pela plataforma';
+    }
+    return erros[0].getStatusCode() + ' ' + erros[0].getMessage();
   }
 
   private static void registrarFalha(
@@ -773,6 +1297,11 @@ public without sharing class SOLDuracaoEtapaService {
     ResultadoDuracao r
   ) {
     r.falhas++;
+    // Falha ANTES de saber quais registros existem — tipicamente a própria
+    // consulta. Não há registro em que gravar pendência, e afirmar o contrário
+    // seria falso. O que resta é o contador, que o Batch usa para marcar o
+    // `AsyncApexJob`, e o log.
+    r.falhasSemSinal++;
     System.debug(
       LoggingLevel.ERROR,
       'SOLDuracaoEtapaService.' +

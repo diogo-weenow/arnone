@@ -144,6 +144,7 @@ private class SOLDuracaoEtapaTest {
         Id,
         StageName,
         SOL_Produto_Negocio__c,
+        SOL_Data_Distribuicao__c,
         SOL_Data_Primeira_Ligacao__c,
         SOL_Data_Inicio_Ciclo_Comercial__c,
         SOL_Data_Reuniao_Procuracao__c,
@@ -1647,6 +1648,623 @@ private class SOLDuracaoEtapaTest {
     Assert.isFalse(
       depois.SOL_Duracao_Pendente__c,
       'E a pendência é limpa.'
+    );
+  }
+
+  // ====================================== falha técnica (bloqueador 1)
+
+  /**
+   * FALHA INESPERADA DE GRAVAÇÃO — o marco comercial NÃO é desfeito, e a lacuna
+   * não fica invisível: a segunda gravação, mínima, registra a pendência
+   * `Falha técnica` com motivo e detalhe.
+   *
+   * Seam mínimo (`simularFalhaDeGravacao`), protegido por `Test.isRunningTest()`
+   * dentro do próprio serviço: fora de teste ele não faz nada.
+   */
+  @IsTest
+  static void falhaDeGravacaoNaoDesfazOMarcoEVirulaPendenciaTecnica() {
+    Lead l = novoLead(PRODUTO_RT);
+    update new Lead(
+      Id = l.Id,
+      SOL_Data_Distribuicao__c = as10(SEGUNDA),
+      SOL_Data_Primeira_Ligacao__c = as10(QUARTA)
+    );
+    Lead antes = lead(l.Id);
+
+    Test.startTest();
+    SOLDuracaoEtapaService.simularFalhaDeGravacao = true;
+    SOLDuracaoEtapaService.ResultadoDuracao r = SOLDuracaoEtapaService.recalcularLeads(
+      new List<Id>{ l.Id }
+    );
+    SOLDuracaoEtapaService.simularFalhaDeGravacao = false;
+    Test.stopTest();
+
+    Lead depois = lead(l.Id);
+    Assert.areEqual(
+      antes.SOL_Data_Primeira_Ligacao__c,
+      depois.SOL_Data_Primeira_Ligacao__c,
+      'O MARCO comercial continua exatamente onde estava: falha analítica não desfaz operação.'
+    );
+    Assert.isNull(
+      depois.SOL_Dias_Primeira_Ligacao__c,
+      'A duração não foi gravada — a gravação falhou.'
+    );
+    Assert.isTrue(
+      depois.SOL_Duracao_Pendente__c,
+      'A falha NÃO some: vira pendência no próprio registro. Resultado: ' +
+      r +
+      ' | erro do sinal: ' +
+      SOLDuracaoEtapaService.ultimoErroDeSinal
+    );
+    Assert.areEqual(
+      SOLDuracaoEtapaService.MOTIVO_FALHA_TECNICA,
+      depois.SOL_Duracao_Pendencia_Motivo__c,
+      'Com motivo próprio, distinto de calendário e de intervalo.'
+    );
+    Assert.isTrue(
+      String.isNotBlank(depois.SOL_Duracao_Pendencia_Detalhe__c),
+      'E com detalhe legível: ' + depois.SOL_Duracao_Pendencia_Detalhe__c
+    );
+    Assert.isTrue(r.falhas > 0, 'O resultado reporta a falha para o Batch.');
+    Assert.isTrue(
+      r.falhasSinalizadas > 0,
+      'E reporta que a falha CONSEGUIU virar pendência no registro.'
+    );
+    Assert.areEqual(
+      0,
+      r.falhasSemSinal,
+      'Nenhuma falha ficou sem sinal neste cenário.'
+    );
+  }
+
+  /**
+   * INVARIANTE — nunca existe `SOL_Duracao_Pendente__c = true` sem motivo e sem
+   * detalhe. Vale para os três motivos.
+   */
+  @IsTest
+  static void pendenciaNuncaExisteSemMotivoESemDetalhe() {
+    Lead semCalendario = novoLead(PRODUTO_RT);
+    Lead inconsistente = novoLead(PRODUTO_RT);
+
+    Test.startTest();
+    SOLBusinessHoursHelper.overrideBusinessHours(null);
+    update new Lead(
+      Id = semCalendario.Id,
+      SOL_Data_Distribuicao__c = as10(SEGUNDA),
+      SOL_Data_Primeira_Ligacao__c = as10(QUARTA)
+    );
+    recalcularLead(semCalendario.Id);
+    SOLBusinessHoursHelper.overrideBusinessHours(bh());
+    update new Lead(
+      Id = inconsistente.Id,
+      SOL_Data_Distribuicao__c = as10(SEXTA),
+      SOL_Data_Primeira_Ligacao__c = as10(SEGUNDA)
+    );
+    recalcularLead(inconsistente.Id);
+    Test.stopTest();
+
+    for (Lead l : new List<Lead>{
+      lead(semCalendario.Id),
+      lead(inconsistente.Id)
+    }) {
+      Assert.isTrue(l.SOL_Duracao_Pendente__c, 'Pré-condição: está pendente.');
+      Assert.isTrue(
+        String.isNotBlank(l.SOL_Duracao_Pendencia_Motivo__c),
+        'Pendência sem motivo é lacuna sem explicação.'
+      );
+      Assert.isTrue(
+        String.isNotBlank(l.SOL_Duracao_Pendencia_Detalhe__c),
+        'Pendência sem detalhe não diz qual etapa investigar.'
+      );
+    }
+  }
+
+  /**
+   * O Batch NÃO pode terminar como sucesso quando encontrou falha técnica. O
+   * `finish()` é chamado direto, com o estado acumulado, para provar o contrato
+   * da classe — o `Test.stopTest()` não serve aqui, porque a exceção do
+   * `finish()` derrubaria o próprio teste.
+   */
+  @IsTest
+  static void batchComFalhaNaoTerminaComoSucesso() {
+    SOLDuracaoEtapaBatch semFalha = new SOLDuracaoEtapaBatch(
+      SOLDuracaoEtapaBatch.Escopo.LEAD
+    );
+    SOLDuracaoEtapaBatch comFalha = new SOLDuracaoEtapaBatch(
+      SOLDuracaoEtapaBatch.Escopo.LEAD
+    );
+    comFalha.totalFalhas = 3;
+    comFalha.totalFalhasSemSinal = 1;
+
+    Test.startTest();
+    semFalha.finish(null);
+    Boolean lancou = false;
+    String mensagem = null;
+    try {
+      comFalha.finish(null);
+    } catch (SOLDuracaoEtapaBatch.VarreduraComFalhaException e) {
+      lancou = true;
+      mensagem = e.getMessage();
+    }
+    Test.stopTest();
+
+    Assert.isTrue(
+      lancou,
+      'Varredura com falha técnica tem de marcar o AsyncApexJob, e é a exceção no finish() que faz isso.'
+    );
+    Assert.isTrue(
+      mensagem.contains('falhasSemSinal=1'),
+      'A mensagem carrega o resumo, que vai para o ExtendedStatus do job: ' +
+      mensagem
+    );
+  }
+
+  // =============================== pendência após a conversão (bloqueador 2)
+
+  /**
+   * A etapa 1 tem origem SÓ no Lead. Sem espelhar essa origem, a Oportunidade
+   * não conseguia avaliar a etapa 1 — e `aplicarPendencia`, que recalcula o
+   * estado do zero, APAGAVA a pendência herdada na primeira reavaliação.
+   *
+   * O caminho inteiro: Lead com etapa 1 incoerente -> conversão -> Oportunidade
+   * com pendência COMPLETA -> recálculo só da Oportunidade NÃO limpa ->
+   * correção da origem + reprocessamento preenche e limpa.
+   */
+  @IsTest
+  static void pendenciaDaEtapa1SobreviveAConversaoEAoRecalculoDaOportunidade() {
+    Lead l = novoLead(PRODUTO_RT);
+    anexar(l.Id);
+    update new Lead(
+      Id = l.Id,
+      Status = 'Apto para Conversão',
+      // Etapa 1 INCOERENTE: a ligação vem antes da distribuição.
+      SOL_Data_Distribuicao__c = as10(SEXTA),
+      SOL_Data_Primeira_Ligacao__c = as10(SEGUNDA),
+      SOL_Data_Contato_Efetivado__c = as10(QUINTA),
+      SOL_Data_Reuniao_Realizada__c = as10(QUINTA),
+      SOL_Status_Procuracao__c = 'Recebida',
+      SOL_Data_Recebimento_Procuracao__c = SEXTA
+    );
+    recalcularLead(l.Id);
+    Lead pendente = lead(l.Id);
+    Assert.areEqual(
+      SOLDuracaoEtapaService.MOTIVO_INCONSISTENTE,
+      pendente.SOL_Duracao_Pendencia_Motivo__c,
+      'Pré-condição: o Lead está pendente por intervalo inconsistente.'
+    );
+
+    Test.startTest();
+    SOL_ConverterLead.Resultado r = SOL_ConverterLead.converter(
+      new List<SOL_ConverterLead.Pedido>{ pedido(l.Id) }
+    )[0];
+    Test.stopTest();
+
+    Assert.isTrue(r.convertido, 'A conversão acontece normalmente. ' + r.mensagem);
+    Id oppId = (Id) r.oportunidadeId;
+
+    Opportunity nascida = opp(oppId);
+    Assert.isTrue(
+      nascida.SOL_Duracao_Pendente__c,
+      'A pendência viaja na conversão.'
+    );
+    Assert.areEqual(
+      SOLDuracaoEtapaService.MOTIVO_INCONSISTENTE,
+      nascida.SOL_Duracao_Pendencia_Motivo__c,
+      'COM motivo — transportar só o checkbox deixaria uma lacuna sem explicação.'
+    );
+    Assert.isTrue(
+      String.isNotBlank(nascida.SOL_Duracao_Pendencia_Detalhe__c),
+      'E com detalhe: ' + nascida.SOL_Duracao_Pendencia_Detalhe__c
+    );
+    Assert.areEqual(
+      as10(SEXTA),
+      nascida.SOL_Data_Distribuicao__c,
+      'A ORIGEM da etapa 1 é espelhada: sem ela a Oportunidade não sabe avaliar essa etapa.'
+    );
+
+    // Recálculo SÓ da Oportunidade: a pendência da etapa 1 não pode sumir.
+    SOLDuracaoEtapaService.recalcularOportunidades(new List<Id>{ oppId });
+    Opportunity apos = opp(oppId);
+    Assert.isTrue(
+      apos.SOL_Duracao_Pendente__c,
+      'Recalcular só a Oportunidade NÃO pode apagar a pendência da etapa 1.'
+    );
+    Assert.areEqual(
+      SOLDuracaoEtapaService.MOTIVO_INCONSISTENTE,
+      apos.SOL_Duracao_Pendencia_Motivo__c,
+      'O motivo continua o mesmo.'
+    );
+    Assert.isNull(
+      apos.SOL_Dias_Primeira_Ligacao__c,
+      'E a etapa 1 continua vazia, nunca zero.'
+    );
+
+    // Correção da origem + reprocessamento sob demanda.
+    update new Opportunity(
+      Id = oppId,
+      SOL_Data_Distribuicao__c = as10(SEGUNDA)
+    );
+    SOLDuracaoEtapaService.recalcularOportunidades(new List<Id>{ oppId });
+    Opportunity corrigida = opp(oppId);
+    Assert.areEqual(
+      0,
+      corrigida.SOL_Dias_Primeira_Ligacao__c,
+      'Corrigida a origem, a etapa 1 é preenchida — aqui, mesmo dia útil, zero.'
+    );
+    Assert.isFalse(
+      corrigida.SOL_Duracao_Pendente__c,
+      'E a pendência é limpa.'
+    );
+  }
+
+  // ================================= teto do intervalo (bloqueador 4)
+
+  /**
+   * O teto existe porque cada dia percorrido custa uma chamada a
+   * `BusinessHours.nextStartDate`, e `LimitException` de CPU não é capturável —
+   * um intervalo absurdo não pode virar risco de derrubar operação comercial.
+   *
+   * A prova de que o intervalo excessivo NÃO percorre datas: a contagem de CPU
+   * antes e depois é praticamente a mesma, e a recusa é imediata. Medir CPU em
+   * teste é instável em valor absoluto, então o que se asserta é a ORDEM DE
+   * GRANDEZA contra o custo de um intervalo NO teto.
+   */
+  @IsTest
+  static void intervaloAcimaDoTetoRecusaSemPercorrerDatas() {
+    Date origem = Date.newInstance(2026, 1, 1);
+    Date noTeto = origem.addDays(SOLBusinessHoursHelper.MAX_DIAS_INTERVALO);
+    Date acimaDoTeto = origem.addDays(
+      SOLBusinessHoursHelper.MAX_DIAS_INTERVALO + 1
+    );
+
+    Test.startTest();
+    Integer cpuAntesDoTeto = Limits.getCpuTime();
+    Integer diasNoTeto = SOLBusinessHoursHelper.diasUteisEntre(
+      bh(),
+      origem,
+      noTeto
+    );
+    Integer custoNoTeto = Limits.getCpuTime() - cpuAntesDoTeto;
+
+    Integer cpuAntesDaRecusa = Limits.getCpuTime();
+    Boolean recusou = false;
+    try {
+      SOLBusinessHoursHelper.diasUteisEntre(bh(), origem, acimaDoTeto);
+    } catch (SOLBusinessHoursHelper.IntervaloInvalidoException e) {
+      recusou = true;
+    }
+    Integer custoDaRecusa = Limits.getCpuTime() - cpuAntesDaRecusa;
+    Test.stopTest();
+
+    Assert.areEqual(
+      400,
+      SOLBusinessHoursHelper.MAX_DIAS_INTERVALO,
+      'O teto é 400 dias, o MESMO valor do guarda que prazoEmDiasUteis já usava.'
+    );
+    Assert.isTrue(
+      diasNoTeto > 0,
+      'NO teto o intervalo é contado normalmente: ' + diasNoTeto
+    );
+    Assert.isTrue(
+      recusou,
+      'UM dia acima do teto vira intervalo inconsistente.'
+    );
+    Assert.isTrue(
+      custoDaRecusa < custoNoTeto,
+      'A recusa é mais barata que a contagem: recusa=' +
+        custoDaRecusa +
+        'ms contagem=' +
+        custoNoTeto +
+        'ms. Se a recusa percorresse as datas, custaria o mesmo ou mais.'
+    );
+  }
+
+  /**
+   * O intervalo excessivo é recusado ANTES de consultar o calendário: mesmo sem
+   * Business Hours, o motivo é INCONSISTENTE e não "calendário indisponível" —
+   * senão um dado absurdo entraria na varredura automática para sempre.
+   */
+  @IsTest
+  static void intervaloAcimaDoTetoRecusaAntesDeOlharOCalendario() {
+    Date origem = Date.newInstance(2026, 1, 1);
+    Date acimaDoTeto = origem.addDays(
+      SOLBusinessHoursHelper.MAX_DIAS_INTERVALO + 30
+    );
+
+    Test.startTest();
+    String tipo = null;
+    try {
+      SOLBusinessHoursHelper.diasUteisEntre(null, origem, acimaDoTeto);
+    } catch (Exception e) {
+      tipo = e.getTypeName();
+    }
+    Test.stopTest();
+
+    Assert.isTrue(
+      tipo != null && tipo.contains('IntervaloInvalidoException'),
+      'Com calendário ausente E intervalo absurdo, vence o dado incoerente: ' +
+      tipo
+    );
+  }
+
+  // ==================== consolidação em lote do mesmo pai (bloqueador 3)
+
+  /**
+   * REPRODUÇÃO — duas Tasks de LIGAÇÃO do mesmo Lead concluídas no MESMO DML.
+   * O Flow faz "Get pai -> verifica vazio -> Update"; com duas interviews sobre
+   * o mesmo pai, a coleção de update do Flow recebe o mesmo Id duas vezes.
+   */
+  @IsTest
+  static void duasLigacoesDoMesmoLeadNoMesmoDml() {
+    Lead l = novoLead(PRODUTO_RT);
+    update new Lead(Id = l.Id, SOL_Data_Distribuicao__c = as10(SEGUNDA));
+    delete [SELECT Id FROM Task WHERE WhoId = :l.Id];
+
+    List<Task> tarefas = new List<Task>{
+      tarefaContatoLigacao(l.Id, 'A'),
+      tarefaContatoLigacao(l.Id, 'B')
+    };
+    insert tarefas;
+
+    Test.startTest();
+    String erro = null;
+    try {
+      for (Task t : tarefas) {
+        t.Status = 'Completed';
+        t.SOL_Resultado_Contato__c = 'Não atendeu';
+      }
+      update tarefas;
+    } catch (Exception e) {
+      erro = e.getTypeName() + ': ' + e.getMessage();
+    }
+    Test.stopTest();
+
+    Lead depois = lead(l.Id);
+    System.debug(
+      LoggingLevel.ERROR,
+      'REPRO ligacao | erro=' +
+        erro +
+        ' | marco=' +
+        depois.SOL_Data_Primeira_Ligacao__c +
+        ' | dias1=' +
+        depois.SOL_Dias_Primeira_Ligacao__c
+    );
+    Assert.isNull(
+      erro,
+      'Concluir duas ligações do mesmo Lead no mesmo DML não pode falhar: ' +
+      erro
+    );
+    Assert.isNotNull(
+      depois.SOL_Data_Primeira_Ligacao__c,
+      'O marco da primeira ligação tem de ser gravado.'
+    );
+  }
+
+  /**
+   * REPRODUÇÃO — duas Tasks de REUNIÃO COMERCIAL do mesmo Lead no mesmo DML.
+   * Alimenta a etapa 3, e o Flow correspondente foi alterado neste card.
+   */
+  @IsTest
+  static void duasReunioesComerciaisDoMesmoLeadNoMesmoDml() {
+    Lead l = novoLead(PRODUTO_RT);
+    delete [SELECT Id FROM Task WHERE WhoId = :l.Id];
+
+    List<Task> tarefas = new List<Task>{
+      tarefaSimples(l.Id, null, 'Reunião comercial', 'R1'),
+      tarefaSimples(l.Id, null, 'Reunião comercial', 'R2')
+    };
+    insert tarefas;
+
+    Test.startTest();
+    String erro = null;
+    try {
+      for (Task t : tarefas) {
+        t.Status = 'Completed';
+        t.SOL_Resultado_Reuniao__c = 'Realizada';
+      }
+      update tarefas;
+    } catch (Exception e) {
+      erro = e.getTypeName() + ': ' + e.getMessage();
+    }
+    Test.stopTest();
+
+    Lead depois = lead(l.Id);
+    System.debug(
+      LoggingLevel.ERROR,
+      'REPRO reuniao comercial | erro=' +
+        erro +
+        ' | marco=' +
+        depois.SOL_Data_Reuniao_Realizada__c
+    );
+    Assert.isNull(erro, 'Duas reuniões no mesmo DML não podem falhar: ' + erro);
+    Assert.isNotNull(
+      depois.SOL_Data_Reuniao_Realizada__c,
+      'O marco da reunião tem de ser gravado.'
+    );
+  }
+
+  /**
+   * REPRODUÇÃO — duas Tasks de ACOMPANHAMENTO DO CÁLCULO da mesma Oportunidade
+   * no mesmo DML, com datas DIFERENTES. Aqui o "primeiro marco cronológico"
+   * é verificável, porque a data vem de campo gravável da Task.
+   */
+  @IsTest
+  static void duasTarefasDeCalculoDaMesmaOportunidadeNoMesmoDml() {
+    Opportunity o = novaOpp(PRODUTO_RT);
+    update new Opportunity(Id = o.Id, SOL_Data_Solicitacao_Calculo__c = SEGUNDA);
+
+    List<Task> tarefas = new List<Task>{
+      tarefaSimples(null, o.Id, 'Acompanhamento do cálculo jurídico', 'C1'),
+      tarefaSimples(null, o.Id, 'Acompanhamento do cálculo jurídico', 'C2')
+    };
+    tarefas[0].SOL_Data_Solicitacao_Calculo_Ref__c = SEGUNDA;
+    tarefas[1].SOL_Data_Solicitacao_Calculo_Ref__c = SEGUNDA;
+    insert tarefas;
+
+    Test.startTest();
+    String erro = null;
+    try {
+      // A SEGUNDA da lista tem a data MAIS ANTIGA de propósito: se a
+      // consolidação pegar "a última que passar", o marco sai errado.
+      tarefas[0].Status = 'Completed';
+      tarefas[0].SOL_Data_Recebimento_Calculo__c = SEXTA;
+      tarefas[1].Status = 'Completed';
+      tarefas[1].SOL_Data_Recebimento_Calculo__c = QUARTA;
+      update tarefas;
+    } catch (Exception e) {
+      erro = e.getTypeName() + ': ' + e.getMessage();
+    }
+    Test.stopTest();
+
+    Opportunity depois = opp(o.Id);
+    System.debug(
+      LoggingLevel.ERROR,
+      'REPRO calculo | erro=' +
+        erro +
+        ' | marco=' +
+        depois.SOL_Data_Recebimento_Calculo__c +
+        ' | dias4=' +
+        depois.SOL_Dias_Calculo_Juridico__c
+    );
+    Assert.isNull(erro, 'Duas tarefas de cálculo no mesmo DML não podem falhar: ' + erro);
+    Assert.areEqual(
+      QUARTA,
+      depois.SOL_Data_Recebimento_Calculo__c,
+      'O marco tem de ser o PRIMEIRO cronologicamente, não o último que a plataforma processar.'
+    );
+  }
+
+  /**
+   * REPRODUÇÃO — duas Tasks de REUNIÃO FINAL da mesma Oportunidade no mesmo
+   * DML, com datas diferentes.
+   */
+  @IsTest
+  static void duasReunioesFinaisDaMesmaOportunidadeNoMesmoDml() {
+    Opportunity o = novaOpp(PRODUTO_RT);
+    update new Opportunity(
+      Id = o.Id,
+      SOL_Data_Solicitacao_Calculo__c = SEGUNDA,
+      SOL_Data_Recebimento_Calculo__c = TERCA
+    );
+
+    List<Task> tarefas = new List<Task>{
+      tarefaSimples(null, o.Id, 'Reunião final', 'F1'),
+      tarefaSimples(null, o.Id, 'Reunião final', 'F2')
+    };
+    tarefas[0].SOL_Data_Recebimento_Calculo_Ref__c = TERCA;
+    tarefas[1].SOL_Data_Recebimento_Calculo_Ref__c = TERCA;
+    insert tarefas;
+
+    Test.startTest();
+    String erro = null;
+    try {
+      tarefas[0].Status = 'Completed';
+      tarefas[0].SOL_Data_Reuniao_Final__c = SEXTA;
+      tarefas[1].Status = 'Completed';
+      tarefas[1].SOL_Data_Reuniao_Final__c = QUARTA;
+      update tarefas;
+    } catch (Exception e) {
+      erro = e.getTypeName() + ': ' + e.getMessage();
+    }
+    Test.stopTest();
+
+    Opportunity depois = opp(o.Id);
+    System.debug(
+      LoggingLevel.ERROR,
+      'REPRO reuniao final | erro=' +
+        erro +
+        ' | marco=' +
+        depois.SOL_Data_Reuniao_Final__c +
+        ' | dias5=' +
+        depois.SOL_Dias_Reuniao_Final__c
+    );
+    Assert.isNull(erro, 'Duas reuniões finais no mesmo DML não podem falhar: ' + erro);
+    Assert.areEqual(
+      QUARTA,
+      depois.SOL_Data_Reuniao_Final__c,
+      'O marco tem de ser o PRIMEIRO cronologicamente.'
+    );
+  }
+
+  /**
+   * O MESMO cenário do cálculo com a ORDEM INVERTIDA na lista: a data mais
+   * antiga vem PRIMEIRO.
+   *
+   * Este par de testes foi escrito ANTES da correção e demonstrou o defeito: com
+   * a consolidação no Flow, este falhava (marco = 04/09) e o anterior passava
+   * (marco = 02/09), para dados equivalentes — o resultado dependia da ordem da
+   * lista, porque todos os Get das interviews rodam antes de qualquer Update e
+   * a última a gravar vencia. Com a consolidação em Apex, os dois passam.
+   */
+  @IsTest
+  static void duasTarefasDeCalculoComAOrdemInvertida() {
+    Opportunity o = novaOpp(PRODUTO_RT);
+    update new Opportunity(Id = o.Id, SOL_Data_Solicitacao_Calculo__c = SEGUNDA);
+
+    List<Task> tarefas = new List<Task>{
+      tarefaSimples(null, o.Id, 'Acompanhamento do cálculo jurídico', 'D1'),
+      tarefaSimples(null, o.Id, 'Acompanhamento do cálculo jurídico', 'D2')
+    };
+    tarefas[0].SOL_Data_Solicitacao_Calculo_Ref__c = SEGUNDA;
+    tarefas[1].SOL_Data_Solicitacao_Calculo_Ref__c = SEGUNDA;
+    insert tarefas;
+
+    Test.startTest();
+    String erro = null;
+    try {
+      // Agora a PRIMEIRA da lista tem a data mais antiga.
+      tarefas[0].Status = 'Completed';
+      tarefas[0].SOL_Data_Recebimento_Calculo__c = QUARTA;
+      tarefas[1].Status = 'Completed';
+      tarefas[1].SOL_Data_Recebimento_Calculo__c = SEXTA;
+      update tarefas;
+    } catch (Exception e) {
+      erro = e.getTypeName() + ': ' + e.getMessage();
+    }
+    Test.stopTest();
+
+    Opportunity depois = opp(o.Id);
+    System.debug(
+      LoggingLevel.ERROR,
+      'REPRO calculo invertido | erro=' +
+        erro +
+        ' | marco=' +
+        depois.SOL_Data_Recebimento_Calculo__c
+    );
+    Assert.isNull(erro, 'Não pode falhar: ' + erro);
+    Assert.areEqual(
+      QUARTA,
+      depois.SOL_Data_Recebimento_Calculo__c,
+      'O marco tem de ser o PRIMEIRO cronologicamente, independentemente da ordem da lista.'
+    );
+  }
+
+  private static Task tarefaContatoLigacao(Id leadId, String sufixo) {
+    return new Task(
+      Subject = 'Ligação ' + sufixo,
+      WhoId = leadId,
+      OwnerId = UserInfo.getUserId(),
+      Status = 'Open',
+      ActivityDate = Date.today(),
+      SOL_Tipo_Tarefa__c = 'Contato',
+      SOL_Canal_Contato__c = 'Ligação'
+    );
+  }
+
+  private static Task tarefaSimples(
+    Id whoId,
+    Id whatId,
+    String tipo,
+    String sufixo
+  ) {
+    return new Task(
+      Subject = tipo + ' ' + sufixo,
+      WhoId = whoId,
+      WhatId = whatId,
+      OwnerId = UserInfo.getUserId(),
+      Status = 'Open',
+      ActivityDate = Date.today(),
+      SOL_Tipo_Tarefa__c = tipo
     );
   }
 

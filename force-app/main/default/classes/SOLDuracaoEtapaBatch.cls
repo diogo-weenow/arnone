@@ -89,6 +89,10 @@ public without sharing class SOLDuracaoEtapaBatch implements Database.Batchable<
   private Integer totalOportunidadesSincronizadas = 0;
   @TestVisible
   private Integer totalFalhas = 0;
+  @TestVisible
+  private Integer totalFalhasSinalizadas = 0;
+  @TestVisible
+  private Integer totalFalhasSemSinal = 0;
 
   /** Varredura completa: Leads e, em seguida, Oportunidades. */
   public SOLDuracaoEtapaBatch() {
@@ -113,9 +117,9 @@ public without sharing class SOLDuracaoEtapaBatch implements Database.Batchable<
     this.objetoAlvo = alvo == null ? Escopo.LEAD : alvo;
     this.incluirInconsistentes = incluirInconsistentes == true;
     this.encadear = encadear == true;
-    this.motivosElegiveis = new Set<String>{
-      SOLDuracaoEtapaService.MOTIVO_CALENDARIO
-    };
+    this.motivosElegiveis = new Set<String>(
+      SOLDuracaoEtapaService.MOTIVOS_REPROCESSAVEIS
+    );
     if (this.incluirInconsistentes) {
       this.motivosElegiveis.add(SOLDuracaoEtapaService.MOTIVO_INCONSISTENTE);
     }
@@ -198,12 +202,25 @@ public without sharing class SOLDuracaoEtapaBatch implements Database.Batchable<
     acumular(r);
   }
 
+  /** Varredura que terminou com falha técnica em algum registro. */
+  public class VarreduraComFalhaException extends Exception {
+  }
+
   public void finish(Database.BatchableContext bc) {
-    System.debug(LoggingLevel.INFO, 'SOLDuracaoEtapaBatch [' + objetoAlvo + '] ' + resumo());
-    if (!this.encadear) {
-      return;
-    }
-    if (Test.isRunningTest()) {
+    System.debug(
+      LoggingLevel.INFO,
+      'SOLDuracaoEtapaBatch [' + objetoAlvo + '] ' + resumo()
+    );
+
+    if (this.encadear && !Test.isRunningTest()) {
+      Database.executeBatch(
+        new SOLDuracaoEtapaBatch(
+          Escopo.OPORTUNIDADE,
+          this.incluirInconsistentes
+        ),
+        TAMANHO_LOTE
+      );
+    } else if (this.encadear) {
       // Encadear em teste não executaria o segundo lote de verdade e ainda
       // consumiria uma posição de fila. Os testes disparam cada escopo
       // explicitamente, que é o que de fato prova o comportamento.
@@ -211,12 +228,31 @@ public without sharing class SOLDuracaoEtapaBatch implements Database.Batchable<
         LoggingLevel.INFO,
         'SOLDuracaoEtapaBatch: encadeamento suprimido em contexto de teste.'
       );
-      return;
     }
-    Database.executeBatch(
-      new SOLDuracaoEtapaBatch(Escopo.OPORTUNIDADE, this.incluirInconsistentes),
-      TAMANHO_LOTE
-    );
+
+    // POR ÚLTIMO, e de propósito: uma varredura que encontrou falha técnica NÃO
+    // pode terminar como sucesso. Lançar aqui, no `finish()`, marca o
+    // AsyncApexJob e NÃO desfaz nada — os chunks já foram commitados em
+    // transações próprias, então a medição correta dos outros registros
+    // sobrevive. Lançar no `execute()` seria o contrário: derrubaria 199
+    // registros bons por causa de um ruim, toda hora, para sempre.
+    //
+    // O encadeamento é disparado ANTES da checagem, senão uma falha no escopo
+    // de Lead impediria a varredura das Oportunidades de acontecer.
+    //
+    // Este NÃO é o único sinal: as falhas que conseguiram ser gravadas viram
+    // pendência `Falha técnica` no próprio registro e aparecem na lista
+    // operacional. `falhasSemSinal` conta exatamente as que não couberam em
+    // registro nenhum — e é por elas que este ponto existe.
+    if (totalFalhas > 0) {
+      throw new VarreduraComFalhaException(
+        'SOLDuracaoEtapaBatch [' +
+          objetoAlvo +
+          '] terminou com falha técnica. ' +
+          resumo()
+      );
+    }
+    return;
   }
 
   private void acumular(SOLDuracaoEtapaService.ResultadoDuracao r) {
@@ -232,6 +268,8 @@ public without sharing class SOLDuracaoEtapaBatch implements Database.Batchable<
     totalAtualizados += r.registrosAtualizados;
     totalOportunidadesSincronizadas += r.oportunidadesSincronizadas;
     totalFalhas += r.falhas;
+    totalFalhasSinalizadas += r.falhasSinalizadas;
+    totalFalhasSemSinal += r.falhasSemSinal;
   }
 
   /** Texto do resumo acumulado, usado no log e pelos testes. */
@@ -254,6 +292,10 @@ public without sharing class SOLDuracaoEtapaBatch implements Database.Batchable<
       ' oportunidadesSincronizadas=' +
       totalOportunidadesSincronizadas +
       ' falhas=' +
-      totalFalhas;
+      totalFalhas +
+      ' falhasSinalizadas=' +
+      totalFalhasSinalizadas +
+      ' falhasSemSinal=' +
+      totalFalhasSemSinal;
   }
 }

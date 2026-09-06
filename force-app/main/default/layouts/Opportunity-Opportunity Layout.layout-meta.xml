@@ -502,6 +502,10 @@
         <layoutColumns>
             <layoutItems>
                 <behavior>Readonly</behavior>
+                <field>SOL_Data_Distribuicao__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
                 <field>SOL_Data_Primeira_Ligacao__c</field>
             </layoutItems>
             <layoutItems>

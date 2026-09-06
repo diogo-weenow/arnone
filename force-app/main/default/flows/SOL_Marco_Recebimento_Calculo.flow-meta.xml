@@ -2,131 +2,32 @@
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <actionCalls>
         <name>Chamar_Duracao</name>
-        <label>Reavaliar as durações por etapa da Oportunidade</label>
+        <label>Consolidar o recebimento do cálculo e reavaliar as durações</label>
         <locationX>176</locationX>
-        <locationY>540</locationY>
+        <locationY>276</locationY>
         <actionName>SOLDuracaoEtapaInvocable</actionName>
         <actionType>apex</actionType>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
             <name>recordId</name>
             <value>
-                <elementReference>Get_Oportunidade.Id</elementReference>
+                <elementReference>$Record.Id</elementReference>
             </value>
         </inputParameters>
         <nameSegment>SOLDuracaoEtapaInvocable</nameSegment>
     </actionCalls>
     <apiVersion>66.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
-    <decisions>
-        <name>Oportunidade_SOL</name>
-        <label>O WhatId aponta para uma Oportunidade da Arnone Soluções?</label>
-        <locationX>176</locationX>
-        <locationY>288</locationY>
-        <defaultConnectorLabel>Não — nada a fazer</defaultConnectorLabel>
-        <rules>
-            <name>Sim_oportunidade_SOL</name>
-            <conditionLogic>and</conditionLogic>
-            <conditions>
-                <leftValueReference>Get_Oportunidade</leftValueReference>
-                <operator>IsNull</operator>
-                <rightValue>
-                    <booleanValue>false</booleanValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>Get_Oportunidade.RecordType.DeveloperName</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <stringValue>SOL</stringValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Marco_Vazio</targetReference>
-            </connector>
-            <label>Sim — é oportunidade da unidade</label>
-        </rules>
-    </decisions>
-    <decisions>
-        <name>Marco_Vazio</name>
-        <label>O recebimento do cálculo ainda não foi registrado?</label>
-        <locationX>176</locationX>
-        <locationY>408</locationY>
-        <defaultConnector>
-            <targetReference>Chamar_Duracao</targetReference>
-        </defaultConnector>
-        <defaultConnectorLabel>Já registrado — preserva o primeiro</defaultConnectorLabel>
-        <rules>
-            <name>Gravar_Primeiro</name>
-            <conditionLogic>and</conditionLogic>
-            <conditions>
-                <leftValueReference>Get_Oportunidade.SOL_Data_Recebimento_Calculo__c</leftValueReference>
-                <operator>IsNull</operator>
-                <rightValue>
-                    <booleanValue>true</booleanValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Gravar_Marco</targetReference>
-            </connector>
-            <label>Sim — gravar o marco</label>
-        </rules>
-    </decisions>
-    <description>CLICKUP-9439 / CLICKUP-9429 (absorvido) — quando a Task de acompanhamento do cálculo jurídico é concluída com a data de recebimento preenchida e WhatId apontando para uma Oportunidade da unidade, copia Task.SOL_Data_Recebimento_Calculo__c para Opportunity.SOL_Data_Recebimento_Calculo__c — SÓ se o campo ainda estiver vazio, preservando o PRIMEIRO recebimento. Esse marco fecha a etapa 4 (solicitação até o recebimento do cálculo) e abre a etapa 5. Consolida na Oportunidade porque a Task pode ser cancelada ou reaberta e some da consulta durante a conversão, e porque o relatório gerencial precisa filtrar período por etapa num objeto só. O tipo do WhatId não é validado por Validation Rule: o Get Records simplesmente não encontra nada quando o WhatId aponta para outro objeto. Depois de gravar, aciona SOLDuracaoEtapaInvocable. Sem fault path — o Invocable nunca relança, então falha analítica não desfaz a conclusão da tarefa. Não altera a Task. Bulk-safe.</description>
+    <description>CLICKUP-9439 / CLICKUP-9429 (absorvido) — quando a Task de acompanhamento do cálculo jurídico é concluída com a data de recebimento preenchida, aciona SOLDuracaoEtapaInvocable para consolidar Opportunity.SOL_Data_Recebimento_Calculo__c e reavaliar as durações. Esse marco fecha a etapa 4 e abre a etapa 5. Consolida na Oportunidade porque a Task pode ser cancelada ou reaberta e não é fonte confiável em tempo de relatório. A consolidação do marco NÃO acontece mais aqui: ela foi para SOLDuracaoEtapaService.consolidarMarcosDeTarefas. O padrão declarativo anterior — Get do pai, decidir se o campo está vazio, Update — parece seguro e não é dentro de uma única transação: TODOS os Get das interviews rodam ANTES de qualquer Update, então duas tarefas qualificadas do MESMO pai concluídas no mesmo DML leem as duas o campo vazio, gravam as duas, e sobra o valor da ÚLTIMA interview processada — não o primeiro marco cronológico. Isso foi REPRODUZIDO por teste, com as duas ordens possíveis da lista produzindo marcos diferentes para dados equivalentes. No Apex o lote chega junto: agrupa por pai, escolhe o MENOR marco, trava o pai com FOR UPDATE e grava uma vez só, apenas se o campo ainda estiver vazio. Este Flow ficou sendo só a PORTA: o filtro de qualificação e a chamada. Sem fault path — o Invocable nunca relança, então falha analítica não desfaz a conclusão da tarefa.</description>
     <environments>Default</environments>
     <interviewLabel>SOL_Marco_Recebimento_Calculo {!$Flow.CurrentDateTime}</interviewLabel>
     <label>SOL_Marco_Recebimento_Calculo</label>
     <processType>AutoLaunchedFlow</processType>
-    <recordLookups>
-        <name>Get_Oportunidade</name>
-        <label>Buscar a Oportunidade do WhatId</label>
-        <locationX>176</locationX>
-        <locationY>180</locationY>
-        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
-        <connector>
-            <targetReference>Oportunidade_SOL</targetReference>
-        </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>Id</field>
-            <operator>EqualTo</operator>
-            <value>
-                <elementReference>$Record.WhatId</elementReference>
-            </value>
-        </filters>
-        <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>Opportunity</object>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-    </recordLookups>
-    <recordUpdates>
-        <name>Gravar_Marco</name>
-        <label>Gravar a data do recebimento do cálculo na Oportunidade</label>
-        <locationX>50</locationX>
-        <locationY>528</locationY>
-        <connector>
-            <targetReference>Chamar_Duracao</targetReference>
-        </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>Id</field>
-            <operator>EqualTo</operator>
-            <value>
-                <elementReference>Get_Oportunidade.Id</elementReference>
-            </value>
-        </filters>
-        <inputAssignments>
-            <field>SOL_Data_Recebimento_Calculo__c</field>
-            <value>
-                <elementReference>$Record.SOL_Data_Recebimento_Calculo__c</elementReference>
-            </value>
-        </inputAssignments>
-        <object>Opportunity</object>
-    </recordUpdates>
     <start>
         <locationX>50</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Get_Oportunidade</targetReference>
+            <targetReference>Chamar_Duracao</targetReference>
         </connector>
         <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
         <filterFormula>AND(

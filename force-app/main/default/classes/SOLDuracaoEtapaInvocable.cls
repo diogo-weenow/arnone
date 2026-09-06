@@ -2,9 +2,14 @@
  * CLICKUP-9439 / CLICKUP-9429 (absorvido) — porta dos Flows de marco para
  * `SOLDuracaoEtapaService`.
  *
- * Camada fina: consolida os Ids recebidos, separa Lead de Oportunidade pelo
- * prefixo do próprio Id e chama o serviço UMA vez por tipo. Não faz SOQL, não
- * faz DML, não duplica regra nenhuma.
+ * Camada fina: consolida os Ids recebidos, separa Lead, Oportunidade e Task
+ * pelo prefixo do próprio Id e chama o serviço UMA vez por tipo. Não faz SOQL,
+ * não faz DML, não duplica regra nenhuma.
+ *
+ * Task entra aqui porque a consolidação dos marcos que nascem em tarefa saiu
+ * dos Flows e veio para o Apex — o padrão declarativo "Get pai, se vazio
+ * grava" não é determinístico quando duas tarefas do mesmo pai são concluídas
+ * na mesma transação. Ver `SOLDuracaoEtapaService.consolidarMarcosDeTarefas`.
  *
  * ==========================================================
  * DIVERGÊNCIA DELIBERADA EM RELAÇÃO À PORTA ESTRITA DO 9449
@@ -34,8 +39,8 @@ public with sharing class SOLDuracaoEtapaInvocable {
      * referência inválida é a porta estrita do contato efetivado, não esta.
      */
     @InvocableVariable(
-      label='Id do Lead ou da Oportunidade'
-      description='Registro cujas durações por etapa devem ser reavaliadas. Nulo ou de outro objeto é ignorado.'
+      label='Id do Lead, da Oportunidade ou da Task'
+      description='Lead ou Oportunidade para reavaliar as durações, ou Task concluída para consolidar o marco dela. Nulo ou de outro objeto é ignorado.'
       required=false
     )
     public Id recordId;
@@ -53,6 +58,7 @@ public with sharing class SOLDuracaoEtapaInvocable {
 
     Set<Id> leadIds = new Set<Id>();
     Set<Id> oppIds = new Set<Id>();
+    Set<Id> taskIds = new Set<Id>();
     for (Entrada entrada : entradas) {
       if (entrada == null || entrada.recordId == null) {
         continue;
@@ -62,12 +68,32 @@ public with sharing class SOLDuracaoEtapaInvocable {
         leadIds.add(entrada.recordId);
       } else if (tipo == Opportunity.SObjectType) {
         oppIds.add(entrada.recordId);
+      } else if (tipo == Task.SObjectType) {
+        // A CONSOLIDAÇÃO do marco que nasce em Task vem para cá inteira, e o
+        // Flow passa só o Id. O motivo está no ApexDoc de
+        // `consolidarMarcosDeTarefas`: dentro de uma transação, o padrão
+        // "Get pai -> se vazio -> Update" deixa a última interview vencer, e o
+        // marco gravado passa a depender da ordem da lista em vez da
+        // cronologia. Aqui o lote inteiro chega junto e o serviço escolhe o
+        // menor marco por pai, com o pai travado.
+        taskIds.add(entrada.recordId);
       }
       // Qualquer outro objeto é descartado: é um Flow apontando para um
       // Contact, uma Account ou um Case, e medir duração ali não faz sentido.
     }
 
     try {
+      // A consolidação vem PRIMEIRO: ela grava os marcos e já reavalia as
+      // durações dos pais afetados.
+      if (!taskIds.isEmpty()) {
+        System.debug(
+          LoggingLevel.INFO,
+          'SOLDuracaoEtapaInvocable (Task): ' +
+            SOLDuracaoEtapaService.consolidarMarcosDeTarefas(
+              new List<Id>(taskIds)
+            )
+        );
+      }
       if (!leadIds.isEmpty()) {
         System.debug(
           LoggingLevel.INFO,

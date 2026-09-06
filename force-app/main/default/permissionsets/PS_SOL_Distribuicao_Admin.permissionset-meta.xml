@@ -321,6 +321,11 @@
         <field>Opportunity.SOL_Duracao_Pendencia_Detalhe__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.SOL_Data_Distribuicao__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Distribuição SOL — Operação do Estado</label>
     <objectPermissions>
