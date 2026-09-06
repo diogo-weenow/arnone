@@ -1,6 +1,6 @@
 /**
- * CLICKUP-9434 / 9435 — Criação das tarefas DIÁRIAS da cadência de contato da
- * Arnone Soluções (Record Type `SOL`): LIGAÇÃO e E-MAIL.
+ * CLICKUP-9434 / 9435 / 9436 — Criação das tarefas DIÁRIAS da cadência de
+ * contato da Arnone Soluções (Record Type `SOL`): LIGAÇÃO, E-MAIL e WHATSAPP.
  *
  * ESCOPO: os COMPONENTES de criação, com um contrato estável para o motor
  * agendado da cadência (CLICKUP-9398), que será implementado depois e é quem
@@ -8,19 +8,25 @@
  * Leads e não encerra cadência: ele apenas cria, de forma idempotente, a tarefa
  * do dia ativo que lhe for pedido.
  *
- * DUAS PORTAS, UM NÚCLEO (CLICKUP-9435) — `criarLigacoes` e `criarEmails` são
- * fachadas de uma linha sobre `criarTarefasDaCadencia`, que carrega o canal como
- * parâmetro PRIVADO. O canal viaja por LOTE, nunca dentro da `Solicitacao`:
- * cada chamada processa um único canal, então a chave de idempotência é sempre
- * construída com o mesmo canal que filtrou a consulta de chaves existentes, e
- * "ler a chave de um canal e atribuí-la a outro" é impossível por construção.
- * O DTO segue cego ao canal e a assinatura de `criarLigacoes` está intacta.
+ * TRÊS PORTAS, UM NÚCLEO (CLICKUP-9435 / 9436) — `criarLigacoes`, `criarEmails`
+ * e `criarWhatsApps` são fachadas de uma linha sobre `criarTarefasDaCadencia`,
+ * que carrega o canal como parâmetro PRIVADO. O canal viaja por LOTE, nunca
+ * dentro da `Solicitacao`: cada chamada processa um único canal, então a chave
+ * de idempotência é sempre construída com o mesmo canal que filtrou a consulta
+ * de chaves existentes, e "ler a chave de um canal e atribuí-la a outro" é
+ * impossível por construção. O DTO segue cego ao canal e as assinaturas de
+ * `criarLigacoes` e `criarEmails` estão intactas. O núcleo só aceita os canais
+ * da WHITELIST `CANAIS_SUPORTADOS`; qualquer outro é rejeitado antes de tocar o
+ * banco — é defeito de programação, não entrada do motor.
  *
- * E-MAIL x LIGAÇÃO — o que difere está isolado em três pontos: o vencimento é
- * obrigatório em TODOS os dias do e-mail (nada é derivado de prazo), o e-mail
- * não recebe `SOL_Prazo_Contato__c` e o resultado do envio mora em
- * `SOL_Resultado_Envio__c`. Ligação e e-mail COEXISTEM no mesmo Lead, ciclo e
- * dia, porque o canal entra na chave.
+ * CANAIS DE MENSAGEM x LIGAÇÃO — e-mail e WhatsApp compartilham o mesmo
+ * contrato, e o que os difere da ligação está isolado em três pontos: o
+ * vencimento é obrigatório em TODOS os dias (nada é derivado de prazo), a tarefa
+ * não recebe `SOL_Prazo_Contato__c` e o desfecho mora em
+ * `SOL_Resultado_Envio__c`, campo ÚNICO reusado pelos dois canais. "WhatsApp" é
+ * só o nome e a classificação técnica da tarefa: nada é enviado por aqui. Os
+ * três canais COEXISTEM no mesmo Lead, ciclo e dia, porque o canal entra na
+ * chave.
  *
  * DIA 1 — a Task "1ª Ligação" que a distribuição e a reatribuição já criavam
  * (CLICKUP-9396 / 9400) passa a ser, formalmente, a ligação do dia 1. A lógica
@@ -68,10 +74,30 @@ public without sharing class SOLCadenciaContatoService {
    */
   public static final String CANAL_EMAIL = 'E-mail';
 
+  /**
+   * Canal de WHATSAPP da cadência (CLICKUP-9436). Grafia byte-exata do value set
+   * restrito de `SOL_Canal_Contato__c`. É classificador interno para
+   * idempotência e regras — não há envio de mensagem neste serviço.
+   */
+  public static final String CANAL_WHATSAPP = 'WhatsApp';
+
+  /**
+   * WHITELIST dos canais que o núcleo aceita. Canal fora daqui é defeito de
+   * programação — nenhuma porta pública o produz — e é rejeitado ANTES de
+   * qualquer acesso ao banco, em vez de gravar uma Task com canal inválido ou
+   * cair no Subject/mensagem de outro canal por acidente.
+   */
+  @TestVisible
+  private static final Set<String> CANAIS_SUPORTADOS = new Set<String>{
+    CANAL_LIGACAO,
+    CANAL_EMAIL,
+    CANAL_WHATSAPP
+  };
+
   /** Primeiro dia ativo: a tarefa que a distribuição/reatribuição já cria. */
   public static final Integer DIA_PRIMEIRA_LIGACAO = 1;
 
-  /** Último dia ativo previsto para a cadência, nos dois canais. */
+  /** Último dia ativo previsto para a cadência, em todos os canais. */
   public static final Integer DIA_MAXIMO = 3;
 
   /** Classificador técnico compartilhado com o CLICKUP-9417 (cancelamentos). */
@@ -108,6 +134,27 @@ public without sharing class SOLCadenciaContatoService {
     3 => '3º E-mail'
   };
 
+  /** Rótulo das tarefas de WhatsApp (CLICKUP-9436). Rótulo, nunca chave. */
+  @TestVisible
+  private static final Map<Integer, String> SUBJECT_WHATSAPP_POR_DIA = new Map<Integer, String>{
+    1 => '1º WhatsApp',
+    2 => '2º WhatsApp',
+    3 => '3º WhatsApp'
+  };
+
+  /**
+   * Subject por CANAL e dia (CLICKUP-9436). Antes a escolha era um ternário
+   * "ligação ou senão e-mail", que atribuiria o rótulo de e-mail a qualquer
+   * canal novo em silêncio. Com o mapa, canal sem rótulo devolve nulo — e nunca
+   * chega aqui, porque a whitelist já o rejeitou.
+   */
+  @TestVisible
+  private static final Map<String, Map<Integer, String>> SUBJECT_POR_CANAL_E_DIA = new Map<String, Map<Integer, String>>{
+    CANAL_LIGACAO => SUBJECT_POR_DIA,
+    CANAL_EMAIL => SUBJECT_EMAIL_POR_DIA,
+    CANAL_WHATSAPP => SUBJECT_WHATSAPP_POR_DIA
+  };
+
   /** Mensagem controlada — sem detalhe técnico sensível. */
   @TestVisible
   private static final String MSG_ERRO_GENERICO = 'Não foi possível criar as tarefas de ligação agora. Nenhuma alteração foi salva.';
@@ -115,6 +162,18 @@ public without sharing class SOLCadenciaContatoService {
   /** Mensagem controlada do canal e-mail (CLICKUP-9435). */
   @TestVisible
   private static final String MSG_ERRO_GENERICO_EMAIL = 'Não foi possível criar as tarefas de e-mail agora. Nenhuma alteração foi salva.';
+
+  /** Mensagem controlada do canal WhatsApp (CLICKUP-9436). */
+  @TestVisible
+  private static final String MSG_ERRO_GENERICO_WHATSAPP = 'Não foi possível criar as tarefas de WhatsApp agora. Nenhuma alteração foi salva.';
+
+  /** Mensagem de falha controlada por canal — mesma generalização do Subject. */
+  @TestVisible
+  private static final Map<String, String> MSG_ERRO_POR_CANAL = new Map<String, String>{
+    CANAL_LIGACAO => MSG_ERRO_GENERICO,
+    CANAL_EMAIL => MSG_ERRO_GENERICO_EMAIL,
+    CANAL_WHATSAPP => MSG_ERRO_GENERICO_WHATSAPP
+  };
 
   /**
    * Pedido de criação de UMA tarefa de contato, emitido pelo motor da cadência.
@@ -125,9 +184,9 @@ public without sharing class SOLCadenciaContatoService {
    *
    * - por `criarLigacoes`: obrigatório nos dias 2 e 3 e IGNORADO no dia 1, cujo
    *   prazo são 5 minutos úteis a partir da atribuição;
-   * - por `criarEmails`: OBRIGATÓRIO em todos os dias, inclusive no dia 1 — não
-   *   existe "e-mail 5 minutos após a atribuição", quem decide o dia útil é o
-   *   motor.
+   * - por `criarEmails` e `criarWhatsApps`: OBRIGATÓRIO em todos os dias,
+   *   inclusive no dia 1 — não existe "mensagem 5 minutos após a atribuição",
+   *   quem decide o dia útil é o motor.
    */
   public class Solicitacao {
     public Id leadId;
@@ -213,8 +272,29 @@ public without sharing class SOLCadenciaContatoService {
     return criarTarefasDaCadencia(solicitacoes, CANAL_EMAIL);
   }
 
+  /**
+   * Cria, em bulk e de forma idempotente, a tarefa de WHATSAPP de cada pedido
+   * (CLICKUP-9436). Terceira porta sobre o mesmo núcleo, com o MESMO contrato
+   * de `criarEmails`: vencimento obrigatório em todos os dias e gravado como
+   * está em `ActivityDate`; `SOL_Prazo_Contato__c` nulo; desfecho em
+   * `SOL_Resultado_Envio__c` — o campo é reusado, não duplicado; e
+   * `SOL_Resultado_Contato__c` vedado pela VR `SOL_WhatsApp_Sem_Resultado_Ligacao`,
+   * regra própria e gêmea da do e-mail, para que nenhuma tarefa de WhatsApp
+   * acione contato efetivado, opt-out ou reatribuição por resultado de ligação.
+   *
+   * "WhatsApp" aqui é só o NOME e a classificação técnica da tarefa: este
+   * serviço não envia mensagem nenhuma. Ele cria a tarefa que lembra o vendedor
+   * de enviar, e o vendedor registra se enviou. O disparo diário é o motor
+   * (CLICKUP-9398).
+   *
+   * @param solicitacoes pedidos do motor. Nulo/vazio devolve resultado zerado.
+   */
+  public static Resultado criarWhatsApps(List<Solicitacao> solicitacoes) {
+    return criarTarefasDaCadencia(solicitacoes, CANAL_WHATSAPP);
+  }
+
   // =====================================================================
-  //  NÚCLEO PRIVADO COMPARTILHADO PELAS DUAS PORTAS (CLICKUP-9435)
+  //  NÚCLEO PRIVADO COMPARTILHADO PELAS TRÊS PORTAS (CLICKUP-9435 / 9436)
   // =====================================================================
 
   /**
@@ -227,11 +307,24 @@ public without sharing class SOLCadenciaContatoService {
    * chamada, então a chave é sempre construída com o mesmo canal que filtrou a
    * consulta — o defeito de "ler chave de um canal e atribuí-la a outro" é
    * impossível por construção, e não apenas evitado por cuidado.
+   *
+   * `@TestVisible` apenas para provar a rejeição de canal desconhecido; as
+   * portas públicas continuam sendo a única entrada de produção.
    */
+  @TestVisible
   private static Resultado criarTarefasDaCadencia(
     List<Solicitacao> solicitacoes,
     String canal
   ) {
+    // (0) WHITELIST (CLICKUP-9436): canal fora da lista é defeito de programação
+    // e falha ALTO, antes de qualquer SOQL/DML — nunca vira Task com canal
+    // inválido nem herda Subject/mensagem de outro canal por acidente.
+    if (!CANAIS_SUPORTADOS.contains(canal)) {
+      throw new IllegalArgumentException(
+        'SOLCadenciaContatoService: canal não suportado pela cadência: ' + canal
+      );
+    }
+
     Resultado r = new Resultado();
     if (solicitacoes == null || solicitacoes.isEmpty()) {
       return r;
@@ -261,7 +354,8 @@ public without sharing class SOLCadenciaContatoService {
       Set<String> chavesOcupadas = chavesExistentes(elegiveis.keySet(), canal);
 
       // O calendário só é resolvido no caminho que realmente usa prazo em
-      // minutos úteis. O e-mail não tem SLA de minutos e não paga essa consulta.
+      // minutos úteis. E-mail e WhatsApp não têm SLA de minutos e não pagam
+      // essa consulta.
       Boolean usaPrazoDeAtribuicao = CANAL_LIGACAO.equals(canal);
       Id bhId = usaPrazoDeAtribuicao
         ? SOLBusinessHoursHelper.businessHoursId()
@@ -328,9 +422,7 @@ public without sharing class SOLCadenciaContatoService {
       // Resultado NOVO: as contagens parciais acima foram desfeitas.
       Resultado erro = new Resultado();
       erro.comErro = validas.size();
-      erro.mensagens.add(
-        CANAL_LIGACAO.equals(canal) ? MSG_ERRO_GENERICO : MSG_ERRO_GENERICO_EMAIL
-      );
+      erro.mensagens.add(MSG_ERRO_POR_CANAL.get(canal));
       return erro;
     }
   }
@@ -379,8 +471,8 @@ public without sharing class SOLCadenciaContatoService {
         montarTarefa(
           l.Id,
           l.OwnerId,
-          // A distribuição só cria LIGAÇÃO: não existe "e-mail 5 minutos úteis
-          // após a atribuição", e o e-mail entra apenas pelo motor.
+          // A distribuição só cria LIGAÇÃO: não existe "mensagem 5 minutos úteis
+          // após a atribuição"; e-mail e WhatsApp entram apenas pelo motor.
           CANAL_LIGACAO,
           DIA_PRIMEIRA_LIGACAO,
           l.SOL_Data_Inicio_Ciclo_Contato__c,
@@ -412,7 +504,7 @@ public without sharing class SOLCadenciaContatoService {
    * Chave lógica da tarefa: Lead + canal + ciclo + dia. O canal passou a ser
    * PARÂMETRO (CLICKUP-9435): antes era a constante de ligação embutida, o que
    * fazia ligação e e-mail disputarem a mesma chave. Com o canal recebido, os
-   * dois canais coexistem no mesmo Lead, ciclo e dia sem se bloquearem.
+   * três canais coexistem no mesmo Lead, ciclo e dia sem se bloquearem.
    *
    * Os milissegundos do ciclo são descartados porque campos DateTime do
    * Salesforce têm precisão de SEGUNDO — comparar o valor em memória com o
@@ -441,11 +533,11 @@ public without sharing class SOLCadenciaContatoService {
    * Pedido bem formado para o canal do lote? Sem acesso ao banco.
    *
    * A exigência de `vencimento` é o único ponto em que o canal muda a
-   * validação, e é por isso que ela recebe o canal (CLICKUP-9435): na ligação o
-   * dia 1 dispensa o vencimento porque ele é DERIVADO dos 5 minutos úteis; no
-   * e-mail nada é derivado, então o vencimento é obrigatório em todos os dias.
-   * Sem esse recorte, um pedido de e-mail de dia 1 sem vencimento passaria a
-   * validação e nasceria uma Task com `ActivityDate` nulo.
+   * validação, e é por isso que ela recebe o canal (CLICKUP-9435 / 9436): na
+   * ligação o dia 1 dispensa o vencimento porque ele é DERIVADO dos 5 minutos
+   * úteis; nos canais de mensagem (e-mail, WhatsApp) nada é derivado, então o
+   * vencimento é obrigatório em todos os dias. Sem esse recorte, um pedido de
+   * dia 1 sem vencimento passaria e nasceria uma Task com `ActivityDate` nulo.
    */
   private static Boolean solicitacaoValida(Solicitacao s, String canal) {
     if (s == null || s.leadId == null) {
@@ -458,7 +550,7 @@ public without sharing class SOLCadenciaContatoService {
       return false;
     }
     if (!CANAL_LIGACAO.equals(canal)) {
-      // E-mail: o dia útil vem pronto do motor em TODOS os dias.
+      // E-mail e WhatsApp: o dia útil vem pronto do motor em TODOS os dias.
       return s.vencimento != null;
     }
     // Ligação, dias 2 e 3: dependem do dia útil que o motor calcula; sem ele não
@@ -521,11 +613,11 @@ public without sharing class SOLCadenciaContatoService {
    * recria.
    *
    * O canal entra em DOIS lugares (CLICKUP-9435): no filtro, para não ler as
-   * chaves do outro canal, e na PROJEÇÃO, para que a chave seja montada com o
-   * valor real gravado na linha em vez de uma constante presumida. Projetar é o
-   * que impede o defeito silencioso de marcar toda chave lida com o canal
+   * chaves dos outros canais, e na PROJEÇÃO, para que a chave seja montada com
+   * o valor real gravado na linha em vez de uma constante presumida. Projetar é
+   * o que impede o defeito silencioso de marcar toda chave lida com o canal
    * errado — o que faria as ligações existentes bloquearem a criação dos
-   * e-mails, sem erro e sem rastro.
+   * e-mails ou dos WhatsApps, sem erro e sem rastro.
    */
   private static Set<String> chavesExistentes(Set<Id> leadIds, String canal) {
     Set<String> chaves = new Set<String>();
@@ -572,10 +664,10 @@ public without sharing class SOLCadenciaContatoService {
    * completa.
    *
    * NENHUM dos dois campos de resultado é gravado aqui: `SOL_Resultado_Contato__c`
-   * (ligação) e `SOL_Resultado_Envio__c` (e-mail) nascem VAZIOS, porque quem
-   * preenche é o vendedor ao concluir — e é exatamente esse vazio que as VRs
-   * `SOL_Resultado_Obrigatorio_Concluir` e `SOL_Resultado_Envio_Obrigatorio`
-   * têm o que bloquear.
+   * (ligação) e `SOL_Resultado_Envio__c` (e-mail e WhatsApp) nascem VAZIOS,
+   * porque quem preenche é o vendedor ao concluir — e é exatamente esse vazio
+   * que as VRs `SOL_Resultado_Obrigatorio_Concluir` e
+   * `SOL_Resultado_Envio_Obrigatorio` têm o que bloquear.
    *
    * O Subject é RÓTULO por canal e dia, nunca chave: o vendedor pode editá-lo e
    * a idempotência não olha para ele.
@@ -598,20 +690,23 @@ public without sharing class SOLCadenciaContatoService {
       SOL_Prazo_Contato__c = prazoContato,
       // CLICKUP-9417: classificador de tarefa de contato — é o que o
       // cancelamento por contato efetivado / opt-out / perda já procura, e é
-      // por ele que a tarefa de e-mail herda os três cancelamentos de graça.
+      // por ele que e-mail e WhatsApp herdam os três cancelamentos de graça.
       SOL_Tipo_Tarefa__c = TIPO_TAREFA_CONTATO,
-      // CLICKUP-9434/9435: canal + ciclo + dia = chave lógica da cadência.
+      // CLICKUP-9434/9435/9436: canal + ciclo + dia = chave lógica da cadência.
       SOL_Canal_Contato__c = canal,
       SOL_Ciclo_Contato__c = ciclo,
       SOL_Dia_Cadencia__c = dia
     );
   }
 
-  /** Rótulo visível ao vendedor, por canal e dia. Nunca chave técnica. */
+  /**
+   * Rótulo visível ao vendedor, por canal e dia. Nunca chave técnica. Canal sem
+   * rótulo devolve nulo em vez de herdar o rótulo de outro canal — e não chega
+   * aqui, porque a whitelist do núcleo já o rejeitou.
+   */
   @TestVisible
   private static String subjectDe(String canal, Integer dia) {
-    return CANAL_LIGACAO.equals(canal)
-      ? SUBJECT_POR_DIA.get(dia)
-      : SUBJECT_EMAIL_POR_DIA.get(dia);
+    Map<Integer, String> porDia = SUBJECT_POR_CANAL_E_DIA.get(canal);
+    return porDia == null ? null : porDia.get(dia);
   }
 }

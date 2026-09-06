@@ -2526,4 +2526,812 @@ private class SOLCadenciaContatoTest {
     }
     Test.stopTest();
   }
+
+  // ======================================================================
+  //  CLICKUP-9436 — CANAL WHATSAPP
+  //
+  //  "WhatsApp" é só o nome e a classificação técnica da Task: nada é enviado.
+  //  Terceira porta sobre o mesmo núcleo, mesmo contrato do e-mail, mesmo campo
+  //  de resultado. O que esta seção prova é que o terceiro canal entra na chave
+  //  sem disputar com os outros dois, que as duas VRs alcançam o WhatsApp sem
+  //  enfraquecer o e-mail, e que canal desconhecido não passa do núcleo.
+  // ======================================================================
+
+  private static final String CANAL_WHATSAPP = 'WhatsApp';
+  private static final String PRODUTO_ART = 'ART 360';
+
+  /**
+   * Subjects esperados por EXTENSO. Reler `SUBJECT_WHATSAPP_POR_DIA` do serviço
+   * tornaria a asserção tautológica: se o mapa de lá trouxesse o rótulo de
+   * e-mail, o teste passaria do mesmo jeito.
+   */
+  private static final Map<Integer, String> SUBJECT_WA_ESPERADO = new Map<Integer, String>{
+    1 => '1º WhatsApp',
+    2 => '2º WhatsApp',
+    3 => '3º WhatsApp'
+  };
+
+  private static List<Task> whatsappsDe(Id leadId) {
+    return tarefasDe(leadId, CANAL_WHATSAPP);
+  }
+
+  private static List<Task> whatsappsDoDia(Id leadId, Integer dia) {
+    return tarefasDoDia(leadId, CANAL_WHATSAPP, dia);
+  }
+
+  /** A terceira porta pública: mesmo DTO, mesmo núcleo, canal WhatsApp. */
+  private static SOLCadenciaContatoService.Resultado criarWhatsApp(
+    List<SOLCadenciaContatoService.Solicitacao> pedidos
+  ) {
+    return SOLCadenciaContatoService.criarWhatsApps(pedidos);
+  }
+
+  /** Os três dias de WhatsApp de um Lead, com vencimentos distintos. */
+  private static List<SOLCadenciaContatoService.Solicitacao> tresDiasDeWhatsApp(
+    Id leadId
+  ) {
+    return new List<SOLCadenciaContatoService.Solicitacao>{
+      pedido(leadId, 1, Date.today().addDays(6)),
+      pedido(leadId, 2, Date.today().addDays(7)),
+      pedido(leadId, 3, Date.today().addDays(8))
+    };
+  }
+
+  /** Tarefa de WhatsApp criada À MÃO: classificada, mas sem dia de cadência. */
+  private static Task whatsappManual(Lead l) {
+    Task t = new Task(
+      Subject = 'WhatsApp manual',
+      WhoId = l.Id,
+      OwnerId = l.OwnerId,
+      Status = STATUS_ABERTO,
+      SOL_Tipo_Tarefa__c = TIPO_CONTATO,
+      SOL_Canal_Contato__c = CANAL_WHATSAPP
+    );
+    insert t;
+    return t;
+  }
+
+  // ------------------------------------- criação, vencimento e classificação
+
+  /** (1) Dias 1, 2 e 3 com vencimento EXATO e classificação completa. */
+  @IsTest
+  static void whatsappDosTresDiasClassificadoComVencimentoExato() {
+    montarCenario(1);
+    Lead l = leadsDistribuidos(1)[0];
+    List<SOLCadenciaContatoService.Solicitacao> pedidos = tresDiasDeWhatsApp(l.Id);
+    Map<Integer, Date> venc = new Map<Integer, Date>();
+    for (SOLCadenciaContatoService.Solicitacao s : pedidos) {
+      venc.put(s.dia, s.vencimento);
+    }
+
+    Test.startTest();
+    SOLCadenciaContatoService.Resultado r = criarWhatsApp(pedidos);
+    Test.stopTest();
+
+    System.assertEquals(3, r.criadas, 'Os três dias de WhatsApp são criados.');
+    System.assertEquals(0, r.jaExistentes + r.ignoradas + r.comErro, 'Nada mais.');
+    List<Task> ws = whatsappsDe(l.Id);
+    System.assertEquals(3, ws.size(), 'Uma tarefa por dia.');
+    for (Task t : ws) {
+      Integer dia = t.SOL_Dia_Cadencia__c.intValue();
+      System.assertEquals(venc.get(dia), t.ActivityDate, 'Vencimento EXATO do dia ' + dia + '.');
+      System.assertEquals(CANAL_WHATSAPP, t.SOL_Canal_Contato__c, 'Canal WhatsApp.');
+      System.assertEquals(TIPO_CONTATO, t.SOL_Tipo_Tarefa__c, 'Tipo Contato.');
+      System.assertEquals(
+        l.SOL_Data_Inicio_Ciclo_Contato__c,
+        t.SOL_Ciclo_Contato__c,
+        'Ciclo congelado.'
+      );
+      System.assertEquals(l.Id, t.WhoId, 'Vinculada ao Lead.');
+      System.assertEquals(l.OwnerId, t.OwnerId, 'Do proprietário ATUAL do Lead.');
+      System.assertEquals(STATUS_ABERTO, t.Status, 'Nasce aberta.');
+      System.assertEquals(null, t.SOL_Prazo_Contato__c, 'Sem SLA em minutos: prazo nulo.');
+      System.assertEquals(null, t.SOL_Resultado_Envio__c, 'Resultado do envio vazio.');
+      System.assertEquals(null, t.SOL_Resultado_Contato__c, 'Resultado de ligação nunca.');
+      System.assertEquals(
+        SUBJECT_WA_ESPERADO.get(dia),
+        t.Subject,
+        'Subject próprio do WhatsApp no dia ' + dia + ', escrito por extenso.'
+      );
+    }
+  }
+
+  /** (2) Vencimento ausente em QUALQUER dia e dia inválido: ignorados sem banco. */
+  @IsTest
+  static void whatsappSemVencimentoOuComDiaInvalidoEhIgnorado() {
+    montarCenario(1);
+    Lead l = leadsDistribuidos(1)[0];
+    Date v = Date.today().addDays(7);
+
+    Test.startTest();
+    Integer antes = Limits.getQueries();
+    SOLCadenciaContatoService.Resultado r = criarWhatsApp(
+      new List<SOLCadenciaContatoService.Solicitacao>{
+        pedido(l.Id, 1, null),
+        pedido(l.Id, 2, null),
+        pedido(l.Id, 3, null),
+        pedido(l.Id, 0, v),
+        pedido(l.Id, 4, v),
+        pedido(l.Id, null, v),
+        pedido(null, 2, v)
+      }
+    );
+    Integer delta = Limits.getQueries() - antes;
+    Test.stopTest();
+
+    System.assertEquals(0, r.criadas, 'Nada criado.');
+    System.assertEquals(
+      7,
+      r.ignoradas,
+      'Os sete pedidos são ignorados — inclusive o dia 1 sem vencimento.'
+    );
+    System.assertEquals(0, r.comErro, 'Ignorar não é erro.');
+    System.assertEquals(0, delta, 'Pedido inválido não chega ao banco.');
+    System.assertEquals(0, whatsappsDe(l.Id).size(), 'Nenhuma tarefa.');
+  }
+
+  /**
+   * (3) Replay, duplicata no lote e tarefas anteriores em QUALQUER estado —
+   * aberta, concluída, cancelada — ocupam a chave. E o Subject editado pelo
+   * vendedor não muda nada: a chave está nos campos estruturados.
+   */
+  @IsTest
+  static void whatsappReplayDuplicataEAnterioresOcupamAChave() {
+    montarCenario(1);
+    Lead l = leadsDistribuidos(1)[0];
+    List<SOLCadenciaContatoService.Solicitacao> pedidos = tresDiasDeWhatsApp(l.Id);
+    criarWhatsApp(pedidos);
+    // dia 1 CONCLUÍDA, dia 2 CANCELADA, dia 3 ABERTA com Subject alterado.
+    Task d1 = whatsappsDoDia(l.Id, 1)[0];
+    d1.SOL_Resultado_Envio__c = RES_ENVIADO;
+    d1.Status = STATUS_CONCLUIDO;
+    Task d2 = whatsappsDoDia(l.Id, 2)[0];
+    d2.Status = STATUS_CANCELADA;
+    d2.SOL_Motivo_Cancelamento__c = MOTIVO_CONTATO_EFETIVADO;
+    Task d3 = whatsappsDoDia(l.Id, 3)[0];
+    d3.Subject = 'Vendedor renomeou esta tarefa';
+    update new List<Task>{ d1, d2, d3 };
+
+    Test.startTest();
+    // duplicata DENTRO do lote, além do replay dos três
+    pedidos.add(pedido(l.Id, 3, Date.today().addDays(8)));
+    SOLCadenciaContatoService.Resultado r = criarWhatsApp(pedidos);
+    Test.stopTest();
+
+    System.assertEquals(0, r.criadas, 'Nada é recriado.');
+    System.assertEquals(
+      4,
+      r.jaExistentes,
+      'Concluída, cancelada, aberta e a duplicata do lote: todas ocupadas.'
+    );
+    System.assertEquals(3, whatsappsDe(l.Id).size(), 'Continuam exatamente três.');
+    System.assertEquals(
+      'Vendedor renomeou esta tarefa',
+      whatsappsDoDia(l.Id, 3)[0].Subject,
+      'O Subject editado sobrevive: ele nunca foi chave.'
+    );
+  }
+
+  // ------------------------------- coexistência e projeção entre três canais
+
+  /** (4) Ligação, e-mail e WhatsApp COEXISTEM no mesmo Lead, ciclo e dia. */
+  @IsTest
+  static void ligacaoEmailEWhatsAppCoexistemNoMesmoDia() {
+    montarCenario(1);
+    Lead l = leadsDistribuidos(1)[0];
+    Date v = Date.today().addDays(7);
+    criar(new List<SOLCadenciaContatoService.Solicitacao>{ pedido(l.Id, 2, v) });
+    criarEmail(new List<SOLCadenciaContatoService.Solicitacao>{ pedido(l.Id, 2, v) });
+
+    Test.startTest();
+    SOLCadenciaContatoService.Resultado r = criarWhatsApp(
+      new List<SOLCadenciaContatoService.Solicitacao>{ pedido(l.Id, 2, v) }
+    );
+    Test.stopTest();
+
+    System.assertEquals(1, r.criadas, 'Nem a ligação nem o e-mail do dia 2 bloqueiam o WhatsApp.');
+    System.assertEquals(0, r.jaExistentes, 'Chave distinta por canal.');
+    Task lig = ligacoesDoDia(l.Id, 2)[0];
+    Task em = emailsDoDia(l.Id, 2)[0];
+    Task wa = whatsappsDoDia(l.Id, 2)[0];
+    System.assertEquals(3, new Set<Id>{ lig.Id, em.Id, wa.Id }.size(), 'Três Tasks diferentes.');
+    System.assertEquals(lig.SOL_Ciclo_Contato__c, wa.SOL_Ciclo_Contato__c, 'Mesmo ciclo da ligação.');
+    System.assertEquals(em.SOL_Ciclo_Contato__c, wa.SOL_Ciclo_Contato__c, 'Mesmo ciclo do e-mail.');
+    System.assertEquals(2, wa.SOL_Dia_Cadencia__c.intValue(), 'Mesmo dia.');
+    System.assertEquals(
+      3,
+      [SELECT COUNT() FROM Task WHERE WhoId = :l.Id AND SOL_Dia_Cadencia__c = 2],
+      'Exatamente uma por canal no dia 2.'
+    );
+  }
+
+  /**
+   * (5) Projeção do canal real na chave, com TRÊS canais. Com todos os dias de
+   * ligação e de e-mail ocupados, o WhatsApp cria os três — nenhuma chave
+   * alheia é lida como dele. E o inverso: replays de e-mail e de ligação são
+   * bloqueados pelas SUAS tarefas, não pelas de WhatsApp.
+   */
+  @IsTest
+  static void projecaoDoCanalNaChaveComTresCanais() {
+    montarCenario(1);
+    Lead l = leadsDistribuidos(1)[0];
+    Date v2 = Date.today().addDays(7);
+    Date v3 = Date.today().addDays(8);
+    criar(
+      new List<SOLCadenciaContatoService.Solicitacao>{ pedido(l.Id, 2, v2), pedido(l.Id, 3, v3) }
+    );
+    criarEmail(
+      new List<SOLCadenciaContatoService.Solicitacao>{
+        pedido(l.Id, 1, Date.today().addDays(6)),
+        pedido(l.Id, 2, v2),
+        pedido(l.Id, 3, v3)
+      }
+    );
+    System.assertEquals(3, ligacoesDe(l.Id).size(), 'Pré: 3 ligações.');
+    System.assertEquals(3, emailsDe(l.Id).size(), 'Pré: 3 e-mails.');
+
+    Test.startTest();
+    SOLCadenciaContatoService.Resultado rWa = criarWhatsApp(tresDiasDeWhatsApp(l.Id));
+    SOLCadenciaContatoService.Resultado rEm = criarEmail(
+      new List<SOLCadenciaContatoService.Solicitacao>{ pedido(l.Id, 2, v2) }
+    );
+    SOLCadenciaContatoService.Resultado rLig = criar(
+      new List<SOLCadenciaContatoService.Solicitacao>{ pedido(l.Id, 3, v3) }
+    );
+    Test.stopTest();
+
+    System.assertEquals(3, rWa.criadas, 'Seis tarefas de outros canais não ocupam chave de WhatsApp.');
+    System.assertEquals(0, rWa.jaExistentes, 'Nenhuma chave de WhatsApp estava ocupada.');
+    System.assertEquals(1, rEm.jaExistentes, 'O e-mail do dia 2 é bloqueado pelo E-MAIL do dia 2.');
+    System.assertEquals(1, rLig.jaExistentes, 'A ligação do dia 3 é bloqueada pela LIGAÇÃO do dia 3.');
+    System.assertEquals(0, rEm.criadas + rLig.criadas, 'E nada novo nos outros canais.');
+    System.assertEquals(
+      9,
+      [SELECT COUNT() FROM Task WHERE WhoId = :l.Id AND SOL_Tipo_Tarefa__c = :TIPO_CONTATO],
+      '3 dias em 3 canais = 9 tarefas, sem colisão.'
+    );
+    for (Task t : whatsappsDe(l.Id)) {
+      System.assertEquals(CANAL_WHATSAPP, t.SOL_Canal_Contato__c, 'Todas WhatsApp.');
+    }
+  }
+
+  // ------------------------------------------------- bulk e inelegibilidades
+
+  /** (6) Lote grande: consultas e DML não escalam com o tamanho. */
+  @IsTest
+  static void loteDeWhatsAppsNaoEscalaConsultas() {
+    montarCenario(2);
+    List<Lead> leads = leadsDistribuidos(5);
+    Date d2 = Date.today().addDays(7);
+    Date d3 = Date.today().addDays(8);
+    List<SOLCadenciaContatoService.Solicitacao> umSo = new List<SOLCadenciaContatoService.Solicitacao>{
+      pedido(leads[0].Id, 2, d2)
+    };
+    List<SOLCadenciaContatoService.Solicitacao> lote = new List<SOLCadenciaContatoService.Solicitacao>();
+    for (Integer i = 1; i < leads.size(); i++) {
+      lote.add(pedido(leads[i].Id, 2, d2));
+      lote.add(pedido(leads[i].Id, 3, d3));
+    }
+
+    Test.startTest();
+    Integer qA = Limits.getQueries();
+    Integer dA = Limits.getDmlStatements();
+    SOLCadenciaContatoService.Resultado rUm = criarWhatsApp(umSo);
+    Integer qUm = Limits.getQueries() - qA;
+    Integer dUm = Limits.getDmlStatements() - dA;
+    qA = Limits.getQueries();
+    dA = Limits.getDmlStatements();
+    SOLCadenciaContatoService.Resultado rLote = criarWhatsApp(lote);
+    Integer qLote = Limits.getQueries() - qA;
+    Integer dLote = Limits.getDmlStatements() - dA;
+    Test.stopTest();
+
+    System.assertEquals(1, rUm.criadas, 'Um Lead, um WhatsApp.');
+    System.assertEquals(8, rLote.criadas, '4 Leads e 2 dias cada.');
+    System.assertEquals(qUm, qLote, 'Consultas não escalam com o lote.');
+    System.assertEquals(dUm, dLote, 'DML não escala com o lote.');
+    System.assert(qLote <= 3, 'Poucas consultas; usou ' + qLote);
+    for (Integer i = 1; i < leads.size(); i++) {
+      System.assertEquals(2, whatsappsDe(leads[i].Id).size(), 'Cada Lead com seus dois dias.');
+    }
+  }
+
+  /**
+   * (7) Inelegibilidades num único lote — sem ciclo, fallback na fila, contato
+   * efetivado, opt-out, negócio perdido, outra BU e inexistente — todas
+   * IGNORADAS sem erro, enquanto o único Lead elegível do lote recebe a tarefa.
+   */
+  @IsTest
+  static void whatsappIgnoraTodasAsInelegibilidadesNoMesmoLote() {
+    Cenario c = montarCenario(2);
+    List<Lead> ls = leadsDistribuidos(6);
+    Lead elegivel = ls[0];
+    update new Lead(Id = ls[1].Id, SOL_Data_Inicio_Ciclo_Contato__c = null);
+    update new Lead(Id = ls[2].Id, OwnerId = c.filaId);
+    update new Lead(Id = ls[3].Id, SOL_Contato_Efetivado__c = true);
+    update new Lead(Id = ls[4].Id, SOL_Opt_Out__c = true, SOL_Motivo_Desqualificacao__c = MOTIVO_OPT_OUT);
+    update new Lead(Id = ls[5].Id, Status = 'Desqualificado', SOL_Motivo_Desqualificacao__c = MOTIVO_PERDA);
+    Lead outraBU = new Lead(
+      LastName = 'Fora',
+      Company = 'Outra BU',
+      Status = statusLead(),
+      SOL_Data_Inicio_Ciclo_Contato__c = System.now()
+    );
+    insert outraBU;
+    Lead apagado = leadsDistribuidos(1)[0];
+    Id idApagado = apagado.Id;
+    delete apagado;
+    Date v = Date.today().addDays(7);
+
+    Test.startTest();
+    SOLCadenciaContatoService.Resultado r = criarWhatsApp(
+      new List<SOLCadenciaContatoService.Solicitacao>{
+        pedido(elegivel.Id, 2, v),
+        pedido(ls[1].Id, 2, v),
+        pedido(ls[2].Id, 2, v),
+        pedido(ls[3].Id, 2, v),
+        pedido(ls[4].Id, 2, v),
+        pedido(ls[5].Id, 2, v),
+        pedido(outraBU.Id, 2, v),
+        pedido(idApagado, 2, v)
+      }
+    );
+    Test.stopTest();
+
+    System.assertEquals(1, r.criadas, 'Só o Lead elegível recebe WhatsApp.');
+    System.assertEquals(7, r.ignoradas, 'Sete inelegibilidades, sete ignorados.');
+    System.assertEquals(0, r.comErro, 'Nenhuma vira erro.');
+    System.assertEquals(1, whatsappsDe(elegivel.Id).size(), 'Criada no elegível.');
+    System.assertEquals(
+      1,
+      [SELECT COUNT() FROM Task WHERE SOL_Canal_Contato__c = :CANAL_WHATSAPP],
+      'E em nenhum outro Lead.'
+    );
+  }
+
+  /** (7) Lead convertido é ignorado. */
+  @IsTest
+  static void whatsappIgnoraLeadConvertido() {
+    montarCenario(1);
+    Lead l = leadsDistribuidos(1)[0];
+    update new Lead(Id = l.Id, SOL_Status_Procuracao__c = 'Recebida');
+    Database.LeadConvert lc = new Database.LeadConvert();
+    lc.setLeadId(l.Id);
+    lc.setDoNotCreateOpportunity(true);
+    lc.setConvertedStatus(
+      [SELECT MasterLabel FROM LeadStatus WHERE IsConverted = TRUE LIMIT 1].MasterLabel
+    );
+    System.assert(Database.convertLead(lc).isSuccess(), 'Pré-condição: converteu.');
+
+    Test.startTest();
+    SOLCadenciaContatoService.Resultado r = criarWhatsApp(
+      new List<SOLCadenciaContatoService.Solicitacao>{ pedido(l.Id, 2, Date.today().addDays(7)) }
+    );
+    Test.stopTest();
+
+    System.assertEquals(0, r.criadas, 'Convertido não recebe WhatsApp.');
+    System.assertEquals(1, r.ignoradas, 'Ignorado.');
+  }
+
+  // ------------------------- conclusão e isolamento dos dois resultados
+
+  /** (8) WhatsApp AUTOMÁTICO e MANUAL (sem dia): nenhum conclui sem resultado. */
+  @IsTest
+  static void whatsappAutomaticoEManualNaoConcluemSemResultado() {
+    montarCenario(1);
+    Lead l = leadsDistribuidos(1)[0];
+    criarWhatsApp(
+      new List<SOLCadenciaContatoService.Solicitacao>{ pedido(l.Id, 2, Date.today().addDays(7)) }
+    );
+    Id automatico = whatsappsDoDia(l.Id, 2)[0].Id;
+    Id manual = whatsappManual(l).Id;
+
+    Test.startTest();
+    Map<Id, String> erros = new Map<Id, String>();
+    for (Id t : new List<Id>{ automatico, manual }) {
+      try {
+        update new Task(Id = t, Status = STATUS_CONCLUIDO);
+        erros.put(t, '');
+      } catch (DmlException e) {
+        erros.put(t, e.getMessage());
+      }
+    }
+    Test.stopTest();
+
+    for (Id t : erros.keySet()) {
+      System.assert(
+        erros.get(t).contains('resultado do envio'),
+        'Bloqueado pela VR de ENVIO. Recebido: ' + erros.get(t)
+      );
+      System.assert(
+        !erros.get(t).contains('resultado da ligação'),
+        'E não pela VR de ligação. Recebido: ' + erros.get(t)
+      );
+    }
+    for (Task t : [SELECT Status, SOL_Dia_Cadencia__c FROM Task WHERE Id IN :erros.keySet()]) {
+      System.assertEquals(STATUS_ABERTO, t.Status, 'Continua aberta (dia=' + t.SOL_Dia_Cadencia__c + ').');
+    }
+
+    // E o lado POSITIVO nos dois: com resultado, ambos concluem — a regra
+    // exige o resultado, não impede a conclusão.
+    update new List<Task>{
+      new Task(Id = automatico, SOL_Resultado_Envio__c = RES_ENVIADO, Status = STATUS_CONCLUIDO),
+      new Task(Id = manual, SOL_Resultado_Envio__c = RES_NAO_ENVIADO, Status = STATUS_CONCLUIDO)
+    };
+    Map<Id, Task> depois = new Map<Id, Task>(
+      [
+        SELECT Id, Status, SOL_Resultado_Envio__c, SOL_Dia_Cadencia__c
+        FROM Task
+        WHERE Id IN :erros.keySet()
+      ]
+    );
+    System.assertEquals(STATUS_CONCLUIDO, depois.get(automatico).Status, 'O automático conclui com "Enviado".');
+    System.assertEquals(RES_ENVIADO, depois.get(automatico).SOL_Resultado_Envio__c, 'Resultado gravado.');
+    System.assertEquals(STATUS_CONCLUIDO, depois.get(manual).Status, 'O manual SEM DIA conclui com "Não enviado".');
+    System.assertEquals(RES_NAO_ENVIADO, depois.get(manual).SOL_Resultado_Envio__c, 'Resultado gravado.');
+    System.assertEquals(null, depois.get(manual).SOL_Dia_Cadencia__c, 'E segue sem dia: o dia nunca foi condição.');
+  }
+
+  /** (9) Zerar o dia na mesma gravação da conclusão não burla a regra. */
+  @IsTest
+  static void limparODiaDoWhatsAppNaMesmaGravacaoNaoBurlaARegra() {
+    montarCenario(1);
+    Lead l = leadsDistribuidos(1)[0];
+    criarWhatsApp(
+      new List<SOLCadenciaContatoService.Solicitacao>{ pedido(l.Id, 2, Date.today().addDays(7)) }
+    );
+    Id waId = whatsappsDoDia(l.Id, 2)[0].Id;
+
+    Test.startTest();
+    String erro = '';
+    try {
+      update new Task(Id = waId, SOL_Dia_Cadencia__c = null, Status = STATUS_CONCLUIDO);
+    } catch (DmlException e) {
+      erro = e.getMessage();
+    }
+    Test.stopTest();
+
+    System.assert(erro.contains('resultado do envio'), 'Continua bloqueado. Recebido: ' + erro);
+    Task depois = [SELECT Status, SOL_Dia_Cadencia__c FROM Task WHERE Id = :waId];
+    System.assertEquals(STATUS_ABERTO, depois.Status, 'Segue aberta.');
+    System.assertEquals(2, depois.SOL_Dia_Cadencia__c.intValue(), 'A gravação inteira foi desfeita: o dia ficou.');
+  }
+
+  /** (10) Conclusão permitida com "Enviado" e com "Não enviado". */
+  @IsTest
+  static void whatsappConcluiComEnviadoEComNaoEnviado() {
+    montarCenario(2);
+    List<Lead> leads = leadsDistribuidos(2);
+    List<String> resultados = new List<String>{ RES_ENVIADO, RES_NAO_ENVIADO };
+    for (Lead l : leads) {
+      criarWhatsApp(
+        new List<SOLCadenciaContatoService.Solicitacao>{ pedido(l.Id, 2, Date.today().addDays(7)) }
+      );
+    }
+
+    Test.startTest();
+    for (Integer i = 0; i < leads.size(); i++) {
+      Task t = whatsappsDoDia(leads[i].Id, 2)[0];
+      t.SOL_Resultado_Envio__c = resultados[i];
+      t.Status = STATUS_CONCLUIDO;
+      update t;
+    }
+    Test.stopTest();
+
+    for (Integer i = 0; i < leads.size(); i++) {
+      Task t = whatsappsDoDia(leads[i].Id, 2)[0];
+      System.assertEquals(STATUS_CONCLUIDO, t.Status, 'Conclui com "' + resultados[i] + '".');
+      System.assertEquals(resultados[i], t.SOL_Resultado_Envio__c, 'Resultado preservado.');
+      System.assertEquals(CANAL_WHATSAPP, t.SOL_Canal_Contato__c, 'Classificação sobrevive.');
+    }
+  }
+
+  /** (11) Qualquer resultado de LIGAÇÃO é rejeitado no WhatsApp — e o e-mail segue protegido. */
+  @IsTest
+  static void whatsappRejeitaResultadoDeLigacaoSemEnfraquecerOEmail() {
+    montarCenario(1);
+    Lead l = leadsDistribuidos(1)[0];
+    Date v = Date.today().addDays(7);
+    criarWhatsApp(new List<SOLCadenciaContatoService.Solicitacao>{ pedido(l.Id, 2, v) });
+    criarEmail(new List<SOLCadenciaContatoService.Solicitacao>{ pedido(l.Id, 2, v) });
+    Id waId = whatsappsDoDia(l.Id, 2)[0].Id;
+    Id emId = emailsDoDia(l.Id, 2)[0].Id;
+    List<String> tentados = new List<String>{ RES_ATENDEU, RES_NAO_ATENDEU, RES_NAO_FOI_POSSIVEL, RES_OPT_OUT };
+
+    Test.startTest();
+    List<String> errosWa = new List<String>();
+    for (String res : tentados) {
+      try {
+        update new Task(Id = waId, SOL_Resultado_Contato__c = res);
+        errosWa.add('');
+      } catch (DmlException e) {
+        errosWa.add(e.getMessage());
+      }
+    }
+    String erroEm = '';
+    try {
+      update new Task(Id = emId, SOL_Resultado_Contato__c = RES_ATENDEU);
+    } catch (DmlException e) {
+      erroEm = e.getMessage();
+    }
+    Test.stopTest();
+
+    for (Integer i = 0; i < tentados.size(); i++) {
+      System.assert(
+        errosWa[i].contains('tarefa de WhatsApp'),
+        '"' + tentados[i] + '" não entra em WhatsApp. Recebido: ' + errosWa[i]
+      );
+    }
+    System.assert(erroEm.contains('tarefa de e-mail'), 'A regra do e-mail segue intacta. Recebido: ' + erroEm);
+    System.assertEquals(null, whatsappsDoDia(l.Id, 2)[0].SOL_Resultado_Contato__c, 'WhatsApp limpo.');
+    System.assertEquals(null, emailsDoDia(l.Id, 2)[0].SOL_Resultado_Contato__c, 'E-mail limpo.');
+  }
+
+  // ---------------------------- ausência de efeitos e cancelamentos herdados
+
+  /**
+   * (12) Concluir os três WhatsApps — e ainda somar uma ligação negativa — não
+   * sinaliza contato efetivado, não desqualifica e não reatribui: o WhatsApp
+   * não conta como tentativa porque nunca carrega resultado de ligação.
+   */
+  @IsTest
+  static void concluirWhatsAppsNaoSinalizaNadaNoLeadNemContaTentativa() {
+    montarCenario(3);
+    Lead l = leadsDistribuidos(1)[0];
+    Id donoOriginal = l.OwnerId;
+    Datetime cicloOriginal = l.SOL_Data_Inicio_Ciclo_Contato__c;
+    criarWhatsApp(tresDiasDeWhatsApp(l.Id));
+
+    Test.startTest();
+    for (Task t : whatsappsDe(l.Id)) {
+      t.SOL_Resultado_Envio__c = RES_NAO_ENVIADO;
+      t.Status = STATUS_CONCLUIDO;
+      update t;
+    }
+    // A ÚNICA tentativa real: a ligação do dia 1, negativa. 1 < 3, não reatribui.
+    Task lig = ligacoesDoDia(l.Id, 1)[0];
+    lig.SOL_Resultado_Contato__c = RES_NAO_ATENDEU;
+    lig.Status = STATUS_CONCLUIDO;
+    update lig;
+    Test.stopTest();
+
+    Lead d = [
+      SELECT
+        OwnerId,
+        Status,
+        SOL_Contato_Efetivado__c,
+        SOL_Data_Contato_Efetivado__c,
+        SOL_Opt_Out__c,
+        SOL_Data_Inicio_Ciclo_Contato__c,
+        SOL_Quantidade_Reatribuicoes__c
+      FROM Lead
+      WHERE Id = :l.Id
+    ];
+    System.assert(d.SOL_Contato_Efetivado__c != true, 'WhatsApp enviado NÃO é contato efetivado.');
+    System.assertEquals(null, d.SOL_Data_Contato_Efetivado__c, 'Sem data de efetivação.');
+    System.assert(d.SOL_Opt_Out__c != true, 'Não é opt-out.');
+    System.assertNotEquals('Desqualificado', d.Status, 'Não desqualifica.');
+    System.assertEquals(
+      donoOriginal,
+      d.OwnerId,
+      'Três WhatsApps + uma ligação negativa = 1 tentativa: não reatribui.'
+    );
+    System.assertEquals(cicloOriginal, d.SOL_Data_Inicio_Ciclo_Contato__c, 'Ciclo intacto.');
+    System.assert(
+      d.SOL_Quantidade_Reatribuicoes__c == null || d.SOL_Quantidade_Reatribuicoes__c == 0,
+      'Contador de reatribuições parado.'
+    );
+  }
+
+  /**
+   * (13) Cancelamentos herdados sem código novo: contato efetivado, opt-out e
+   * negócio perdido cancelam o WhatsApp pendente — três Leads, uma causa cada.
+   */
+  @IsTest
+  static void contatoEfetivadoOptOutEPerdaCancelamWhatsAppPendente() {
+    montarCenario(3);
+    List<Lead> ls = leadsDistribuidos(3);
+    // O encerramento por perda (9425) exige produto de interesse SOL.
+    update new Lead(Id = ls[2].Id, SOL_Produto_Interesse__c = PRODUTO_RT);
+    for (Lead l : ls) {
+      criarWhatsApp(
+        new List<SOLCadenciaContatoService.Solicitacao>{
+          pedido(l.Id, 2, Date.today().addDays(7)),
+          pedido(l.Id, 3, Date.today().addDays(8))
+        }
+      );
+    }
+
+    Test.startTest();
+    Task efet = ligacoesDoDia(ls[0].Id, 1)[0];
+    efet.SOL_Resultado_Contato__c = RES_ATENDEU;
+    efet.Status = STATUS_CONCLUIDO;
+    update efet;
+    Task opt = ligacoesDoDia(ls[1].Id, 1)[0];
+    opt.SOL_Resultado_Contato__c = RES_OPT_OUT;
+    opt.Status = STATUS_CONCLUIDO;
+    update opt;
+    update new Lead(Id = ls[2].Id, Status = 'Desqualificado', SOL_Motivo_Desqualificacao__c = MOTIVO_PERDA);
+    Test.stopTest();
+
+    Map<Id, String> motivoEsperado = new Map<Id, String>{
+      ls[0].Id => MOTIVO_CONTATO_EFETIVADO,
+      ls[1].Id => MOTIVO_OPT_OUT,
+      ls[2].Id => MOTIVO_PERDA
+    };
+    for (Lead l : ls) {
+      List<Task> ws = whatsappsDe(l.Id);
+      System.assertEquals(2, ws.size(), 'Os dois WhatsApps continuam existindo.');
+      for (Task t : ws) {
+        System.assertEquals(STATUS_CANCELADA, t.Status, 'Cancelado por "' + motivoEsperado.get(l.Id) + '".');
+        System.assertEquals(motivoEsperado.get(l.Id), t.SOL_Motivo_Cancelamento__c, 'Motivo da automação.');
+        System.assertEquals(null, t.SOL_Resultado_Envio__c, 'Cancelado não é enviado.');
+        System.assertEquals(
+          l.Id == ls[2].Id,
+          t.SOL_Cancelada_Por_Perda__c == true,
+          'A flag de perda só aparece no cancelamento por perda.'
+        );
+      }
+    }
+  }
+
+  // ------------------------------------------- FLS, produtos e whitelist
+
+  /**
+   * (14) FLS EFETIVA do resultado do envio para o canal WhatsApp, mais a
+   * premissa que torna o card BARATO: o WhatsApp não trouxe campo, FLS,
+   * Permission Set nem Layout novos — ele REUSA o que o 9435 já concedeu.
+   *
+   * A medição é por `getDescribe()` dentro de `System.runAs` porque esse é o
+   * único mecanismo válido em Apex: DML de Apex roda em modo de sistema e NÃO
+   * aplica FLS, então uma tentativa de gravar o campo como gestor passaria e
+   * não provaria nada. Não troque estas asserções por um `update` "de
+   * verdade" — ele daria um falso verde.
+   */
+  @IsTest
+  static void flsEfetivaDoResultadoEnvioValeParaWhatsApp() {
+    User vendedor = usuarioStandard('wv' + rnd().left(3));
+    User gestor = usuarioStandard('wg' + rnd().left(3));
+    System.runAs(contextoAtual()) {
+      insert new List<User>{ vendedor, gestor };
+      insert new List<PermissionSetAssignment>{
+        new PermissionSetAssignment(AssigneeId = vendedor.Id, PermissionSetId = permissionSetId('PS_SOL_Comercial')),
+        new PermissionSetAssignment(AssigneeId = gestor.Id, PermissionSetId = permissionSetId('PS_SOL_Distribuicao_Admin'))
+      };
+    }
+
+    Test.startTest();
+    System.runAs(new User(Id = vendedor.Id)) {
+      Schema.DescribeFieldResult envio = Task.SOL_Resultado_Envio__c.getDescribe();
+      System.assert(envio.isAccessible(), 'Vendedor lê o resultado do envio.');
+      System.assert(envio.isUpdateable(), 'Vendedor EDITA o resultado do envio — é ele quem registra o envio.');
+      System.assert(
+        !Task.SOL_Canal_Contato__c.getDescribe().isUpdateable(),
+        'Vendedor não edita o canal: é o classificador que sustenta a chave e as duas VRs.'
+      );
+      System.assert(!Task.SOL_Dia_Cadencia__c.getDescribe().isUpdateable(), 'Nem o dia da cadência.');
+    }
+    System.runAs(new User(Id = gestor.Id)) {
+      Schema.DescribeFieldResult envio = Task.SOL_Resultado_Envio__c.getDescribe();
+      System.assert(envio.isAccessible(), 'Gestor lê o resultado do envio.');
+      System.assert(!envio.isUpdateable(), 'Gestor NÃO edita: quem registra o envio é o vendedor.');
+    }
+    Test.stopTest();
+
+    // REUSO, não duplicação: o desfecho do WhatsApp mora no MESMO campo do
+    // e-mail, com os MESMOS dois valores restritos. Se alguém criar um
+    // "SOL_Resultado_Envio_WhatsApp__c" no futuro, este teste cai.
+    Map<String, Schema.SObjectField> campos = Task.SObjectType.getDescribe().fields.getMap();
+    List<String> resultadosDeEnvio = new List<String>();
+    for (String nome : campos.keySet()) {
+      if (nome.startsWith('sol_resultado_envio')) {
+        resultadosDeEnvio.add(nome);
+      }
+    }
+    System.assertEquals(
+      new List<String>{ 'sol_resultado_envio__c' },
+      resultadosDeEnvio,
+      'Existe UM só campo de resultado de envio, compartilhado pelos canais de mensagem.'
+    );
+    Schema.DescribeFieldResult envio = Task.SOL_Resultado_Envio__c.getDescribe();
+    System.assert(envio.isRestrictedPicklist(), 'Picklist restrita: nada além dos dois valores entra.');
+    Set<String> valores = new Set<String>();
+    for (Schema.PicklistEntry pe : envio.getPicklistValues()) {
+      if (pe.isActive()) {
+        valores.add(pe.getValue());
+      }
+    }
+    System.assertEquals(
+      new Set<String>{ RES_ENVIADO, RES_NAO_ENVIADO },
+      valores,
+      'Exatamente "Enviado" e "Não enviado" — nenhum valor que signifique contato efetivado.'
+    );
+    // E o canal WhatsApp precisa estar ATIVO no value set, senão a Task nem grava.
+    Set<String> canais = new Set<String>();
+    for (Schema.PicklistEntry pe : Task.SOL_Canal_Contato__c.getDescribe().getPicklistValues()) {
+      if (pe.isActive()) {
+        canais.add(pe.getValue());
+      }
+    }
+    System.assert(canais.contains(CANAL_WHATSAPP), 'O canal WhatsApp está ativo no value set restrito.');
+  }
+
+  /**
+   * (15) Recuperação Tributária e ART 360 se comportam IGUAL: mesma criação,
+   * mesma classificação e o mesmo cancelamento por perda — a única automação
+   * da cadência recortada por produto.
+   */
+  @IsTest
+  static void whatsappIgualEmRecuperacaoTributariaEArt360() {
+    montarCenario(2);
+    List<Lead> ls = leadsDistribuidos(2);
+    update new List<Lead>{
+      new Lead(Id = ls[0].Id, SOL_Produto_Interesse__c = PRODUTO_RT),
+      new Lead(Id = ls[1].Id, SOL_Produto_Interesse__c = PRODUTO_ART)
+    };
+
+    Test.startTest();
+    SOLCadenciaContatoService.Resultado rRT = criarWhatsApp(tresDiasDeWhatsApp(ls[0].Id));
+    SOLCadenciaContatoService.Resultado rART = criarWhatsApp(tresDiasDeWhatsApp(ls[1].Id));
+    update new List<Lead>{
+      new Lead(Id = ls[0].Id, Status = 'Desqualificado', SOL_Motivo_Desqualificacao__c = MOTIVO_PERDA),
+      new Lead(Id = ls[1].Id, Status = 'Desqualificado', SOL_Motivo_Desqualificacao__c = MOTIVO_PERDA)
+    };
+    Test.stopTest();
+
+    System.assertEquals(3, rRT.criadas, 'RT: três WhatsApps.');
+    System.assertEquals(3, rART.criadas, 'ART 360: três WhatsApps.');
+    for (Lead l : ls) {
+      List<Task> ws = whatsappsDe(l.Id);
+      System.assertEquals(3, ws.size(), 'Três tarefas em cada produto.');
+      for (Task t : ws) {
+        System.assertEquals(STATUS_CANCELADA, t.Status, 'A perda cancela nos dois produtos.');
+        System.assertEquals(MOTIVO_PERDA, t.SOL_Motivo_Cancelamento__c, 'Mesmo motivo.');
+        System.assertEquals(true, t.SOL_Cancelada_Por_Perda__c, 'Mesma flag.');
+        System.assertEquals(null, t.SOL_Prazo_Contato__c, 'Mesmo prazo nulo.');
+      }
+    }
+  }
+
+  /** (16) Canal fora da whitelist é rejeitado pelo núcleo ANTES de tocar o banco. */
+  @IsTest
+  static void canalDesconhecidoEhRejeitadoInternamente() {
+    montarCenario(1);
+    Lead l = leadsDistribuidos(1)[0];
+    List<SOLCadenciaContatoService.Solicitacao> pedidos = new List<SOLCadenciaContatoService.Solicitacao>{
+      pedido(l.Id, 2, Date.today().addDays(7))
+    };
+
+    Test.startTest();
+    Integer antes = Limits.getQueries();
+    String erro = '';
+    try {
+      SOLCadenciaContatoService.criarTarefasDaCadencia(pedidos, 'Telegrama');
+    } catch (IllegalArgumentException e) {
+      erro = e.getMessage();
+    }
+    String erroNulo = '';
+    try {
+      SOLCadenciaContatoService.criarTarefasDaCadencia(pedidos, null);
+    } catch (IllegalArgumentException e) {
+      erroNulo = e.getMessage();
+    }
+    Integer delta = Limits.getQueries() - antes;
+    Test.stopTest();
+
+    System.assert(erro.contains('Telegrama'), 'Canal desconhecido falha alto, nomeando o canal. Recebido: ' + erro);
+    System.assert(erroNulo.contains('não suportado'), 'Canal nulo também. Recebido: ' + erroNulo);
+    System.assertEquals(0, delta, 'A rejeição acontece antes de qualquer SOQL.');
+    System.assertEquals(
+      1,
+      [SELECT COUNT() FROM Task WHERE WhoId = :l.Id AND SOL_Tipo_Tarefa__c = :TIPO_CONTATO],
+      'Só a ligação do dia 1 existe: nada foi gravado com canal inválido.'
+    );
+    System.assertEquals(
+      null,
+      SOLCadenciaContatoService.subjectDe('Telegrama', 1),
+      'Canal sem rótulo não herda o rótulo de outro canal.'
+    );
+    System.assertEquals(3, SOLCadenciaContatoService.CANAIS_SUPORTADOS.size(), 'Whitelist: exatamente os três canais.');
+  }
 }
