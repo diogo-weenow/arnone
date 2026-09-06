@@ -964,10 +964,21 @@ public without sharing class SOLDistribuicaoService {
           continue;
         }
         leadsSOL.add(l.Id);
-        // Idempotência: só grava o flag/data se ainda não sinalizado.
-        if (l.SOL_Contato_Efetivado__c != true) {
+        // Idempotência: flag e data só são gravados quando ainda faltam, e a
+        // data do PRIMEIRO contato efetivado nunca é sobrescrita.
+        //
+        // (CLICKUP-9449) A data é tratada separadamente do flag porque a porta
+        // nova — marcar `SOL_Contato_Efetivado__c` direto no Lead — chega aqui
+        // com o flag JÁ verdadeiro e a data VAZIA. Sem este recorte o Lead
+        // ficaria efetivado sem data, e é essa data que alimenta o prazo total
+        // de 30 dias úteis (CLICKUP-9424): o Lead sumiria daquele cálculo.
+        Boolean faltaFlag = l.SOL_Contato_Efetivado__c != true;
+        Boolean faltaData = l.SOL_Data_Contato_Efetivado__c == null;
+        if (faltaFlag || faltaData) {
           l.SOL_Contato_Efetivado__c = true;
-          l.SOL_Data_Contato_Efetivado__c = agora;
+          if (faltaData) {
+            l.SOL_Data_Contato_Efetivado__c = agora;
+          }
           leadsParaSinalizar.add(l);
         }
       }
@@ -994,11 +1005,23 @@ public without sharing class SOLDistribuicaoService {
         t.SOL_Motivo_Cancelamento__c = MOTIVO_CANCELAMENTO_CONTATO_EFETIVADO;
       }
 
-      if (!leadsParaSinalizar.isEmpty()) {
-        update leadsParaSinalizar;
-      }
+      // (CLICKUP-9449) A ORDEM IMPORTA, e é ela o mecanismo anti-recursão.
+      //
+      // O Flow SOL_Cancelar_Tarefas_Apos_Contato_Efetivado dispara no update do
+      // LEAD e chama este método de novo. Cancelando as TAREFAS primeiro, a
+      // reentrada encontra o Lead já marcado (nada a sinalizar) e as tarefas já
+      // com `IsClosed = true` (fora do `WHERE IsClosed = false`), então não faz
+      // DML nenhum e a profundidade para em 2.
+      //
+      // Na ordem inversa — Lead primeiro — a reentrada ainda enxergaria as
+      // tarefas ABERTAS e as cancelaria, e este nível as atualizaria de novo em
+      // seguida: a mesma tarefa gravada DUAS vezes. Medido nesta org antes da
+      // correção: 6 DML statements na transação, contra 5 depois.
       if (!pendentes.isEmpty()) {
         update pendentes;
+      }
+      if (!leadsParaSinalizar.isEmpty()) {
+        update leadsParaSinalizar;
       }
 
       r.leadsSinalizados = leadsParaSinalizar.size();

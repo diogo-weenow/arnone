@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Chamar_Cancelar_Tarefas_Contato_Efetivado</name>
+        <label>Cancelar tarefas de contato pendentes SOL</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <actionName>SOLContatoEfetivadoInvocable</actionName>
+        <actionType>apex</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>leadId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>estrito</name>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </inputParameters>
+        <nameSegment>SOLContatoEfetivadoInvocable</nameSegment>
+    </actionCalls>
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>CLICKUP-9449 — Terceira porta do contato efetivado: a mudança do PRÓPRIO Lead.SOL_Contato_Efetivado__c para verdadeiro cancela as tarefas de contato ainda abertas dos três canais. Até aqui o cancelamento só existia pelas Tasks (ligação com "Atendeu", CLICKUP-9417; checkbox de resposta no e-mail e no WhatsApp, 9447/9448); quem marcasse o flag direto no Lead — por tela, API, importação ou outra automação — deixava as tarefas abertas. Chama o MESMO SOLContatoEfetivadoInvocable, com estrito = true: nenhum serviço, campo, status ou motivo novo. O serviço encontra o Lead já marcado, PRESERVA a data existente e cancela apenas o que está aberto. doesRequireRecordChangedToMeetCriteria = true restringe à TRANSIÇÃO para verdadeiro, então reprocessar o Lead não redispara. RECURSÃO: quando a chamada vem de uma Task, o serviço grava o flag e este Flow entra uma vez; nessa reentrada as tarefas JÁ foram canceladas (o serviço as atualiza ANTES do Lead) e o flag já está gravado, então nada é atualizado de novo e a profundidade para em 2. flowTransactionModel = CurrentTransaction e a AUSÊNCIA de fault path fazem uma falha do cancelamento desfazer também a marcação original do flag. Não atualiza Task aqui: todo o cancelamento fica no serviço, que é bulk, idempotente e transacional.</description>
+    <environments>Default</environments>
+    <interviewLabel>SOL_Cancelar_Tarefas_Apos_Contato_Efetivado {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL_Cancelar_Tarefas_Apos_Contato_Efetivado</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Chamar_Cancelar_Tarefas_Contato_Efetivado</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &apos;SOL&apos;,
+  {!$Record.SOL_Contato_Efetivado__c},
+  NOT({!$Record.IsConverted})
+)</filterFormula>
+        <object>Lead</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
