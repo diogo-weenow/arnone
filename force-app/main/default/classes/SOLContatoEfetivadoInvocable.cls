@@ -23,6 +23,12 @@ public with sharing class SOLContatoEfetivadoInvocable {
    */
   public static final String MSG_VINCULO_INVALIDO = 'Não foi possível registrar a resposta: esta tarefa não está vinculada a um lead da Arnone Soluções. Nenhuma alteração foi salva.';
 
+  /**
+   * (CLICKUP-9449) Mensagem controlada do lead em ESTADO TERMINAL — negócio
+   * perdido ou opt-out já registrado. Também sem detalhe técnico.
+   */
+  public static final String MSG_LEAD_NAO_ELEGIVEL = 'Não foi possível registrar o contato efetivado: este lead não está mais em contato ativo (negócio perdido ou opt-out registrado). Nenhuma alteração foi salva.';
+
   public class Entrada {
     @InvocableVariable(
       label='Id do Lead (WhoId da Task)'
@@ -96,7 +102,29 @@ public with sharing class SOLContatoEfetivadoInvocable {
     }
 
     try {
-      SOLDistribuicaoService.registrarContatoEfetivado(new List<Id>(ids));
+      SOLDistribuicaoService.ResultadoContatoEfetivado r = SOLDistribuicaoService.registrarContatoEfetivado(
+        new List<Id>(ids)
+      );
+
+      // (CLICKUP-9449) Na porta ESTRITA, um Lead que o serviço RECUSOU não pode
+      // terminar com a marcação gravada. Sem isto, marcar
+      // `SOL_Contato_Efetivado__c` num Lead perdido ou em opt-out deixava o flag
+      // verdadeiro, sem contato registrado e com a data vazia — o serviço
+      // ignorava e ninguém desfazia a gravação original. "O Apex ignora" não é
+      // proteção; é dado falso persistido.
+      //
+      // A decisão vem do resultado do SERVIÇO, que avalia o Lead lido com
+      // FOR UPDATE — não da pré-consulta sem lock feita em `exigirLeadsSOL`.
+      // Como aquela pré-consulta já rejeitou o que não é Lead SOL ativo, um
+      // `ignorados > 0` aqui só pode ser estado terminal.
+      //
+      // A porta TOLERANTE (ligação, sem `estrito`) não passa por aqui e mantém
+      // o comportamento de sempre: ignora em silêncio e a Task conclui.
+      if (estrito && r != null && r.ignorados > 0) {
+        throw new SOLDistribuicaoService.ContatoEfetivadoException(
+          MSG_LEAD_NAO_ELEGIVEL
+        );
+      }
     } catch (SOLDistribuicaoService.ContatoEfetivadoException e) {
       // Falha já tratada e com Savepoint desfeito no serviço: relança a
       // mensagem controlada para o Flow abortar a transação inteira.

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>SOL_Cancelar_Tarefas_Apos_Contato_Efetivado</members>
+        <name>Flow</name>
+    </types>
+    <types>
+        <members>SOLCancelamentoContatoEfetivadoTest</members>
+        <members>SOLContatoEfetivadoInvocable</members>
+        <members>SOLDistribuicaoService</members>
+        <name>ApexClass</name>
+    </types>
+    <version>66.0</version>
+</Package>
