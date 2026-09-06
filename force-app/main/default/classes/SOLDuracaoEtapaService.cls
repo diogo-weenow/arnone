@@ -97,6 +97,17 @@ public without sharing class SOLDuracaoEtapaService {
     MOTIVO_FALHA_TECNICA
   };
 
+  /**
+   * O MARCO não pôde ser gravado. É a ÚNICA exceção que este serviço deixa sair,
+   * e ela existe porque marco não é medida analítica: é o registro comercial do
+   * que aconteceu. Sem ele, a tarefa não pode terminar concluída.
+   */
+  public class MarcoNaoGravadoException extends Exception {
+  }
+
+  /** Mensagem controlada para o vendedor. Sem detalhe técnico. */
+  public static final String MSG_MARCO_NAO_GRAVADO = 'Não foi possível registrar esta conclusão na jornada da Arnone Soluções. Nada foi salvo — conclua a tarefa de novo. Se o erro continuar, acione o administrador.';
+
   @TestVisible
   private static final String RT_SOL = 'SOL';
 
@@ -624,6 +635,15 @@ public without sharing class SOLDuracaoEtapaService {
       detalheAgora = 'Pendência sem detalhe apurado.';
     }
 
+    // Uma pendência TÉCNICA registrada nesta mesma execução não pode ser
+    // apagada por uma reavaliação posterior: quem a gravou foi a segunda
+    // chance da gravação, e o objeto em memória aqui não sabe disso. Sem esta
+    // guarda, o único registro da falha desapareceria no mesmo instante em que
+    // foi criado.
+    if (!pendenteAgora && pendenciaTecnicaNestaExecucao.contains((Id) reg.get('Id'))) {
+      return false;
+    }
+
     Boolean pendenteAntes = ((Boolean) reg.get(CAMPO_PENDENTE)) == true;
     String motivoAntes = (String) reg.get(CAMPO_MOTIVO);
     String detalheAntes = (String) reg.get(CAMPO_DETALHE);
@@ -802,12 +822,12 @@ public without sharing class SOLDuracaoEtapaService {
     if (ids.isEmpty()) {
       return r;
     }
+    // Menor marco por (pai, campo). Marcos de Lead são sempre DateTime e os de
+    // Oportunidade sempre Date — por isso dois mapas, e nenhuma comparação
+    // genérica de Object que pudesse comparar tipos trocados.
+    Map<Id, Map<String, Datetime>> menorNoLead = new Map<Id, Map<String, Datetime>>();
+    Map<Id, Map<String, Date>> menorNaOportunidade = new Map<Id, Map<String, Date>>();
     try {
-      // Menor marco por (pai, campo). Marcos de Lead são sempre DateTime e os
-      // de Oportunidade sempre Date — por isso dois mapas, e nenhuma comparação
-      // genérica de Object que pudesse comparar tipos trocados.
-      Map<Id, Map<String, Datetime>> menorNoLead = new Map<Id, Map<String, Datetime>>();
-      Map<Id, Map<String, Date>> menorNaOportunidade = new Map<Id, Map<String, Date>>();
 
       for (Task t : [
         SELECT
@@ -912,7 +932,7 @@ public without sharing class SOLDuracaoEtapaService {
             paraAtualizar.add(l);
           }
         }
-        gravar(paraAtualizar, r);
+        gravarMarcosOuLancar(paraAtualizar, r);
       }
 
       // ---- Oportunidades depois ----
@@ -939,10 +959,22 @@ public without sharing class SOLDuracaoEtapaService {
             paraAtualizar.add(o);
           }
         }
-        gravar(paraAtualizar, r);
+        gravarMarcosOuLancar(paraAtualizar, r);
       }
+    } catch (MarcoNaoGravadoException e) {
+      // O MARCO é obrigatório: esta é a única exceção que sai daqui. Ela sobe
+      // pelo Invocable até o Flow e desfaz a conclusão da Task, para que nunca
+      // exista tarefa concluída sem o marco que ela deveria ter registrado.
+      throw e;
+    } catch (Exception e) {
+      registrarFalha('consolidarMarcosDeTarefas (marco)', e, r);
+      return r;
+    }
 
-      // ---- e então as durações dos pais afetados ----
+    // ---- DAQUI PARA BAIXO a política muda: o marco já está persistido, e o
+    // cálculo da duração é TOLERANTE. Nada abaixo desta linha pode desfazer a
+    // conclusão da Task.
+    try {
       if (!menorNoLead.isEmpty()) {
         somar(r, recalcularLeads(new List<Id>(menorNoLead.keySet())));
       }
@@ -953,7 +985,7 @@ public without sharing class SOLDuracaoEtapaService {
         );
       }
     } catch (Exception e) {
-      registrarFalha('consolidarMarcosDeTarefas', e, r);
+      registrarFalha('consolidarMarcosDeTarefas (duração)', e, r);
     }
     return r;
   }
@@ -1049,6 +1081,11 @@ public without sharing class SOLDuracaoEtapaService {
     alvo.registrosAtualizados += parcial.registrosAtualizados;
     alvo.oportunidadesSincronizadas += parcial.oportunidadesSincronizadas;
     alvo.falhas += parcial.falhas;
+    // `falhasSinalizadas` ficou de fora quando este método foi escrito, e o
+    // efeito era silencioso: uma falha que VIROU pendência numa chamada
+    // aninhada sumia do resultado externo, e quem lesse o resumo do Batch
+    // concluiria que nenhuma falha tinha sido sinalizada.
+    alvo.falhasSinalizadas += parcial.falhasSinalizadas;
     alvo.falhasSemSinal += parcial.falhasSemSinal;
   }
 
@@ -1172,8 +1209,35 @@ public without sharing class SOLDuracaoEtapaService {
    * falha analítica não desfaz o marco comercial e que a pendência técnica
    * ainda assim fica registrada. Protegido por `Test.isRunningTest()`.
    */
+  /**
+   * Somente testes: força a falha da gravação da DURAÇÃO. Protegido por
+   * `Test.isRunningTest()`; fora de teste não faz nada.
+   */
   @TestVisible
   private static Boolean simularFalhaDeGravacao = false;
+
+  /**
+   * Somente testes: força a falha da gravação do MARCO. É um seam SEPARADO do
+   * anterior de propósito — as duas falhas têm políticas opostas, e um seam só
+   * não conseguiria provar isso.
+   */
+  @TestVisible
+  private static Boolean simularFalhaDeGravacaoDoMarco = false;
+
+  /**
+   * Registros que ganharam pendência técnica NESTA transação por falha de
+   * gravação. `aplicarPendencia` recalcula o estado do zero e, sem esta
+   * memória, uma reavaliação posterior na mesma execução apagaria a pendência
+   * que acabou de ser registrada — justamente a que ninguém mais registraria.
+   */
+  @TestVisible
+  private static Set<Id> pendenciaTecnicaNestaExecucao = new Set<Id>();
+
+  /** Somente testes: zera a memória de pendência técnica entre cenários. */
+  @TestVisible
+  private static void limparMemoriaDeFalha() {
+    pendenciaTecnicaNestaExecucao = new Set<Id>();
+  }
 
   /**
    * Último erro que impediu ATÉ o sinal mínimo de pendência. Existe para que um
@@ -1246,6 +1310,46 @@ public without sharing class SOLDuracaoEtapaService {
   }
 
   /**
+   * Gravação do MARCO: atômica e que LANÇA em qualquer falha.
+   *
+   * É o oposto de `gravar`, e a diferença é a política, não o gosto. O marco é
+   * o registro comercial do que aconteceu; a duração é medida sobre ele. A
+   * decisão do P.O. é "marco SEMPRE, duração tolerante" — então aqui não há
+   * sucesso parcial, não há segunda chance e não há engolir: se o marco não
+   * pôde ser gravado, a exceção sobe até o Flow e desfaz a conclusão da Task,
+   * para que nunca exista tarefa concluída afirmando um marco que não existe.
+   *
+   * Sobre atomicidade entre Lead e Oportunidade: são duas DMLs, porque uma
+   * única DML não aceita tipos misturados. A atomicidade não vem do
+   * `allOrNone`, e sim do `throw`: ele aborta a TRANSAÇÃO inteira do Flow, o
+   * que desfaz também a gravação que já tinha passado.
+   */
+  private static void gravarMarcosOuLancar(
+    List<SObject> registros,
+    ResultadoDuracao r
+  ) {
+    if (registros == null || registros.isEmpty()) {
+      return;
+    }
+    if (simularFalhaDeGravacaoDoMarco && Test.isRunningTest()) {
+      throw new MarcoNaoGravadoException(MSG_MARCO_NAO_GRAVADO);
+    }
+    try {
+      Database.update(registros, true, AccessLevel.SYSTEM_MODE);
+      r.registrosAtualizados += registros.size();
+    } catch (Exception e) {
+      System.debug(
+        LoggingLevel.ERROR,
+        'SOLDuracaoEtapaService: falha ao gravar MARCO -> ' +
+          e.getTypeName() +
+          ': ' +
+          e.getMessage()
+      );
+      throw new MarcoNaoGravadoException(MSG_MARCO_NAO_GRAVADO);
+    }
+  }
+
+  /**
    * Segunda chance: grava SÓ os campos de pendência dos registros que a
    * gravação principal recusou, para que a lacuna não fique invisível.
    */
@@ -1282,6 +1386,7 @@ public without sharing class SOLDuracaoEtapaService {
     for (Integer i = 0; i < resultados.size(); i++) {
       if (resultados[i].isSuccess()) {
         r.falhasSinalizadas++;
+        pendenciaTecnicaNestaExecucao.add((Id) sinais[i].get('Id'));
         continue;
       }
       // Nem o sinal mínimo passou. É o único caso em que a falha NÃO fica no

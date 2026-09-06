@@ -20,12 +20,18 @@
  * em estado terminal DERRUBAM a transação de propósito, porque deixar passar
  * gravaria um dado falso (a tarefa afirmando que o lead respondeu).
  *
- * Aqui NUNCA se relança. A razão não é conveniência: a duração é medida
+ * Aqui a DURAÇÃO nunca relança. A razão não é conveniência: a duração é medida
  * ANALÍTICA, e a decisão do P.O. (Opção B) é explícita — falha exclusivamente
  * analítica não pode desfazer reunião, contato, procuração, cálculo ou
- * fechamento. Engolir aqui também não persiste nada falso: o marco comercial
+ * fechamento. Engolir ali também não persiste nada falso: o marco comercial
  * fica gravado, a duração fica VAZIA e a pendência fica registrada em
  * `SOL_Duracao_Pendente__c` + motivo + detalhe, visível na lista operacional.
+ *
+ * O MARCO é o outro lado da mesma política, e por isso tem tratamento oposto:
+ * `MarcoNaoGravadoException` ATRAVESSA esta porta e derruba o save da Task. A
+ * frase aprovada é "marco SEMPRE, duração tolerante" — uma tarefa concluída
+ * sem o marco que ela deveria registrar seria dado falso persistido, que é
+ * exatamente o que o repositório proíbe em todos os outros pontos.
  *
  * O serviço já não lança; este `try/catch` é a segunda cerca, para que nem uma
  * falha inesperada de plataforma volte para o Flow e aborte o save do vendedor.
@@ -108,8 +114,16 @@ public with sharing class SOLDuracaoEtapaInvocable {
             SOLDuracaoEtapaService.recalcularOportunidades(new List<Id>(oppIds))
         );
       }
+    } catch (SOLDuracaoEtapaService.MarcoNaoGravadoException e) {
+      // A ÚNICA exceção que atravessa esta porta, e ela atravessa de propósito.
+      // Marco não é medida: é o registro comercial do que aconteceu. Sem ele, a
+      // Task não pode terminar concluída, então a exceção sobe para o Flow e
+      // desfaz o save — com mensagem controlada, sem detalhe técnico.
+      System.debug(LoggingLevel.ERROR, 'SOLDuracaoEtapaInvocable (marco): ' + e.getMessage());
+      throw e;
     } catch (Exception e) {
-      // Segunda cerca. Nenhuma operação comercial cai por causa da medição.
+      // Segunda cerca, para TUDO o que é medição. Nenhuma operação comercial
+      // cai por causa dela.
       System.debug(
         LoggingLevel.ERROR,
         'SOLDuracaoEtapaInvocable: ' +

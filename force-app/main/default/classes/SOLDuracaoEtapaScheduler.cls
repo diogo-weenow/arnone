@@ -31,6 +31,20 @@
  * Batch de um card anterior e misturar falha analítica com falha operacional.
  * Por isso, agendador próprio — e no minuto 45, como a emenda determina.
  *
+ * ===========================================================
+ * POR QUE O SCHEDULER DISPARA OS DOIS ESCOPOS, e não o Batch
+ * ===========================================================
+ * A varredura de Oportunidades já foi encadeada no `finish()` do escopo de
+ * Lead. Era inseguro: aquele mesmo `finish()` LANÇA quando encontra falha
+ * técnica, e o `Database.executeBatch` do encadeamento estava na mesma
+ * transação — a exceção pode desfazer o enfileiramento, e uma falha no escopo
+ * de Lead silenciaria a varredura de Oportunidades sem deixar rastro.
+ *
+ * Agora os dois são disparados aqui, lado a lado e sem dependência. O que se
+ * perde é a ordem dentro da mesma janela: a correção de um Lead pode levar uma
+ * varredura a mais para descer à Oportunidade dele. É consistência eventual, e
+ * é o que a política promete.
+ *
  * O agendamento NÃO é criado automaticamente (sem inicializador estático, sem
  * trigger): use `SOLDuracaoEtapaScheduler.agendar()` de forma controlada (Apex
  * anônimo / Setup) — ver runbook de deploy.
@@ -54,10 +68,11 @@ public without sharing class SOLDuracaoEtapaScheduler implements Schedulable {
   }
 
   public void execute(SchedulableContext sc) {
-    // SOBREPOSIÇÃO: se a varredura anterior ainda não terminou, esta janela é
-    // PULADA. Duas passagens simultâneas não corromperiam nada — a idempotência
-    // por etapa cuida disso —, mas disputariam os mesmos registros sem entregar
-    // nada de novo. Mesma decisão de SOLCadenciaMotorScheduler.
+    // SOBREPOSIÇÃO: se QUALQUER varredura anterior ainda não terminou, esta
+    // janela inteira é PULADA. Duas passagens simultâneas não corromperiam nada
+    // — a idempotência por etapa cuida disso —, mas disputariam os mesmos
+    // registros sem entregar nada de novo. É também o que garante que nunca há
+    // job duplicado do mesmo escopo. Mesma decisão de SOLCadenciaMotorScheduler.
     if (haExecucaoEmAndamento()) {
       System.debug(
         LoggingLevel.INFO,
@@ -66,8 +81,20 @@ public without sharing class SOLDuracaoEtapaScheduler implements Schedulable {
       );
       return;
     }
+    // OS DOIS ESCOPOS SÃO DISPARADOS AQUI, INDEPENDENTES.
+    //
+    // Antes, o escopo de Oportunidade era encadeado no `finish()` do escopo de
+    // Lead, e o mesmo `finish()` lançava quando havia falha — as duas coisas na
+    // mesma transação. Uma falha no Lead podia, portanto, desfazer o
+    // enfileiramento e silenciar a varredura de Oportunidades inteira. Aqui não
+    // existe essa dependência: cada job vive por conta própria, e o que falha
+    // marca apenas o `AsyncApexJob` dele.
     Database.executeBatch(
-      new SOLDuracaoEtapaBatch(),
+      new SOLDuracaoEtapaBatch(SOLDuracaoEtapaBatch.Escopo.LEAD),
+      SOLDuracaoEtapaBatch.TAMANHO_LOTE
+    );
+    Database.executeBatch(
+      new SOLDuracaoEtapaBatch(SOLDuracaoEtapaBatch.Escopo.OPORTUNIDADE),
       SOLDuracaoEtapaBatch.TAMANHO_LOTE
     );
   }

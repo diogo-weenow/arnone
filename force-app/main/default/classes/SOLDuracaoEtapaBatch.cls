@@ -26,13 +26,15 @@
  * executado sob demanda pelo administrador DEPOIS de corrigir as datas. É
  * decisão humana, não laço automático.
  *
- * ================
- * ENCADEAMENTO
- * ================
- * A varredura padrão começa pelos Leads e encadeia as Oportunidades no
- * `finish()`. A ordem importa: `recalcularLeads` propaga as etapas 1 a 3 para a
- * Oportunidade dos Leads já convertidos, então consertar o Lead primeiro faz a
- * Oportunidade já receber o valor certo na mesma rodada.
+ * =========================
+ * ESCOPOS INDEPENDENTES
+ * =========================
+ * Cada escopo é uma execução própria, disparada por `SOLDuracaoEtapaScheduler`.
+ * NÃO há encadeamento no `finish()`: enfileirar o segundo escopo na mesma
+ * transação em que se lança a exceção de falha significaria apostar que o
+ * rollback não desfaz o enfileiramento — e uma falha no escopo de Lead poderia
+ * silenciar a varredura de Oportunidades. Independentes, uma falha marca só o
+ * job dela.
  *
  * NÃO LANÇA em `execute()`, ao contrário de `SOLPrazoTotalBatch`: lá a falha é
  * operacional e precisa marcar o job como falho; aqui é analítica, e derrubar o
@@ -62,10 +64,6 @@ public without sharing class SOLDuracaoEtapaBatch implements Database.Batchable<
   @TestVisible
   private Boolean incluirInconsistentes;
 
-  /** Encadeia a varredura de Oportunidades ao terminar a de Leads. */
-  @TestVisible
-  private Boolean encadear;
-
   /** Motivos de pendência que esta execução aceita reprocessar. */
   @TestVisible
   private Set<String> motivosElegiveis;
@@ -94,29 +92,20 @@ public without sharing class SOLDuracaoEtapaBatch implements Database.Batchable<
   @TestVisible
   private Integer totalFalhasSemSinal = 0;
 
-  /** Varredura completa: Leads e, em seguida, Oportunidades. */
+  /** Varredura do escopo de Lead. Cada escopo é disparado por conta própria. */
   public SOLDuracaoEtapaBatch() {
-    this(Escopo.LEAD, false, true);
+    this(Escopo.LEAD, false);
   }
 
-  /** Varredura de um objeto só, sem encadear. */
+  /** Varredura de um escopo. */
   public SOLDuracaoEtapaBatch(Escopo alvo) {
-    this(alvo, false, false);
+    this(alvo, false);
   }
 
-  /** Varredura de um objeto só, opcionalmente reprocessando inconsistências. */
+  /** Varredura de um escopo, opcionalmente reprocessando inconsistências. */
   public SOLDuracaoEtapaBatch(Escopo alvo, Boolean incluirInconsistentes) {
-    this(alvo, incluirInconsistentes, false);
-  }
-
-  private SOLDuracaoEtapaBatch(
-    Escopo alvo,
-    Boolean incluirInconsistentes,
-    Boolean encadear
-  ) {
     this.objetoAlvo = alvo == null ? Escopo.LEAD : alvo;
     this.incluirInconsistentes = incluirInconsistentes == true;
-    this.encadear = encadear == true;
     this.motivosElegiveis = new Set<String>(
       SOLDuracaoEtapaService.MOTIVOS_REPROCESSAVEIS
     );
@@ -149,6 +138,9 @@ public without sharing class SOLDuracaoEtapaBatch implements Database.Batchable<
             AND (SOL_Duracao_Pendencia_Motivo__c = NULL
             OR SOL_Duracao_Pendencia_Motivo__c IN :motivos)
             AND (SOL_Duracao_Pendente__c = TRUE
+            OR (SOL_Data_Distribuicao__c != NULL
+            AND SOL_Data_Primeira_Ligacao__c != NULL
+            AND SOL_Dias_Primeira_Ligacao__c = NULL)
             OR (SOL_Data_Primeira_Ligacao__c != NULL
             AND SOL_Data_Inicio_Ciclo_Comercial__c != NULL
             AND SOL_Dias_Contato_Efetivado__c = NULL)
@@ -212,38 +204,21 @@ public without sharing class SOLDuracaoEtapaBatch implements Database.Batchable<
       'SOLDuracaoEtapaBatch [' + objetoAlvo + '] ' + resumo()
     );
 
-    if (this.encadear && !Test.isRunningTest()) {
-      Database.executeBatch(
-        new SOLDuracaoEtapaBatch(
-          Escopo.OPORTUNIDADE,
-          this.incluirInconsistentes
-        ),
-        TAMANHO_LOTE
-      );
-    } else if (this.encadear) {
-      // Encadear em teste não executaria o segundo lote de verdade e ainda
-      // consumiria uma posição de fila. Os testes disparam cada escopo
-      // explicitamente, que é o que de fato prova o comportamento.
-      System.debug(
-        LoggingLevel.INFO,
-        'SOLDuracaoEtapaBatch: encadeamento suprimido em contexto de teste.'
-      );
-    }
-
-    // POR ÚLTIMO, e de propósito: uma varredura que encontrou falha técnica NÃO
-    // pode terminar como sucesso. Lançar aqui, no `finish()`, marca o
-    // AsyncApexJob e NÃO desfaz nada — os chunks já foram commitados em
-    // transações próprias, então a medição correta dos outros registros
-    // sobrevive. Lançar no `execute()` seria o contrário: derrubaria 199
-    // registros bons por causa de um ruim, toda hora, para sempre.
+    // NÃO HÁ ENCADEAMENTO AQUI, e a ausência é o ponto.
     //
-    // O encadeamento é disparado ANTES da checagem, senão uma falha no escopo
-    // de Lead impediria a varredura das Oportunidades de acontecer.
+    // A versão anterior enfileirava o escopo de Oportunidade neste mesmo método
+    // e DEPOIS lançava quando havia falha, apoiada na ideia de que "enfileirar
+    // antes de lançar preserva a segunda varredura". Isso nunca foi comprovado
+    // e é inseguro: o `Database.executeBatch` e o `throw` estão na MESMA
+    // transação, e a exceção pode desfazer o enfileiramento. O resultado seria o
+    // pior possível — uma falha no escopo de Lead silenciando a varredura de
+    // Oportunidades sem que ninguém percebesse.
     //
-    // Este NÃO é o único sinal: as falhas que conseguiram ser gravadas viram
-    // pendência `Falha técnica` no próprio registro e aparecem na lista
-    // operacional. `falhasSemSinal` conta exatamente as que não couberam em
-    // registro nenhum — e é por elas que este ponto existe.
+    // Quem dispara os dois escopos agora é `SOLDuracaoEtapaScheduler`, de forma
+    // INDEPENDENTE. Nenhum depende do sucesso do outro, e o preço é abrir mão da
+    // ordem Lead -> Oportunidade dentro da mesma janela: a propagação da
+    // correção de um Lead para a Oportunidade dele pode levar uma varredura a
+    // mais. É consistência eventual, que é exatamente o que a política promete.
     if (totalFalhas > 0) {
       throw new VarreduraComFalhaException(
         'SOLDuracaoEtapaBatch [' +
@@ -252,7 +227,6 @@ public without sharing class SOLDuracaoEtapaBatch implements Database.Batchable<
           resumo()
       );
     }
-    return;
   }
 
   private void acumular(SOLDuracaoEtapaService.ResultadoDuracao r) {

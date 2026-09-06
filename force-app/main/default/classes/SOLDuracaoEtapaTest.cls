@@ -1093,9 +1093,9 @@ private class SOLDuracaoEtapaTest {
       'E o valor DESCE para a Oportunidade — sem isso o relatório perderia a etapa 1 para sempre.'
     );
 
-    // Em produção o Batch encadeia o escopo de Oportunidade no finish(); em
-    // teste o encadeamento é suprimido, então a segunda metade é exercitada
-    // aqui pelo mesmo caminho de código.
+    // Os dois escopos são disparados de forma INDEPENDENTE pelo Scheduler, sem
+    // encadeamento; aqui a segunda metade é exercitada pelo mesmo caminho de
+    // código que o escopo de Oportunidade usa.
     SOLDuracaoEtapaService.recalcularOportunidades(new List<Id>{ oppId });
     Opportunity depois = opp(oppId);
     Assert.isFalse(
@@ -1816,48 +1816,6 @@ private class SOLDuracaoEtapaTest {
   }
 
   /**
-   * A prova literal de que falha analítica não desfaz operação comercial: com a
-   * gravação da medição falhando, a Task continua CONCLUÍDA. O Flow roda em
-   * `CurrentTransaction` e sem fault path — se o serviço lançasse, o próprio
-   * save da tarefa seria desfeito.
-   */
-  @IsTest
-  static void falhaDaMedicaoNaoDesfazAConclusaoDaTarefa() {
-    Lead l = novoLead(PRODUTO_RT);
-    update new Lead(Id = l.Id, SOL_Data_Distribuicao__c = as10(SEGUNDA));
-    delete [SELECT Id FROM Task WHERE WhoId = :l.Id];
-    Task t = tarefaContatoLigacao(l.Id, 'Falha');
-    insert t;
-
-    Test.startTest();
-    SOLDuracaoEtapaService.simularFalhaDeGravacao = true;
-    update new Task(
-      Id = t.Id,
-      Status = 'Completed',
-      SOL_Resultado_Contato__c = 'Não atendeu'
-    );
-    SOLDuracaoEtapaService.simularFalhaDeGravacao = false;
-    Test.stopTest();
-
-    Task depois = [SELECT Id, Status FROM Task WHERE Id = :t.Id];
-    Assert.areEqual(
-      'Completed',
-      depois.Status,
-      'A tarefa continua concluída: a medição falhou e NÃO derrubou a operação comercial.'
-    );
-    Lead lead = lead(l.Id);
-    Assert.isTrue(
-      lead.SOL_Duracao_Pendente__c,
-      'E a falha ficou visível no Lead, em vez de sumir no log.'
-    );
-    Assert.areEqual(
-      SOLDuracaoEtapaService.MOTIVO_FALHA_TECNICA,
-      lead.SOL_Duracao_Pendencia_Motivo__c,
-      'Com o motivo técnico.'
-    );
-  }
-
-  /**
    * Em transações SEPARADAS o primeiro marco também é preservado — aqui a
    * cronologia é verificável de verdade, porque `CompletedDateTime` difere
    * entre as duas conclusões. Duas tarefas concluídas no MESMO DML compartilham
@@ -2082,6 +2040,349 @@ private class SOLDuracaoEtapaTest {
       tipo != null && tipo.contains('IntervaloInvalidoException'),
       'Com calendário ausente E intervalo absurdo, vence o dado incoerente: ' +
       tipo
+    );
+  }
+
+  // ============ marco obrigatório x duração tolerante (item 2)
+
+  /**
+   * A METADE OBRIGATÓRIA da política. Se o MARCO não pode ser gravado, a
+   * conclusão da Task é desfeita — porque uma tarefa concluída afirmando um
+   * marco que não existe é dado falso persistido, e isso o repositório não
+   * aceita em lugar nenhum.
+   */
+  @IsTest
+  static void falhaAoGravarOMarcoDesfazAConclusaoDaTarefa() {
+    Lead l = novoLead(PRODUTO_RT);
+    update new Lead(Id = l.Id, SOL_Data_Distribuicao__c = as10(SEGUNDA));
+    delete [SELECT Id FROM Task WHERE WhoId = :l.Id];
+    Task t = tarefaContatoLigacao(l.Id, 'Marco');
+    insert t;
+
+    Test.startTest();
+    SOLDuracaoEtapaService.simularFalhaDeGravacaoDoMarco = true;
+    Boolean bloqueou = false;
+    String mensagem = null;
+    try {
+      update new Task(
+        Id = t.Id,
+        Status = 'Completed',
+        SOL_Resultado_Contato__c = 'Não atendeu'
+      );
+    } catch (Exception e) {
+      bloqueou = true;
+      mensagem = e.getMessage();
+    }
+    SOLDuracaoEtapaService.simularFalhaDeGravacaoDoMarco = false;
+    Test.stopTest();
+
+    Assert.isTrue(
+      bloqueou,
+      'Falha ao gravar o MARCO tem de derrubar a conclusão da tarefa.'
+    );
+    Assert.isTrue(
+      mensagem.contains('Não foi possível registrar esta conclusão'),
+      'Com mensagem controlada, sem detalhe técnico: ' + mensagem
+    );
+    Assert.areEqual(
+      'Open',
+      [SELECT Id, Status FROM Task WHERE Id = :t.Id].Status,
+      'A tarefa NÃO ficou concluída — a transação inteira foi desfeita.'
+    );
+    Assert.isNull(
+      lead(l.Id).SOL_Data_Primeira_Ligacao__c,
+      'E nenhum marco pela metade ficou gravado.'
+    );
+  }
+
+  /**
+   * A METADE TOLERANTE. Depois que o MARCO está persistido, a falha do CÁLCULO
+   * não desfaz nada: a Task fica concluída, **o marco fica gravado**, e a
+   * lacuna vira pendência técnica durável.
+   *
+   * A asserção do marco é o que faltava na versão anterior deste teste: sem
+   * ela, ele passava mesmo se o marco tivesse se perdido junto com a duração.
+   */
+  @IsTest
+  static void falhaDaDuracaoNaoDesfazATarefaEPreservaOMarco() {
+    Lead l = novoLead(PRODUTO_RT);
+    update new Lead(Id = l.Id, SOL_Data_Distribuicao__c = as10(SEGUNDA));
+    delete [SELECT Id FROM Task WHERE WhoId = :l.Id];
+    Task t = tarefaContatoLigacao(l.Id, 'Duracao');
+    insert t;
+
+    Test.startTest();
+    SOLDuracaoEtapaService.simularFalhaDeGravacao = true;
+    update new Task(
+      Id = t.Id,
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Não atendeu'
+    );
+    SOLDuracaoEtapaService.simularFalhaDeGravacao = false;
+    Test.stopTest();
+
+    Assert.areEqual(
+      'Completed',
+      [SELECT Id, Status FROM Task WHERE Id = :t.Id].Status,
+      'A tarefa continua concluída: falha de MEDIÇÃO não derruba operação.'
+    );
+    Lead depois = lead(l.Id);
+    Assert.isNotNull(
+      depois.SOL_Data_Primeira_Ligacao__c,
+      'O MARCO foi gravado — ele é obrigatório e não depende do cálculo dar certo.'
+    );
+    Assert.isNull(
+      depois.SOL_Dias_Primeira_Ligacao__c,
+      'A duração é que ficou vazia.'
+    );
+    Assert.isTrue(
+      depois.SOL_Duracao_Pendente__c,
+      'E a lacuna virou pendência durável no registro.'
+    );
+    Assert.areEqual(
+      SOLDuracaoEtapaService.MOTIVO_FALHA_TECNICA,
+      depois.SOL_Duracao_Pendencia_Motivo__c,
+      'Com o motivo técnico.'
+    );
+  }
+
+  /**
+   * A pendência técnica gravada pela segunda chance NÃO pode ser apagada por
+   * uma reavaliação na MESMA execução. Sem essa memória, o único registro da
+   * falha desapareceria no instante seguinte ao de ter sido criado.
+   */
+  @IsTest
+  static void recalculoNaoApagaPendenciaTecnicaDaMesmaExecucao() {
+    Lead l = novoLead(PRODUTO_RT);
+    update new Lead(
+      Id = l.Id,
+      SOL_Data_Distribuicao__c = as10(SEGUNDA),
+      SOL_Data_Primeira_Ligacao__c = as10(QUARTA)
+    );
+
+    Test.startTest();
+    SOLDuracaoEtapaService.simularFalhaDeGravacao = true;
+    recalcularLead(l.Id);
+    SOLDuracaoEtapaService.simularFalhaDeGravacao = false;
+    Assert.isTrue(
+      lead(l.Id).SOL_Duracao_Pendente__c,
+      'Pré-condição: a falha virou pendência técnica.'
+    );
+    // Reavaliação na MESMA transação, agora sem falha nenhuma.
+    recalcularLead(l.Id);
+    Test.stopTest();
+
+    Assert.isTrue(
+      lead(l.Id).SOL_Duracao_Pendente__c,
+      'A pendência técnica desta execução sobrevive ao recálculo seguinte.'
+    );
+    Assert.areEqual(
+      SOLDuracaoEtapaService.MOTIVO_FALHA_TECNICA,
+      lead(l.Id).SOL_Duracao_Pendencia_Motivo__c,
+      'E continua com o motivo técnico.'
+    );
+  }
+
+  /**
+   * `somar` acumulava `falhas` e `falhasSemSinal` e ESQUECIA
+   * `falhasSinalizadas`. O efeito era silencioso: uma falha que virou pendência
+   * numa chamada aninhada sumia do resultado externo, e o resumo do Batch dizia
+   * que nada tinha sido sinalizado.
+   *
+   * Este teste FALHA na versão anterior do serviço.
+   */
+  @IsTest
+  static void resultadoAninhadoNaoPerdeAContagemDeFalhasSinalizadas() {
+    Lead l = novoLead(PRODUTO_RT);
+    update new Lead(Id = l.Id, SOL_Data_Distribuicao__c = as10(SEGUNDA));
+    delete [SELECT Id FROM Task WHERE WhoId = :l.Id];
+    Task t = tarefaContatoLigacao(l.Id, 'Somar');
+    insert t;
+    update new Task(
+      Id = t.Id,
+      Status = 'Completed',
+      SOL_Resultado_Contato__c = 'Não atendeu'
+    );
+    // Zera a medição para que a chamada abaixo tenha o que calcular.
+    update new Lead(
+      Id = l.Id,
+      SOL_Dias_Primeira_Ligacao__c = null,
+      SOL_Duracao_Pendente__c = false,
+      SOL_Duracao_Pendencia_Motivo__c = null,
+      SOL_Duracao_Pendencia_Detalhe__c = null
+    );
+    SOLDuracaoEtapaService.limparMemoriaDeFalha();
+
+    Test.startTest();
+    SOLDuracaoEtapaService.simularFalhaDeGravacao = true;
+    // consolidarMarcosDeTarefas chama recalcularLeads por dentro: é o caminho
+    // aninhado em que a contagem se perdia.
+    SOLDuracaoEtapaService.ResultadoDuracao r = SOLDuracaoEtapaService.consolidarMarcosDeTarefas(
+      new List<Id>{ t.Id }
+    );
+    SOLDuracaoEtapaService.simularFalhaDeGravacao = false;
+    Test.stopTest();
+
+    Assert.isTrue(
+      r.falhas > 0,
+      'Pré-condição: houve falha na chamada aninhada. ' + r
+    );
+    Assert.isTrue(
+      r.falhasSinalizadas > 0,
+      'O resultado EXTERNO tem de trazer as falhas que viraram pendência na chamada aninhada. ' +
+      r
+    );
+  }
+
+  // ================================ escopos independentes (item 1)
+
+  /**
+   * A execução AGENDADA — de verdade, pelo framework do Schedulable, e não por
+   * chamada direta a `finish()` — enfileira os DOIS escopos.
+   *
+   * `AsyncApexJob` NÃO é isolado em teste, então o que se mede é o DELTA, e o
+   * cenário em que a janela é pulada por haver varredura real em andamento é
+   * tratado explicitamente em vez de virar falha intermitente.
+   */
+  @IsTest
+  static void execucaoAgendadaEnfileiraOsDoisEscopos() {
+    Integer antes = [
+      SELECT COUNT()
+      FROM AsyncApexJob
+      WHERE JobType = 'BatchApex' AND ApexClass.Name = 'SOLDuracaoEtapaBatch'
+    ];
+    Boolean haviaEmVoo = SOLDuracaoEtapaScheduler.haExecucaoEmAndamento();
+
+    Test.startTest();
+    System.schedule(
+      'SOL Duracao teste ' + rnd(),
+      '0 0 0 1 1 ? 2099',
+      new SOLDuracaoEtapaScheduler()
+    );
+    Test.stopTest();
+
+    Integer depois = [
+      SELECT COUNT()
+      FROM AsyncApexJob
+      WHERE JobType = 'BatchApex' AND ApexClass.Name = 'SOLDuracaoEtapaBatch'
+    ];
+    if (haviaEmVoo) {
+      Assert.areEqual(
+        antes,
+        depois,
+        'Com varredura já em andamento a janela inteira é pulada, e é assim que se evita job duplicado.'
+      );
+      return;
+    }
+    Assert.areEqual(
+      antes + 2,
+      depois,
+      'A execução agendada enfileira DOIS jobs, um por escopo — nenhum depende do finish() do outro.'
+    );
+  }
+
+  /**
+   * A propriedade que o encadeamento no `finish()` não conseguia garantir: uma
+   * falha no escopo de Lead NÃO tira o job de Oportunidade do caminho.
+   *
+   * Ela é estrutural, e o teste prova as duas metades: o agendamento cria os
+   * dois ANTES de qualquer um rodar, e o `finish()` que lança não cria nem
+   * remove job nenhum.
+   */
+  @IsTest
+  static void falhaNoEscopoLeadNaoImpedeOJobDeOportunidade() {
+    Boolean haviaEmVoo = SOLDuracaoEtapaScheduler.haExecucaoEmAndamento();
+    Integer antes = [
+      SELECT COUNT()
+      FROM AsyncApexJob
+      WHERE JobType = 'BatchApex' AND ApexClass.Name = 'SOLDuracaoEtapaBatch'
+    ];
+
+    Test.startTest();
+    System.schedule(
+      'SOL Duracao teste falha ' + rnd(),
+      '0 0 0 1 1 ? 2099',
+      new SOLDuracaoEtapaScheduler()
+    );
+    Test.stopTest();
+
+    Integer aposAgendar = [
+      SELECT COUNT()
+      FROM AsyncApexJob
+      WHERE JobType = 'BatchApex' AND ApexClass.Name = 'SOLDuracaoEtapaBatch'
+    ];
+    if (!haviaEmVoo) {
+      Assert.areEqual(
+        antes + 2,
+        aposAgendar,
+        'Os dois escopos são enfileirados juntos, antes de qualquer um executar.'
+      );
+    }
+
+    // Agora o finish do escopo de Lead falha. Ele não pode mexer no outro job.
+    SOLDuracaoEtapaBatch comFalha = new SOLDuracaoEtapaBatch(
+      SOLDuracaoEtapaBatch.Escopo.LEAD
+    );
+    comFalha.totalFalhas = 2;
+    Boolean lancou = false;
+    try {
+      comFalha.finish(null);
+    } catch (SOLDuracaoEtapaBatch.VarreduraComFalhaException e) {
+      lancou = true;
+    }
+    Integer aposFalha = [
+      SELECT COUNT()
+      FROM AsyncApexJob
+      WHERE JobType = 'BatchApex' AND ApexClass.Name = 'SOLDuracaoEtapaBatch'
+    ];
+
+    Assert.isTrue(lancou, 'O escopo de Lead marca o job dele como falho.');
+    Assert.areEqual(
+      aposAgendar,
+      aposFalha,
+      'E não enfileira nem remove job nenhum — o escopo de Oportunidade segue intacto.'
+    );
+  }
+
+  // ============================ backfill da etapa 1 na Oportunidade (item 3)
+
+  /**
+   * Oportunidade com os DOIS marcos da etapa 1, duração vazia e sem pendência:
+   * a varredura AUTOMÁTICA tem de alcançá-la. Antes, a cláusula da etapa 1 não
+   * estava na query do escopo de Oportunidade e o registro ficava fora para
+   * sempre.
+   */
+  @IsTest
+  static void backfillAutomaticoAlcancaAEtapa1DaOportunidade() {
+    Opportunity o = novaOpp(PRODUTO_RT);
+    update new Opportunity(
+      Id = o.Id,
+      SOL_Data_Distribuicao__c = as10(SEGUNDA),
+      SOL_Data_Primeira_Ligacao__c = as10(QUARTA),
+      SOL_Dias_Primeira_Ligacao__c = null,
+      SOL_Duracao_Pendente__c = false
+    );
+    Opportunity antes = opp(o.Id);
+    Assert.isNull(
+      antes.SOL_Dias_Primeira_Ligacao__c,
+      'Pré-condição: a duração da etapa 1 está vazia.'
+    );
+    Assert.isFalse(
+      antes.SOL_Duracao_Pendente__c,
+      'Pré-condição: sem pendência — só as cláusulas de marco podem selecioná-la.'
+    );
+
+    Test.startTest();
+    Database.executeBatch(
+      new SOLDuracaoEtapaBatch(SOLDuracaoEtapaBatch.Escopo.OPORTUNIDADE),
+      200
+    );
+    Test.stopTest();
+
+    Assert.areEqual(
+      2,
+      opp(o.Id).SOL_Dias_Primeira_Ligacao__c,
+      'A varredura automática selecionou a Oportunidade e preencheu a etapa 1.'
     );
   }
 
@@ -2480,9 +2781,9 @@ private class SOLDuracaoEtapaTest {
     // Medição por DELTA, e não por total: AsyncApexJob não é isolado em teste,
     // então um total absoluto dependeria do que a org já rodou hoje.
     Assert.areEqual(
-      antes + 1,
+      antes + 2,
       depois,
-      'O scheduler enfileirou exatamente uma varredura.'
+      'O scheduler enfileira UMA varredura por escopo — os dois independentes, sem encadeamento.'
     );
   }
 
