@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Dashboard xmlns="http://soap.sforce.com/2006/04/metadata">
+    <backgroundEndColor>#FFFFFF</backgroundEndColor>
+    <backgroundFadeDirection>Diagonal</backgroundFadeDirection>
+    <backgroundStartColor>#FFFFFF</backgroundStartColor>
+    <dashboardFilters>
+        <dashboardFilterOptions>
+            <operator>equals</operator>
+            <values>THIS_MONTH</values>
+        </dashboardFilterOptions>
+        <dashboardFilterOptions>
+            <operator>equals</operator>
+            <values>LAST_MONTH</values>
+        </dashboardFilterOptions>
+        <dashboardFilterOptions>
+            <operator>equals</operator>
+            <values>LAST_N_DAYS:30</values>
+        </dashboardFilterOptions>
+        <dashboardFilterOptions>
+            <operator>equals</operator>
+            <values>LAST_N_DAYS:90</values>
+        </dashboardFilterOptions>
+        <dashboardFilterOptions>
+            <operator>equals</operator>
+            <values>THIS_FISCAL_YEAR</values>
+        </dashboardFilterOptions>
+        <name>Período de criação</name>
+    </dashboardFilters>
+    <dashboardGridLayout>
+        <dashboardGridComponents>
+            <colSpan>6</colSpan>
+            <columnIndex>0</columnIndex>
+            <dashboardComponent>
+                <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+                <chartAxisRange>Auto</chartAxisRange>
+                <componentType>BarStacked</componentType>
+                <dashboardFilterColumns>
+                    <column>CREATED_DATE</column>
+                </dashboardFilterColumns>
+                <displayUnits>Auto</displayUnits>
+                <drillEnabled>true</drillEnabled>
+                <drillToDetailEnabled>false</drillToDetailEnabled>
+                <enableHover>true</enableHover>
+                <expandOthers>true</expandOthers>
+                <footer>Cada barra é um Status; cada faixa dentro dela é um vendedor.</footer>
+                <groupingSortProperties/>
+                <header>Captação — Leads por Status e Vendedor</header>
+                <legendPosition>Bottom</legendPosition>
+                <report>Arnone_Comercial/SOL_Funil_Leads_Status_Vendedor</report>
+                <showPercentage>false</showPercentage>
+                <showValues>true</showValues>
+                <sortBy>RowLabelAscending</sortBy>
+                <sortLegendValues>false</sortLegendValues>
+                <title>Leads da Arnone Soluções</title>
+                <useReportChart>false</useReportChart>
+            </dashboardComponent>
+            <rowIndex>0</rowIndex>
+            <rowSpan>5</rowSpan>
+        </dashboardGridComponents>
+        <dashboardGridComponents>
+            <colSpan>6</colSpan>
+            <columnIndex>6</columnIndex>
+            <dashboardComponent>
+                <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+                <chartAxisRange>Auto</chartAxisRange>
+                <componentType>BarStacked</componentType>
+                <dashboardFilterColumns>
+                    <column>CREATED_DATE</column>
+                </dashboardFilterColumns>
+                <displayUnits>Auto</displayUnits>
+                <drillEnabled>true</drillEnabled>
+                <drillToDetailEnabled>false</drillToDetailEnabled>
+                <enableHover>true</enableHover>
+                <expandOthers>true</expandOthers>
+                <footer>Cada barra é uma etapa do funil; cada faixa dentro dela é um vendedor.</footer>
+                <groupingSortProperties/>
+                <header>Vendas — Oportunidades por Etapa e Vendedor</header>
+                <legendPosition>Bottom</legendPosition>
+                <report>Arnone_Comercial/SOL_Funil_Oportunidades_Etapa_Vendedor</report>
+                <showPercentage>false</showPercentage>
+                <showValues>true</showValues>
+                <sortBy>RowLabelAscending</sortBy>
+                <sortLegendValues>false</sortLegendValues>
+                <title>Oportunidades da Arnone Soluções</title>
+                <useReportChart>false</useReportChart>
+            </dashboardComponent>
+            <rowIndex>0</rowIndex>
+            <rowSpan>5</rowSpan>
+        </dashboardGridComponents>
+        <numberOfColumns>12</numberOfColumns>
+        <rowHeight>60</rowHeight>
+    </dashboardGridLayout>
+    <dashboardType>LoggedInUser</dashboardType>
+    <description>CLICKUP-9404 — Funil comercial da Arnone Soluções. A matriz está nos relatórios; aqui os dados aparecem como barras empilhadas derivadas deles. O filtro Período de criação atua em CREATED_DATE nos dois componentes. Roda como o usuário conectado.</description>
+    <isGridLayout>true</isGridLayout>
+    <owner>joao.silva.weenow@weenow.com.br</owner>
+    <textColor>#000000</textColor>
+    <title>SOL — Funil Comercial</title>
+    <titleColor>#1F1D1A</titleColor>
+    <titleSize>14</titleSize>
+</Dashboard>

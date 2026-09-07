@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Arnone_Comercial/SOL_Funil_Leads_Status_Vendedor</members>
+        <members>Arnone_Comercial/SOL_Funil_Oportunidades_Etapa_Vendedor</members>
+        <name>Report</name>
+    </types>
+    <types>
+        <members>Arnone_Comercial/SOL_Funil_Comercial</members>
+        <name>Dashboard</name>
+    </types>
+    <version>66.0</version>
+</Package>
