@@ -1267,6 +1267,109 @@ private class SOLEventoJornadaTest {
     );
   }
 
+  /**
+   * (5b) O vetor que o recorte por produto sozinho deixava aberto: uma
+   * Oportunidade de OUTRA BU, atualizada por API com um produto SOL, e perdida
+   * pelo processo daquela BU.
+   *
+   * O Flow before-save exige as TRÊS condições juntas — Record Type SOL,
+   * produto no escopo e transição real. Sem a checagem de Record Type, esta
+   * Oportunidade incrementaria `SOL_Qtd_Perdas__c` de outra unidade.
+   */
+  @IsTest
+  static void outraBUComProdutoSolNaoIncrementaNemRegistra() {
+    montarFila(2);
+    Id rtOutraBU = Opportunity.SObjectType.getDescribe()
+      .getRecordTypeInfosByDeveloperName()
+      .get('STE_Telecom')
+      .getRecordTypeId();
+    Account a = new Account(Name = 'Conta outra BU ' + rnd().left(8));
+    insert a;
+    Opportunity outraBU = new Opportunity(
+      Name = 'Op outra BU ' + rnd().left(8),
+      AccountId = a.Id,
+      RecordTypeId = rtOutraBU,
+      CloseDate = Date.today().addDays(30),
+      StageName = 'Pré-Matrícula',
+      // O vetor: produto da Arnone Soluções preenchido num registro que não é
+      // da Arnone Soluções.
+      SOL_Produto_Negocio__c = PRODUTO_RT
+    );
+    insert outraBU;
+    Task t = new Task(
+      WhatId = outraBU.Id,
+      Subject = 'Tarefa de outra BU',
+      OwnerId = UserInfo.getUserId(),
+      Status = 'Open',
+      ActivityDate = Date.today().addDays(3)
+    );
+    insert t;
+
+    Test.startTest();
+    update new Opportunity(
+      Id = outraBU.Id,
+      StageName = 'Perdido',
+      STE_Motivo_Perda__c = 'Desistiu'
+    );
+    Test.stopTest();
+
+    Opportunity depois = [
+      SELECT StageName, RecordTypeId, SOL_Qtd_Perdas__c, SOL_Produto_Negocio__c
+      FROM Opportunity
+      WHERE Id = :outraBU.Id
+    ];
+    System.assertEquals(
+      'Perdido',
+      depois.StageName,
+      'A outra BU perde o negócio dela normalmente.'
+    );
+    System.assertEquals(
+      PRODUTO_RT,
+      depois.SOL_Produto_Negocio__c,
+      'E o produto SOL continua preenchido — o vetor está de fato armado.'
+    );
+    System.assertEquals(
+      null,
+      depois.SOL_Qtd_Perdas__c,
+      'O contador de transições da Arnone Soluções NÃO foi incrementado.'
+    );
+    System.assertEquals(
+      0,
+      totalEventos(),
+      'E nenhuma ocorrência da jornada SOL foi criada.'
+    );
+    Task tDepois = [
+      SELECT Status, SOL_Cancelada_Por_Perda__c, SOL_Motivo_Cancelamento__c
+      FROM Task
+      WHERE Id = :t.Id
+    ];
+    System.assertEquals(
+      'Open',
+      tDepois.Status,
+      'A automação SOL não encostou na tarefa da outra BU.'
+    );
+    System.assertNotEquals(true, tDepois.SOL_Cancelada_Por_Perda__c);
+    System.assertEquals(null, tDepois.SOL_Motivo_Cancelamento__c);
+  }
+
+  /** (5c) Contraprova: a MESMA perda, no Record Type SOL, conta. */
+  @IsTest
+  static void mesmaPerdaNoRecordTypeSolIncrementaERegistra() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], null, null, 'Negociação');
+
+    Test.startTest();
+    perder(oppId);
+    Test.stopTest();
+
+    System.assertEquals(
+      1,
+      opp(oppId).SOL_Qtd_Perdas__c,
+      'No Record Type SOL o contador anda.'
+    );
+    System.assertEquals(1, eventosDaOpp(oppId).size(), 'E a ocorrência nasce.');
+  }
+
   // ======================================= 6. ATOMICIDADE NOS DOIS SENTIDOS
 
   /**

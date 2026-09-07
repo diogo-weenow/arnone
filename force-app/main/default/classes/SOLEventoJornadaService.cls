@@ -87,10 +87,23 @@
  * `Opportunity.SOL_Qtd_Perdas__c` é gravado pelo Flow BEFORE-SAVE
  * SOL_Marco_Perda_Oportunidade, no próprio save que fecha o negócio. Isso NÃO é
  * o contador em Apex que foi recusado: aquele exigiria `update Opportunity` a
- * partir do after-save, acoplando o fechamento da venda a uma gravação
- * analítica capaz de abortá-la. Before-save não faz DML, não faz consulta e não
- * depende de Apex — é o mesmo padrão que o CLICKUP-9439 já adotou para
- * `SOL_Data_Encerramento__c`, e pela mesma razão.
+ * partir do after-save, acrescentando DML ao fechamento da venda. Aqui o
+ * incremento é um assignment e não acrescenta DML; a checagem de Record Type do
+ * Flow acrescenta UMA consulta por transação, bulkificada pela plataforma.
+ *
+ * ISOLAMENTO: o Flow exige as TRÊS condições juntas — Record Type SOL, produto
+ * no escopo e transição REAL para "Perdido". Sem a checagem de Record Type, uma
+ * Oportunidade de outra BU atualizada por API com um produto SOL incrementaria
+ * o contador.
+ *
+ * O QUE ISSO CUSTA, dito sem eufemismo: o Flow roda na MESMA transação da
+ * Oportunidade. Uma falha inesperada nele PODE impedir a gravação, e um
+ * rollback posterior desfaz também o contador. O que o before-save evita é o
+ * DML extra, não o compartilhamento de destino da transação.
+ *
+ * Já a inserção do EVENTO é deliberadamente atômica: se ela falhar, a perda
+ * TEM de ser abortada. É a única forma de não existir perda sem ocorrência, e
+ * é uma escolha, não um efeito colateral.
  *
  * Com isso: reprocessar sem transição reencontra o mesmo n e não duplica;
  * reabrir e perder de novo incrementa n e gera ocorrência nova, mesmo partindo
