@@ -24,7 +24,22 @@
             <operator>equals</operator>
             <values>THIS_FISCAL_YEAR</values>
         </dashboardFilterOptions>
-        <name>Período de criação</name>
+        <name>Período de referência</name>
+    </dashboardFilters>
+    <dashboardFilters>
+        <dashboardFilterOptions>
+            <operator>equals</operator>
+            <values>Joao Silva</values>
+        </dashboardFilterOptions>
+        <dashboardFilterOptions>
+            <operator>equals</operator>
+            <values>Omar Faruk</values>
+        </dashboardFilterOptions>
+        <dashboardFilterOptions>
+            <operator>equals</operator>
+            <values>Thaina Coutinho</values>
+        </dashboardFilterOptions>
+        <name>Vendedor</name>
     </dashboardFilters>
     <dashboardGridLayout>
         <dashboardGridComponents>
@@ -36,6 +51,9 @@
                 <componentType>BarStacked</componentType>
                 <dashboardFilterColumns>
                     <column>CREATED_DATE</column>
+                </dashboardFilterColumns>
+                <dashboardFilterColumns>
+                    <column>OWNER</column>
                 </dashboardFilterColumns>
                 <displayUnits>Auto</displayUnits>
                 <drillEnabled>true</drillEnabled>
@@ -67,6 +85,9 @@
                 <dashboardFilterColumns>
                     <column>CREATED_DATE</column>
                 </dashboardFilterColumns>
+                <dashboardFilterColumns>
+                    <column>FULL_NAME</column>
+                </dashboardFilterColumns>
                 <displayUnits>Auto</displayUnits>
                 <drillEnabled>true</drillEnabled>
                 <drillToDetailEnabled>false</drillToDetailEnabled>
@@ -96,6 +117,9 @@
                 <componentType>Bar</componentType>
                 <dashboardFilterColumns>
                     <column>Lead.SOL_Data_Primeira_Ligacao__c</column>
+                </dashboardFilterColumns>
+                <dashboardFilterColumns>
+                    <column>OWNER</column>
                 </dashboardFilterColumns>
                 <displayUnits>Auto</displayUnits>
                 <drillEnabled>true</drillEnabled>
@@ -127,6 +151,9 @@
                 <dashboardFilterColumns>
                     <column>Lead.SOL_Data_Contato_Efetivado__c</column>
                 </dashboardFilterColumns>
+                <dashboardFilterColumns>
+                    <column>OWNER</column>
+                </dashboardFilterColumns>
                 <displayUnits>Auto</displayUnits>
                 <drillEnabled>true</drillEnabled>
                 <drillToDetailEnabled>false</drillToDetailEnabled>
@@ -156,6 +183,9 @@
                 <componentType>Bar</componentType>
                 <dashboardFilterColumns>
                     <column>Lead.SOL_Data_Reuniao_Procuracao__c</column>
+                </dashboardFilterColumns>
+                <dashboardFilterColumns>
+                    <column>OWNER</column>
                 </dashboardFilterColumns>
                 <displayUnits>Auto</displayUnits>
                 <drillEnabled>true</drillEnabled>
@@ -187,6 +217,9 @@
                 <dashboardFilterColumns>
                     <column>Opportunity.SOL_Data_Recebimento_Calculo__c</column>
                 </dashboardFilterColumns>
+                <dashboardFilterColumns>
+                    <column>FULL_NAME</column>
+                </dashboardFilterColumns>
                 <displayUnits>Auto</displayUnits>
                 <drillEnabled>true</drillEnabled>
                 <drillToDetailEnabled>false</drillToDetailEnabled>
@@ -217,6 +250,9 @@
                 <dashboardFilterColumns>
                     <column>Opportunity.SOL_Data_Reuniao_Final__c</column>
                 </dashboardFilterColumns>
+                <dashboardFilterColumns>
+                    <column>FULL_NAME</column>
+                </dashboardFilterColumns>
                 <displayUnits>Auto</displayUnits>
                 <drillEnabled>true</drillEnabled>
                 <drillToDetailEnabled>false</drillToDetailEnabled>
@@ -246,6 +282,9 @@
                 <componentType>Bar</componentType>
                 <dashboardFilterColumns>
                     <column>Opportunity.SOL_Data_Encerramento__c</column>
+                </dashboardFilterColumns>
+                <dashboardFilterColumns>
+                    <column>FULL_NAME</column>
                 </dashboardFilterColumns>
                 <displayUnits>Auto</displayUnits>
                 <drillEnabled>true</drillEnabled>
