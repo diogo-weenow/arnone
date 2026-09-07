@@ -110,6 +110,16 @@ public without sharing class SOLNegocioPerdidoService {
    */
   public static final String MSG_ETAPA_ANTERIOR_AUSENTE = 'Não foi possível registrar a perda desta Oportunidade: a automação não informou a etapa anterior à perda. A mudança para "Perdido" foi cancelada — tente novamente.';
 
+  /**
+   * (CLICKUP-9438) A Oportunidade chegou como perdida sem o contador de
+   * transições (`SOL_Qtd_Perdas__c`) que o Flow before-save
+   * SOL_Marco_Perda_Oportunidade carimba no próprio save. Sem ele não há como
+   * distinguir reprocessamento de nova perda após reabertura — e as duas
+   * respostas erradas custam caro: ou some uma ocorrência, ou nasce uma
+   * duplicada. Aborta em vez de escolher no escuro.
+   */
+  public static final String MSG_TRANSICAO_NAO_CARIMBADA = 'Não foi possível registrar a perda desta Oportunidade: a transição para "Perdido" não foi carimbada pela automação. A mudança foi cancelada — tente novamente. Se persistir, acione o administrador.';
+
   /** Falha controlada do encerramento por perda (CLICKUP-9425). */
   public class NegocioPerdidoException extends Exception {
   }
@@ -265,7 +275,9 @@ public without sharing class SOLNegocioPerdidoService {
 
       // (CLICKUP-9438) OwnerId entra na projeção: é o vendedor responsável no
       // instante da perda, e o evento o congela antes de qualquer transferência
-      // posterior da Oportunidade.
+      // posterior da Oportunidade. SOL_Qtd_Perdas__c é o número desta TRANSIÇÃO
+      // para "Perdido", incrementado pelo Flow before-save no mesmo save que
+      // fechou o negócio — é ele que identifica a ocorrência.
       Map<Id, Opportunity> perdidas = new Map<Id, Opportunity>();
       Set<Id> encontradas = new Set<Id>();
       for (Opportunity o : [
@@ -274,6 +286,7 @@ public without sharing class SOLNegocioPerdidoService {
           OwnerId,
           StageName,
           SOL_Produto_Negocio__c,
+          SOL_Qtd_Perdas__c,
           RecordType.DeveloperName
         FROM Opportunity
         WHERE Id IN :ids
@@ -320,8 +333,20 @@ public without sharing class SOLNegocioPerdidoService {
         ) {
           throw new NegocioPerdidoException(MSG_ETAPA_ANTERIOR_AUSENTE);
         }
+        // Sem o contador da transição não dá para saber se esta perda é a mesma
+        // de antes ou uma nova depois de reabertura — e as duas respostas
+        // erradas são graves: ou some uma ocorrência, ou nasce uma duplicada.
+        // Aborta, em vez de escolher no escuro.
+        if (o.SOL_Qtd_Perdas__c == null || o.SOL_Qtd_Perdas__c <= 0) {
+          throw new NegocioPerdidoException(MSG_TRANSICAO_NAO_CARIMBADA);
+        }
         eventos.add(
-          SOLEventoJornadaService.oportunidadePerdida(o, etapaAnterior, agora)
+          SOLEventoJornadaService.oportunidadePerdida(
+            o,
+            etapaAnterior,
+            o.SOL_Qtd_Perdas__c,
+            agora
+          )
         );
       }
       SOLEventoJornadaService.registrar(eventos);

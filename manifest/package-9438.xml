@@ -18,6 +18,7 @@
         <members>SOL_Evento_Jornada__c.SOL_Sequencia__c</members>
         <members>SOL_Evento_Jornada__c.SOL_Tipo_Evento__c</members>
         <members>SOL_Evento_Jornada__c.SOL_Vendedor__c</members>
+        <members>Opportunity.SOL_Qtd_Perdas__c</members>
         <name>CustomField</name>
     </types>
     <types>
@@ -33,10 +34,12 @@
     </types>
     <types>
         <members>SOL_Encerrar_Tarefas_Oportunidade_Perdida</members>
+        <members>SOL_Marco_Perda_Oportunidade</members>
         <name>Flow</name>
     </types>
     <types>
         <members>PS_SOL_Comercial</members>
+        <members>PS_SOL_Distribuicao_Admin</members>
         <name>PermissionSet</name>
     </types>
     <types>

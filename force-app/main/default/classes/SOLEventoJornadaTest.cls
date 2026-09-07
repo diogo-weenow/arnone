@@ -317,10 +317,42 @@ private class SOLEventoJornadaTest {
 
   private static Opportunity opp(Id id) {
     return [
-      SELECT Id, OwnerId, StageName, SOL_Qtd_Reatribuicoes_Prazo__c
+      SELECT
+        Id,
+        OwnerId,
+        StageName,
+        SOL_Qtd_Reatribuicoes_Prazo__c,
+        SOL_Qtd_Perdas__c
       FROM Opportunity
       WHERE Id = :id
     ];
+  }
+
+  private static void perder(Id oppId) {
+    update new Opportunity(
+      Id = oppId,
+      StageName = 'Perdido',
+      SOL_Motivo_Perda__c = 'Sem retorno'
+    );
+  }
+
+  private static void reabrir(Id oppId, String etapa) {
+    update new Opportunity(
+      Id = oppId,
+      StageName = etapa,
+      SOL_Motivo_Perda__c = null
+    );
+  }
+
+  /**
+   * Reprocessa a perda pelo mesmo caminho que a automação usa, SEM nova
+   * transição: a Oportunidade já está em "Perdido" e nada muda de etapa.
+   */
+  private static void reprocessarPerda(Id oppId, String etapaAnterior) {
+    SOLNegocioPerdidoService.encerrarPorOportunidadePerdida(
+      new List<Id>{ oppId },
+      new Map<Id, String>{ oppId => etapaAnterior }
+    );
   }
 
   private static List<SOL_Evento_Jornada__c> eventos() {
@@ -580,8 +612,19 @@ private class SOLEventoJornadaTest {
     System.assertEquals(null, e.SOL_Novo_Vendedor__c);
     System.assertEquals(PRODUTO_RT, e.SOL_Produto__c);
     System.assertEquals(
-      'OP|' + String.valueOf(oppId) + '|Negociação',
-      e.SOL_Chave_Idempotencia__c
+      1,
+      e.SOL_Sequencia__c,
+      'Primeira transição desta Oportunidade para "Perdido".'
+    );
+    System.assertEquals(
+      'OP|' + String.valueOf(oppId) + '|1',
+      e.SOL_Chave_Idempotencia__c,
+      'A chave identifica a TRANSIÇÃO, não a etapa de origem.'
+    );
+    System.assertEquals(
+      1,
+      opp(oppId).SOL_Qtd_Perdas__c,
+      'O contador de transições foi carimbado pelo Flow before-save.'
     );
   }
 
@@ -607,6 +650,228 @@ private class SOLEventoJornadaTest {
       'A segmentação da perda acompanha a etapa real de origem.'
     );
     System.assertEquals(PRODUTO_ART, evs[0].SOL_Produto__c);
+  }
+
+  // ============ 1bis. A PERDA É IDENTIFICADA PELA TRANSIÇÃO, NÃO PELO ESTADO
+
+  /**
+   * (1f) A narrativa inteira, na ordem em que acontece na vida real:
+   *   1. a Oportunidade é perdida            -> 1 ocorrência
+   *   2. reprocessa SEM nova transição       -> continua 1
+   *   3. reabre
+   *   4. perde de novo, da MESMA etapa       -> 2 ocorrências
+   *   5. reprocessa a segunda perda          -> continua 2
+   *
+   * O passo 4 é o ponto do card: uma segunda transição REAL é ocorrência nova
+   * mesmo partindo da mesma etapa. Quem separa os passos 2 e 4 é o contador de
+   * transições — nenhum timestamp da plataforma consegue, porque
+   * LastStageChangeDate/LastModifiedDate/SystemModstamp têm precisão de segundo
+   * e a reabertura e a segunda perda caem no mesmo segundo aqui dentro.
+   */
+  @IsTest
+  static void perdaReabreEPerdeDeNovoNaMesmaEtapaContaDuasVezes() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], null, null, 'Negociação');
+
+    Test.startTest();
+    // [1] primeira perda
+    perder(oppId);
+    List<SOL_Evento_Jornada__c> apos1 = eventosDaOpp(oppId);
+    Datetime ocorrencia1 = apos1.isEmpty() ? null : apos1[0].SOL_Data_Ocorrencia__c;
+
+    // [2] reprocessa sem transição — duas vezes, para não sobrar dúvida
+    reprocessarPerda(oppId, 'Negociação');
+    reprocessarPerda(oppId, 'Negociação');
+    List<SOL_Evento_Jornada__c> apos2 = eventosDaOpp(oppId);
+
+    // [3] reabre e [4] perde de novo, DA MESMA ETAPA
+    reabrir(oppId, 'Negociação');
+    perder(oppId);
+    List<SOL_Evento_Jornada__c> apos4 = eventosDaOpp(oppId);
+
+    // [5] reprocessa a segunda perda
+    reprocessarPerda(oppId, 'Negociação');
+    List<SOL_Evento_Jornada__c> apos5 = eventosDaOpp(oppId);
+    Test.stopTest();
+
+    System.assertEquals(1, apos1.size(), '[1] a perda gera UMA ocorrência.');
+    System.assertEquals(
+      1,
+      apos2.size(),
+      '[2] reprocessar sem nova transição não duplica.'
+    );
+    System.assertEquals(
+      ocorrencia1,
+      apos2[0].SOL_Data_Ocorrencia__c,
+      '[2] e não reescreve a ocorrência original.'
+    );
+    System.assertEquals(
+      2,
+      apos4.size(),
+      '[4] a segunda perda REAL, da mesma etapa, é ocorrência nova.'
+    );
+    System.assertEquals(
+      2,
+      apos5.size(),
+      '[5] reprocessar a segunda perda também não duplica.'
+    );
+
+    System.assertEquals(1, apos5[0].SOL_Sequencia__c);
+    System.assertEquals(2, apos5[1].SOL_Sequencia__c);
+    System.assertEquals(
+      'OP|' + String.valueOf(oppId) + '|1',
+      apos5[0].SOL_Chave_Idempotencia__c
+    );
+    System.assertEquals(
+      'OP|' + String.valueOf(oppId) + '|2',
+      apos5[1].SOL_Chave_Idempotencia__c,
+      'Chaves distintas para transições distintas.'
+    );
+    System.assertEquals(
+      'Negociação',
+      apos5[0].SOL_Etapa_Anterior__c,
+      'As duas perdas saíram da MESMA etapa — e ainda assim são duas linhas.'
+    );
+    System.assertEquals('Negociação', apos5[1].SOL_Etapa_Anterior__c);
+    System.assertEquals(
+      2,
+      opp(oppId).SOL_Qtd_Perdas__c,
+      'O contador de transições acompanha as duas perdas.'
+    );
+  }
+
+  /**
+   * (1g) Lote com perdas distintas não colide: cada Oportunidade tem o seu
+   * próprio contador, e a chave carrega o Id.
+   */
+  @IsTest
+  static void loteDePerdasDistintasNaoColide() {
+    List<Id> vs = montarFila(2);
+    List<Id> opps = new List<Id>();
+    for (Integer i = 0; i < 6; i++) {
+      opps.add(
+        novaOpp(
+          Math.mod(i, 2) == 0 ? PRODUTO_RT : PRODUTO_ART,
+          true,
+          vs[0],
+          null,
+          null,
+          Math.mod(i, 2) == 0 ? 'Negociação' : 'Fechamento'
+        )
+      );
+    }
+
+    Test.startTest();
+    List<Opportunity> perdas = new List<Opportunity>();
+    for (Id oppId : opps) {
+      perdas.add(
+        new Opportunity(
+          Id = oppId,
+          StageName = 'Perdido',
+          SOL_Motivo_Perda__c = 'Sem retorno'
+        )
+      );
+    }
+    update perdas;
+    Test.stopTest();
+
+    List<SOL_Evento_Jornada__c> evs = eventos();
+    System.assertEquals(6, evs.size(), 'Seis perdas, seis ocorrências.');
+    Set<String> chaves = new Set<String>();
+    Set<Id> oppsVistas = new Set<Id>();
+    for (SOL_Evento_Jornada__c e : evs) {
+      chaves.add(e.SOL_Chave_Idempotencia__c);
+      oppsVistas.add(e.SOL_Oportunidade__c);
+      System.assertEquals(
+        1,
+        e.SOL_Sequencia__c,
+        'Cada Oportunidade está na sua primeira perda.'
+      );
+    }
+    System.assertEquals(6, chaves.size(), 'Seis chaves distintas.');
+    System.assertEquals(6, oppsVistas.size(), 'Uma ocorrência por Oportunidade.');
+  }
+
+  /**
+   * (1h) Concorrência na perda, nos limites testáveis em Apex: mesmo que duas
+   * transações simultâneas passem pelo filtro de chaves existentes, o índice
+   * ÚNICO recusa a segunda linha da MESMA transição.
+   */
+  @IsTest
+  static void indiceUnicoRecusaSegundaLinhaDaMesmaPerda() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], null, null, 'Negociação');
+    perder(oppId);
+
+    Test.startTest();
+    Boolean recusou = false;
+    String codigo = null;
+    try {
+      insert new SOL_Evento_Jornada__c(
+        SOL_Tipo_Evento__c = SOLEventoJornadaService.TIPO_PERDA,
+        SOL_Motivo__c = SOLEventoJornadaService.MOTIVO_OPORTUNIDADE_PERDIDA,
+        SOL_Origem__c = SOLEventoJornadaService.ORIGEM_OPORTUNIDADE,
+        SOL_Data_Ocorrencia__c = System.now(),
+        SOL_Sequencia__c = 1,
+        SOL_Oportunidade__c = oppId,
+        SOL_Etapa_Anterior__c = 'Negociação',
+        SOL_Record_Type_Origem__c = 'SOL',
+        SOL_Chave_Idempotencia__c = 'OP|' + String.valueOf(oppId) + '|1'
+      );
+    } catch (DmlException e) {
+      recusou = true;
+      codigo = String.valueOf(e.getDmlType(0));
+    }
+    Test.stopTest();
+
+    System.assert(recusou, 'A duplicata da mesma transição é recusada.');
+    System.assertEquals(String.valueOf(StatusCode.DUPLICATE_VALUE), codigo);
+    System.assertEquals(1, eventosDaOpp(oppId).size());
+  }
+
+  /**
+   * (1i) Perda sem o carimbo da transição ABORTA. Sem o contador não há como
+   * separar reprocessamento de nova perda, e as duas respostas erradas custam
+   * caro: ou some uma ocorrência, ou nasce uma duplicada.
+   */
+  @IsTest
+  static void perdaSemCarimboDaTransicaoAborta() {
+    List<Id> vs = montarFila(2);
+    Id oppId = novaOpp(PRODUTO_RT, true, vs[0], null, null, 'Negociação');
+    perder(oppId);
+    delete [SELECT Id FROM SOL_Evento_Jornada__c];
+    // Simula o registro que nunca passou pelo Flow before-save (dado anterior à
+    // implantação, ou carga que desligou automações).
+    update new Opportunity(Id = oppId, SOL_Qtd_Perdas__c = null);
+    Task t = new Task(
+      WhatId = oppId,
+      Subject = 'Aberta',
+      OwnerId = vs[0],
+      Status = 'Open',
+      ActivityDate = Date.today()
+    );
+    insert t;
+
+    Test.startTest();
+    String mensagem = null;
+    try {
+      reprocessarPerda(oppId, 'Negociação');
+    } catch (SOLNegocioPerdidoService.NegocioPerdidoException e) {
+      mensagem = e.getMessage();
+    }
+    Test.stopTest();
+
+    System.assertEquals(
+      SOLNegocioPerdidoService.MSG_TRANSICAO_NAO_CARIMBADA,
+      mensagem,
+      'Aborta com mensagem própria, sem detalhe técnico.'
+    );
+    System.assertEquals(0, totalEventos(), 'Nenhuma ocorrência sem identidade.');
+    System.assertEquals(
+      'Open',
+      [SELECT Status FROM Task WHERE Id = :t.Id].Status,
+      'E a operação de negócio foi desfeita junto.'
+    );
   }
 
   // ============================== 2. MÚLTIPLAS OCORRÊNCIAS DO MESMO REGISTRO

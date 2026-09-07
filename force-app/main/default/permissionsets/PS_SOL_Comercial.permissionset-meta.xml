@@ -529,6 +529,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Opportunity.SOL_Qtd_Perdas__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>SOL_Evento_Jornada__c.SOL_Lead__c</field>
         <readable>true</readable>
     </fieldPermissions>

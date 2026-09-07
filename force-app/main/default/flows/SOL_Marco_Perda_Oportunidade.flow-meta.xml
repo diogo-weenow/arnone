@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Incrementa no próprio save, sem SOQL nem DML extra.</description>
+        <name>Contar_Perda</name>
+        <label>Contar esta transição para Perdido</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.SOL_Qtd_Perdas__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>formulaProximaPerda</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <description>CLICKUP-9438 — carimba a IDENTIDADE DA TRANSIÇÃO no próprio save que leva a Oportunidade da unidade para &quot;Perdido&quot;, incrementando SOL_Qtd_Perdas__c. Existe porque a ocorrência de perda precisa ser idempotente SEM perder a segunda perda: reprocessar sem transição reencontra o mesmo número e não duplica; reabrir e perder de novo incrementa e gera ocorrência nova, mesmo partindo da MESMA etapa. Nenhum campo da plataforma serve: LastStageChangeDate, LastModifiedDate e SystemModstamp têm precisão de SEGUNDO (medido nesta org: duas transições distintas compartilharam o carimbo) e SOL_Data_Encerramento__c é congelado no primeiro encerramento pelo CLICKUP-9439. BEFORE-SAVE de propósito, e é isso que o distingue do contador em Apex que foi recusado: grava no próprio save, sem DML, sem consulta e sem Apex, então a medição analítica NUNCA pode abortar o fechamento do negócio — mesmo padrão já adotado em SOL_Marco_Encerramento_Oportunidade. NÃO reaproveita aquele Flow porque lá o critério exige SOL_Data_Encerramento__c vazio, que por decisão do 9439 bloqueia o segundo fechamento — exatamente o caso que este card precisa contar. O filtro usa SOL_Produto_Negocio__c, e não o Record Type, porque critério de entrada de flow antes de salvar não alcança campo de registro relacionado; o produto é exclusivo desta BU e delimita o mesmo conjunto. doesRequireRecordChangedToMeetCriteria = true garante a TRANSIÇÃO real: reeditar uma Oportunidade que já estava em &quot;Perdido&quot; não incrementa nada.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Contador atual (vazio conta como zero) mais um.</description>
+        <name>formulaProximaPerda</name>
+        <dataType>Number</dataType>
+        <expression>BLANKVALUE({!$Record.SOL_Qtd_Perdas__c}, 0) + 1</expression>
+        <scale>0</scale>
+    </formulas>
+    <interviewLabel>SOL_Marco_Perda_Oportunidade {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL_Marco_Perda_Oportunidade</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Contar_Perda</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  OR(
+    ISPICKVAL({!$Record.SOL_Produto_Negocio__c}, &apos;Recuperação Tributária&apos;),
+    ISPICKVAL({!$Record.SOL_Produto_Negocio__c}, &apos;ART 360&apos;)
+  ),
+  ISPICKVAL({!$Record.StageName}, &apos;Perdido&apos;)
+)</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

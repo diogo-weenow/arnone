@@ -64,18 +64,37 @@
  *   OO|leadId    opt-out. Não leva discriminador de propósito: o serviço só age
  *                quando `SOL_Opt_Out__c` ainda é falso, então o opt-out é único
  *                e definitivo por Lead.
- *   OP|oppId|etapa   perda de Oportunidade, discriminada pela ETAPA ANTERIOR
- *                real. Reprocessar a mesma perda traz a mesma etapa e é
- *                descartado; reabrir para OUTRA etapa e perder de novo é
- *                ocorrência nova e legítima.
+ *   OP|oppId|n   perda de Oportunidade, n = `Opportunity.SOL_Qtd_Perdas__c`, o
+ *                contador de TRANSIÇÕES para "Perdido". Ver abaixo.
  *
- * LIMITAÇÃO ACEITA E DOCUMENTADA da chave da perda: reabrir para a MESMA etapa
- * e perder outra vez reaproveita a chave e não gera segunda ocorrência. A
- * alternativa seria um contador de perdas na própria Oportunidade, o que
- * exigiria DML na Oportunidade dentro do after-save — acoplando o fechamento do
- * negócio a uma gravação analítica, exatamente o que o CLICKUP-9439 evitou ao
- * pôr `SOL_Data_Encerramento__c` em before-save. Preferimos perder uma
- * ocorrência rara a poder abortar uma venda.
+ * =====================================================================
+ * A CHAVE DA PERDA IDENTIFICA A TRANSIÇÃO, NÃO O ESTADO
+ * =====================================================================
+ * Uma segunda transição REAL para "Perdido" é uma ocorrência nova e precisa ser
+ * contada — inclusive quando parte da MESMA etapa anterior. Ao mesmo tempo,
+ * reprocessar a mesma transição não pode duplicar. Só um contador de transições
+ * separa as duas coisas, e a razão é MEDIDA, não suposta:
+ *
+ *   - `LastStageChangeDate`, `LastModifiedDate` e `SystemModstamp` têm precisão
+ *     de SEGUNDO. Sondado nesta org: uma reabertura e a perda seguinte
+ *     compartilharam o mesmo `LastStageChangeDate` (1788790779000). Qualquer
+ *     chave baseada em timestamp colapsaria as duas transições numa só.
+ *   - `SOL_Data_Encerramento__c` é congelado no PRIMEIRO encerramento por
+ *     decisão do CLICKUP-9439 — não distingue a 2ª perda da 1ª.
+ *   - O Field History não é legível dentro da transação e está proibido como
+ *     fonte deste relatório.
+ *
+ * `Opportunity.SOL_Qtd_Perdas__c` é gravado pelo Flow BEFORE-SAVE
+ * SOL_Marco_Perda_Oportunidade, no próprio save que fecha o negócio. Isso NÃO é
+ * o contador em Apex que foi recusado: aquele exigiria `update Opportunity` a
+ * partir do after-save, acoplando o fechamento da venda a uma gravação
+ * analítica capaz de abortá-la. Before-save não faz DML, não faz consulta e não
+ * depende de Apex — é o mesmo padrão que o CLICKUP-9439 já adotou para
+ * `SOL_Data_Encerramento__c`, e pela mesma razão.
+ *
+ * Com isso: reprocessar sem transição reencontra o mesmo n e não duplica;
+ * reabrir e perder de novo incrementa n e gera ocorrência nova, mesmo partindo
+ * da mesma etapa e mesmo dentro do mesmo segundo.
  *
  * =====================================================================
  * PROPRIETÁRIO DO EVENTO
@@ -281,11 +300,16 @@ public without sharing class SOLEventoJornadaService {
    * @param oportunidade Oportunidade JÁ carregada, com `OwnerId`,
    *   `RecordType.DeveloperName` e `SOL_Produto_Negocio__c` na projeção.
    * @param etapaAnterior etapa imediatamente anterior à perda.
+   * @param sequencia `Opportunity.SOL_Qtd_Perdas__c` — o número desta TRANSIÇÃO
+   *   para "Perdido", já incrementado pelo Flow before-save no mesmo save. É o
+   *   que separa "reprocessamento da mesma perda" de "perdeu de novo depois de
+   *   reabrir", inclusive quando as duas partem da mesma etapa.
    * @param quando instante da perda.
    */
   public static SOL_Evento_Jornada__c oportunidadePerdida(
     Opportunity oportunidade,
     String etapaAnterior,
+    Decimal sequencia,
     Datetime quando
   ) {
     SOL_Evento_Jornada__c e = base(
@@ -293,7 +317,7 @@ public without sharing class SOLEventoJornadaService {
       MOTIVO_OPORTUNIDADE_PERDIDA,
       ORIGEM_OPORTUNIDADE,
       quando,
-      1
+      sequencia
     );
     e.SOL_Oportunidade__c = oportunidade == null ? null : oportunidade.Id;
     e.SOL_Produto__c = oportunidade == null
@@ -307,7 +331,7 @@ public without sharing class SOLEventoJornadaService {
     e.SOL_Chave_Idempotencia__c = chave(
       PREFIXO_PERDA_OPORTUNIDADE,
       e.SOL_Oportunidade__c,
-      e.SOL_Etapa_Anterior__c
+      formatarSequencia(sequencia)
     );
     return e;
   }

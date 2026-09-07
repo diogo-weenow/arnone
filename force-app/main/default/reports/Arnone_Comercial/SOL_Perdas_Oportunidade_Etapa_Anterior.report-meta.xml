@@ -23,6 +23,9 @@
         <field>SOL_Evento_Jornada__c.SOL_Vendedor__c</field>
     </columns>
     <columns>
+        <field>SOL_Evento_Jornada__c.SOL_Sequencia__c</field>
+    </columns>
+    <columns>
         <field>SOL_Evento_Jornada__c.SOL_Chave_Idempotencia__c</field>
     </columns>
     <description>CLICKUP-9438 — Oportunidades perdidas pela ETAPA ANTERIOR real, nunca &quot;Perdido&quot;: quantidade e % do total. A etapa vem de $Record__Prior.StageName na transição. Período pela data da ocorrência. Filtros travados: motivo e origem SOL.</description>

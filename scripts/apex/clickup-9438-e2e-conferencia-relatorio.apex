@@ -215,6 +215,11 @@ if (idEtapa != null) {
   ok('[F] total de perdas do relatório == SOQL', totalPerdas == totalSoql2,
     'relatório=' + totalPerdas + ' soql=' + totalSoql2);
 
+  // Índices das colunas de detalhe, pela ORDEM declarada no relatório.
+  Integer cOpp = m2.getDetailColumns().indexOf('SOL_Evento_Jornada__c.SOL_Oportunidade__c');
+  Integer cSeq = m2.getDetailColumns().indexOf('SOL_Evento_Jornada__c.SOL_Sequencia__c');
+  Map<String, List<String>> sequenciasPorOportunidade = new Map<String, List<String>>();
+
   for (Reports.GroupingValue g : r2.getGroupingsDown().getGroupings()) {
     Reports.ReportFactWithDetails linha = (Reports.ReportFactWithDetails) r2.getFactMap()
       .get(g.getKey() + '!T');
@@ -225,7 +230,48 @@ if (idEtapa != null) {
     ok('[F] quantidade da etapa "' + etapa + '" confere com SOQL', qtd == esperado,
       'relatório=' + qtd + ' soql=' + esperado);
     ok('[F] a etapa de origem NUNCA é "Perdido"', etapa != 'Perdido', etapa);
+
+    // [H] As LINHAS DE DETALHE, que é onde a segunda perda da mesma
+    // Oportunidade tem de aparecer como uma segunda linha.
+    if (cOpp >= 0 && cSeq >= 0) {
+      for (Reports.ReportDetailRow dr : linha.getRows()) {
+        String nomeOpp = String.valueOf(dr.getDataCells()[cOpp].getLabel());
+        String seq = String.valueOf(dr.getDataCells()[cSeq].getLabel());
+        if (!sequenciasPorOportunidade.containsKey(nomeOpp)) {
+          sequenciasPorOportunidade.put(nomeOpp, new List<String>());
+        }
+        sequenciasPorOportunidade.get(nomeOpp).add(etapa + '#' + seq);
+      }
+    }
   }
+
+  // ========== [H] DUAS PERDAS DA MESMA OPORTUNIDADE, DUAS LINHAS NO RELATÓRIO
+  Integer oppsComDuasPerdas = 0;
+  for (String nomeOpp : sequenciasPorOportunidade.keySet()) {
+    List<String> linhas = sequenciasPorOportunidade.get(nomeOpp);
+    if (linhas.size() > 1) {
+      oppsComDuasPerdas++;
+      System.debug(LoggingLevel.ERROR, '[H]   "' + nomeOpp + '" aparece ' + linhas.size()
+        + ' vezes no detalhe: ' + linhas);
+    }
+  }
+  // Confronto independente: quantas Oportunidades têm mais de uma perda?
+  Integer oppsComDuasPerdasSoql = 0;
+  for (AggregateResult ar : [
+    SELECT SOL_Oportunidade__c oid, COUNT(Id) qtd
+    FROM SOL_Evento_Jornada__c
+    WHERE SOL_Motivo__c = 'Oportunidade perdida' AND SOL_Record_Type_Origem__c = 'SOL'
+    GROUP BY SOL_Oportunidade__c
+    HAVING COUNT(Id) > 1
+  ]) {
+    oppsComDuasPerdasSoql++;
+  }
+  System.debug(LoggingLevel.ERROR, '[H] Oportunidades com MAIS DE UMA perda — relatório=' + oppsComDuasPerdas
+    + ' soql=' + oppsComDuasPerdasSoql);
+  ok('[H] o relatório mostra as perdas repetidas da mesma Oportunidade como LINHAS separadas',
+    oppsComDuasPerdas == oppsComDuasPerdasSoql && oppsComDuasPerdasSoql > 0,
+    'relatório=' + oppsComDuasPerdas + ' soql=' + oppsComDuasPerdasSoql
+      + (oppsComDuasPerdasSoql == 0 ? ' (rode antes o E2E de dados, passo [4b])' : ''));
 }
 
 // ============================ CONTROLE: NÃO SE CONTA TROCA DE OWNER

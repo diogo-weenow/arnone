@@ -23,8 +23,11 @@
  *       em clickup-9438-e2e-conferencia-relatorio.apex, que roda depois, em
  *       outra transação: o motor de relatórios só enxerga dado commitado.
  *
- * Execução:
- *   sf apex run --file scripts/apex/clickup-9438-e2e-relatorio-reatribuicoes-perdas.apex --target-org <alias>
+ * Execução, NESTA ORDEM (cada script é uma transação; juntos estourariam o
+ * limite de consultas, e o relatório só enxerga dado commitado):
+ *   1. sf apex run --file scripts/apex/clickup-9438-e2e-relatorio-reatribuicoes-perdas.apex --target-org <alias>
+ *   2. sf apex run --file scripts/apex/clickup-9438-e2e-perda-repetida.apex --target-org <alias>
+ *   3. sf apex run --file scripts/apex/clickup-9438-e2e-conferencia-relatorio.apex --target-org <alias>
  *
  * Cria dados próprios com o prefixo E2E_9438. NÃO faz backfill e NÃO altera
  * agendamento nenhum.
