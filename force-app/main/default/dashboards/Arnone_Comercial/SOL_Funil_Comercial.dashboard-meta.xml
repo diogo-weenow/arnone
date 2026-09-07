@@ -6,23 +6,23 @@
     <dashboardFilters>
         <dashboardFilterOptions>
             <operator>equals</operator>
-            <values>THIS MONTH</values>
+            <values>THIS_MONTH</values>
         </dashboardFilterOptions>
         <dashboardFilterOptions>
             <operator>equals</operator>
-            <values>LAST MONTH</values>
+            <values>LAST_MONTH</values>
         </dashboardFilterOptions>
         <dashboardFilterOptions>
             <operator>equals</operator>
-            <values>LAST 30 DAYS</values>
+            <values>LAST_N_DAYS:30</values>
         </dashboardFilterOptions>
         <dashboardFilterOptions>
             <operator>equals</operator>
-            <values>LAST 90 DAYS</values>
+            <values>LAST_N_DAYS:90</values>
         </dashboardFilterOptions>
         <dashboardFilterOptions>
             <operator>equals</operator>
-            <values>THIS FISCAL YEAR</values>
+            <values>THIS_FISCAL_YEAR</values>
         </dashboardFilterOptions>
         <name>Período de criação</name>
     </dashboardFilters>
