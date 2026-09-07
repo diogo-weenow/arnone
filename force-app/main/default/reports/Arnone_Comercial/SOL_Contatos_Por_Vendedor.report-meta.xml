@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report xmlns="http://soap.sforce.com/2006/04/metadata">
     <aggregates>
-        <acrossGroupingContext>GRAND_SUMMARY</acrossGroupingContext>
-        <calculatedFormula>IF(Activity.SOL_Contato_Avaliado__c:SUM &gt; 0, Activity.SOL_Contato_Sucesso__c:SUM / Activity.SOL_Contato_Avaliado__c:SUM, 0)</calculatedFormula>
+        <acrossGroupingContext>COLUMN_GRAND_SUMMARY</acrossGroupingContext>
+        <calculatedFormula>IF(DEN:SUM &gt; 0, NUM:SUM / DEN:SUM, 0)</calculatedFormula>
         <datatype>percent</datatype>
         <developerName>FORMULA1</developerName>
         <downGroupingContext>ASSIGNED</downGroupingContext>
         <isActive>true</isActive>
+        <isCrossBlock>false</isCrossBlock>
         <masterLabel>Taxa de sucesso</masterLabel>
         <scale>1</scale>
     </aggregates>
     <aggregates>
-        <acrossGroupingContext>GRAND_SUMMARY</acrossGroupingContext>
-        <calculatedFormula>IF(Activity.SOL_Contato_Avaliado__c:SUM &gt; 0, Activity.SOL_Contato_Sucesso__c:SUM / Activity.SOL_Contato_Avaliado__c:SUM, 0)</calculatedFormula>
+        <acrossGroupingContext>COLUMN_GRAND_SUMMARY</acrossGroupingContext>
+        <calculatedFormula>IF(DEN:SUM &gt; 0, NUM:SUM / DEN:SUM, 0)</calculatedFormula>
         <datatype>percent</datatype>
         <developerName>FORMULA2</developerName>
-        <downGroupingContext>GRAND_SUMMARY</downGroupingContext>
+        <downGroupingContext>ROW_GRAND_SUMMARY</downGroupingContext>
         <isActive>true</isActive>
+        <isCrossBlock>false</isCrossBlock>
         <masterLabel>Taxa de sucesso (geral)</masterLabel>
         <scale>1</scale>
     </aggregates>
@@ -49,13 +51,27 @@
     </columns>
     <columns>
         <aggregateTypes>Sum</aggregateTypes>
-        <field>Activity.SOL_Contato_Sucesso__c</field>
+        <field>NUM</field>
     </columns>
     <columns>
         <aggregateTypes>Sum</aggregateTypes>
-        <field>Activity.SOL_Contato_Avaliado__c</field>
+        <field>DEN</field>
     </columns>
-    <description>CLICKUP-9428 — Contatos SOL por vendedor: linhas por proprietário, colunas por canal efetivo e resultado normalizado, com taxa de sucesso. Escopo fixo em Tipo de tarefa = Contato. Canal e resultado vêm de campos de fórmula, nunca do Subject.</description>
+    <customDetailFormulas>
+        <calculatedFormula>IF(Activity.SOL_Resultado_Normalizado__c = &quot;Sucesso&quot;, 1, 0)</calculatedFormula>
+        <dataType>Double</dataType>
+        <developerName>NUM</developerName>
+        <label>Contato com sucesso</label>
+        <scale>0</scale>
+    </customDetailFormulas>
+    <customDetailFormulas>
+        <calculatedFormula>IF(OR(Activity.SOL_Resultado_Normalizado__c = &quot;Sucesso&quot;, Activity.SOL_Resultado_Normalizado__c = &quot;Sem sucesso&quot;), 1, 0)</calculatedFormula>
+        <dataType>Double</dataType>
+        <developerName>DEN</developerName>
+        <label>Tentativa válida</label>
+        <scale>0</scale>
+    </customDetailFormulas>
+    <description>CLICKUP-9428 — Contatos SOL por vendedor: linhas por proprietário, colunas por canal efetivo e resultado normalizado. A taxa vem de duas fórmulas de linha somadas (NUM/DEN), sem campos agregados no objeto. Escopo fixo em Tipo de tarefa = Contato.</description>
     <filter>
         <criteriaItems>
             <column>Activity.SOL_Tipo_Tarefa__c</column>
@@ -69,7 +85,7 @@
             <columnToColumn>false</columnToColumn>
             <isUnlocked>false</isUnlocked>
             <operator>equals</operator>
-            <value>true</value>
+            <value>1</value>
         </criteriaItems>
         <criteriaItems>
             <column>ASSIGNED</column>
@@ -117,6 +133,10 @@
     <params>
         <name>type</name>
         <value>t</value>
+    </params>
+    <params>
+        <name>co</name>
+        <value>1</value>
     </params>
     <reportType>Activity</reportType>
     <scope>organization</scope>
