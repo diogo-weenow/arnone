@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Sequencia__c</fullName>
+    <description>Número da ocorrência para aquele registro dentro daquele motivo. Nas reatribuições é o próprio contador da jornada JÁ INCREMENTADO — Lead.SOL_Quantidade_Reatribuicoes__c ou Opportunity.SOL_Qtd_Reatribuicoes_Prazo__c — de modo que a 2ª reatribuição do mesmo Lead nasce com 2 e produz chave de idempotência diferente da 1ª. Nas perdas e no opt-out vale 1. É a parte da chave que distingue &quot;nova ocorrência legítima&quot; de &quot;reprocessamento da mesma ocorrência&quot;. CLICKUP-9438.</description>
+    <externalId>false</externalId>
+    <label>Sequência</label>
+    <precision>4</precision>
+    <required>true</required>
+    <scale>0</scale>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

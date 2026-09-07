@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Novo_Vendedor__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Vendedor que RECEBEU o registro na reatribuição — o &quot;para quem&quot;. Preenchido apenas quando SOL_Tipo_Evento__c = &quot;Reatribuição&quot;; fica vazio nas perdas, onde não há troca de dono. Junto com SOL_Vendedor__c fecha o par origem/destino de cada troca, que nenhum relatório de Field History consegue montar (o histórico separa Owner e motivo em linhas distintas). CLICKUP-9438.</description>
+    <label>Novo vendedor</label>
+    <referenceTo>User</referenceTo>
+    <relationshipLabel>Eventos da Jornada SOL (novo vendedor)</relationshipLabel>
+    <relationshipName>Eventos_Jornada_SOL_Novo_Vendedor</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

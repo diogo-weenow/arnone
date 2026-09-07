@@ -1050,8 +1050,13 @@ private class SOLPrazoTotalTest {
     // tradeoff documentado; o que NÃO pode é escalar de forma quadrática nem
     // estourar os limites de governança. Para 12 Opps: bem abaixo de 100 SOQL /
     // 150 DML. Em produção o Batch roda lote = 1 (uma Opp por transação).
-    System.assert(soql <= 40, 'SOQL linear e contido: ' + soql);
-    System.assert(dml <= 60, 'DML linear e contido: ' + dml);
+    // (CLICKUP-9438) Os tetos subiram (SOQL 40 -> 48, DML 60 -> 72) porque a
+    // ocorrência da jornada entra no MESMO Savepoint de cada Oportunidade — 2
+    // consultas e 1 gravação a mais por Opp. Consolidar os eventos fora do laço
+    // economizaria consultas e destruiria o isolamento por Oportunidade, que é o
+    // motivo de o custo ser linear aqui desde o PR #15.
+    System.assert(soql <= 48, 'SOQL linear e contido: ' + soql);
+    System.assert(dml <= 72, 'DML linear e contido: ' + dml);
     System.assertEquals(
       12,
       [SELECT COUNT() FROM Opportunity WHERE Id IN :opps AND SOL_Qtd_Reatribuicoes_Prazo__c = 1]

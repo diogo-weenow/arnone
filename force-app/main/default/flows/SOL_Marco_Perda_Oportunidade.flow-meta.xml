@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Incrementa o contador da transição no próprio save. Assignment puro: não acrescenta DML nem consulta.</description>
+        <name>Contar_Perda</name>
+        <label>Contar esta transição para Perdido</label>
+        <locationX>176</locationX>
+        <locationY>516</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.SOL_Qtd_Perdas__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>formulaProximaPerda</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <description>Só a Arnone Soluções conta. Fecha por padrão: Record Type ausente ou diferente não incrementa nada.</description>
+        <name>Decidir_Record_Type_SOL</name>
+        <label>É Record Type SOL?</label>
+        <locationX>176</locationX>
+        <locationY>396</locationY>
+        <defaultConnectorLabel>Não — outra BU, não conta</defaultConnectorLabel>
+        <rules>
+            <name>E_Record_Type_SOL</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.RecordTypeId</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <elementReference>Obter_Record_Type_SOL.Id</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Contar_Perda</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <description>CLICKUP-9438 — carimba a IDENTIDADE DA TRANSIÇÃO no próprio save que leva a Oportunidade da Arnone Soluções para &quot;Perdido&quot;, incrementando SOL_Qtd_Perdas__c. Existe porque a ocorrência de perda precisa ser idempotente SEM perder a segunda perda: reprocessar sem transição reencontra o mesmo número e não duplica; reabrir e perder de novo incrementa e gera ocorrência nova, mesmo partindo da MESMA etapa. Nenhum campo da plataforma serve: LastStageChangeDate, LastModifiedDate e SystemModstamp têm precisão de SEGUNDO (medido nesta org: uma reabertura e a perda seguinte compartilharam o carimbo) e SOL_Data_Encerramento__c é congelado no primeiro encerramento pelo CLICKUP-9439. ISOLAMENTO: o recorte exige as TRÊS condições juntas — Record Type SOL, produto Recuperação Tributária ou ART 360, e transição REAL para &quot;Perdido&quot; (doesRequireRecordChangedToMeetCriteria = true). O Record Type é verificado por Get Records + Decision porque o critério de entrada de flow BEFORE-SAVE não alcança campo de registro relacionado; o Id não é fixado no metadado, para o Flow continuar portável entre orgs. O Get Records é bulkificado pela plataforma (uma consulta por transação, não por registro) e só roda para os registros que já passaram no filtro de entrada. Fecha por padrão: Record Type ausente ou diferente não incrementa. CUSTO E ATOMICIDADE: o incremento é um assignment, não acrescenta DML e não acrescenta SOQL; a verificação de Record Type acrescenta UMA consulta por transação. O Flow participa da MESMA transação da Oportunidade — uma falha inesperada aqui pode impedir a gravação, e um rollback posterior desfaz também o contador. BEFORE-SAVE em vez de contador em Apex after-save: aquele exigiria um update na Oportunidade a partir do after-save, acrescentando DML ao fechamento do negócio. NÃO reaproveita SOL_Marco_Encerramento_Oportunidade porque lá o critério exige SOL_Data_Encerramento__c vazio, que por decisão do 9439 bloqueia o segundo fechamento — exatamente o caso que este card precisa contar.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Contador atual (vazio conta como zero) mais um.</description>
+        <name>formulaProximaPerda</name>
+        <dataType>Number</dataType>
+        <expression>BLANKVALUE({!$Record.SOL_Qtd_Perdas__c}, 0) + 1</expression>
+        <scale>0</scale>
+    </formulas>
+    <interviewLabel>SOL_Marco_Perda_Oportunidade {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL_Marco_Perda_Oportunidade</label>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Record Type SOL de Oportunidade, pelo DeveloperName — sem Id fixado no metadado, para o Flow ser portável. Filtro constante, então a plataforma bulkifica: uma consulta por transação.</description>
+        <name>Obter_Record_Type_SOL</name>
+        <label>Obter o Record Type SOL de Oportunidade</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Decidir_Record_Type_SOL</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>SobjectType</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Opportunity</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>SOL</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>RecordType</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Obter_Record_Type_SOL</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  OR(
+    ISPICKVAL({!$Record.SOL_Produto_Negocio__c}, &apos;Recuperação Tributária&apos;),
+    ISPICKVAL({!$Record.SOL_Produto_Negocio__c}, &apos;ART 360&apos;)
+  ),
+  ISPICKVAL({!$Record.StageName}, &apos;Perdido&apos;)
+)</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

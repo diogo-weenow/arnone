@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Vendedor__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Vendedor responsável pelo registro NO INSTANTE da ocorrência — nas reatribuições é o proprietário ANTERIOR, capturado antes de o OwnerId perder o valor. É a fonte de verdade do &quot;de quem&quot;: o OwnerId do próprio evento serve ao compartilhamento e cai para o usuário da automação quando o vendedor está inativo (a plataforma recusa atribuir registro a usuário inativo), mas ESTE campo nunca deixa de apontar o vendedor real. Nunca leia o Owner atual do Lead/Oportunidade para responder a essa pergunta: depois da segunda reatribuição ele já é outro. CLICKUP-9438.</description>
+    <label>Vendedor</label>
+    <referenceTo>User</referenceTo>
+    <relationshipLabel>Eventos da Jornada SOL (vendedor)</relationshipLabel>
+    <relationshipName>Eventos_Jornada_SOL_Vendedor</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

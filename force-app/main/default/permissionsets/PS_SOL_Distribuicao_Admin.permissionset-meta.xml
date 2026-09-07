@@ -103,6 +103,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Opportunity.SOL_Qtd_Perdas__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Opportunity.SOL_Status_Reatribuicao_Prazo__c</field>
         <readable>true</readable>
     </fieldPermissions>
