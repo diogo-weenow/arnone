@@ -2096,6 +2096,78 @@ private class SOLDuracaoEtapaTest {
   }
 
   /**
+   * O BURACO QUE FALTAVA: uma falha INESPERADA na fase obrigatória — consulta,
+   * lock, preparação, consolidação — também tem de desfazer a conclusão da
+   * Task. Fechar só o caminho previsto (`MarcoNaoGravadoException`) e deixar o
+   * imprevisto cair num `catch (Exception)` que loga e retorna deixava
+   * exatamente o mesmo defeito uma camada acima.
+   *
+   * O seam é SEPARADO de `simularFalhaDeGravacaoDoMarco` de propósito: aquele
+   * lança `MarcoNaoGravadoException` diretamente e por isso NÃO passa pelo
+   * `catch (Exception)`. Um teste que o reutilizasse passaria sem exercitar o
+   * caminho defeituoso — não provaria nada.
+   */
+  @IsTest
+  static void falhaInesperadaNaFaseDoMarcoTambemDesfazAConclusaoDaTarefa() {
+    Lead l = novoLead(PRODUTO_RT);
+    update new Lead(Id = l.Id, SOL_Data_Distribuicao__c = as10(SEGUNDA));
+    delete [SELECT Id FROM Task WHERE WhoId = :l.Id];
+    Task t = tarefaContatoLigacao(l.Id, 'Inesperada');
+    insert t;
+
+    Test.startTest();
+    SOLDuracaoEtapaService.simularFalhaInesperadaNoMarco = true;
+    Boolean bloqueou = false;
+    String mensagem = null;
+    try {
+      update new Task(
+        Id = t.Id,
+        Status = 'Completed',
+        SOL_Resultado_Contato__c = 'Não atendeu'
+      );
+    } catch (Exception e) {
+      bloqueou = true;
+      mensagem = e.getMessage();
+    }
+    SOLDuracaoEtapaService.simularFalhaInesperadaNoMarco = false;
+    Test.stopTest();
+
+    Assert.isTrue(
+      bloqueou,
+      'Falha INESPERADA antes de o marco existir também derruba a conclusão da tarefa.'
+    );
+    Assert.isTrue(
+      mensagem.contains('Não foi possível registrar esta conclusão'),
+      'A exceção genérica é CONVERTIDA na mensagem controlada, sem detalhe técnico vazando: ' +
+      mensagem
+    );
+    Assert.isFalse(
+      mensagem.contains('Attempt to de-reference a null object'),
+      'O erro cru não chega ao vendedor: ' + mensagem
+    );
+
+    Task depois = [SELECT Id, Status FROM Task WHERE Id = :t.Id];
+    Assert.areEqual(
+      'Open',
+      depois.Status,
+      'A tarefa volta para Open — a transação inteira foi desfeita.'
+    );
+    Lead leadDepois = lead(l.Id);
+    Assert.isNull(
+      leadDepois.SOL_Data_Primeira_Ligacao__c,
+      'O marco continua VAZIO.'
+    );
+    Assert.isNull(
+      leadDepois.SOL_Dias_Primeira_Ligacao__c,
+      'E nenhum estado parcial da medição ficou para trás.'
+    );
+    Assert.isFalse(
+      leadDepois.SOL_Duracao_Pendente__c,
+      'Nem pendência: nada foi persistido nesta transação.'
+    );
+  }
+
+  /**
    * A METADE TOLERANTE. Depois que o MARCO está persistido, a falha do CÁLCULO
    * não desfaz nada: a Task fica concluída, **o marco fica gravado**, e a
    * lacuna vira pendência técnica durável.

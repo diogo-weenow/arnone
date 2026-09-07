@@ -33,8 +33,9 @@
  * sem o marco que ela deveria registrar seria dado falso persistido, que é
  * exatamente o que o repositório proíbe em todos os outros pontos.
  *
- * O serviço já não lança; este `try/catch` é a segunda cerca, para que nem uma
- * falha inesperada de plataforma volte para o Flow e aborte o save do vendedor.
+ * Fora da consolidação de marco, o serviço não lança; o `try/catch` daqui é a
+ * segunda cerca, para que nem uma falha inesperada de plataforma no caminho da
+ * DURAÇÃO volte para o Flow e aborte o save do vendedor.
  */
 public with sharing class SOLDuracaoEtapaInvocable {
   public class Entrada {
@@ -115,7 +116,10 @@ public with sharing class SOLDuracaoEtapaInvocable {
         );
       }
     } catch (SOLDuracaoEtapaService.MarcoNaoGravadoException e) {
-      // A ÚNICA exceção que atravessa esta porta, e ela atravessa de propósito.
+      // A única exceção que atravessa esta porta, e ela atravessa de propósito.
+      // O serviço converte QUALQUER falha da fase obrigatória nela — inclusive
+      // as inesperadas —, então "marco não gravado" chega aqui sempre com a
+      // mesma cara, venha de onde vier.
       // Marco não é medida: é o registro comercial do que aconteceu. Sem ele, a
       // Task não pode terminar concluída, então a exceção sobe para o Flow e
       // desfaz o save — com mensagem controlada, sem detalhe técnico.

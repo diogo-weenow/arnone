@@ -814,7 +814,16 @@ public without sharing class SOLDuracaoEtapaService {
    * `recalcularLeads`. Nenhum caminho deste serviço trava Oportunidade antes de
    * Lead, então não há ciclo.
    *
-   * NUNCA lança.
+   * ====================================================
+   * ESTE MÉTODO LANÇA — e a fronteira é o marco, não o tipo
+   * ====================================================
+   * É o único do serviço que lança, e lança `MarcoNaoGravadoException` para
+   * QUALQUER falha ocorrida ANTES de o marco estar persistido: consulta, lock,
+   * preparação, consolidação ou a gravação em si. Todas viram a mesma mensagem
+   * controlada, sobem pelo Invocable e desfazem a conclusão da Task.
+   *
+   * Depois que o marco está gravado, a política inverte: o cálculo da duração é
+   * TOLERANTE e nada ali desfaz operação comercial.
    */
   public static ResultadoDuracao consolidarMarcosDeTarefas(List<Id> taskIds) {
     ResultadoDuracao r = new ResultadoDuracao();
@@ -910,6 +919,12 @@ public without sharing class SOLDuracaoEtapaService {
         r.ignoradas++;
       }
 
+      if (simularFalhaInesperadaNoMarco && Test.isRunningTest()) {
+        // Uma exceção qualquer, do tipo que ninguém previu — é esse o ponto.
+        String nulo = null;
+        nulo.length();
+      }
+
       // ---- Leads primeiro (ordem de lock) ----
       if (!menorNoLead.isEmpty()) {
         List<Lead> paraAtualizar = new List<Lead>();
@@ -962,13 +977,25 @@ public without sharing class SOLDuracaoEtapaService {
         gravarMarcosOuLancar(paraAtualizar, r);
       }
     } catch (MarcoNaoGravadoException e) {
-      // O MARCO é obrigatório: esta é a única exceção que sai daqui. Ela sobe
-      // pelo Invocable até o Flow e desfaz a conclusão da Task, para que nunca
-      // exista tarefa concluída sem o marco que ela deveria ter registrado.
+      // O MARCO é obrigatório: ela sobe pelo Invocable até o Flow e desfaz a
+      // conclusão da Task, para que nunca exista tarefa concluída sem o marco
+      // que ela deveria ter registrado.
       throw e;
     } catch (Exception e) {
+      // E QUALQUER OUTRA FALHA DESTA FASE TAMBÉM SOBE — convertida.
+      //
+      // A versão anterior registrava e dava `return` aqui, e o efeito era
+      // exatamente o buraco que a fase obrigatória existe para fechar: falha
+      // inesperada em consulta, lock, preparação ou consolidação virava log, e
+      // a Task ficava concluída SEM marco. Fechar só o caminho previsto
+      // (`MarcoNaoGravadoException`) e deixar o imprevisto aberto é o mesmo
+      // defeito uma camada acima.
+      //
+      // A regra não é sobre QUAL exceção aconteceu: é sobre QUANDO. Enquanto o
+      // marco não estiver persistido, tudo aborta a conclusão da Task. Depois
+      // dele, nada aborta.
       registrarFalha('consolidarMarcosDeTarefas (marco)', e, r);
-      return r;
+      throw new MarcoNaoGravadoException(MSG_MARCO_NAO_GRAVADO);
     }
 
     // ---- DAQUI PARA BAIXO a política muda: o marco já está persistido, e o
@@ -1223,6 +1250,18 @@ public without sharing class SOLDuracaoEtapaService {
    */
   @TestVisible
   private static Boolean simularFalhaDeGravacaoDoMarco = false;
+
+  /**
+   * Somente testes: provoca uma exceção GENÉRICA e inesperada dentro da fase
+   * obrigatória, ANTES de qualquer gravação.
+   *
+   * É um seam SEPARADO do anterior por um motivo concreto: aquele lança
+   * `MarcoNaoGravadoException` diretamente e, por isso, NÃO passa pelo
+   * `catch (Exception)` — um teste que o reutilizasse passaria sem exercitar o
+   * caminho defeituoso. Este aqui força justamente o imprevisto.
+   */
+  @TestVisible
+  private static Boolean simularFalhaInesperadaNoMarco = false;
 
   /**
    * Registros que ganharam pendência técnica NESTA transação por falha de
