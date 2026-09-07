@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Distribuicao__c</fullName>
+    <description>Espelho tecnico de Lead.SOL_Data_Distribuicao__c, copiado por SOL_ConverterLead na conversao e ressincronizado por SOLDuracaoEtapaService. Existe por um motivo preciso: sem a ORIGEM da etapa 1 na propria Oportunidade, ela nao consegue recalcular essa etapa nem decidir se a pendencia dela ainda existe — e um recalculo so da Oportunidade acabaria APAGANDO uma pendencia legitima herdada do Lead. Nunca sobrescrito depois de preenchido. Campo tecnico, somente leitura. CLICKUP-9439 / CLICKUP-9429 (absorvido).</description>
+    <label>Data da distribuicao (SOL)</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>DateTime</type>
+</CustomField>

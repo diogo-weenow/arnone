@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Chamar_Duracao</name>
+        <label>Consolidar a reunião final e reavaliar as durações</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <actionName>SOLDuracaoEtapaInvocable</actionName>
+        <actionType>apex</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>recordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>SOLDuracaoEtapaInvocable</nameSegment>
+    </actionCalls>
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>CLICKUP-9439 / CLICKUP-9429 (absorvido) — quando a Task de reunião final é concluída com a data preenchida, aciona SOLDuracaoEtapaInvocable para consolidar Opportunity.SOL_Data_Reuniao_Final__c e reavaliar as durações. Esse marco fecha a etapa 5 e abre a etapa 6. A consolidação do marco NÃO acontece mais aqui: ela foi para SOLDuracaoEtapaService.consolidarMarcosDeTarefas. O padrão declarativo anterior — Get do pai, decidir se o campo está vazio, Update — parece seguro e não é dentro de uma única transação: TODOS os Get das interviews rodam ANTES de qualquer Update, então duas tarefas qualificadas do MESMO pai concluídas no mesmo DML leem as duas o campo vazio, gravam as duas, e sobra o valor da ÚLTIMA interview processada — não o primeiro marco cronológico. Isso foi REPRODUZIDO por teste, com as duas ordens possíveis da lista produzindo marcos diferentes para dados equivalentes. No Apex o lote chega junto: agrupa por pai, escolhe o MENOR marco, trava o pai com FOR UPDATE e grava uma vez só, apenas se o campo ainda estiver vazio. Este Flow ficou sendo só a PORTA: o filtro de qualificação e a chamada. Sem fault path, e aqui isso tem DUAS leituras opostas, conforme o momento da falha. Falha ao REGISTRAR O MARCO relança (MarcoNaoGravadoException) e desfaz a conclusão da tarefa — de propósito: tarefa concluída afirmando um marco que não existe seria dado falso persistido. Vale para qualquer falha anterior à persistência do marco, inclusive as inesperadas. Falha POSTERIOR, no cálculo da duração, é tolerante e NÃO desfaz a operação: a duração fica vazia e a pendência fica registrada.</description>
+    <environments>Default</environments>
+    <interviewLabel>SOL_Marco_Reuniao_Final {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL_Marco_Reuniao_Final</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Chamar_Duracao</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  TEXT({!$Record.SOL_Tipo_Tarefa__c}) = &apos;Reunião final&apos;,
+  TEXT({!$Record.Status}) = &apos;Completed&apos;,
+  NOT(ISBLANK({!$Record.SOL_Data_Reuniao_Final__c})),
+  NOT(ISBLANK({!$Record.WhatId}))
+)</filterFormula>
+        <object>Task</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

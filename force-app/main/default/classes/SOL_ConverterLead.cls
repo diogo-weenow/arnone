@@ -48,7 +48,29 @@ public with sharing class SOL_ConverterLead {
     'Id, Name, FirstName, LastName, Company, Email, Phone, IsConverted, ' +
     'CNPJ__c, RecordType.DeveloperName, SOL_Produto_Interesse__c, ' +
     'SOL_Status_Procuracao__c, SOL_Data_Recebimento_Procuracao__c, ' +
-    'SOL_Apto_Conversao__c, SOL_Data_Contato_Efetivado__c';
+    'SOL_Apto_Conversao__c, SOL_Data_Contato_Efetivado__c, ' +
+    // CLICKUP-9439 / CLICKUP-9429 (absorvido) — medicao por etapa. Sao
+    // transportados para a Oportunidade na conversao; ver avancarOportunidade.
+    'SOL_Data_Primeira_Ligacao__c, SOL_Data_Reuniao_Procuracao__c, ' +
+    'SOL_Dias_Primeira_Ligacao__c, SOL_Dias_Contato_Efetivado__c, ' +
+    'SOL_Dias_Reuniao_Procuracao__c, SOL_Duracao_Pendente__c, ' +
+    'SOL_Duracao_Pendencia_Motivo__c, SOL_Duracao_Pendencia_Detalhe__c';
+
+  // CLICKUP-9439 — SOL_Data_Distribuicao__c fica DE FORA da projeção acima, e
+  // isso não é esquecimento. Esta consulta é DINÂMICA, e SOQL dinâmico resolve
+  // o nome do campo com a FLS de quem está executando: para um usuário sem
+  // PS_SOL_Distribuicao_Admin — que é o caso de todo o Comercial — o campo
+  // "não existe" e a consulta lança QueryException, que o catch abaixo
+  // transforma em SEM_PERMISSAO. Incluí-la ali quebraria a CONVERSÃO INTEIRA
+  // para o time comercial, disfarçada de falta de acesso. Medido em Apex
+  // anônimo antes de escrever esta linha.
+  //
+  // O espelho é lido por SOLDuracaoEtapaService.distribuicaoDeLeads, e NEM
+  // MESMO em SOQL estático dentro desta classe: consultar o campo aqui faz a
+  // plataforma re-resolver a query em tempo de execução para quem não o enxerga,
+  // e a conversão passa a falhar com "Variable does not exist: tmpVar1" — foi o
+  // que aconteceu, medido em teste, antes de a leitura ser movida para o
+  // serviço, que já lê esse campo em todas as suas consultas.
 
   // ------------------------------------------------- regras compartilhadas
   //
@@ -426,15 +448,66 @@ public with sharing class SOL_ConverterLead {
     // permission sets). É a automação da conversão que os grava — em modo de
     // sistema, porque quem dispara a conversão não tem edição nesses campos
     // técnicos.
+    //
+    // CLICKUP-9439 / CLICKUP-9429 (absorvido) — a mesma gravação leva também os
+    // seis campos da medição por etapa. É CÓPIA DIRETA, sem cálculo nenhum: não
+    // consulta calendário, não conta dia útil e por isso NÃO introduz caminho de
+    // falha novo na conversão.
+    //
+    // CONTRASTE DELIBERADO, e ele é o ponto: o prazo total acima é OPERACIONAL
+    // — dispara a reatribuição de dono do CLICKUP-9424 —, e sem ele a
+    // Oportunidade não pode nascer; por isso `calcularPrazoTotal` continua
+    // ABORTANDO a conversão inteira quando o calendário falta. As durações são
+    // ANALÍTICAS, e a política do P.O. para elas é a oposta: se não dá para
+    // medir, o negócio segue e a medição fica pendente. Aqui as duas convivem
+    // sem se misturar porque o transporte não calcula nada — se a duração
+    // chegou vazia no Lead, chega vazia na Oportunidade, com a pendência junto,
+    // e SOLDuracaoEtapaService a ressincroniza quando o Lead for corrigido.
+    // A ORIGEM da etapa 1 vem por consulta ESTÁTICA, pelo motivo explicado na
+    // constante de campos: em SOQL dinâmico ela derrubaria a conversão de quem
+    // não tem PS_SOL_Distribuicao_Admin. Sem ela na Oportunidade, um recálculo
+    // só da Oportunidade acharia a etapa 1 "sem origem" e APAGARIA a pendência
+    // legítima herdada do Lead.
+    Datetime distribuicao = SOLDuracaoEtapaService.distribuicaoDeLeads(
+        new Set<Id>{ l.Id }
+      )
+      .get(l.Id);
+
+    Opportunity tecnicos = new Opportunity(
+      Id = oportunidadeId,
+      SOL_Data_Distribuicao__c = distribuicao,
+      SOL_Data_Primeira_Ligacao__c = l.SOL_Data_Primeira_Ligacao__c,
+      SOL_Data_Reuniao_Procuracao__c = l.SOL_Data_Reuniao_Procuracao__c,
+      SOL_Dias_Primeira_Ligacao__c = l.SOL_Dias_Primeira_Ligacao__c,
+      SOL_Dias_Contato_Efetivado__c = l.SOL_Dias_Contato_Efetivado__c,
+      SOL_Dias_Reuniao_Procuracao__c = l.SOL_Dias_Reuniao_Procuracao__c,
+      // Pendência COMPLETA: checkbox, motivo e detalhe viajam juntos. Transportar
+      // só o checkbox deixaria a Oportunidade nascer com uma lacuna marcada e
+      // sem explicação nenhuma — pior do que não marcar, porque parece
+      // informação.
+      SOL_Duracao_Pendente__c = l.SOL_Duracao_Pendente__c == true,
+      SOL_Duracao_Pendencia_Motivo__c = l.SOL_Duracao_Pendencia_Motivo__c,
+      SOL_Duracao_Pendencia_Detalhe__c = l.SOL_Duracao_Pendencia_Detalhe__c
+    );
+    Boolean haMedicao =
+      distribuicao != null ||
+      l.SOL_Data_Primeira_Ligacao__c != null ||
+      l.SOL_Data_Reuniao_Procuracao__c != null ||
+      l.SOL_Dias_Primeira_Ligacao__c != null ||
+      l.SOL_Dias_Contato_Efetivado__c != null ||
+      l.SOL_Dias_Reuniao_Procuracao__c != null ||
+      l.SOL_Duracao_Pendente__c == true;
+
     if (inicioCiclo != null) {
+      tecnicos.SOL_Data_Inicio_Ciclo_Comercial__c = inicioCiclo;
+      tecnicos.SOL_Prazo_Total_Comercial__c = prazoTotal;
+    }
+
+    // Sem contato efetivado E sem medição nenhuma no Lead não há o que
+    // transportar: a gravação extra é evitada, como sempre foi.
+    if (inicioCiclo != null || haMedicao) {
       Database.update(
-        new List<Opportunity>{
-          new Opportunity(
-            Id = oportunidadeId,
-            SOL_Data_Inicio_Ciclo_Comercial__c = inicioCiclo,
-            SOL_Prazo_Total_Comercial__c = prazoTotal
-          )
-        },
+        new List<Opportunity>{ tecnicos },
         AccessLevel.SYSTEM_MODE
       );
     }

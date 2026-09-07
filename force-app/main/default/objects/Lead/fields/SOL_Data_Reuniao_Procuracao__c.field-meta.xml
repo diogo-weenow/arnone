@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Reuniao_Procuracao__c</fullName>
+    <description>O ÚLTIMO dos dois marcos da etapa 3: data da reunião realizada e data do recebimento da procuração. Só é gravado quando os DOIS existem — com um só marco a etapa não terminou e o campo fica vazio, nunca com o marco isolado. A reunião é DateTime e a procuração é Date: o DateTime é normalizado para a data em America/Sao_Paulo antes da comparação, senão o fuso erraria em até um dia. Campo técnico, escrito apenas por SOLDuracaoEtapaService, somente leitura para todos. CLICKUP-9439 / CLICKUP-9429 (absorvido).</description>
+    <label>Data da reunião e procuração (SOL)</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

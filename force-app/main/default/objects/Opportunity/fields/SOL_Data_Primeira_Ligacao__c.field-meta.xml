@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Primeira_Ligacao__c</fullName>
+    <description>Espelho de Lead.SOL_Data_Primeira_Ligacao__c, copiado por SOL_ConverterLead na conversão e ressincronizado por SOLDuracaoEtapaService quando o Lead convertido é corrigido depois. Existe para que o relatório gerencial filtre período por etapa num objeto só, sem depender do Lead nem de Tasks que somem durante Database.convertLead. Nunca sobrescrito depois de preenchido. Campo técnico, somente leitura. CLICKUP-9439 / CLICKUP-9429 (absorvido).</description>
+    <label>Data da primeira ligação concluída (SOL)</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>DateTime</type>
+</CustomField>

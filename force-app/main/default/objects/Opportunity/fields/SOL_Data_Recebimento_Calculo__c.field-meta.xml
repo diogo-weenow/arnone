@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Recebimento_Calculo__c</fullName>
+    <description>Consolidação de Task.SOL_Data_Recebimento_Calculo__c da tarefa de acompanhamento do cálculo jurídico concluída. Fecha a etapa 4 (solicitação - recebimento do cálculo) e abre a etapa 5. Só é gravado quando está vazio: recebimentos posteriores não sobrescrevem o primeiro. Consolidado na Oportunidade porque a Task pode ser cancelada ou reaberta e não é fonte confiável em tempo de relatório. Exclusivo de Recuperação Tributária — em ART 360 permanece vazio. Campo técnico, somente leitura. CLICKUP-9439 / CLICKUP-9429 (absorvido).</description>
+    <label>Data do recebimento do cálculo (SOL)</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

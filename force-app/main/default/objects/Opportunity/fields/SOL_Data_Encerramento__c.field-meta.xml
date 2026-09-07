@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Encerramento__c</fullName>
+    <description>Instante da transição REAL da Oportunidade para Ganho ou Perdido, gravado por Flow before-save no próprio save que muda a etapa. Fecha a etapa 6 (reunião final - encerramento). NÃO é o CloseDate: aquele é data PREVISTA e editável pelo vendedor, e serviria de marco falso. Só é gravado quando está vazio — reabrir e fechar de novo não reescreve o primeiro encerramento. Gravado em before-save de propósito: não faz DML nem depende do calendário, então nenhuma falha analítica pode impedir o fechamento do negócio. Campo técnico, somente leitura. CLICKUP-9439 / CLICKUP-9429 (absorvido).</description>
+    <label>Data do encerramento (SOL)</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>DateTime</type>
+</CustomField>

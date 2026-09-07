@@ -1,95 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Chamar_Duracao</name>
+        <label>Consolidar a reunião realizada e reavaliar as durações</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <actionName>SOLDuracaoEtapaInvocable</actionName>
+        <actionType>apex</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>recordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>SOLDuracaoEtapaInvocable</nameSegment>
+    </actionCalls>
     <apiVersion>66.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
-    <decisions>
-        <name>Lead_SOL_Sem_Data</name>
-        <label>Lead SOL sem a data consolidada?</label>
-        <locationX>176</locationX>
-        <locationY>288</locationY>
-        <defaultConnectorLabel>Não — nada a fazer</defaultConnectorLabel>
-        <rules>
-            <name>Consolidar</name>
-            <conditionLogic>and</conditionLogic>
-            <conditions>
-                <leftValueReference>Get_Lead</leftValueReference>
-                <operator>IsNull</operator>
-                <rightValue>
-                    <booleanValue>false</booleanValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>Get_Lead.RecordType.DeveloperName</leftValueReference>
-                <operator>EqualTo</operator>
-                <rightValue>
-                    <stringValue>SOL</stringValue>
-                </rightValue>
-            </conditions>
-            <conditions>
-                <leftValueReference>Get_Lead.SOL_Data_Reuniao_Realizada__c</leftValueReference>
-                <operator>IsNull</operator>
-                <rightValue>
-                    <booleanValue>true</booleanValue>
-                </rightValue>
-            </conditions>
-            <connector>
-                <targetReference>Consolidar_Data</targetReference>
-            </connector>
-            <label>Consolidar a primeira data</label>
-        </rules>
-    </decisions>
-    <description>CLICKUP-9419 — Quando uma Task de &quot;Reunião comercial&quot; é concluída (Status = &quot;Completed&quot;, SOL_Resultado_Reuniao__c = &quot;Realizada&quot;, CompletedDateTime preenchido, WhoId apontando para Lead), copia o CompletedDateTime para Lead.SOL_Data_Reuniao_Realizada__c — mas SÓ se o campo ainda estiver vazio (preserva a PRIMEIRA reunião realizada; reprocessamentos e reuniões posteriores não sobrescrevem). Consolida a evidência da reunião no Lead porque as Tasks ficam indisponíveis para consulta durante Database.convertLead. Não altera a Task. Bulk-safe (Get Records + Update do Flow são bulkificados).</description>
+    <description>CLICKUP-9419 — Quando uma Task de &quot;Reunião comercial&quot; é concluída (Status = &quot;Completed&quot;, SOL_Resultado_Reuniao__c = &quot;Realizada&quot;, CompletedDateTime preenchido, WhoId apontando para Lead), copia o CompletedDateTime para Lead.SOL_Data_Reuniao_Realizada__c — mas SÓ se o campo ainda estiver vazio (preserva a PRIMEIRA reunião realizada; reprocessamentos e reuniões posteriores não sobrescrevem). Consolida a evidência da reunião no Lead porque as Tasks ficam indisponíveis para consulta durante Database.convertLead. Não altera a Task. Bulk-safe (Get Records + Update do Flow são bulkificados). CLICKUP-9439 / CLICKUP-9429 (absorvido) — ESTENDIDO, e agora a gravação também saiu daqui: a consolidação de SOL_Data_Reuniao_Realizada__c passou para SOLDuracaoEtapaService.consolidarMarcosDeTarefas, com a MESMA semântica de sempre (só se vazio, preservando a PRIMEIRA reunião realizada, só Lead da unidade). A consolidação do marco NÃO acontece mais aqui: ela foi para SOLDuracaoEtapaService.consolidarMarcosDeTarefas. O padrão declarativo anterior — Get do pai, decidir se o campo está vazio, Update — parece seguro e não é dentro de uma única transação: TODOS os Get das interviews rodam ANTES de qualquer Update, então duas tarefas qualificadas do MESMO pai concluídas no mesmo DML leem as duas o campo vazio, gravam as duas, e sobra o valor da ÚLTIMA interview processada — não o primeiro marco cronológico. Isso foi REPRODUZIDO por teste, com as duas ordens possíveis da lista produzindo marcos diferentes para dados equivalentes. No Apex o lote chega junto: agrupa por pai, escolhe o MENOR marco, trava o pai com FOR UPDATE e grava uma vez só, apenas se o campo ainda estiver vazio. Este Flow ficou sendo só a PORTA: o filtro de qualificação e a chamada. Sem fault path, e aqui isso tem DUAS leituras opostas, conforme o momento da falha. Falha ao REGISTRAR O MARCO relança (MarcoNaoGravadoException) e desfaz a conclusão da tarefa — de propósito: tarefa concluída afirmando um marco que não existe seria dado falso persistido. Vale para qualquer falha anterior à persistência do marco, inclusive as inesperadas. Falha POSTERIOR, no cálculo da duração, é tolerante e NÃO desfaz a operação: a duração fica vazia e a pendência fica registrada. A reunião é um dos dois insumos da etapa 3; o outro é acompanhado por SOL_Duracao_Marcos_Lead.</description>
     <environments>Default</environments>
     <interviewLabel>SOL_Consolidar_Reuniao_Realizada {!$Flow.CurrentDateTime}</interviewLabel>
     <label>SOL_Consolidar_Reuniao_Realizada</label>
     <processType>AutoLaunchedFlow</processType>
-    <recordLookups>
-        <name>Get_Lead</name>
-        <label>Buscar o Lead do WhoId</label>
-        <locationX>176</locationX>
-        <locationY>180</locationY>
-        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
-        <connector>
-            <targetReference>Lead_SOL_Sem_Data</targetReference>
-        </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>Id</field>
-            <operator>EqualTo</operator>
-            <value>
-                <elementReference>$Record.WhoId</elementReference>
-            </value>
-        </filters>
-        <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>Lead</object>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-    </recordLookups>
-    <recordUpdates>
-        <name>Consolidar_Data</name>
-        <label>Gravar a data no Lead</label>
-        <locationX>50</locationX>
-        <locationY>408</locationY>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>Id</field>
-            <operator>EqualTo</operator>
-            <value>
-                <elementReference>Get_Lead.Id</elementReference>
-            </value>
-        </filters>
-        <inputAssignments>
-            <field>SOL_Data_Reuniao_Realizada__c</field>
-            <value>
-                <elementReference>$Record.CompletedDateTime</elementReference>
-            </value>
-        </inputAssignments>
-        <object>Lead</object>
-    </recordUpdates>
     <start>
         <locationX>50</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Get_Lead</targetReference>
+            <targetReference>Chamar_Duracao</targetReference>
         </connector>
         <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
         <filterFormula>AND(

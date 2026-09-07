@@ -263,6 +263,21 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>SOL_Duracao_Pendencia_Motivo__c</picklist>
+        <values>
+            <fullName>Calendário indisponível</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Intervalo inconsistente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Falha técnica</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>SOL_Motivo_Desqualificacao__c</picklist>
         <values>
             <fullName>Negócio perdido</fullName>

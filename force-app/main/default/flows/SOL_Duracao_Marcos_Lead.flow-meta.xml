@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Chamar_Duracao</name>
+        <label>Reavaliar as durações por etapa do Lead</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <actionName>SOLDuracaoEtapaInvocable</actionName>
+        <actionType>apex</actionType>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>recordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>SOLDuracaoEtapaInvocable</nameSegment>
+    </actionCalls>
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>CLICKUP-9439 / CLICKUP-9429 (absorvido) — aciona SOLDuracaoEtapaInvocable quando muda no Lead da unidade uma das duas datas que fecham etapa e não têm Flow próprio: SOL_Data_Contato_Efetivado__c, que fecha a etapa 2 e abre a 3, e SOL_Data_Recebimento_Procuracao__c, gravada pela ação guiada da procuração (SOL_Procuracao), que é um dos dois insumos da etapa 3. O critério usa ISCHANGED em vez de doesRequireRecordChangedToMeetCriteria porque as duas datas chegam em momentos diferentes: com o critério de "passou a atender", a segunda data a chegar não dispararia nada, já que o registro já atenderia ao filtro desde a primeira — e a etapa 3, que só existe quando as DUAS existem, nunca seria fechada. Por isso também é gatilho de UPDATE apenas: ISCHANGED não tem sentido na criação, e um Lead nasce sem essas datas. Este Flow não grava campo nenhum: a consolidação do marco da etapa 3 (o último dos dois) é feita em Apex, onde o DateTime da reunião é normalizado para a data em America/Sao_Paulo antes de ser comparado com a data da procuração — uma fórmula de Flow usaria o fuso do usuário e erraria em até um dia. Não toca as portas do contato efetivado (CLICKUP-9417 / 9447 / 9448 / 9449). Sem fault path: por ESTE caminho o Invocable não relança, porque ele só dispara recálculo de duração, e cálculo de duração é tolerante. Quem relança é a consolidação de marco vinda de Task, que não passa por aqui.</description>
+    <environments>Default</environments>
+    <interviewLabel>SOL_Duracao_Marcos_Lead {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL_Duracao_Marcos_Lead</label>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Chamar_Duracao</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &apos;SOL&apos;,
+  OR(
+    ISCHANGED({!$Record.SOL_Data_Contato_Efetivado__c}),
+    ISCHANGED({!$Record.SOL_Data_Recebimento_Procuracao__c})
+  )
+)</filterFormula>
+        <object>Lead</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
