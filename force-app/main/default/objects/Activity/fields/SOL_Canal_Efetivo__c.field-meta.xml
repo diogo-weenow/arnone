@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Canal_Efetivo__c</fullName>
+    <description>CLICKUP-9428. Canal do contato para relatorio, sem depender de Subject. Usa SOL_Canal_Contato__c quando preenchido. Tarefas legadas anteriores ao CLICKUP-9434 tem canal vazio: quando ha evidencia estruturada de ligacao (SOL_Resultado_Contato__c preenchido) o campo mostra &quot;Ligacao (legado)&quot;; sem evidencia alguma mostra &quot;Sem canal informado&quot;, para que nenhum registro suma do relatorio. Nao faz backfill: e classificacao em tempo de leitura.</description>
+    <externalId>false</externalId>
+    <formula>IF(
+  NOT(ISBLANK(TEXT(SOL_Canal_Contato__c))),
+  TEXT(SOL_Canal_Contato__c),
+  IF(
+    NOT(ISBLANK(TEXT(SOL_Resultado_Contato__c))),
+    &quot;Ligação (legado)&quot;,
+    &quot;Sem canal informado&quot;
+  )
+)</formula>
+    <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
+    <label>Canal efetivo do contato SOL</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
