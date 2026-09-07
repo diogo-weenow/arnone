@@ -112,8 +112,12 @@
             <colSpan>4</colSpan>
             <columnIndex>0</columnIndex>
             <dashboardComponent>
-                <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+                <autoselectColumnsFromReport>false</autoselectColumnsFromReport>
                 <chartAxisRange>Auto</chartAxisRange>
+                <chartSummary>
+                    <axisBinding>y</axisBinding>
+                    <column>FORMULA1</column>
+                </chartSummary>
                 <componentType>Bar</componentType>
                 <dashboardFilterColumns>
                     <column>Lead.SOL_Data_Primeira_Ligacao__c</column>
@@ -127,6 +131,7 @@
                 <enableHover>true</enableHover>
                 <expandOthers>true</expandOthers>
                 <footer>Média de dias úteis, só de quem concluiu a etapa.</footer>
+                <groupingColumn>OWNER</groupingColumn>
                 <groupingSortProperties/>
                 <header>1. Primeira ligação</header>
                 <legendPosition>Bottom</legendPosition>
