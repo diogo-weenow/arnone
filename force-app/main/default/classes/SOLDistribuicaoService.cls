@@ -609,6 +609,9 @@ public without sharing class SOLDistribuicaoService {
       // sobre Leads antigos, e concorre com a desqualificação por perda — que
       // também trava o Lead. O lock serializa os dois e garante que o estado
       // lido abaixo é o atual.
+      // (CLICKUP-9438) SOL_Produto_Interesse__c entra na projeção porque o
+      // evento da jornada congela o produto do instante da ocorrência — o
+      // relatório filtra por ele e não pode depender do valor atual do Lead.
       List<Lead> carregados = [
         SELECT
           Id,
@@ -616,6 +619,7 @@ public without sharing class SOLDistribuicaoService {
           RecordType.DeveloperName,
           SOL_Data_Inicio_Ciclo_Contato__c,
           SOL_Quantidade_Reatribuicoes__c,
+          SOL_Produto_Interesse__c,
           SOL_Opt_Out__c,
           Status,
           SOL_Motivo_Desqualificacao__c
@@ -760,9 +764,17 @@ public without sharing class SOLDistribuicaoService {
       Id ponteiroNovo = estado.Ultimo_Usuario__c;
       List<Lead> leadsAlterados = new List<Lead>();
       List<Lead> reatribuidos = new List<Lead>();
+      // (CLICKUP-9438) Uma ocorrência por reatribuição EFETIVADA, montada com o
+      // vendedor anterior ainda em mãos e gravada mais abaixo, dentro deste
+      // mesmo Savepoint.
+      List<SOL_Evento_Jornada__c> eventos = new List<SOL_Evento_Jornada__c>();
 
       for (Lead l : paraReatribuir) {
         Id escolhido = proximoVendedorExcluindo(ativos, cursor, l.OwnerId);
+        // Depois da linha `l.OwnerId = escolhido` este valor não existe mais em
+        // lugar nenhum consultável — nem no Field History, que separa Owner e
+        // motivo em linhas distintas.
+        Id vendedorAnterior = l.OwnerId;
 
         // Novo início de ciclo: logo após a última Task contada (e nunca no
         // passado). Garante que as Tasks que dispararam a avaliação não voltem
@@ -809,6 +821,18 @@ public without sharing class SOLDistribuicaoService {
         ponteiroNovo = escolhido;
         r.reatribuidos++;
         reatribuidos.add(l);
+        // (CLICKUP-9438) A sequência é o contador JÁ incrementado: a 2ª
+        // reatribuição legítima do mesmo Lead nasce com chave diferente da 1ª,
+        // e um reprocessamento da mesma reatribuição reencontra a mesma chave.
+        eventos.add(
+          SOLEventoJornadaService.reatribuicaoPorFaltaDeContato(
+            l,
+            vendedorAnterior,
+            escolhido,
+            l.SOL_Quantidade_Reatribuicoes__c,
+            agora
+          )
+        );
       }
 
       if (!leadsAlterados.isEmpty()) {
@@ -823,6 +847,11 @@ public without sharing class SOLDistribuicaoService {
       if (!tarefasNovas.isEmpty()) {
         insert tarefasNovas;
       }
+      // (CLICKUP-9438) MESMA transação, MESMO Savepoint: se a ocorrência não
+      // puder ser gravada, o `catch` abaixo desfaz a reatribuição inteira e o
+      // ponteiro não avança. Nunca há reatribuição sem evento, e o Savepoint
+      // garante o inverso — nenhum evento sobrevive a uma reatribuição desfeita.
+      SOLEventoJornadaService.registrar(eventos);
       if (ponteiroNovo != estado.Ultimo_Usuario__c) {
         estado.Ultimo_Usuario__c = ponteiroNovo;
         estado.Data_Ultima_Distribuicao__c = agora;
@@ -832,9 +861,14 @@ public without sharing class SOLDistribuicaoService {
       return r;
     } catch (DistribuicaoException e) {
       Database.rollback(sp);
-      r.comErro = ids.size();
-      r.mensagens.add(MSG_CONFIG);
-      return r;
+      // (CLICKUP-9438) Resultado NOVO, e não `r` acumulado: o rollback desfez as
+      // reatribuições já contadas, e devolver `reatribuidos > 0` junto com
+      // `comErro > 0` faria o chamador relatar sucesso de algo que não existe
+      // mais. Mesmo padrão de SOLPrazoTotalService.
+      ResultadoReatribuicao erro = new ResultadoReatribuicao();
+      erro.comErro = ids.size();
+      erro.mensagens.add(MSG_CONFIG);
+      return erro;
     } catch (Exception e) {
       Database.rollback(sp);
       System.debug(
@@ -846,9 +880,10 @@ public without sharing class SOLDistribuicaoService {
           '\n' +
           e.getStackTraceString()
       );
-      r.comErro = ids.size();
-      r.mensagens.add(MSG_ERRO_GENERICO);
-      return r;
+      ResultadoReatribuicao erro = new ResultadoReatribuicao();
+      erro.comErro = ids.size();
+      erro.mensagens.add(MSG_ERRO_GENERICO);
+      return erro;
     }
   }
 
@@ -1107,10 +1142,15 @@ public without sharing class SOLDistribuicaoService {
     try {
       sp = Database.setSavepoint();
       // Trava os Leads: serializa dois opt-outs concorrentes do mesmo Lead.
+      // (CLICKUP-9438) OwnerId e SOL_Produto_Interesse__c entram na projeção
+      // para o evento da jornada registrar o vendedor responsável e o produto
+      // do instante da perda.
       List<Lead> carregados = [
         SELECT
           Id,
+          OwnerId,
           RecordType.DeveloperName,
+          SOL_Produto_Interesse__c,
           SOL_Opt_Out__c,
           Status,
           SOL_Motivo_Desqualificacao__c
@@ -1173,6 +1213,19 @@ public without sharing class SOLDistribuicaoService {
       }
       if (!pendentes.isEmpty()) {
         update pendentes;
+      }
+
+      // (CLICKUP-9438) Uma ocorrência "Lead perdido por opt-out" por Lead que
+      // REALMENTE foi desqualificado agora — os já em opt-out nem chegam nesta
+      // lista, então a idempotência do serviço já é a idempotência do evento.
+      // Dentro do mesmo Savepoint: falha aqui desfaz a desqualificação e o
+      // cancelamento das tarefas, e relança OptOutException.
+      if (!leadsParaDesqualificar.isEmpty()) {
+        List<SOL_Evento_Jornada__c> eventos = new List<SOL_Evento_Jornada__c>();
+        for (Lead l : leadsParaDesqualificar) {
+          eventos.add(SOLEventoJornadaService.leadPerdidoPorOptOut(l, agora));
+        }
+        SOLEventoJornadaService.registrar(eventos);
       }
 
       r.leadsDesqualificados = leadsParaDesqualificar.size();

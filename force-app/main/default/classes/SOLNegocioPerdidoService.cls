@@ -16,8 +16,17 @@
  *     com motivo "Opt-out" e SOL_Opt_Out__c = true, então NUNCA entra aqui — os
  *     dois fluxos ficam isolados e nenhum sobrescreve o dado do outro.
  *
- *   encerrarPorOportunidadePerdida(oppIds)   ← Flow SOL_Encerrar_Tarefas_Oportunidade_Perdida
+ *   encerrarPorOportunidadePerdida(oppIds, etapasAnteriores)
+ *                                            ← Flow SOL_Encerrar_Tarefas_Oportunidade_Perdida
  *     Perda DEPOIS da conversão: StageName = "Perdido". Tasks pelo WhatId.
+ *     (CLICKUP-9438) O segundo argumento traz, por Oportunidade, a etapa REAL
+ *     de onde ela saiu — `$Record__Prior.StageName` no Flow after-save. É
+ *     OBRIGATÓRIO: depois do save esse valor não existe mais em lugar nenhum
+ *     consultável, e sem ele o relatório de perdas registraria "Perdido" como
+ *     etapa anterior, isto é, o destino no lugar da origem. Oportunidade no
+ *     escopo sem etapa anterior utilizável ABORTA a perda com mensagem
+ *     controlada — não existe overload de um argumento só, de propósito:
+ *     ele seria uma porta para perder negócio sem registrar a ocorrência.
  *
  * O QUE É GRAVADO em cada Task cancelada, na MESMA atualização:
  *   Status = "Cancelada"
@@ -93,6 +102,13 @@ public without sharing class SOLNegocioPerdidoService {
   public static final String MSG_FALHA_LEAD = 'Não foi possível encerrar as tarefas abertas do lead perdido. A desqualificação foi cancelada — tente novamente.';
   /** Falha ao encerrar as tarefas de uma Oportunidade perdida (a perda é abortada). */
   public static final String MSG_FALHA_OPORTUNIDADE = 'Não foi possível encerrar as tarefas abertas da Oportunidade perdida. A mudança para "Perdido" foi cancelada — tente novamente.';
+
+  /**
+   * (CLICKUP-9438) Perda chegou ao serviço sem a etapa de onde a Oportunidade
+   * saiu. Aborta em vez de gravar a ocorrência com etapa vazia ou com
+   * "Perdido" — que é o destino, não a origem.
+   */
+  public static final String MSG_ETAPA_ANTERIOR_AUSENTE = 'Não foi possível registrar a perda desta Oportunidade: a automação não informou a etapa anterior à perda. A mudança para "Perdido" foi cancelada — tente novamente.';
 
   /** Falha controlada do encerramento por perda (CLICKUP-9425). */
   public class NegocioPerdidoException extends Exception {
@@ -223,12 +239,20 @@ public without sharing class SOLNegocioPerdidoService {
 
   /**
    * Encerra todas as Tasks abertas das Oportunidades que acabaram de virar
-   * "Perdido".
+   * "Perdido" e registra, na MESMA transação, a ocorrência "Oportunidade
+   * perdida" do relatório de reatribuições e perdas (CLICKUP-9438).
    *
    * @param opportunityIds Ids de Opportunity (qualquer origem; filtrados aqui).
-   * @throws NegocioPerdidoException falha no cancelamento — aborta a perda.
+   * @param etapasAnteriores etapa REAL de onde cada Oportunidade saiu, por Id —
+   *   `$Record__Prior.StageName` no Flow after-save. Obrigatória para toda
+   *   Oportunidade que entrar no escopo; "Perdido" não vale (é o destino).
+   * @throws NegocioPerdidoException falha no cancelamento, ou etapa anterior
+   *   ausente/inválida — nos dois casos a perda é abortada.
    */
-  public static ResultadoPerda encerrarPorOportunidadePerdida(List<Id> opportunityIds) {
+  public static ResultadoPerda encerrarPorOportunidadePerdida(
+    List<Id> opportunityIds,
+    Map<Id, String> etapasAnteriores
+  ) {
     ResultadoPerda r = new ResultadoPerda();
     Set<Id> ids = idsDoTipo(opportunityIds, Opportunity.SObjectType);
     if (ids.isEmpty()) {
@@ -239,10 +263,18 @@ public without sharing class SOLNegocioPerdidoService {
     try {
       sp = Database.setSavepoint();
 
-      Set<Id> perdidas = new Set<Id>();
+      // (CLICKUP-9438) OwnerId entra na projeção: é o vendedor responsável no
+      // instante da perda, e o evento o congela antes de qualquer transferência
+      // posterior da Oportunidade.
+      Map<Id, Opportunity> perdidas = new Map<Id, Opportunity>();
       Set<Id> encontradas = new Set<Id>();
       for (Opportunity o : [
-        SELECT Id, StageName, SOL_Produto_Negocio__c, RecordType.DeveloperName
+        SELECT
+          Id,
+          OwnerId,
+          StageName,
+          SOL_Produto_Negocio__c,
+          RecordType.DeveloperName
         FROM Opportunity
         WHERE Id IN :ids
         FOR UPDATE
@@ -253,7 +285,7 @@ public without sharing class SOLNegocioPerdidoService {
           PRODUTOS_NO_ESCOPO.contains(o.SOL_Produto_Negocio__c) &&
           oportunidadePerdida(o);
         if (noEscopo) {
-          perdidas.add(o.Id);
+          perdidas.put(o.Id, o);
         } else {
           r.ignorados++;
         }
@@ -265,8 +297,47 @@ public without sharing class SOLNegocioPerdidoService {
       }
       r.negociosPerdidos = perdidas.size();
 
-      cancelarTarefasAbertas(perdidas, false, r);
+      cancelarTarefasAbertas(perdidas.keySet(), false, r);
+
+      // (CLICKUP-9438) Uma ocorrência por perda, no MESMO Savepoint: se ela não
+      // puder ser gravada, o rollback desfaz o cancelamento das tarefas e a
+      // exceção aborta a própria mudança para "Perdido" (o Flow chama com
+      // flowTransactionModel = CurrentTransaction). Não existe perda sem
+      // ocorrência, nem ocorrência sem perda.
+      //
+      // A etapa anterior é exigida ANTES de montar o evento, com mensagem
+      // própria: "o Apex ignora" não é proteção — gravar a perda com etapa
+      // vazia deixaria dado falso no relatório do gestor sem erro nenhum.
+      Datetime agora = System.now();
+      List<SOL_Evento_Jornada__c> eventos = new List<SOL_Evento_Jornada__c>();
+      for (Opportunity o : perdidas.values()) {
+        String etapaAnterior = etapasAnteriores == null
+          ? null
+          : etapasAnteriores.get(o.Id);
+        if (
+          String.isBlank(etapaAnterior) ||
+          etapaAnterior == SOLEventoJornadaService.ETAPA_PERDIDO
+        ) {
+          throw new NegocioPerdidoException(MSG_ETAPA_ANTERIOR_AUSENTE);
+        }
+        eventos.add(
+          SOLEventoJornadaService.oportunidadePerdida(o, etapaAnterior, agora)
+        );
+      }
+      SOLEventoJornadaService.registrar(eventos);
+
       return r;
+    } catch (NegocioPerdidoException e) {
+      // Mensagem já controlada (etapa anterior ausente): preserva o texto em
+      // vez de trocá-lo pelo genérico de cancelamento de tarefas.
+      if (sp != null) {
+        Database.rollback(sp);
+      }
+      System.debug(
+        LoggingLevel.ERROR,
+        'SOLNegocioPerdidoService.oportunidade: ' + e.getMessage()
+      );
+      throw e;
     } catch (Exception e) {
       if (sp != null) {
         Database.rollback(sp);

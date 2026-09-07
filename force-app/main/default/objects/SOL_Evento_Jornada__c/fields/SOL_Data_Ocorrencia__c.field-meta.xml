@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Data_Ocorrencia__c</fullName>
+    <description>Instante em que a ocorrência aconteceu — o MESMO System.now() que o serviço usou para carimbar a reatribuição ou a perda no registro de negócio. É a coluna do filtro de período do relatório, declarada explicitamente para o report type não aplicar data padrão em silêncio. Não use CreatedDate no lugar dela: a gravação é simultânea hoje, mas este campo declara a intenção e sobrevive a qualquer reprocessamento. Campo técnico, somente leitura. CLICKUP-9438.</description>
+    <label>Data da ocorrência</label>
+    <required>true</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

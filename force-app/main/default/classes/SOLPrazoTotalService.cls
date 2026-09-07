@@ -309,13 +309,21 @@ public without sharing class SOLPrazoTotalService {
 
       Savepoint spOpp = Database.setSavepoint();
       try {
+        // (CLICKUP-9438) Contador já incrementado: é a sequência da ocorrência
+        // e entra na chave de idempotência do evento.
+        Decimal sequencia =
+          (o.SOL_Qtd_Reatribuicoes_Prazo__c == null
+            ? 0
+            : o.SOL_Qtd_Reatribuicoes_Prazo__c) + 1;
+        // Proprietário ANTES da troca. `o` não é mutado (o update usa uma
+        // instância nova), então este valor continua íntegro — mas capturá-lo
+        // aqui deixa a intenção explícita e imune a refatoração.
+        Id vendedorAnterior = o.OwnerId;
+
         update new Opportunity(
           Id = o.Id,
           OwnerId = escolhido,
-          SOL_Qtd_Reatribuicoes_Prazo__c =
-            (o.SOL_Qtd_Reatribuicoes_Prazo__c == null
-              ? 0
-              : o.SOL_Qtd_Reatribuicoes_Prazo__c) + 1,
+          SOL_Qtd_Reatribuicoes_Prazo__c = sequencia,
           SOL_Data_Reatribuicao_Prazo__c = agora,
           SOL_Motivo_Reatribuicao_Prazo__c = MOTIVO_PRAZO_TOTAL,
           SOL_Status_Reatribuicao_Prazo__c = STATUS_REATRIBUIDO
@@ -340,6 +348,30 @@ public without sharing class SOLPrazoTotalService {
         if (!transferir.isEmpty()) {
           update transferir;
         }
+
+        // (CLICKUP-9438) A ocorrência entra no MESMO Savepoint desta
+        // Oportunidade: se ela não puder ser gravada, o `catch` abaixo desfaz
+        // proprietário, Tasks, auditoria e ponteiro, e a Oportunidade continua
+        // elegível para a próxima varredura. Nunca há reatribuição sem evento —
+        // e, pelo mesmo rollback, nunca há evento sem reatribuição.
+        //
+        // Custo por iteração (2 consultas + 1 gravação) é deliberado: o
+        // isolamento por Oportunidade EXIGE que o evento fique no Savepoint
+        // dela. Não há estouro de limite porque a varredura roda com
+        // SOLPrazoTotalScheduler.TAMANHO_LOTE = 1 — uma Oportunidade por
+        // transação. Consolidar os eventos fora do laço economizaria consultas
+        // e destruiria o isolamento.
+        SOLEventoJornadaService.registrar(
+          new List<SOL_Evento_Jornada__c>{
+            SOLEventoJornadaService.reatribuicaoPorPrazoTotal(
+              o,
+              vendedorAnterior,
+              escolhido,
+              sequencia,
+              agora
+            )
+          }
+        );
 
         // PONTEIRO NO MESMO SAVEPOINT (revisão final do PR #15). Se o ponteiro
         // não puder ser gravado, o round-robin ficaria incorreto com a

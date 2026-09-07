@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Oportunidade__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Oportunidade que originou a ocorrência. Preenchida quando SOL_Origem__c = &quot;Oportunidade&quot; (reatribuição por estouro do prazo total e Oportunidade perdida); vazia nas ocorrências de Lead. SetNull de propósito: excluir a Oportunidade não pode apagar o histórico da jornada nem travar a exclusão — o evento permanece com data, motivo, vendedor e etapa anterior. CLICKUP-9438.</description>
+    <label>Oportunidade</label>
+    <referenceTo>Opportunity</referenceTo>
+    <relationshipLabel>Eventos da Jornada SOL</relationshipLabel>
+    <relationshipName>Eventos_Jornada_SOL</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

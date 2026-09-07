@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Tipo_Evento__c</fullName>
+    <description>Natureza da ocorrência: &quot;Reatribuição&quot; (o registro trocou de vendedor) ou &quot;Perda&quot; (o negócio foi encerrado sem venda). Agrupador de primeiro nível do relatório; o detalhe fica em SOL_Motivo__c. Gravado exclusivamente por SOLEventoJornadaService, em contexto de sistema. CLICKUP-9438.</description>
+    <label>Tipo de evento</label>
+    <required>true</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Reatribuição</fullName>
+                <default>false</default>
+                <label>Reatribuição</label>
+            </value>
+            <value>
+                <fullName>Perda</fullName>
+                <default>false</default>
+                <label>Perda</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

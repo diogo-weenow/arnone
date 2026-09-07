@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Etapa_Anterior__c</fullName>
+    <description>Etapa REAL de onde a Oportunidade saiu ao ser perdida — Diagnóstico, Negociação ou Fechamento. NUNCA &quot;Perdido&quot;: o valor vem de $Record__Prior.StageName no Flow after-save SOL_Encerrar_Tarefas_Oportunidade_Perdida, ou seja, do estado ANTES do save que fechou o negócio. Depois do save esse valor não existe mais em lugar nenhum consultável — por isso ele é capturado na transição e congelado aqui. É o eixo da segmentação &quot;em que etapa a Arnone perde&quot;. Vazio nas ocorrências que não são perda de Oportunidade. Texto e não picklist: acompanhar o Funil_SOL sem exigir manutenção de valores. CLICKUP-9438.</description>
+    <externalId>false</externalId>
+    <label>Etapa anterior</label>
+    <length>80</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

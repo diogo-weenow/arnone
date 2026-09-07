@@ -9,9 +9,17 @@
  * Automação SEPARADA da do Lead de propósito: objetos diferentes, gatilhos
  * diferentes, entradas diferentes no serviço.
  *
- * Falha ATÔMICA: se o cancelamento das Tasks falhar, a exceção controlada é
- * RELANÇADA para o Flow. Com flowTransactionModel = CurrentTransaction, isso
- * aborta a própria mudança da Oportunidade para "Perdido".
+ * (CLICKUP-9438) Passou a receber também a ETAPA ANTERIOR — o Flow envia
+ * `$Record__Prior.StageName`, isto é, o estado ANTES do save que fechou o
+ * negócio. É o único ponto da plataforma em que esse valor ainda existe: o
+ * after-save já vê "Perdido" no registro, e o Field History não junta etapa e
+ * motivo numa mesma linha de relatório. Sem ela o serviço aborta a perda em vez
+ * de registrar a ocorrência com a etapa errada.
+ *
+ * Falha ATÔMICA: se o cancelamento das Tasks ou o registro da ocorrência
+ * falhar, a exceção controlada é RELANÇADA para o Flow. Com
+ * flowTransactionModel = CurrentTransaction, isso aborta a própria mudança da
+ * Oportunidade para "Perdido".
  */
 public with sharing class SOLNegocioPerdidoOportunidadeInvocable {
   public class Entrada {
@@ -21,11 +29,18 @@ public with sharing class SOLNegocioPerdidoOportunidadeInvocable {
       required=true
     )
     public Id opportunityId;
+
+    @InvocableVariable(
+      label='Etapa anterior à perda'
+      description='Etapa de onde a Oportunidade saiu, vinda de $Record__Prior.StageName. Obrigatória: é o que o relatório de perdas por etapa consome, e depois do save ela não existe mais em lugar nenhum.'
+      required=true
+    )
+    public String etapaAnterior;
   }
 
   @InvocableMethod(
     label='Encerrar tarefas da Oportunidade perdida SOL'
-    description='Consolida os Ids recebidos e chama SOLNegocioPerdidoService.encerrarPorOportunidadePerdida uma única vez por execução bulk.'
+    description='Consolida os Ids recebidos e chama SOLNegocioPerdidoService.encerrarPorOportunidadePerdida uma única vez por execução bulk, levando a etapa anterior de cada Oportunidade.'
     category='Arnone Soluções'
   )
   public static void encerrar(List<Entrada> entradas) {
@@ -33,22 +48,30 @@ public with sharing class SOLNegocioPerdidoOportunidadeInvocable {
       return;
     }
 
-    Set<Id> ids = new Set<Id>();
+    // Consolidação bulk: uma chamada só ao serviço, com a etapa anterior de
+    // cada Oportunidade. A PRIMEIRA etapa informada para um mesmo Id vence —
+    // num lote a mesma Oportunidade só aparece uma vez, e repetição com valores
+    // divergentes seria defeito do chamador, não dado a ser mesclado.
+    Map<Id, String> etapasAnteriores = new Map<Id, String>();
     for (Entrada entrada : entradas) {
       if (
         entrada != null &&
         entrada.opportunityId != null &&
-        entrada.opportunityId.getSObjectType() == Opportunity.SObjectType
+        entrada.opportunityId.getSObjectType() == Opportunity.SObjectType &&
+        !etapasAnteriores.containsKey(entrada.opportunityId)
       ) {
-        ids.add(entrada.opportunityId);
+        etapasAnteriores.put(entrada.opportunityId, entrada.etapaAnterior);
       }
     }
-    if (ids.isEmpty()) {
+    if (etapasAnteriores.isEmpty()) {
       return;
     }
 
     try {
-      SOLNegocioPerdidoService.encerrarPorOportunidadePerdida(new List<Id>(ids));
+      SOLNegocioPerdidoService.encerrarPorOportunidadePerdida(
+        new List<Id>(etapasAnteriores.keySet()),
+        etapasAnteriores
+      );
     } catch (SOLNegocioPerdidoService.NegocioPerdidoException e) {
       System.debug(LoggingLevel.ERROR, 'SOLNegocioPerdidoOportunidadeInvocable: ' + e.getMessage());
       throw e;

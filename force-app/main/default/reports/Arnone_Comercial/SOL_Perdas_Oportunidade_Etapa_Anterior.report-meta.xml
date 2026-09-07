@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <aggregates>
+        <calculatedFormula>RowCount/PARENTGROUPVAL(RowCount, GRAND_SUMMARY)</calculatedFormula>
+        <datatype>percent</datatype>
+        <developerName>FORMULA1</developerName>
+        <downGroupingContext>SOL_Evento_Jornada__c.SOL_Etapa_Anterior__c</downGroupingContext>
+        <isActive>true</isActive>
+        <isCrossBlock>false</isCrossBlock>
+        <masterLabel>% do total</masterLabel>
+        <scale>1</scale>
+    </aggregates>
+    <columns>
+        <field>SOL_Evento_Jornada__c.SOL_Data_Ocorrencia__c</field>
+    </columns>
+    <columns>
+        <field>SOL_Evento_Jornada__c.SOL_Oportunidade__c</field>
+    </columns>
+    <columns>
+        <field>SOL_Evento_Jornada__c.SOL_Produto__c</field>
+    </columns>
+    <columns>
+        <field>SOL_Evento_Jornada__c.SOL_Vendedor__c</field>
+    </columns>
+    <columns>
+        <field>SOL_Evento_Jornada__c.SOL_Chave_Idempotencia__c</field>
+    </columns>
+    <description>CLICKUP-9438 — Oportunidades perdidas pela ETAPA ANTERIOR real, nunca &quot;Perdido&quot;: quantidade e % do total. A etapa vem de $Record__Prior.StageName na transição. Período pela data da ocorrência. Filtros travados: motivo e origem SOL.</description>
+    <filter>
+        <criteriaItems>
+            <column>SOL_Evento_Jornada__c.SOL_Record_Type_Origem__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>false</isUnlocked>
+            <operator>equals</operator>
+            <value>SOL</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>SOL_Evento_Jornada__c.SOL_Motivo__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>false</isUnlocked>
+            <operator>equals</operator>
+            <value>Oportunidade perdida</value>
+        </criteriaItems>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>SOL_Evento_Jornada__c.SOL_Etapa_Anterior__c</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>SOL — Perdas por etapa anterior</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
+    <reportType>CustomEntity$SOL_Evento_Jornada__c</reportType>
+    <scope>organization</scope>
+    <showDetails>true</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>SOL_Evento_Jornada__c.SOL_Data_Ocorrencia__c</dateColumn>
+        <interval>INTERVAL_CURFY</interval>
+    </timeFrameFilter>
+</Report>
