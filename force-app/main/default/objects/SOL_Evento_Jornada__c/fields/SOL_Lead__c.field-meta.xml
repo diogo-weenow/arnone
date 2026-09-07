@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Lead__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Lead que originou a ocorrência. Preenchido quando SOL_Origem__c = &quot;Lead&quot; (reatribuição por falta de contato e Lead perdido por opt-out); vazio nas ocorrências de Oportunidade. SetNull de propósito: excluir um Lead não pode apagar o histórico da jornada nem travar a exclusão — o evento permanece com data, motivo e vendedor. CLICKUP-9438.</description>
+    <label>Lead</label>
+    <referenceTo>Lead</referenceTo>
+    <relationshipLabel>Eventos da Jornada SOL</relationshipLabel>
+    <relationshipName>Eventos_Jornada_SOL</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

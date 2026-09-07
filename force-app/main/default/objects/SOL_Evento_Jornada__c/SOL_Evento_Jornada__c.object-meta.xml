@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <allowInChatterGroups>false</allowInChatterGroups>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description>CLICKUP-9438 — Livro-razão da jornada Arnone Soluções: UMA linha por ocorrência, gravada na MESMA transação da ação de negócio. Quatro motivos: reatribuição por falta de contato, por estouro do prazo total, Lead perdido por opt-out e Oportunidade perdida. POR QUE EXISTE, medido na org: LeadHistory só rastreia Owner e Status; o field history separa cada campo em UMA LINHA, e relatório não junta duas linhas numa ocorrência; o report type de histórico traz os campos do Lead no estado ATUAL, então com 2+ reatribuições todas as linhas mostram o mesmo último motivo; e havia 18 trocas de Owner contra 9 reatribuições por prazo — contar Owner superestima pela metade. SOL_Quantidade_Reatribuicoes__c é contador acumulado, não histórico. BACKEND: sem aba, sem uso manual, sem Create/Edit/Delete em Permission Set. OWD Private, proprietário = vendedor do instante; o gestor consolida pela hierarquia de papéis. Idempotência por SOL_Chave_Idempotencia__c. SEM backfill: a série começa na implantação.</description>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableLicensing>false</enableLicensing>
+    <enableReports>true</enableReports>
+    <enableSearch>false</enableSearch>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <externalSharingModel>Private</externalSharingModel>
+    <label>Evento da Jornada SOL</label>
+    <nameField>
+        <displayFormat>EJ-{0000000000}</displayFormat>
+        <label>Número do evento</label>
+        <trackHistory>false</trackHistory>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>Eventos da Jornada SOL</pluralLabel>
+    <searchLayouts></searchLayouts>
+    <sharingModel>Private</sharingModel>
+    <visibility>Public</visibility>
+</CustomObject>

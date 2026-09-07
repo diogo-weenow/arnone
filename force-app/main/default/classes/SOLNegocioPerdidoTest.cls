@@ -200,6 +200,21 @@ private class SOLNegocioPerdidoTest {
     update new Opportunity(Id = oppId, StageName = 'Perdido', SOL_Motivo_Perda__c = 'Sem retorno');
   }
 
+  /**
+   * (CLICKUP-9438) Etapa anterior exigida pelo serviço, uma por Oportunidade.
+   * Todas as Oportunidades destes testes saem de "Negociação" para "Perdido" —
+   * é o mesmo valor que o Flow envia em $Record__Prior.StageName na transição
+   * real, então a chamada direta reencontra a MESMA chave de idempotência e não
+   * duplica a ocorrência já gravada pela automação.
+   */
+  private static Map<Id, String> etapaAnterior(List<Id> oppIds, String etapa) {
+    Map<Id, String> m = new Map<Id, String>();
+    for (Id i : oppIds) {
+      m.put(i, etapa);
+    }
+    return m;
+  }
+
   /** Task ABERTA de tipo técnico (ou MANUAL, quando `tipo` é null). */
   private static Task tarefa(Id whoId, Id whatId, Id owner, String tipo) {
     Task t = new Task(
@@ -349,7 +364,10 @@ private class SOLNegocioPerdidoTest {
     Test.startTest();
     SOLNegocioPerdidoService.ResultadoPerda r;
     perderOpp(oppId);
-    r = SOLNegocioPerdidoService.encerrarPorOportunidadePerdida(new List<Id>{ oppId });
+    r = SOLNegocioPerdidoService.encerrarPorOportunidadePerdida(
+      new List<Id>{ oppId },
+      etapaAnterior(new List<Id>{ oppId }, 'Negociação')
+    );
     Test.stopTest();
 
     assertCanceladaPorPerda(tipada, 'Classificada');
@@ -377,7 +395,8 @@ private class SOLNegocioPerdidoTest {
 
     Test.startTest();
     SOLNegocioPerdidoService.ResultadoPerda r = SOLNegocioPerdidoService.encerrarPorOportunidadePerdida(
-      new List<Id>{ oppId }
+      new List<Id>{ oppId },
+      etapaAnterior(new List<Id>{ oppId }, 'Negociação')
     );
     Test.stopTest();
 
@@ -729,7 +748,8 @@ private class SOLNegocioPerdidoTest {
       SOL_Motivo_Perda__c = 'Sem retorno'
     );
     SOLNegocioPerdidoService.ResultadoPerda r = SOLNegocioPerdidoService.encerrarPorOportunidadePerdida(
-      new List<Id>{ outraBU, semProduto }
+      new List<Id>{ outraBU, semProduto },
+      etapaAnterior(new List<Id>{ outraBU, semProduto }, 'Negociação')
     );
     Test.stopTest();
 
@@ -752,7 +772,8 @@ private class SOLNegocioPerdidoTest {
     perderOpp(oppId);
     perderLead(l.Id);
     SOLNegocioPerdidoService.ResultadoPerda rOpp = SOLNegocioPerdidoService.encerrarPorOportunidadePerdida(
-      new List<Id>{ oppId }
+      new List<Id>{ oppId },
+      etapaAnterior(new List<Id>{ oppId }, 'Negociação')
     );
     SOLNegocioPerdidoService.ResultadoPerda rLead = SOLNegocioPerdidoService.encerrarPorLeadPerdido(
       new List<Id>{ l.Id }
@@ -778,17 +799,33 @@ private class SOLNegocioPerdidoTest {
     update new Opportunity(Id = oppId, StageName = 'Perdido', SOL_Motivo_Perda__c = 'Sem retorno');
 
     Test.startTest();
+    Map<Id, String> etapas = etapaAnterior(new List<Id>{ oppId }, 'Negociação');
     SOLNegocioPerdidoService.ResultadoPerda r1 = SOLNegocioPerdidoService.encerrarPorOportunidadePerdida(
-      new List<Id>{ oppId }
+      new List<Id>{ oppId },
+      etapas
     );
     Datetime depoisDoPrimeiro = [SELECT LastModifiedDate FROM Task WHERE Id = :t].LastModifiedDate;
     SOLNegocioPerdidoService.ResultadoPerda r2 = SOLNegocioPerdidoService.encerrarPorOportunidadePerdida(
-      new List<Id>{ oppId }
+      new List<Id>{ oppId },
+      etapas
     );
     SOLNegocioPerdidoService.ResultadoPerda r3 = SOLNegocioPerdidoService.encerrarPorOportunidadePerdida(
-      new List<Id>{ oppId }
+      new List<Id>{ oppId },
+      etapas
     );
     Test.stopTest();
+
+    // (CLICKUP-9438) Três passadas, UMA ocorrência: a chave de idempotência é a
+    // mesma nas três, e a única que existe veio da transição real do Flow.
+    System.assertEquals(
+      1,
+      [
+        SELECT COUNT()
+        FROM SOL_Evento_Jornada__c
+        WHERE SOL_Oportunidade__c = :oppId
+      ],
+      'Reprocessar a perda não duplica a ocorrência da jornada.'
+    );
 
     assertCanceladaPorPerda(t, 'Após reprocessamento');
     System.assertEquals(0, r2.tarefasCanceladas, '2ª passada não cancela nada.');
@@ -832,15 +869,20 @@ private class SOLNegocioPerdidoTest {
     Integer q0 = Limits.getQueries();
     Integer d0 = Limits.getDmlStatements();
     SOLNegocioPerdidoService.ResultadoPerda r = SOLNegocioPerdidoService.encerrarPorOportunidadePerdida(
-      opps
+      opps,
+      etapaAnterior(opps, 'Negociação')
     );
     Integer soql = Limits.getQueries() - q0;
     Integer dml = Limits.getDmlStatements() - d0;
     Test.stopTest();
 
     System.assertEquals(10, r.negociosPerdidos, 'As 10 estão no escopo.');
-    System.assert(soql <= 3, 'Sem SOQL em laço: ' + soql);
-    System.assert(dml <= 3, 'Sem DML em laço: ' + dml);
+    // (CLICKUP-9438) O teto subiu de 3 para 5 porque o registro da ocorrência
+    // acrescenta um custo FIXO (chaves existentes + usuários ativos + insert),
+    // não proporcional. O que o teste protege continua sendo o mesmo: 10
+    // Oportunidades custam o mesmo que 1.
+    System.assert(soql <= 5, 'Sem SOQL em laço (custo fixo para as 10): ' + soql);
+    System.assert(dml <= 3, 'Sem DML em laço (custo fixo para as 10): ' + dml);
     System.assertEquals(
       10,
       [SELECT COUNT() FROM Task WHERE WhatId IN :opps AND SOL_Cancelada_Por_Perda__c = TRUE],
@@ -873,7 +915,10 @@ private class SOLNegocioPerdidoTest {
     Boolean lancou = false;
     String mensagem = null;
     try {
-      SOLNegocioPerdidoService.encerrarPorOportunidadePerdida(new List<Id>{ oppId });
+      SOLNegocioPerdidoService.encerrarPorOportunidadePerdida(
+        new List<Id>{ oppId },
+        etapaAnterior(new List<Id>{ oppId }, 'Negociação')
+      );
     } catch (SOLNegocioPerdidoService.NegocioPerdidoException e) {
       lancou = true;
       mensagem = e.getMessage();
@@ -1445,7 +1490,8 @@ private class SOLNegocioPerdidoTest {
       new List<Id>{ UserInfo.getUserId() }
     );
     SOLNegocioPerdidoService.ResultadoPerda r4 = SOLNegocioPerdidoService.encerrarPorOportunidadePerdida(
-      new List<Id>{ UserInfo.getUserId() }
+      new List<Id>{ UserInfo.getUserId() },
+      new Map<Id, String>()
     );
     Test.stopTest();
 
@@ -1482,6 +1528,9 @@ private class SOLNegocioPerdidoTest {
     Test.startTest();
     SOLNegocioPerdidoOportunidadeInvocable.Entrada eOpp = new SOLNegocioPerdidoOportunidadeInvocable.Entrada();
     eOpp.opportunityId = oppId;
+    // (CLICKUP-9438) O Flow envia $Record__Prior.StageName; sem ele o serviço
+    // aborta a perda em vez de registrar a ocorrência com a etapa errada.
+    eOpp.etapaAnterior = 'Negociação';
     SOLNegocioPerdidoOportunidadeInvocable.encerrar(
       new List<SOLNegocioPerdidoOportunidadeInvocable.Entrada>{ eOpp }
     );
@@ -1533,6 +1582,7 @@ private class SOLNegocioPerdidoTest {
     // Id de outro tipo: consolidado fora, sem chamar o serviço.
     SOLNegocioPerdidoOportunidadeInvocable.Entrada eTipoErrado = new SOLNegocioPerdidoOportunidadeInvocable.Entrada();
     eTipoErrado.opportunityId = UserInfo.getUserId();
+    eTipoErrado.etapaAnterior = 'Negociação';
     SOLNegocioPerdidoLeadInvocable.Entrada eLeadTipoErrado = new SOLNegocioPerdidoLeadInvocable.Entrada();
     eLeadTipoErrado.leadId = UserInfo.getUserId();
 
@@ -1549,6 +1599,9 @@ private class SOLNegocioPerdidoTest {
     try {
       SOLNegocioPerdidoOportunidadeInvocable.Entrada e1 = new SOLNegocioPerdidoOportunidadeInvocable.Entrada();
       e1.opportunityId = oppId;
+      // Etapa anterior presente: a falha exercitada aqui é a de GRAVAÇÃO (modo
+      // somente leitura), não a da etapa faltando — que tem teste próprio.
+      e1.etapaAnterior = 'Negociação';
       SOLNegocioPerdidoOportunidadeInvocable.encerrar(
         new List<SOLNegocioPerdidoOportunidadeInvocable.Entrada>{ e1 }
       );

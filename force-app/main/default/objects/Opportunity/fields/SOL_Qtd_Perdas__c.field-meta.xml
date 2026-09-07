@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Qtd_Perdas__c</fullName>
+    <description>Quantas vezes esta Oportunidade JÁ transitou para &quot;Perdido&quot;. Identifica a TRANSIÇÃO e torna a ocorrência de perda idempotente sem perder a segunda: reprocessar sem transição reencontra o mesmo número, reabrir e perder de novo incrementa — mesmo partindo da MESMA etapa e dentro do mesmo segundo. Nenhum campo da plataforma resolve: LastStageChangeDate, LastModifiedDate e SystemModstamp têm precisão de SEGUNDO — medido nesta org, duas transições distintas compartilharam o carimbo — e SOL_Data_Encerramento__c é congelado no primeiro encerramento pelo CLICKUP-9439. Gravado pelo Flow BEFORE-SAVE SOL_Marco_Perda_Oportunidade: o incremento é assignment e não acrescenta DML; a checagem de Record Type acrescenta UMA consulta por transação. O Flow participa da MESMA transação da Oportunidade — falha inesperada nele pode impedir a gravação, e um rollback desfaz também este contador. Sem histórico de campo: a auditoria vive em SOL_Evento_Jornada__c. Somente leitura. CLICKUP-9438.</description>
+    <externalId>false</externalId>
+    <label>Perdas registradas</label>
+    <precision>4</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>
