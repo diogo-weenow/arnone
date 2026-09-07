@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Arnone_Comercial/SOL_Tempo_Medio_Primeira_Ligacao</members>
+        <members>Arnone_Comercial/SOL_Tempo_Medio_Contato_Efetivado</members>
+        <members>Arnone_Comercial/SOL_Tempo_Medio_Reuniao_Procuracao</members>
+        <members>Arnone_Comercial/SOL_Tempo_Medio_Calculo_Juridico</members>
+        <members>Arnone_Comercial/SOL_Tempo_Medio_Reuniao_Final</members>
+        <members>Arnone_Comercial/SOL_Tempo_Medio_Fechamento</members>
+        <name>Report</name>
+    </types>
+    <types>
+        <members>Arnone_Comercial/SOL_Funil_Comercial</members>
+        <name>Dashboard</name>
+    </types>
+    <version>66.0</version>
+</Package>
