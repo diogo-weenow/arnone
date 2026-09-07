@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Resultado_Normalizado__c</fullName>
+    <description>CLICKUP-9428. Resultado do contato numa regua unica, por precedencia: 1) Status Cancelada vence tudo; 2) tarefa aberta e Pendente; 3) ligacao concluida com Atendeu e Sucesso, e Atendeu_Sem_Conclusao / Nao atendeu / Nao foi possivel ligar / Opt-out sao Sem sucesso; 4) e-mail ou WhatsApp concluido com Enviado e Sucesso e Nao enviado e Sem sucesso; 5) qualquer combinacao incoerente cai em Nao classificado, que fica visivel no relatorio em vez de sumir.</description>
+    <externalId>false</externalId>
+    <formula>IF( ISPICKVAL(Status, &quot;Cancelada&quot;), &quot;Cancelada&quot;,
+IF( NOT(ISPICKVAL(Status, &quot;Completed&quot;)), &quot;Pendente&quot;,
+IF( BEGINS(SOL_Canal_Efetivo__c, &quot;Ligação&quot;),
+    IF( ISPICKVAL(SOL_Resultado_Contato__c, &quot;Atendeu&quot;), &quot;Sucesso&quot;,
+    IF( OR( ISPICKVAL(SOL_Resultado_Contato__c, &quot;Atendeu_Sem_Conclusao&quot;),
+            ISPICKVAL(SOL_Resultado_Contato__c, &quot;Não atendeu&quot;),
+            ISPICKVAL(SOL_Resultado_Contato__c, &quot;Não foi possível ligar&quot;),
+            ISPICKVAL(SOL_Resultado_Contato__c, &quot;Opt-out&quot;) ), &quot;Sem sucesso&quot;,
+    &quot;Não classificado&quot; )),
+IF( OR( ISPICKVAL(SOL_Canal_Contato__c, &quot;E-mail&quot;),
+        ISPICKVAL(SOL_Canal_Contato__c, &quot;WhatsApp&quot;) ),
+    IF( ISPICKVAL(SOL_Resultado_Envio__c, &quot;Enviado&quot;), &quot;Sucesso&quot;,
+    IF( ISPICKVAL(SOL_Resultado_Envio__c, &quot;Não enviado&quot;), &quot;Sem sucesso&quot;,
+    &quot;Não classificado&quot; )),
+&quot;Não classificado&quot; ))))</formula>
+    <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
+    <label>Resultado normalizado do contato</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
