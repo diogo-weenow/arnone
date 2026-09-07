@@ -163,6 +163,13 @@ registrosDoE2E.add(leadFC);
 Id vendedor1 = [SELECT OwnerId FROM Lead WHERE Id = :leadFC].OwnerId;
 tentativas(leadFC, 3, 'a');
 Id vendedor2 = [SELECT OwnerId FROM Lead WHERE Id = :leadFC].OwnerId;
+// Ao reatribuir, o serviço reinicia o ciclo em "última conclusão + 1s" para as
+// tarefas que dispararam a troca não voltarem a contar. Numa transação rápida a
+// RODADA SEGUINTE cai dentro desse mesmo segundo e a 2ª reatribuição não
+// acontece — o E2E ficaria dependente da velocidade da máquina. Antecipar o
+// início do ciclo torna a segunda rodada determinística sem mascarar nada: o
+// que se verifica aqui é a OCORRÊNCIA gravada, não a régua de contagem.
+update new Lead(Id = leadFC, SOL_Data_Inicio_Ciclo_Contato__c = Datetime.now().addMinutes(-1));
 tentativas(leadFC, 3, 'b');
 Id vendedor3 = [SELECT OwnerId FROM Lead WHERE Id = :leadFC].OwnerId;
 

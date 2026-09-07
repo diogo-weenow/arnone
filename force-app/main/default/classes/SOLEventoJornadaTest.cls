@@ -212,6 +212,29 @@ private class SOLEventoJornadaTest {
     ];
   }
 
+  /**
+   * Abre o ciclo de contato um minuto atrás.
+   *
+   * POR QUÊ: ao reatribuir, o serviço reinicia o ciclo em
+   * `ultimaConclusaoContada + 1s`, justamente para as tarefas que dispararam a
+   * troca não voltarem a contar. Numa transação rápida, as tarefas da RODADA
+   * SEGUINTE são concluídas dentro desse mesmo segundo e caem ANTES do novo
+   * ciclo — a 2ª reatribuição simplesmente não acontece, e o teste passa ou
+   * falha conforme a máquina esteja mais rápida ou mais lenta. Foi exatamente
+   * assim que estes dois testes passaram em execução síncrona e falharam na
+   * execução paralela do deploy.
+   *
+   * Antecipar o início do ciclo elimina a corrida sem mascarar nada: o que
+   * estes testes medem é a OCORRÊNCIA gravada, não a régua de contagem de
+   * tentativas — essa tem testes próprios em SOLReatribuicaoContatoServiceTest.
+   */
+  private static void abrirCicloUmMinutoAtras(Id leadId) {
+    update new Lead(
+      Id = leadId,
+      SOL_Data_Inicio_Ciclo_Contato__c = System.now().addMinutes(-1)
+    );
+  }
+
   private static void tentativasNegativas(Id leadId, Integer qtd) {
     List<Task> ts = new List<Task>();
     for (Integer i = 0; i < qtd; i++) {
@@ -604,6 +627,7 @@ private class SOLEventoJornadaTest {
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
     Id vendedor2 = lead(l.Id).OwnerId;
 
+    abrirCicloUmMinutoAtras(l.Id);
     tentativasNegativas(l.Id, 3);
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
     Test.stopTest();
@@ -1382,6 +1406,7 @@ private class SOLEventoJornadaTest {
     Lead l1 = leadDistribuido(PRODUTO_RT);
     tentativasNegativas(l1.Id, 3);
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l1.Id });
+    abrirCicloUmMinutoAtras(l1.Id);
     tentativasNegativas(l1.Id, 3);
     SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l1.Id });
 
