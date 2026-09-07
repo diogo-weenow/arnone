@@ -90,11 +90,10 @@
         <numberOfColumns>12</numberOfColumns>
         <rowHeight>60</rowHeight>
     </dashboardGridLayout>
-    <dashboardType>SpecifiedUser</dashboardType>
-    <description>CLICKUP-9404 — Funil comercial da Arnone Soluções: Leads por Status x vendedor e Oportunidades por etapa x vendedor. O filtro Período de criação atua em CREATED_DATE nos dois componentes. Visão gerencial; não prova segregação por vendedor.</description>
+    <dashboardType>LoggedInUser</dashboardType>
+    <description>CLICKUP-9404 — Funil comercial da Arnone Soluções. A matriz está nos relatórios; aqui os dados aparecem como barras empilhadas derivadas deles. O filtro Período de criação atua em CREATED_DATE nos dois componentes. Roda como o usuário conectado.</description>
     <isGridLayout>true</isGridLayout>
     <owner>joao.silva.weenow@weenow.com.br</owner>
-    <runningUser>joao.silva.weenow@weenow.com.br</runningUser>
     <textColor>#000000</textColor>
     <title>SOL — Funil Comercial</title>
     <titleColor>#1F1D1A</titleColor>
