@@ -24,7 +24,22 @@
             <operator>equals</operator>
             <values>THIS_FISCAL_YEAR</values>
         </dashboardFilterOptions>
-        <name>Período de criação</name>
+        <name>Período de referência</name>
+    </dashboardFilters>
+    <dashboardFilters>
+        <dashboardFilterOptions>
+            <operator>equals</operator>
+            <values>Joao Silva</values>
+        </dashboardFilterOptions>
+        <dashboardFilterOptions>
+            <operator>equals</operator>
+            <values>Omar Faruk</values>
+        </dashboardFilterOptions>
+        <dashboardFilterOptions>
+            <operator>equals</operator>
+            <values>Thaina Coutinho</values>
+        </dashboardFilterOptions>
+        <name>Vendedor</name>
     </dashboardFilters>
     <dashboardGridLayout>
         <dashboardGridComponents>
@@ -36,6 +51,9 @@
                 <componentType>BarStacked</componentType>
                 <dashboardFilterColumns>
                     <column>CREATED_DATE</column>
+                </dashboardFilterColumns>
+                <dashboardFilterColumns>
+                    <column>OWNER</column>
                 </dashboardFilterColumns>
                 <displayUnits>Auto</displayUnits>
                 <drillEnabled>true</drillEnabled>
@@ -67,6 +85,9 @@
                 <dashboardFilterColumns>
                     <column>CREATED_DATE</column>
                 </dashboardFilterColumns>
+                <dashboardFilterColumns>
+                    <column>FULL_NAME</column>
+                </dashboardFilterColumns>
                 <displayUnits>Auto</displayUnits>
                 <drillEnabled>true</drillEnabled>
                 <drillToDetailEnabled>false</drillToDetailEnabled>
@@ -87,11 +108,239 @@
             <rowIndex>0</rowIndex>
             <rowSpan>5</rowSpan>
         </dashboardGridComponents>
+        <dashboardGridComponents>
+            <colSpan>4</colSpan>
+            <columnIndex>0</columnIndex>
+            <dashboardComponent>
+                <autoselectColumnsFromReport>false</autoselectColumnsFromReport>
+                <chartAxisRange>Auto</chartAxisRange>
+                <chartSummary>
+                    <axisBinding>y</axisBinding>
+                    <column>FORMULA1</column>
+                </chartSummary>
+                <componentType>Bar</componentType>
+                <dashboardFilterColumns>
+                    <column>Lead.SOL_Data_Primeira_Ligacao__c</column>
+                </dashboardFilterColumns>
+                <dashboardFilterColumns>
+                    <column>OWNER</column>
+                </dashboardFilterColumns>
+                <displayUnits>Auto</displayUnits>
+                <drillEnabled>true</drillEnabled>
+                <drillToDetailEnabled>false</drillToDetailEnabled>
+                <enableHover>true</enableHover>
+                <expandOthers>true</expandOthers>
+                <footer>Média de dias úteis, só de quem concluiu a etapa.</footer>
+                <groupingColumn>OWNER</groupingColumn>
+                <groupingSortProperties/>
+                <header>1. Primeira ligação</header>
+                <legendPosition>Bottom</legendPosition>
+                <report>Arnone_Comercial/SOL_Tempo_Medio_Primeira_Ligacao</report>
+                <showPercentage>false</showPercentage>
+                <showValues>true</showValues>
+                <sortBy>RowLabelAscending</sortBy>
+                <sortLegendValues>false</sortLegendValues>
+                <title>Tempo médio por vendedor</title>
+                <useReportChart>false</useReportChart>
+            </dashboardComponent>
+            <rowIndex>6</rowIndex>
+            <rowSpan>5</rowSpan>
+        </dashboardGridComponents>
+        <dashboardGridComponents>
+            <colSpan>4</colSpan>
+            <columnIndex>4</columnIndex>
+            <dashboardComponent>
+                <autoselectColumnsFromReport>false</autoselectColumnsFromReport>
+                <chartAxisRange>Auto</chartAxisRange>
+                <chartSummary>
+                    <axisBinding>y</axisBinding>
+                    <column>FORMULA1</column>
+                </chartSummary>
+                <componentType>Bar</componentType>
+                <dashboardFilterColumns>
+                    <column>Lead.SOL_Data_Contato_Efetivado__c</column>
+                </dashboardFilterColumns>
+                <dashboardFilterColumns>
+                    <column>OWNER</column>
+                </dashboardFilterColumns>
+                <displayUnits>Auto</displayUnits>
+                <drillEnabled>true</drillEnabled>
+                <drillToDetailEnabled>false</drillToDetailEnabled>
+                <enableHover>true</enableHover>
+                <expandOthers>true</expandOthers>
+                <footer>Média de dias úteis, só de quem concluiu a etapa.</footer>
+                <groupingColumn>OWNER</groupingColumn>
+                <groupingSortProperties/>
+                <header>2. Contato efetivado</header>
+                <legendPosition>Bottom</legendPosition>
+                <report>Arnone_Comercial/SOL_Tempo_Medio_Contato_Efetivado</report>
+                <showPercentage>false</showPercentage>
+                <showValues>true</showValues>
+                <sortBy>RowLabelAscending</sortBy>
+                <sortLegendValues>false</sortLegendValues>
+                <title>Tempo médio por vendedor</title>
+                <useReportChart>false</useReportChart>
+            </dashboardComponent>
+            <rowIndex>6</rowIndex>
+            <rowSpan>5</rowSpan>
+        </dashboardGridComponents>
+        <dashboardGridComponents>
+            <colSpan>4</colSpan>
+            <columnIndex>8</columnIndex>
+            <dashboardComponent>
+                <autoselectColumnsFromReport>false</autoselectColumnsFromReport>
+                <chartAxisRange>Auto</chartAxisRange>
+                <chartSummary>
+                    <axisBinding>y</axisBinding>
+                    <column>FORMULA1</column>
+                </chartSummary>
+                <componentType>Bar</componentType>
+                <dashboardFilterColumns>
+                    <column>Lead.SOL_Data_Reuniao_Procuracao__c</column>
+                </dashboardFilterColumns>
+                <dashboardFilterColumns>
+                    <column>OWNER</column>
+                </dashboardFilterColumns>
+                <displayUnits>Auto</displayUnits>
+                <drillEnabled>true</drillEnabled>
+                <drillToDetailEnabled>false</drillToDetailEnabled>
+                <enableHover>true</enableHover>
+                <expandOthers>true</expandOthers>
+                <footer>Média de dias úteis, só de quem concluiu a etapa.</footer>
+                <groupingColumn>OWNER</groupingColumn>
+                <groupingSortProperties/>
+                <header>3. Reunião e procuração</header>
+                <legendPosition>Bottom</legendPosition>
+                <report>Arnone_Comercial/SOL_Tempo_Medio_Reuniao_Procuracao</report>
+                <showPercentage>false</showPercentage>
+                <showValues>true</showValues>
+                <sortBy>RowLabelAscending</sortBy>
+                <sortLegendValues>false</sortLegendValues>
+                <title>Tempo médio por vendedor</title>
+                <useReportChart>false</useReportChart>
+            </dashboardComponent>
+            <rowIndex>6</rowIndex>
+            <rowSpan>5</rowSpan>
+        </dashboardGridComponents>
+        <dashboardGridComponents>
+            <colSpan>4</colSpan>
+            <columnIndex>0</columnIndex>
+            <dashboardComponent>
+                <autoselectColumnsFromReport>false</autoselectColumnsFromReport>
+                <chartAxisRange>Auto</chartAxisRange>
+                <chartSummary>
+                    <axisBinding>y</axisBinding>
+                    <column>FORMULA1</column>
+                </chartSummary>
+                <componentType>Bar</componentType>
+                <dashboardFilterColumns>
+                    <column>Opportunity.SOL_Data_Recebimento_Calculo__c</column>
+                </dashboardFilterColumns>
+                <dashboardFilterColumns>
+                    <column>FULL_NAME</column>
+                </dashboardFilterColumns>
+                <displayUnits>Auto</displayUnits>
+                <drillEnabled>true</drillEnabled>
+                <drillToDetailEnabled>false</drillToDetailEnabled>
+                <enableHover>true</enableHover>
+                <expandOthers>true</expandOthers>
+                <footer>Média de dias úteis, só de quem concluiu a etapa.</footer>
+                <groupingColumn>FULL_NAME</groupingColumn>
+                <groupingSortProperties/>
+                <header>4. Cálculo jurídico</header>
+                <legendPosition>Bottom</legendPosition>
+                <report>Arnone_Comercial/SOL_Tempo_Medio_Calculo_Juridico</report>
+                <showPercentage>false</showPercentage>
+                <showValues>true</showValues>
+                <sortBy>RowLabelAscending</sortBy>
+                <sortLegendValues>false</sortLegendValues>
+                <title>Tempo médio por vendedor</title>
+                <useReportChart>false</useReportChart>
+            </dashboardComponent>
+            <rowIndex>11</rowIndex>
+            <rowSpan>5</rowSpan>
+        </dashboardGridComponents>
+        <dashboardGridComponents>
+            <colSpan>4</colSpan>
+            <columnIndex>4</columnIndex>
+            <dashboardComponent>
+                <autoselectColumnsFromReport>false</autoselectColumnsFromReport>
+                <chartAxisRange>Auto</chartAxisRange>
+                <chartSummary>
+                    <axisBinding>y</axisBinding>
+                    <column>FORMULA1</column>
+                </chartSummary>
+                <componentType>Bar</componentType>
+                <dashboardFilterColumns>
+                    <column>Opportunity.SOL_Data_Reuniao_Final__c</column>
+                </dashboardFilterColumns>
+                <dashboardFilterColumns>
+                    <column>FULL_NAME</column>
+                </dashboardFilterColumns>
+                <displayUnits>Auto</displayUnits>
+                <drillEnabled>true</drillEnabled>
+                <drillToDetailEnabled>false</drillToDetailEnabled>
+                <enableHover>true</enableHover>
+                <expandOthers>true</expandOthers>
+                <footer>Média de dias úteis, só de quem concluiu a etapa.</footer>
+                <groupingColumn>FULL_NAME</groupingColumn>
+                <groupingSortProperties/>
+                <header>5. Reunião final</header>
+                <legendPosition>Bottom</legendPosition>
+                <report>Arnone_Comercial/SOL_Tempo_Medio_Reuniao_Final</report>
+                <showPercentage>false</showPercentage>
+                <showValues>true</showValues>
+                <sortBy>RowLabelAscending</sortBy>
+                <sortLegendValues>false</sortLegendValues>
+                <title>Tempo médio por vendedor</title>
+                <useReportChart>false</useReportChart>
+            </dashboardComponent>
+            <rowIndex>11</rowIndex>
+            <rowSpan>5</rowSpan>
+        </dashboardGridComponents>
+        <dashboardGridComponents>
+            <colSpan>4</colSpan>
+            <columnIndex>8</columnIndex>
+            <dashboardComponent>
+                <autoselectColumnsFromReport>false</autoselectColumnsFromReport>
+                <chartAxisRange>Auto</chartAxisRange>
+                <chartSummary>
+                    <axisBinding>y</axisBinding>
+                    <column>FORMULA1</column>
+                </chartSummary>
+                <componentType>Bar</componentType>
+                <dashboardFilterColumns>
+                    <column>Opportunity.SOL_Data_Encerramento__c</column>
+                </dashboardFilterColumns>
+                <dashboardFilterColumns>
+                    <column>FULL_NAME</column>
+                </dashboardFilterColumns>
+                <displayUnits>Auto</displayUnits>
+                <drillEnabled>true</drillEnabled>
+                <drillToDetailEnabled>false</drillToDetailEnabled>
+                <enableHover>true</enableHover>
+                <expandOthers>true</expandOthers>
+                <footer>Média de dias úteis, só de quem concluiu a etapa.</footer>
+                <groupingColumn>FULL_NAME</groupingColumn>
+                <groupingSortProperties/>
+                <header>6. Fechamento</header>
+                <legendPosition>Bottom</legendPosition>
+                <report>Arnone_Comercial/SOL_Tempo_Medio_Fechamento</report>
+                <showPercentage>false</showPercentage>
+                <showValues>true</showValues>
+                <sortBy>RowLabelAscending</sortBy>
+                <sortLegendValues>false</sortLegendValues>
+                <title>Tempo médio por vendedor</title>
+                <useReportChart>false</useReportChart>
+            </dashboardComponent>
+            <rowIndex>11</rowIndex>
+            <rowSpan>5</rowSpan>
+        </dashboardGridComponents>
         <numberOfColumns>12</numberOfColumns>
         <rowHeight>60</rowHeight>
     </dashboardGridLayout>
     <dashboardType>LoggedInUser</dashboardType>
-    <description>CLICKUP-9404 — Funil comercial da Arnone Soluções. A matriz está nos relatórios; aqui os dados aparecem como barras empilhadas derivadas deles. O filtro Período de criação atua em CREATED_DATE nos dois componentes. Roda como o usuário conectado.</description>
+    <description>9404+9451 — 8 componentes: 2 de funil e 6 de tempo médio por etapa, todos por vendedor. Período de referência = data de criação no funil, data de conclusão da etapa nas durações. Vendedor = proprietário atual. Roda como LoggedInUser.</description>
     <isGridLayout>true</isGridLayout>
     <owner>joao.silva.weenow@weenow.com.br</owner>
     <textColor>#000000</textColor>

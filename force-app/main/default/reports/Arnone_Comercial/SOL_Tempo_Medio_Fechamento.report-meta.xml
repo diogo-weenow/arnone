@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+    <aggregates>
+        <calculatedFormula>Opportunity.SOL_Dias_Fechamento__c:AVG</calculatedFormula>
+        <datatype>number</datatype>
+        <developerName>FORMULA1</developerName>
+        <downGroupingContext>FULL_NAME</downGroupingContext>
+        <isActive>true</isActive>
+        <masterLabel>Dias úteis (média)</masterLabel>
+        <scale>1</scale>
+    </aggregates>
+    <columns>
+        <field>OPPORTUNITY_NAME</field>
+    </columns>
+    <columns>
+        <field>Opportunity.SOL_Data_Encerramento__c</field>
+    </columns>
+    <columns>
+        <field>Opportunity.SOL_Dias_Fechamento__c</field>
+    </columns>
+    <description>CLICKUP-9451 — Tempo médio da etapa 6 — fechamento, por vendedor (proprietário atual). Média direta do campo de duração já consolidado pelo CLICKUP-9439; o relatório não recalcula dias úteis. Só entram registros com a duração preenchida.</description>
+    <filter>
+        <criteriaItems>
+            <column>RECORDTYPE</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>false</isUnlocked>
+            <operator>equals</operator>
+            <value>Opportunity.SOL</value>
+        </criteriaItems>
+        <criteriaItems>
+            <column>Opportunity.SOL_Dias_Fechamento__c</column>
+            <columnToColumn>false</columnToColumn>
+            <isUnlocked>false</isUnlocked>
+            <operator>notEqual</operator>
+            <value></value>
+        </criteriaItems>
+    </filter>
+    <format>Summary</format>
+    <groupingsDown>
+        <dateGranularity>Day</dateGranularity>
+        <field>FULL_NAME</field>
+        <sortOrder>Asc</sortOrder>
+    </groupingsDown>
+    <name>SOL — Tempo médio fechamento</name>
+    <reportType>Opportunity</reportType>
+    <scope>organization</scope>
+    <showDetails>false</showDetails>
+    <showGrandTotal>true</showGrandTotal>
+    <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>Opportunity.SOL_Data_Encerramento__c</dateColumn>
+        <interval>INTERVAL_CURFY</interval>
+    </timeFrameFilter>
+</Report>
