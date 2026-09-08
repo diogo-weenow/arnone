@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Arnone_Comercial</members>
+        <name>ReportFolder</name>
+    </types>
+    <types>
+        <members>Arnone_Comercial</members>
+        <name>DashboardFolder</name>
+    </types>
+    <types>
+        <members>SOL_Restringir_Tarefas_Ao_Proprietario</members>
+        <name>CustomPermission</name>
+    </types>
+    <types>
+        <members>SOL_Tarefas_Somente_Do_Proprietario</members>
+        <name>RestrictionRule</name>
+    </types>
+    <types>
+        <members>PS_SOL_Comercial</members>
+        <name>PermissionSet</name>
+    </types>
+    <types>
+        <members>SOLTarefasRestritasTest</members>
+        <name>ApexClass</name>
+    </types>
+    <version>66.0</version>
+</Package>

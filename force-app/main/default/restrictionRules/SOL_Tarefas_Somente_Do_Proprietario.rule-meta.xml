@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RestrictionRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <description>CLICKUP-9430 — Vendedor restrito vê apenas Tasks próprias. Incide só sobre quem tem a custom permission SOL_Restringir_Tarefas_Ao_Proprietario. View All/Modify All fazem bypass, preservando o gestor. Não vale para System Mode, onde roda a automação SOL.</description>
+    <enforcementType>Restrict</enforcementType>
+    <masterLabel>SOL — Tarefas somente do proprietário</masterLabel>
+    <recordFilter>OwnerId = $User.Id</recordFilter>
+    <targetEntity>Task</targetEntity>
+    <userCriteria>$Permission.SOL_Restringir_Tarefas_Ao_Proprietario = true</userCriteria>
+    <version>1</version>
+</RestrictionRule>

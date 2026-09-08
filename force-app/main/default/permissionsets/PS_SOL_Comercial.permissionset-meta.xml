@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
     <classAccesses>
+        <apexClass>SOLAcompanhamentoCalculoInvocable</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>SOLContatoEfetivadoInvocable</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
-        <apexClass>SOLOptOutInvocable</apexClass>
-        <enabled>true</enabled>
-    </classAccesses>
-    <classAccesses>
-        <apexClass>SOLAcompanhamentoCalculoInvocable</apexClass>
+        <apexClass>SOLDuracaoEtapaInvocable</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
@@ -29,15 +29,19 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>SOLOptOutInvocable</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>SOLProcuracaoAcompanhamentoInvocable</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
-        <apexClass>SOLReuniaoFinalInvocable</apexClass>
+        <apexClass>SOLReuniaoComercialInvocable</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
-        <apexClass>SOLReuniaoComercialInvocable</apexClass>
+        <apexClass>SOLReuniaoFinalInvocable</apexClass>
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
@@ -52,19 +56,14 @@
         <apexClass>SOL_PrepararConversao</apexClass>
         <enabled>true</enabled>
     </classAccesses>
-    <classAccesses>
-        <apexClass>SOLDuracaoEtapaInvocable</apexClass>
+    <customPermissions>
         <enabled>true</enabled>
-    </classAccesses>
+        <name>SOL_Restringir_Tarefas_Ao_Proprietario</name>
+    </customPermissions>
     <description>Acesso aos campos da jornada da Arnone Soluções (Recuperação Tributária e ART 360). Atribuir apenas a quem atende essa BU — os campos ficam invisíveis para as demais unidades. CLICKUP-9438: leitura de SOL_Evento_Jornada__c — nunca escrita, nem View All.</description>
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.CNPJ__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Lead.CNPJ__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -73,8 +72,108 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>false</editable>
+        <field>Event.SOL_Canal_Contato__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Event.SOL_Canal_Efetivo__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Event.SOL_Cancelada_Por_Perda__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Event.SOL_Ciclo_Contato__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Event.SOL_Contato_Efetivado__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Event.SOL_Data_Recebimento_Calculo_Ref__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Event.SOL_Data_Recebimento_Calculo__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Event.SOL_Data_Reuniao_Final_Ref__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Event.SOL_Data_Reuniao_Final__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Event.SOL_Data_Solicitacao_Calculo_Ref__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Event.SOL_Data_Solicitacao_Ref__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Event.SOL_Dia_Cadencia__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Event.SOL_Encerrado_Pela_Oportunidade__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Event.SOL_Motivo_Cancelamento__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Event.SOL_Prazo_Contato__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Event.SOL_Resultado_Contato__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Event.SOL_Resultado_Envio__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Event.SOL_Resultado_Normalizado__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>true</editable>
         <field>Event.SOL_Resultado_Reuniao__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Event.SOL_Tipo_Tarefa__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.CNPJ__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -85,16 +184,6 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Lead.SOL_Contato_Com_Decisor__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Lead.SOL_Data_Recebimento_Procuracao__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Lead.SOL_Data_Solicitacao_Procuracao__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -114,12 +203,32 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Lead.SOL_Data_Reuniao_Realizada__c</field>
+        <field>Lead.SOL_Data_Opt_Out__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Lead.SOL_Data_Opt_Out__c</field>
+        <field>Lead.SOL_Data_Primeira_Ligacao__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.SOL_Data_Recebimento_Procuracao__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.SOL_Data_Reuniao_Procuracao__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.SOL_Data_Reuniao_Realizada__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.SOL_Data_Solicitacao_Procuracao__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -129,7 +238,42 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Lead.SOL_Dias_Contato_Efetivado__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.SOL_Dias_Primeira_Ligacao__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.SOL_Dias_Reuniao_Procuracao__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Lead.SOL_Dias_Sem_Atualizacao__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.SOL_Duracao_Pendencia_Detalhe__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.SOL_Duracao_Pendencia_Motivo__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.SOL_Duracao_Pendente__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.SOL_Lead_Parado__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -139,27 +283,7 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Lead.SOL_Opt_Out__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Lead.SOL_Lead_Parado__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
         <field>Lead.SOL_Motivo_Ultima_Reatribuicao__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Lead.SOL_Quantidade_Reatribuicoes__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Lead.SOL_Status_Reatribuicao__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -168,13 +292,28 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.SOL_Opt_Out__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>true</editable>
         <field>Lead.SOL_Produto_Interesse__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.SOL_Quantidade_Reatribuicoes__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>true</editable>
         <field>Lead.SOL_Status_Procuracao__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Lead.SOL_Status_Reatribuicao__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -199,12 +338,17 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Opportunity.SOL_Data_Entrada_Negociacao__c</field>
+        <field>Opportunity.SOL_Data_Distribuicao__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Opportunity.SOL_Data_Solicitacao_Calculo__c</field>
+        <field>Opportunity.SOL_Data_Encerramento__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.SOL_Data_Entrada_Negociacao__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -214,27 +358,32 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Opportunity.SOL_Data_Primeira_Ligacao__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Opportunity.SOL_Data_Reatribuicao_Prazo__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Opportunity.SOL_Motivo_Reatribuicao_Prazo__c</field>
+        <field>Opportunity.SOL_Data_Recebimento_Calculo__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Opportunity.SOL_Prazo_Total_Comercial__c</field>
+        <field>Opportunity.SOL_Data_Reuniao_Final__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Opportunity.SOL_Qtd_Reatribuicoes_Prazo__c</field>
+        <field>Opportunity.SOL_Data_Reuniao_Procuracao__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Opportunity.SOL_Status_Reatribuicao_Prazo__c</field>
+        <field>Opportunity.SOL_Data_Solicitacao_Calculo__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -244,7 +393,52 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Opportunity.SOL_Dias_Calculo_Juridico__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.SOL_Dias_Contato_Efetivado__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Opportunity.SOL_Dias_Em_Negociacao__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.SOL_Dias_Fechamento__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.SOL_Dias_Primeira_Ligacao__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.SOL_Dias_Reuniao_Final__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.SOL_Dias_Reuniao_Procuracao__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.SOL_Duracao_Pendencia_Detalhe__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.SOL_Duracao_Pendencia_Motivo__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.SOL_Duracao_Pendente__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -269,6 +463,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>Opportunity.SOL_Motivo_Reatribuicao_Prazo__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Opportunity.SOL_Negociacao_Parada__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -283,8 +482,23 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.SOL_Prazo_Total_Comercial__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>true</editable>
         <field>Opportunity.SOL_Produto_Negocio__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.SOL_Qtd_Perdas__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.SOL_Qtd_Reatribuicoes_Prazo__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -295,6 +509,11 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>Opportunity.SOL_Resultado_Apresentacao__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Opportunity.SOL_Status_Reatribuicao_Prazo__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -324,7 +543,62 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>SOL_Evento_Jornada__c.SOL_Etapa_Anterior__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SOL_Evento_Jornada__c.SOL_Lead__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SOL_Evento_Jornada__c.SOL_Novo_Vendedor__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SOL_Evento_Jornada__c.SOL_Oportunidade__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SOL_Evento_Jornada__c.SOL_Produto__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SOL_Evento_Jornada__c.SOL_Record_Type_Origem__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SOL_Evento_Jornada__c.SOL_Vendedor__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Task.SOL_Canal_Contato__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Task.SOL_Canal_Efetivo__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>Task.SOL_Cancelada_Por_Perda__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Task.SOL_Ciclo_Contato__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Task.SOL_Contato_Efetivado__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -349,17 +623,22 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Task.SOL_Encerrado_Pela_Oportunidade__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
         <field>Task.SOL_Data_Solicitacao_Calculo_Ref__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
         <field>Task.SOL_Data_Solicitacao_Ref__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Task.SOL_Dia_Cadencia__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Task.SOL_Encerrado_Pela_Oportunidade__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -378,23 +657,8 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
-        <field>Task.SOL_Tipo_Tarefa__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
         <editable>true</editable>
-        <field>Task.SOL_Resultado_Reuniao__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Task.SOL_Canal_Contato__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Task.SOL_Canal_Efetivo__c</field>
+        <field>Task.SOL_Resultado_Envio__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -404,177 +668,12 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Task.SOL_Contato_Efetivado__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Task.SOL_Resultado_Envio__c</field>
+        <field>Task.SOL_Resultado_Reuniao__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Task.SOL_Ciclo_Contato__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Task.SOL_Dia_Cadencia__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Lead.SOL_Data_Primeira_Ligacao__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Lead.SOL_Data_Reuniao_Procuracao__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Lead.SOL_Dias_Primeira_Ligacao__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Lead.SOL_Dias_Contato_Efetivado__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Lead.SOL_Dias_Reuniao_Procuracao__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Lead.SOL_Duracao_Pendente__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Lead.SOL_Duracao_Pendencia_Motivo__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Lead.SOL_Duracao_Pendencia_Detalhe__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Opportunity.SOL_Data_Primeira_Ligacao__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Opportunity.SOL_Data_Reuniao_Procuracao__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Opportunity.SOL_Data_Recebimento_Calculo__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Opportunity.SOL_Data_Reuniao_Final__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Opportunity.SOL_Data_Encerramento__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Opportunity.SOL_Dias_Primeira_Ligacao__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Opportunity.SOL_Dias_Contato_Efetivado__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Opportunity.SOL_Dias_Reuniao_Procuracao__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Opportunity.SOL_Dias_Calculo_Juridico__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Opportunity.SOL_Dias_Reuniao_Final__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Opportunity.SOL_Dias_Fechamento__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Opportunity.SOL_Duracao_Pendente__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Opportunity.SOL_Duracao_Pendencia_Motivo__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Opportunity.SOL_Duracao_Pendencia_Detalhe__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Opportunity.SOL_Data_Distribuicao__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Opportunity.SOL_Qtd_Perdas__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>SOL_Evento_Jornada__c.SOL_Lead__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>SOL_Evento_Jornada__c.SOL_Oportunidade__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>SOL_Evento_Jornada__c.SOL_Vendedor__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>SOL_Evento_Jornada__c.SOL_Novo_Vendedor__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>SOL_Evento_Jornada__c.SOL_Etapa_Anterior__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>SOL_Evento_Jornada__c.SOL_Produto__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>SOL_Evento_Jornada__c.SOL_Record_Type_Origem__c</field>
+        <field>Task.SOL_Tipo_Tarefa__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
