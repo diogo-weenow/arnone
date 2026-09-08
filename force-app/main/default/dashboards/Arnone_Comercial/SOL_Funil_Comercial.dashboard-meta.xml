@@ -150,8 +150,12 @@
             <colSpan>4</colSpan>
             <columnIndex>4</columnIndex>
             <dashboardComponent>
-                <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+                <autoselectColumnsFromReport>false</autoselectColumnsFromReport>
                 <chartAxisRange>Auto</chartAxisRange>
+                <chartSummary>
+                    <axisBinding>y</axisBinding>
+                    <column>FORMULA1</column>
+                </chartSummary>
                 <componentType>Bar</componentType>
                 <dashboardFilterColumns>
                     <column>Lead.SOL_Data_Contato_Efetivado__c</column>
@@ -165,6 +169,7 @@
                 <enableHover>true</enableHover>
                 <expandOthers>true</expandOthers>
                 <footer>Média de dias úteis, só de quem concluiu a etapa.</footer>
+                <groupingColumn>OWNER</groupingColumn>
                 <groupingSortProperties/>
                 <header>2. Contato efetivado</header>
                 <legendPosition>Bottom</legendPosition>
@@ -183,8 +188,12 @@
             <colSpan>4</colSpan>
             <columnIndex>8</columnIndex>
             <dashboardComponent>
-                <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+                <autoselectColumnsFromReport>false</autoselectColumnsFromReport>
                 <chartAxisRange>Auto</chartAxisRange>
+                <chartSummary>
+                    <axisBinding>y</axisBinding>
+                    <column>FORMULA1</column>
+                </chartSummary>
                 <componentType>Bar</componentType>
                 <dashboardFilterColumns>
                     <column>Lead.SOL_Data_Reuniao_Procuracao__c</column>
@@ -198,6 +207,7 @@
                 <enableHover>true</enableHover>
                 <expandOthers>true</expandOthers>
                 <footer>Média de dias úteis, só de quem concluiu a etapa.</footer>
+                <groupingColumn>OWNER</groupingColumn>
                 <groupingSortProperties/>
                 <header>3. Reunião e procuração</header>
                 <legendPosition>Bottom</legendPosition>
@@ -216,8 +226,12 @@
             <colSpan>4</colSpan>
             <columnIndex>0</columnIndex>
             <dashboardComponent>
-                <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+                <autoselectColumnsFromReport>false</autoselectColumnsFromReport>
                 <chartAxisRange>Auto</chartAxisRange>
+                <chartSummary>
+                    <axisBinding>y</axisBinding>
+                    <column>FORMULA1</column>
+                </chartSummary>
                 <componentType>Bar</componentType>
                 <dashboardFilterColumns>
                     <column>Opportunity.SOL_Data_Recebimento_Calculo__c</column>
@@ -231,6 +245,7 @@
                 <enableHover>true</enableHover>
                 <expandOthers>true</expandOthers>
                 <footer>Média de dias úteis, só de quem concluiu a etapa.</footer>
+                <groupingColumn>FULL_NAME</groupingColumn>
                 <groupingSortProperties/>
                 <header>4. Cálculo jurídico</header>
                 <legendPosition>Bottom</legendPosition>
@@ -249,8 +264,12 @@
             <colSpan>4</colSpan>
             <columnIndex>4</columnIndex>
             <dashboardComponent>
-                <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+                <autoselectColumnsFromReport>false</autoselectColumnsFromReport>
                 <chartAxisRange>Auto</chartAxisRange>
+                <chartSummary>
+                    <axisBinding>y</axisBinding>
+                    <column>FORMULA1</column>
+                </chartSummary>
                 <componentType>Bar</componentType>
                 <dashboardFilterColumns>
                     <column>Opportunity.SOL_Data_Reuniao_Final__c</column>
@@ -264,6 +283,7 @@
                 <enableHover>true</enableHover>
                 <expandOthers>true</expandOthers>
                 <footer>Média de dias úteis, só de quem concluiu a etapa.</footer>
+                <groupingColumn>FULL_NAME</groupingColumn>
                 <groupingSortProperties/>
                 <header>5. Reunião final</header>
                 <legendPosition>Bottom</legendPosition>
@@ -282,8 +302,12 @@
             <colSpan>4</colSpan>
             <columnIndex>8</columnIndex>
             <dashboardComponent>
-                <autoselectColumnsFromReport>true</autoselectColumnsFromReport>
+                <autoselectColumnsFromReport>false</autoselectColumnsFromReport>
                 <chartAxisRange>Auto</chartAxisRange>
+                <chartSummary>
+                    <axisBinding>y</axisBinding>
+                    <column>FORMULA1</column>
+                </chartSummary>
                 <componentType>Bar</componentType>
                 <dashboardFilterColumns>
                     <column>Opportunity.SOL_Data_Encerramento__c</column>
@@ -297,6 +321,7 @@
                 <enableHover>true</enableHover>
                 <expandOthers>true</expandOthers>
                 <footer>Média de dias úteis, só de quem concluiu a etapa.</footer>
+                <groupingColumn>FULL_NAME</groupingColumn>
                 <groupingSortProperties/>
                 <header>6. Fechamento</header>
                 <legendPosition>Bottom</legendPosition>
@@ -315,7 +340,7 @@
         <rowHeight>60</rowHeight>
     </dashboardGridLayout>
     <dashboardType>LoggedInUser</dashboardType>
-    <description>CLICKUP-9404 — Funil comercial da Arnone Soluções. A matriz está nos relatórios; aqui os dados aparecem como barras empilhadas derivadas deles. O filtro Período de criação atua em CREATED_DATE nos dois componentes. Roda como o usuário conectado.</description>
+    <description>9404+9451 — 8 componentes: 2 de funil e 6 de tempo médio por etapa, todos por vendedor. Período de referência = data de criação no funil, data de conclusão da etapa nas durações. Vendedor = proprietário atual. Roda como LoggedInUser.</description>
     <isGridLayout>true</isGridLayout>
     <owner>joao.silva.weenow@weenow.com.br</owner>
     <textColor>#000000</textColor>

@@ -4,7 +4,7 @@
         <calculatedFormula>Lead.SOL_Dias_Contato_Efetivado__c:AVG</calculatedFormula>
         <datatype>number</datatype>
         <developerName>FORMULA1</developerName>
-        <downGroupingContext>GRAND_SUMMARY</downGroupingContext>
+        <downGroupingContext>OWNER</downGroupingContext>
         <isActive>true</isActive>
         <masterLabel>Dias úteis (média)</masterLabel>
         <scale>1</scale>

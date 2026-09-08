@@ -4,7 +4,7 @@
         <calculatedFormula>Opportunity.SOL_Dias_Reuniao_Final__c:AVG</calculatedFormula>
         <datatype>number</datatype>
         <developerName>FORMULA1</developerName>
-        <downGroupingContext>GRAND_SUMMARY</downGroupingContext>
+        <downGroupingContext>FULL_NAME</downGroupingContext>
         <isActive>true</isActive>
         <masterLabel>Dias úteis (média)</masterLabel>
         <scale>1</scale>
