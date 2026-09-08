@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>CLICKUP-9430 — Marca o usuário como vendedor restrito: ele só enxerga Tasks das quais é proprietário. Concedida por Permission Set, nunca por perfil, papel ou Id fixado. Sem ela, o comportamento do usuário não muda.</description>
+    <isLicensed>false</isLicensed>
+    <label>SOL — Restringir tarefas ao proprietário</label>
+</CustomPermission>
