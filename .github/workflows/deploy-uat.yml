@@ -1,0 +1,163 @@
+name: Deploy UAT
+
+# Propaga para a sandbox arnone-uat tudo que entrar na main.
+# O deploy e incremental: so sobem os componentes alterados entre o commit
+# anterior da main e o novo (delta calculado pelo sfdx-git-delta).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "force-app/**"
+      - "sfdx-project.json"
+  workflow_dispatch:
+    inputs:
+      test_level:
+        description: "Nivel de teste do deploy"
+        required: false
+        default: "NoTestRun"
+        type: choice
+        options:
+          - NoTestRun
+          - RunLocalTests
+          - RunAllTestsInOrg
+      from_ref:
+        description: "Commit/tag inicial do delta (vazio = HEAD~1)"
+        required: false
+        default: ""
+        type: string
+      dry_run:
+        description: "Somente validar, sem aplicar na org"
+        required: false
+        default: false
+        type: boolean
+
+# Um deploy por vez: dois merges seguidos na main nao disputam a org.
+concurrency:
+  group: deploy-uat
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Delta deploy para arnone-uat
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout com historico completo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar Salesforce CLI e sfdx-git-delta
+        run: |
+          npm install --global @salesforce/cli@latest
+          echo y | sf plugins install sfdx-git-delta@latest
+          sf version
+
+      - name: Autenticar na arnone-uat
+        env:
+          SF_AUTH_URL_UAT: ${{ secrets.SF_AUTH_URL_UAT }}
+        run: |
+          if [ -z "$SF_AUTH_URL_UAT" ]; then
+            echo "::error::Secret SF_AUTH_URL_UAT nao configurado no repositorio."
+            exit 1
+          fi
+          printf '%s' "$SF_AUTH_URL_UAT" > "$RUNNER_TEMP/auth_url.txt"
+          sf org login sfdx-url --sfdx-url-file "$RUNNER_TEMP/auth_url.txt" --alias arnone-uat --set-default
+          rm -f "$RUNNER_TEMP/auth_url.txt"
+          sf org display --target-org arnone-uat --json \
+            | jq -r '"Org: \(.result.username) | \(.result.instanceUrl)"'
+
+      - name: Resolver commit inicial do delta
+        id: base
+        run: |
+          FROM="${{ inputs.from_ref }}"
+          if [ -z "$FROM" ]; then
+            FROM="${{ github.event.before }}"
+          fi
+          # push inicial / force-push / branch nova vem como SHA zerado
+          if [ -z "$FROM" ] || [ "$FROM" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "${FROM}^{commit}" 2>/dev/null; then
+            echo "Commit inicial invalido ou inacessivel ($FROM), usando HEAD~1."
+            FROM="$(git rev-parse HEAD~1)"
+          fi
+          echo "from=$FROM" >> "$GITHUB_OUTPUT"
+          echo "Delta: $FROM -> ${{ github.sha }}"
+
+      - name: Calcular delta
+        id: delta
+        run: |
+          mkdir -p delta
+          sf sgd source delta \
+            --from "${{ steps.base.outputs.from }}" \
+            --to "${{ github.sha }}" \
+            --output-dir delta \
+            --source-dir force-app \
+            --ignore-whitespace
+
+          echo "--- package.xml (a subir) ---"
+          cat delta/package/package.xml
+
+          if grep -q "<types>" delta/package/package.xml; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "Nenhum componente alterado no delta."
+          fi
+
+          # Remocoes NAO sao aplicadas automaticamente (risco de perda de dados).
+          # Ficam reportadas no resumo do job para deploy manual.
+          if [ -f delta/destructiveChanges/destructiveChanges.xml ] \
+             && grep -q "<types>" delta/destructiveChanges/destructiveChanges.xml; then
+            echo "has_destructive=true" >> "$GITHUB_OUTPUT"
+            echo "--- destructiveChanges.xml (NAO aplicado) ---"
+            cat delta/destructiveChanges/destructiveChanges.xml
+          else
+            echo "has_destructive=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy na arnone-uat
+        if: steps.delta.outputs.has_changes == 'true'
+        run: |
+          sf project deploy start \
+            --manifest delta/package/package.xml \
+            --target-org arnone-uat \
+            --test-level "${{ inputs.test_level || 'NoTestRun' }}" \
+            --wait 60 \
+            --verbose \
+            ${{ inputs.dry_run == true && '--dry-run' || '' }}
+
+      - name: Resumo
+        if: always()
+        run: |
+          {
+            echo "## Deploy main -> arnone-uat"
+            echo ""
+            echo "- Delta: \`${{ steps.base.outputs.from }}\` -> \`${{ github.sha }}\`"
+            echo "- Componentes alterados: ${{ steps.delta.outputs.has_changes }}"
+            echo "- Nivel de teste: ${{ inputs.test_level || 'NoTestRun' }}"
+            echo "- Dry run: ${{ inputs.dry_run || false }}"
+            echo ""
+            if [ -f delta/package/package.xml ]; then
+              echo "<details><summary>package.xml aplicado</summary>"
+              echo ""
+              echo '```xml'
+              cat delta/package/package.xml
+              echo '```'
+              echo ""
+              echo "</details>"
+            fi
+            if [ "${{ steps.delta.outputs.has_destructive }}" = "true" ]; then
+              echo ""
+              echo "> [!WARNING]"
+              echo "> Ha remocoes de metadados neste delta. Elas **nao foram aplicadas** na UAT."
+              echo "> Revise e faca o deploy destrutivo manualmente."
+              echo ""
+              echo '```xml'
+              cat delta/destructiveChanges/destructiveChanges.xml
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
