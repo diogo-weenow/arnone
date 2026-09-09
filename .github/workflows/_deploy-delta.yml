@@ -1,0 +1,155 @@
+name: Deploy delta (reutilizavel)
+
+# Corpo compartilhado pelos deploys de dev e uat. Os dois fazem exatamente a
+# mesma coisa contra orgs diferentes, entao o passo a passo vive aqui e cada
+# workflow so informa a org e o secret.
+#
+# Producao NAO usa este arquivo: la o fluxo e validate -> aprovacao -> quick
+# deploy, estruturalmente diferente (ver deploy-prod.yml).
+on:
+  workflow_call:
+    inputs:
+      org_alias:
+        description: "Alias da org de destino"
+        required: true
+        type: string
+      test_level:
+        required: false
+        type: string
+        default: "NoTestRun"
+      from_ref:
+        description: "Commit inicial do delta (vazio = topo anterior da branch)"
+        required: false
+        type: string
+        default: ""
+      dry_run:
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      SF_AUTH_URL:
+        required: true
+
+jobs:
+  deploy:
+    name: Delta para ${{ inputs.org_alias }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout com historico completo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar Salesforce CLI e sfdx-git-delta
+        run: |
+          npm install --global @salesforce/cli@latest
+          echo y | sf plugins install sfdx-git-delta@latest
+          sf version
+
+      - name: Autenticar na ${{ inputs.org_alias }}
+        env:
+          SF_AUTH_URL: ${{ secrets.SF_AUTH_URL }}
+        run: |
+          if [ -z "$SF_AUTH_URL" ]; then
+            echo "::error::Secret de autenticacao vazio para ${{ inputs.org_alias }}."
+            exit 1
+          fi
+          printf '%s' "$SF_AUTH_URL" > "$RUNNER_TEMP/auth_url.txt"
+          sf org login sfdx-url --sfdx-url-file "$RUNNER_TEMP/auth_url.txt" \
+            --alias "${{ inputs.org_alias }}" --set-default
+          rm -f "$RUNNER_TEMP/auth_url.txt"
+          sf org display --target-org "${{ inputs.org_alias }}" --json \
+            | jq -r '"Org: \(.result.username) | \(.result.instanceUrl)"'
+
+      - name: Resolver commit inicial do delta
+        id: base
+        run: |
+          FROM="${{ inputs.from_ref }}"
+          if [ -z "$FROM" ]; then
+            FROM="${{ github.event.before }}"
+          fi
+          # Branch nova, force-push ou disparo manual chegam sem before valido.
+          if [ -z "$FROM" ] || [ "$FROM" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "${FROM}^{commit}" 2>/dev/null; then
+            echo "Commit inicial invalido ou inacessivel ($FROM), usando HEAD~1."
+            FROM="$(git rev-parse HEAD~1)"
+          fi
+          echo "from=$FROM" >> "$GITHUB_OUTPUT"
+          echo "Delta: $FROM -> ${{ github.sha }}"
+
+      - name: Calcular delta
+        id: delta
+        run: |
+          mkdir -p delta
+          sf sgd source delta \
+            --from "${{ steps.base.outputs.from }}" \
+            --to "${{ github.sha }}" \
+            --output-dir delta \
+            --source-dir force-app \
+            --ignore-whitespace
+
+          echo "--- package.xml ---"
+          cat delta/package/package.xml
+
+          if grep -q "<types>" delta/package/package.xml; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "Nenhum componente alterado no delta."
+          fi
+
+          # Remocoes NAO sao aplicadas: ficam reportadas para deploy manual.
+          if [ -f delta/destructiveChanges/destructiveChanges.xml ] \
+             && grep -q "<types>" delta/destructiveChanges/destructiveChanges.xml; then
+            echo "has_destructive=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_destructive=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy
+        if: steps.delta.outputs.has_changes == 'true'
+        run: |
+          sf project deploy start \
+            --manifest delta/package/package.xml \
+            --target-org "${{ inputs.org_alias }}" \
+            --test-level "${{ inputs.test_level }}" \
+            --wait 60 \
+            --verbose \
+            ${{ inputs.dry_run && '--dry-run' || '' }}
+
+      - name: Resumo
+        if: always()
+        run: |
+          {
+            echo "## Deploy para \`${{ inputs.org_alias }}\`"
+            echo ""
+            echo "- Delta: \`${{ steps.base.outputs.from }}\` -> \`${{ github.sha }}\`"
+            echo "- Componentes alterados: ${{ steps.delta.outputs.has_changes }}"
+            echo "- Nivel de teste: ${{ inputs.test_level }}"
+            echo "- Dry run: ${{ inputs.dry_run }}"
+            if [ -f delta/package/package.xml ]; then
+              echo ""
+              echo "<details><summary>package.xml aplicado</summary>"
+              echo ""
+              echo '```xml'
+              cat delta/package/package.xml
+              echo '```'
+              echo ""
+              echo "</details>"
+            fi
+            if [ "${{ steps.delta.outputs.has_destructive }}" = "true" ]; then
+              echo ""
+              echo "> [!WARNING]"
+              echo "> Ha remocoes de metadados neste delta. Elas **nao foram aplicadas**."
+              echo "> Revise e faca o deploy destrutivo manualmente."
+              echo ""
+              echo '```xml'
+              cat delta/destructiveChanges/destructiveChanges.xml
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
