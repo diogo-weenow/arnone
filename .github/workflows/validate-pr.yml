@@ -23,6 +23,9 @@ jobs:
   validate:
     name: Dry-run na arnone-uat
     runs-on: ubuntu-latest
+    # Repo publico: PR vindo de fork nao recebe os secrets, entao a validacao
+    # falharia na autenticacao. Fork nao valida — so PR de branch deste repo.
+    if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - name: Checkout com historico completo
         uses: actions/checkout@v4

@@ -8,26 +8,33 @@ Todas usam [`sfdx-git-delta`](https://github.com/scolladon/sfdx-git-delta) para 
 |---|---|---|---|
 | [`validate-pr.yml`](validate-pr.yml) | PR contra `main` | `arnone-uat` | Não — dry-run |
 | [`deploy-uat.yml`](deploy-uat.yml) | push na `main` (merge de PR) | `arnone-uat` | Sim |
-| [`deploy-prod.yml`](deploy-prod.yml) | manual, em dois passos | `arnone-prod` | Só no 2º passo |
+| [`deploy-prod.yml`](deploy-prod.yml) | push na `production` (merge de PR) | `arnone-prod` | Sim, após aprovação |
 
 ## Fluxo
 
 ```
-feature/xxx ──PR──> main ──merge──> UAT ──manual──> Produção
-             │                       │               │
-        validate-pr              deploy-uat     deploy-prod
-        (dry-run,                (delta         (validate →
-         comenta no PR)           automático)    quick-deploy)
+feature/xxx ──PR──> main ──PR──> production
+     │               │              │
+ validate-pr    deploy-uat     deploy-prod
+ (dry-run na    (delta na      (valida com testes →
+  UAT, comenta   UAT)           aprovação → aplica)
+  no PR)
 ```
+
+As duas branches longas são espelhos de org: `main` reflete a `arnone-uat`, `production`
+reflete a `arnone-prod`. Promover para produção é abrir um PR de `main` para `production`.
 
 ## `validate-pr.yml`
 
 Valida na `arnone-uat` sem aplicar nada, e comenta o resultado no próprio PR (comentário
 fixo, editado a cada push em vez de empilhar um por commit).
 
-O nível de teste é escolhido pelo conteúdo do delta: `RunLocalTests` quando o PR mexe em
+O nível de teste sai do conteúdo do delta: `RunLocalTests` quando o PR mexe em
 `ApexClass`/`ApexTrigger`, `NoTestRun` quando não — não faz sentido gastar minutos rodando
 a bateria inteira num PR que só mexe em layout ou relatório.
+
+> O repositório é público: PR vindo de **fork** não recebe os secrets e por isso não é
+> validado. Só PR de branch deste repo dispara o workflow.
 
 ## `deploy-uat.yml`
 
@@ -37,54 +44,59 @@ disputar a org.
 
 ## `deploy-prod.yml`
 
-Produção nunca sai de um merge automático. São dois disparos manuais deliberados, no padrão
-recomendado pela Salesforce:
+Merge na branch `production` significa deployar. O delta sai de `github.event.before` — o
+topo anterior da branch, ou seja, o que já está na org — até o novo commit.
 
-**Passo 1 — `modo: validate`**
+São dois jobs, de propósito:
 
-Valida na produção com `sf project deploy validate` e `RunLocalTests`. O delta parte da tag
-`prod`, que marca o que já está em produção. O resumo do job devolve um **job id** válido
-por 10 dias.
+**`validar`** — roda `sf project deploy validate` com `RunLocalTests` na produção. Não muda
+nada na org, então roda **sem esperar aprovação**: se um teste quebra, ninguém foi incomodado
+para aprovar um deploy que ia falhar. Guarda o `package.xml` como artifact por 30 dias.
 
-> No primeiro uso não existe a tag `prod`. Informe `from_ref` com o commit ou tag que
-> representa o estado atual da produção — a pipeline recusa rodar sem isso, para não tentar
-> deployar o repositório inteiro.
+**`aplicar`** — gated pelo environment `production`, que exige revisor obrigatório. O run
+fica parado aqui até alguém aprovar no GitHub. Aí roda `sf project deploy quick` sobre o
+pacote já validado: aplica em minutos, **sem reexecutar a bateria de testes**.
 
-**Passo 2 — `modo: quick-deploy`**
+### Primeiro deploy
 
-No **mesmo ref**, informe o `job_id` do passo 1 e digite `DEPLOY PRODUCAO` em `confirmacao`.
-Roda `sf project deploy quick`, que aplica o pacote já validado **sem reexecutar os testes** —
-deploy de minutos em vez de uma hora. Ao final, move a tag `prod` para o commit deployado.
+A branch `production` foi criada a partir do topo da `main`, o que declara que produção está
+idêntica à UAT neste momento. Se a org de produção estiver de fato **atrás** disso, o primeiro
+delta sairia errado (pequeno demais). Nesse caso, antes do primeiro merge:
 
-### Aprovação por revisor
+- resete a branch para o commit que representa o estado real da produção, **ou**
+- rode o workflow manualmente (`workflow_dispatch`) informando `from_ref` com esse commit.
 
-O workflow declara `environment: production`. O plano atual do GitHub **não permite required
-reviewers em repositório privado** — a API recusa com *"Please ensure the billing plan supports
-the required reviewers protection rule"*. Hoje o portão é humano por construção: dois disparos
-manuais e uma confirmação digitada.
+### Aprovação
 
-Ao subir para GitHub Pro/Team, basta adicionar o revisor obrigatório no environment
-`production` (Settings → Environments) — nenhuma mudança de código é necessária.
+Configurada em Settings → Environments → `production`:
+
+- **Required reviewer**: `diogo-weenow`. O job `aplicar` não roda sem aprovação.
+- **Deployment branch policy**: só a branch `production` pode deployar nesse environment.
+
+Para exigir mais de um aprovador, ou aprovação por equipe, é só adicionar reviewers ali —
+nenhuma mudança de código é necessária.
 
 ## Secrets
 
-| Secret | Onde | Para quê |
-|---|---|---|
-| `SF_AUTH_URL_UAT` | repositório | `validate-pr.yml` e `deploy-uat.yml` |
-| `SF_AUTH_URL_PROD` | environment `production` | `deploy-prod.yml` |
+| Secret | Para quê |
+|---|---|
+| `SF_AUTH_URL_UAT` | `validate-pr.yml` e `deploy-uat.yml` |
+| `SF_AUTH_URL_PROD` | `deploy-prod.yml` (ambos os jobs) |
 
 ```bash
-# UAT (secret de repositório)
 sf org display --target-org arnone-uat --verbose --json | jq -r '.result.sfdxAuthUrl' \
   | gh secret set SF_AUTH_URL_UAT --repo diogo-weenow/arnone
 
-# Produção (secret do environment, escopo mais restrito)
 sf org display --target-org arnone-prod --verbose --json | jq -r '.result.sfdxAuthUrl' \
-  | gh secret set SF_AUTH_URL_PROD --repo diogo-weenow/arnone --env production
+  | gh secret set SF_AUTH_URL_PROD --repo diogo-weenow/arnone
 ```
 
-> A auth URL carrega o refresh token da org — vive só no secret, nunca no repo. Se a sandbox
-> for refreshada ou o token revogado, rode o comando de novo.
+`SF_AUTH_URL_PROD` é secret **de repositório**, não do environment: o job `validar` precisa
+dele e roda antes do portão de aprovação. O portão protege a aplicação, não a leitura —
+validar não altera a org.
+
+> A auth URL carrega o refresh token da org — vive só no secret, nunca no repo. Se a org for
+> refreshada ou o token revogado, rode o comando de novo.
 
 Para mais controle (timeout de refresh token, IP ranges, sem dependência de login web), o
 caminho é um Connected App com certificado digital e `sf org login jwt`, com os secrets
