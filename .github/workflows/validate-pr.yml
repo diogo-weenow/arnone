@@ -1,0 +1,184 @@
+name: Validar PR
+
+# Valida na arnone-uat, sem aplicar nada, tudo que um PR pretende levar para a main.
+# Pega erro de metadado e falha de teste antes do merge, em vez de sujar a UAT.
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+    paths:
+      - "force-app/**"
+      - "sfdx-project.json"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+# Push novo no PR cancela a validacao anterior: so o ultimo commit importa.
+concurrency:
+  group: validate-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Dry-run na arnone-uat
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout com historico completo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar Salesforce CLI e sfdx-git-delta
+        run: |
+          npm install --global @salesforce/cli@latest
+          echo y | sf plugins install sfdx-git-delta@latest
+          sf version
+
+      - name: Autenticar na arnone-uat
+        env:
+          SF_AUTH_URL_UAT: ${{ secrets.SF_AUTH_URL_UAT }}
+        run: |
+          if [ -z "$SF_AUTH_URL_UAT" ]; then
+            echo "::error::Secret SF_AUTH_URL_UAT nao configurado no repositorio."
+            exit 1
+          fi
+          printf '%s' "$SF_AUTH_URL_UAT" > "$RUNNER_TEMP/auth_url.txt"
+          sf org login sfdx-url --sfdx-url-file "$RUNNER_TEMP/auth_url.txt" --alias arnone-uat --set-default
+          rm -f "$RUNNER_TEMP/auth_url.txt"
+          sf org display --target-org arnone-uat --json \
+            | jq -r '"Org: \(.result.username) | \(.result.instanceUrl)"'
+
+      - name: Calcular delta do PR
+        id: delta
+        run: |
+          BASE_REF="${{ github.base_ref }}"
+          git fetch --quiet origin "$BASE_REF"
+          # HEAD aqui e o merge commit do PR: o delta e o estado pos-merge.
+          FROM="$(git merge-base "origin/$BASE_REF" HEAD)"
+          echo "from=$FROM" >> "$GITHUB_OUTPUT"
+          echo "Delta: $FROM -> HEAD"
+
+          mkdir -p delta
+          sf sgd source delta \
+            --from "$FROM" \
+            --to HEAD \
+            --output-dir delta \
+            --source-dir force-app \
+            --ignore-whitespace
+
+          echo "--- package.xml (a validar) ---"
+          cat delta/package/package.xml
+
+          if grep -q "<types>" delta/package/package.xml; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "Nenhum componente alterado no delta."
+          fi
+
+          # Só roda a bateria de testes se o PR mexe em Apex — senão a validação
+          # gastaria minutos rodando testes que nada no delta pode ter quebrado.
+          if grep -qE "<name>(ApexClass|ApexTrigger)</name>" delta/package/package.xml; then
+            echo "test_level=RunLocalTests" >> "$GITHUB_OUTPUT"
+          else
+            echo "test_level=NoTestRun" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [ -f delta/destructiveChanges/destructiveChanges.xml ] \
+             && grep -q "<types>" delta/destructiveChanges/destructiveChanges.xml; then
+            echo "has_destructive=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_destructive=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validar deploy (dry-run)
+        id: dryrun
+        if: steps.delta.outputs.has_changes == 'true'
+        run: |
+          set +e
+          sf project deploy start \
+            --manifest delta/package/package.xml \
+            --target-org arnone-uat \
+            --test-level "${{ steps.delta.outputs.test_level }}" \
+            --dry-run \
+            --wait 60 \
+            --verbose 2>&1 | tee "$RUNNER_TEMP/deploy.log"
+          STATUS=${PIPESTATUS[0]}
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+          exit $STATUS
+
+      - name: Comentar resultado no PR
+        if: always() && steps.delta.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ "${{ steps.dryrun.outcome }}" = "success" ]; then
+            ICONE="✅"
+            TITULO="Validação passou na \`arnone-uat\`"
+          else
+            ICONE="❌"
+            TITULO="Validação falhou na \`arnone-uat\`"
+          fi
+
+          {
+            echo "<!-- validate-pr -->"
+            echo "## $ICONE $TITULO"
+            echo ""
+            echo "Dry-run — **nada foi aplicado na org**."
+            echo ""
+            echo "- Nível de teste: \`${{ steps.delta.outputs.test_level }}\`"
+            echo "- Delta a partir de: \`${{ steps.delta.outputs.from }}\`"
+            echo "- [Log completo do run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+            echo ""
+            echo "<details><summary>Componentes no delta</summary>"
+            echo ""
+            echo '```xml'
+            cat delta/package/package.xml
+            echo '```'
+            echo ""
+            echo "</details>"
+
+            if [ "${{ steps.delta.outputs.has_destructive }}" = "true" ]; then
+              echo ""
+              echo "> [!WARNING]"
+              echo "> Este PR remove metadados. A pipeline de UAT **não aplica remoções**;"
+              echo "> após o merge, o deploy destrutivo é manual e revisado."
+              echo ""
+              echo '```xml'
+              cat delta/destructiveChanges/destructiveChanges.xml
+              echo '```'
+            fi
+
+            if [ -f "$RUNNER_TEMP/deploy.log" ] && [ "${{ steps.dryrun.outcome }}" != "success" ]; then
+              echo ""
+              echo "<details open><summary>Erros</summary>"
+              echo ""
+              echo '```'
+              tail -n 60 "$RUNNER_TEMP/deploy.log"
+              echo '```'
+              echo ""
+              echo "</details>"
+            fi
+          } > "$RUNNER_TEMP/comment.md"
+
+          PR="${{ github.event.pull_request.number }}"
+          # Comentário fixo: edita o anterior em vez de empilhar um por push.
+          gh pr comment "$PR" --body-file "$RUNNER_TEMP/comment.md" --edit-last \
+            || gh pr comment "$PR" --body-file "$RUNNER_TEMP/comment.md"
+
+      - name: Resumo
+        if: always()
+        run: |
+          {
+            echo "## Validação do PR #${{ github.event.pull_request.number }}"
+            echo ""
+            echo "- Componentes alterados: ${{ steps.delta.outputs.has_changes }}"
+            echo "- Nível de teste: ${{ steps.delta.outputs.test_level }}"
+            echo "- Resultado: ${{ steps.dryrun.outcome }}"
+          } >> "$GITHUB_STEP_SUMMARY"
