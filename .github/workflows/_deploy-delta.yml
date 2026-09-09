@@ -59,6 +59,14 @@ jobs:
             echo "::error::Secret de autenticacao vazio para ${{ inputs.org_alias }}."
             exit 1
           fi
+          # "sf org display --json" REDIGE o sfdxAuthUrl (devolve "[REDACTED]...").
+          # A URL real sai de "sf org auth show-sfdx-auth-url" e comeca com force://
+          case "$SF_AUTH_URL" in
+            force://*) ;;
+            *) echo "::error::Secret de ${{ inputs.org_alias }} nao e uma auth URL valida (nao comeca com force://)."
+               echo "::error::Gere com: sf org auth show-sfdx-auth-url --target-org ${{ inputs.org_alias }} --json | jq -r .result.sfdxAuthUrl"
+               exit 1 ;;
+          esac
           printf '%s' "$SF_AUTH_URL" > "$RUNNER_TEMP/auth_url.txt"
           sf org login sfdx-url --sfdx-url-file "$RUNNER_TEMP/auth_url.txt" \
             --alias "${{ inputs.org_alias }}" --set-default

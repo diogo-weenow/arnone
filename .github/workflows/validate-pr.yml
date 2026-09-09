@@ -60,6 +60,12 @@ jobs:
             echo "::error::Secret de autenticacao vazio para $ORG_ALIAS (base: ${{ github.base_ref }})."
             exit 1
           fi
+          case "$SF_AUTH_URL" in
+            force://*) ;;
+            *) echo "::error::Secret de $ORG_ALIAS nao e uma auth URL valida (nao comeca com force://)."
+               echo "::error::Gere com: sf org auth show-sfdx-auth-url --target-org <alias> --json | jq -r .result.sfdxAuthUrl"
+               exit 1 ;;
+          esac
           printf '%s' "$SF_AUTH_URL" > "$RUNNER_TEMP/auth_url.txt"
           sf org login sfdx-url --sfdx-url-file "$RUNNER_TEMP/auth_url.txt" \
             --alias "$ORG_ALIAS" --set-default

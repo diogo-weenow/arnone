@@ -75,10 +75,15 @@ Configurado em Settings → Environments → `production`:
 
 ```bash
 for par in DEV:arnone-dev UAT:arnone-uat PROD:arnone-prod; do
-  sf org display --target-org "${par#*:}" --verbose --json | jq -r '.result.sfdxAuthUrl' \
+  sf org auth show-sfdx-auth-url --target-org "${par#*:}" --json | jq -r '.result.sfdxAuthUrl' \
     | gh secret set "SF_AUTH_URL_${par%%:*}" --repo diogo-weenow/arnone
 done
 ```
+
+> Use `sf org auth show-sfdx-auth-url`, **não** `sf org display --json`: este último **redige** o
+> campo e devolve o literal `[REDACTED]...`, que entra no secret sem erro aparente e só falha no
+> runner com `INVALID_SFDX_AUTH_URL`. Os workflows agora checam o prefixo `force://` e falham com
+> mensagem clara se o secret estiver assim.
 
 > A auth URL carrega o refresh token da org — vive só no secret, nunca no repo. Se a org for
 > refreshada ou o token revogado, rode de novo.
