@@ -2,7 +2,7 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Reuniao_Final_Nao_Antes_Recebimento</fullName>
     <active>true</active>
-    <description>CLICKUP-9422: na tarefa tipo "Reunião final", SOL_Data_Reuniao_Final__c não pode ser anterior a SOL_Data_Recebimento_Calculo_Ref__c. Referência ausente não dispara. Por SOL_Tipo_Tarefa__c; não afeta outras Tasks.</description>
+    <description>CLICKUP-9422: na tarefa tipo &quot;Reunião final&quot;, SOL_Data_Reuniao_Final__c não pode ser anterior a SOL_Data_Recebimento_Calculo_Ref__c. Referência ausente não dispara. Por SOL_Tipo_Tarefa__c; não afeta outras Tasks.</description>
     <errorConditionFormula>AND(
   ISPICKVAL( SOL_Tipo_Tarefa__c , &quot;Reunião final&quot; ),
   NOT( ISBLANK( SOL_Data_Reuniao_Final__c ) ),

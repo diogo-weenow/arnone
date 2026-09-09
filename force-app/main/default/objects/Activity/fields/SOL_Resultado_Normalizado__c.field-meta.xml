@@ -18,10 +18,8 @@ IF( OR( ISPICKVAL(SOL_Canal_Contato__c, &quot;E-mail&quot;),
     IF( ISPICKVAL(SOL_Resultado_Envio__c, &quot;Não enviado&quot;), &quot;Sem sucesso&quot;,
     &quot;Não classificado&quot; )),
 &quot;Não classificado&quot; ))))</formula>
-    <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
     <label>Resultado normalizado do contato</label>
     <required>false</required>
-    <trackHistory>false</trackHistory>
     <type>Text</type>
     <unique>false</unique>
 </CustomField>

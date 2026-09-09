@@ -2,8 +2,8 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Dias_Primeira_Ligacao__c</fullName>
     <description>Etapa 1, espelho de Lead.SOL_Dias_Primeira_Ligacao__c. É sempre CÓPIA, nunca recalculado aqui: a origem da etapa (a data da distribuição) só existe no Lead. Copiado por SOL_ConverterLead na conversão e ressincronizado por SOLDuracaoEtapaService quando o Lead convertido é corrigido depois — é isso que impede que uma indisponibilidade de calendário antes da conversão apague a etapa 1 do relatório. Vazio enquanto o Lead não tiver o valor. Campo técnico, somente leitura. CLICKUP-9439 / CLICKUP-9429 (absorvido).</description>
-    <label>Dias úteis até a primeira ligação (SOL)</label>
     <externalId>false</externalId>
+    <label>Dias úteis até a primeira ligação (SOL)</label>
     <precision>4</precision>
     <required>false</required>
     <scale>0</scale>

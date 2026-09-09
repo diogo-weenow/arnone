@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Contato_Efetivado__c</fullName>
-    <description>Sinal MANUAL de que o Lead RESPONDEU à mensagem desta tarefa (CLICKUP-9447 para E-mail, 9448 para WhatsApp). Distinto de SOL_Resultado_Envio__c = "Enviado", que diz apenas que a mensagem SAIU: não há leitura de caixa de e-mail nem de conversa de WhatsApp, nem integração de mensageria; quem sabe da resposta é o vendedor. Só pode ser verdadeiro com SOL_Tipo_Tarefa__c = "Contato", SOL_Canal_Contato__c = "E-mail" ou "WhatsApp", Status = "Completed" e SOL_Resultado_Envio__c = "Enviado" (VR SOL_Contato_Efetivado_Envio_Coerente, sem guarda), sobre uma tarefa ligada a um LEAD (VR SOL_Contato_Efetivado_Exige_Lead, só na marcação) da Arnone Soluções (verificado no Apex, que o WhoId polimórfico não permite validar em fórmula). Não pode ser desmarcado nem reapontado para outro lead. Aciona o Flow SOL_Contato_Efetivado_Por_Envio, único para os dois canais, que reusa a automação do CLICKUP-9417. Homônimo de Lead.SOL_Contato_Efetivado__c: sempre qualifique com Task. ou Lead.</description>
-    <label>Contato efetivado (lead respondeu)</label>
     <defaultValue>false</defaultValue>
-    <trackFeedHistory>false</trackFeedHistory>
-    <trackHistory>false</trackHistory>
+    <description>Sinal MANUAL de que o Lead RESPONDEU à mensagem desta tarefa (CLICKUP-9447 para E-mail, 9448 para WhatsApp). Distinto de SOL_Resultado_Envio__c = &quot;Enviado&quot;, que diz apenas que a mensagem SAIU: não há leitura de caixa de e-mail nem de conversa de WhatsApp, nem integração de mensageria; quem sabe da resposta é o vendedor. Só pode ser verdadeiro com SOL_Tipo_Tarefa__c = &quot;Contato&quot;, SOL_Canal_Contato__c = &quot;E-mail&quot; ou &quot;WhatsApp&quot;, Status = &quot;Completed&quot; e SOL_Resultado_Envio__c = &quot;Enviado&quot; (VR SOL_Contato_Efetivado_Envio_Coerente, sem guarda), sobre uma tarefa ligada a um LEAD (VR SOL_Contato_Efetivado_Exige_Lead, só na marcação) da Arnone Soluções (verificado no Apex, que o WhoId polimórfico não permite validar em fórmula). Não pode ser desmarcado nem reapontado para outro lead. Aciona o Flow SOL_Contato_Efetivado_Por_Envio, único para os dois canais, que reusa a automação do CLICKUP-9417. Homônimo de Lead.SOL_Contato_Efetivado__c: sempre qualifique com Task. ou Lead.</description>
+    <label>Contato efetivado (lead respondeu)</label>
     <type>Checkbox</type>
 </CustomField>

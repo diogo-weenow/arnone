@@ -19,5 +19,5 @@
   )
 )</errorConditionFormula>
     <errorDisplayField>Status</errorDisplayField>
-    <errorMessage>O status "Cancelada" é exclusivo das tarefas de automação Arnone Soluções (tipo e motivo do cancelamento obrigatórios). Tarefa sem tipo só é cancelada pelo encerramento automático por perda do negócio.</errorMessage>
+    <errorMessage>O status &quot;Cancelada&quot; é exclusivo das tarefas de automação Arnone Soluções (tipo e motivo do cancelamento obrigatórios). Tarefa sem tipo só é cancelada pelo encerramento automático por perda do negócio.</errorMessage>
 </ValidationRule>

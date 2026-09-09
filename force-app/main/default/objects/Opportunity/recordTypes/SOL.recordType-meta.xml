@@ -129,11 +129,11 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Intervalo inconsistente</fullName>
+            <fullName>Falha técnica</fullName>
             <default>false</default>
         </values>
         <values>
-            <fullName>Falha técnica</fullName>
+            <fullName>Intervalo inconsistente</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -214,6 +214,17 @@
         </values>
         <values>
             <fullName>Sucesso</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SOL_Status_Reatribuicao_Prazo__c</picklist>
+        <values>
+            <fullName>Reatribuido</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sem outro vendedor</fullName>
             <default>false</default>
         </values>
     </picklistValues>

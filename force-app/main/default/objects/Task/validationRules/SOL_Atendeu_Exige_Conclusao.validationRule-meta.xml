@@ -2,7 +2,7 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Atendeu_Exige_Conclusao</fullName>
     <active>true</active>
-    <description>CLICKUP-9437: "Atendeu" só vale ao CONCLUIR a ligação (Status=Completed); aberta ou cancelada ele não efetiva contato nem bloqueia reatribuição. Recorte por classificação (prazo legado OU Tipo+Canal). IsClosed não reflete a própria gravação em VR de Task.</description>
+    <description>CLICKUP-9437: &quot;Atendeu&quot; só vale ao CONCLUIR a ligação (Status=Completed); aberta ou cancelada ele não efetiva contato nem bloqueia reatribuição. Recorte por classificação (prazo legado OU Tipo+Canal). IsClosed não reflete a própria gravação em VR de Task.</description>
     <errorConditionFormula>AND(
   OR(
     NOT( ISBLANK( SOL_Prazo_Contato__c ) ),

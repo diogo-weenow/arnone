@@ -99,6 +99,17 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>SOL_Duracao_Pendencia_Motivo__c</picklist>
+        <values>
+            <fullName>Calendário indisponível</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Intervalo inconsistente</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>SOL_ECAC_Resultado__c</picklist>
         <values>
             <fullName>Débito</fullName>
@@ -155,6 +166,17 @@
         </values>
         <values>
             <fullName>Sucesso</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SOL_Status_Reatribuicao_Prazo__c</picklist>
+        <values>
+            <fullName>Reatribuido</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sem outro vendedor</fullName>
             <default>false</default>
         </values>
     </picklistValues>

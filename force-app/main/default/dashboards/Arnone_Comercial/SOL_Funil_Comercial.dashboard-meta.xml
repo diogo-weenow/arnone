@@ -59,14 +59,14 @@
                 <drillEnabled>true</drillEnabled>
                 <drillToDetailEnabled>false</drillToDetailEnabled>
                 <enableHover>true</enableHover>
-                <expandOthers>true</expandOthers>
+                <expandOthers>false</expandOthers>
                 <footer>Cada barra é um Status; cada faixa dentro dela é um vendedor.</footer>
                 <groupingSortProperties/>
                 <header>Captação — Leads por Status e Vendedor</header>
                 <legendPosition>Bottom</legendPosition>
                 <report>Arnone_Comercial/SOL_Funil_Leads_Status_Vendedor</report>
                 <showPercentage>false</showPercentage>
-                <showValues>true</showValues>
+                <showValues>false</showValues>
                 <sortBy>RowLabelAscending</sortBy>
                 <sortLegendValues>false</sortLegendValues>
                 <title>Leads da Arnone Soluções</title>
@@ -92,14 +92,14 @@
                 <drillEnabled>true</drillEnabled>
                 <drillToDetailEnabled>false</drillToDetailEnabled>
                 <enableHover>true</enableHover>
-                <expandOthers>true</expandOthers>
+                <expandOthers>false</expandOthers>
                 <footer>Cada barra é uma etapa do funil; cada faixa dentro dela é um vendedor.</footer>
                 <groupingSortProperties/>
                 <header>Vendas — Oportunidades por Etapa e Vendedor</header>
                 <legendPosition>Bottom</legendPosition>
                 <report>Arnone_Comercial/SOL_Funil_Oportunidades_Etapa_Vendedor</report>
                 <showPercentage>false</showPercentage>
-                <showValues>true</showValues>
+                <showValues>false</showValues>
                 <sortBy>RowLabelAscending</sortBy>
                 <sortLegendValues>false</sortLegendValues>
                 <title>Oportunidades da Arnone Soluções</title>
@@ -129,7 +129,7 @@
                 <drillEnabled>true</drillEnabled>
                 <drillToDetailEnabled>false</drillToDetailEnabled>
                 <enableHover>true</enableHover>
-                <expandOthers>true</expandOthers>
+                <expandOthers>false</expandOthers>
                 <footer>Média de dias úteis, só de quem concluiu a etapa.</footer>
                 <groupingColumn>OWNER</groupingColumn>
                 <groupingSortProperties/>
@@ -137,6 +137,7 @@
                 <legendPosition>Bottom</legendPosition>
                 <report>Arnone_Comercial/SOL_Tempo_Medio_Primeira_Ligacao</report>
                 <showPercentage>false</showPercentage>
+                <showPicturesOnCharts>false</showPicturesOnCharts>
                 <showValues>true</showValues>
                 <sortBy>RowLabelAscending</sortBy>
                 <sortLegendValues>false</sortLegendValues>
@@ -167,7 +168,7 @@
                 <drillEnabled>true</drillEnabled>
                 <drillToDetailEnabled>false</drillToDetailEnabled>
                 <enableHover>true</enableHover>
-                <expandOthers>true</expandOthers>
+                <expandOthers>false</expandOthers>
                 <footer>Média de dias úteis, só de quem concluiu a etapa.</footer>
                 <groupingColumn>OWNER</groupingColumn>
                 <groupingSortProperties/>
@@ -175,6 +176,7 @@
                 <legendPosition>Bottom</legendPosition>
                 <report>Arnone_Comercial/SOL_Tempo_Medio_Contato_Efetivado</report>
                 <showPercentage>false</showPercentage>
+                <showPicturesOnCharts>false</showPicturesOnCharts>
                 <showValues>true</showValues>
                 <sortBy>RowLabelAscending</sortBy>
                 <sortLegendValues>false</sortLegendValues>
@@ -205,7 +207,7 @@
                 <drillEnabled>true</drillEnabled>
                 <drillToDetailEnabled>false</drillToDetailEnabled>
                 <enableHover>true</enableHover>
-                <expandOthers>true</expandOthers>
+                <expandOthers>false</expandOthers>
                 <footer>Média de dias úteis, só de quem concluiu a etapa.</footer>
                 <groupingColumn>OWNER</groupingColumn>
                 <groupingSortProperties/>
@@ -213,6 +215,7 @@
                 <legendPosition>Bottom</legendPosition>
                 <report>Arnone_Comercial/SOL_Tempo_Medio_Reuniao_Procuracao</report>
                 <showPercentage>false</showPercentage>
+                <showPicturesOnCharts>false</showPicturesOnCharts>
                 <showValues>true</showValues>
                 <sortBy>RowLabelAscending</sortBy>
                 <sortLegendValues>false</sortLegendValues>
@@ -243,7 +246,7 @@
                 <drillEnabled>true</drillEnabled>
                 <drillToDetailEnabled>false</drillToDetailEnabled>
                 <enableHover>true</enableHover>
-                <expandOthers>true</expandOthers>
+                <expandOthers>false</expandOthers>
                 <footer>Média de dias úteis, só de quem concluiu a etapa.</footer>
                 <groupingColumn>FULL_NAME</groupingColumn>
                 <groupingSortProperties/>
@@ -251,6 +254,7 @@
                 <legendPosition>Bottom</legendPosition>
                 <report>Arnone_Comercial/SOL_Tempo_Medio_Calculo_Juridico</report>
                 <showPercentage>false</showPercentage>
+                <showPicturesOnCharts>false</showPicturesOnCharts>
                 <showValues>true</showValues>
                 <sortBy>RowLabelAscending</sortBy>
                 <sortLegendValues>false</sortLegendValues>
@@ -281,7 +285,7 @@
                 <drillEnabled>true</drillEnabled>
                 <drillToDetailEnabled>false</drillToDetailEnabled>
                 <enableHover>true</enableHover>
-                <expandOthers>true</expandOthers>
+                <expandOthers>false</expandOthers>
                 <footer>Média de dias úteis, só de quem concluiu a etapa.</footer>
                 <groupingColumn>FULL_NAME</groupingColumn>
                 <groupingSortProperties/>
@@ -289,6 +293,7 @@
                 <legendPosition>Bottom</legendPosition>
                 <report>Arnone_Comercial/SOL_Tempo_Medio_Reuniao_Final</report>
                 <showPercentage>false</showPercentage>
+                <showPicturesOnCharts>false</showPicturesOnCharts>
                 <showValues>true</showValues>
                 <sortBy>RowLabelAscending</sortBy>
                 <sortLegendValues>false</sortLegendValues>
@@ -319,7 +324,7 @@
                 <drillEnabled>true</drillEnabled>
                 <drillToDetailEnabled>false</drillToDetailEnabled>
                 <enableHover>true</enableHover>
-                <expandOthers>true</expandOthers>
+                <expandOthers>false</expandOthers>
                 <footer>Média de dias úteis, só de quem concluiu a etapa.</footer>
                 <groupingColumn>FULL_NAME</groupingColumn>
                 <groupingSortProperties/>
@@ -327,6 +332,7 @@
                 <legendPosition>Bottom</legendPosition>
                 <report>Arnone_Comercial/SOL_Tempo_Medio_Fechamento</report>
                 <showPercentage>false</showPercentage>
+                <showPicturesOnCharts>false</showPicturesOnCharts>
                 <showValues>true</showValues>
                 <sortBy>RowLabelAscending</sortBy>
                 <sortLegendValues>false</sortLegendValues>
@@ -343,6 +349,7 @@
     <description>9404+9451 — 8 componentes: 2 de funil e 6 de tempo médio por etapa, todos por vendedor. Período de referência = data de criação no funil, data de conclusão da etapa nas durações. Vendedor = proprietário atual. Roda como LoggedInUser.</description>
     <isGridLayout>true</isGridLayout>
     <owner>joao.silva.weenow@weenow.com.br</owner>
+    <runningUser>joao.silva.weenow@weenow.com.br</runningUser>
     <textColor>#000000</textColor>
     <title>SOL — Funil Comercial</title>
     <titleColor>#1F1D1A</titleColor>

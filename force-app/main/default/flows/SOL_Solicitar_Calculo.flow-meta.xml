@@ -37,6 +37,54 @@
     <label>SOL_Solicitar_Calculo</label>
     <processType>Flow</processType>
     <screens>
+        <name>Tela_Erro</name>
+        <label>Não foi possível registrar</label>
+        <locationX>440</locationX>
+        <locationY>384</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>Texto_Erro</name>
+            <fieldText>&lt;p&gt;{!$Flow.FaultMessage}&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
+        <name>Tela_Resultado</name>
+        <label>Resultado</label>
+        <locationX>176</locationX>
+        <locationY>384</locationY>
+        <allowBack>false</allowBack>
+        <allowFinish>true</allowFinish>
+        <allowPause>false</allowPause>
+        <fields>
+            <name>Texto_Resultado</name>
+            <fieldText>&lt;p&gt;{!Registrar_Solicitacao.mensagem}&lt;/p&gt;&lt;p&gt;Atualize a página para ver o campo.&lt;/p&gt;</fieldText>
+            <fieldType>DisplayText</fieldType>
+            <styleProperties>
+                <verticalAlignment>
+                    <stringValue>top</stringValue>
+                </verticalAlignment>
+                <width>
+                    <stringValue>12</stringValue>
+                </width>
+            </styleProperties>
+        </fields>
+        <showFooter>true</showFooter>
+        <showHeader>true</showHeader>
+    </screens>
+    <screens>
         <name>Tela_Solicitar</name>
         <label>Solicitar cálculo ao jurídico</label>
         <locationX>176</locationX>
@@ -83,54 +131,6 @@
             </validationRule>
         </fields>
         <nextOrFinishButtonLabel>Registrar</nextOrFinishButtonLabel>
-        <showFooter>true</showFooter>
-        <showHeader>true</showHeader>
-    </screens>
-    <screens>
-        <name>Tela_Erro</name>
-        <label>Não foi possível registrar</label>
-        <locationX>440</locationX>
-        <locationY>384</locationY>
-        <allowBack>false</allowBack>
-        <allowFinish>true</allowFinish>
-        <allowPause>false</allowPause>
-        <fields>
-            <name>Texto_Erro</name>
-            <fieldText>&lt;p&gt;{!$Flow.FaultMessage}&lt;/p&gt;</fieldText>
-            <fieldType>DisplayText</fieldType>
-            <styleProperties>
-                <verticalAlignment>
-                    <stringValue>top</stringValue>
-                </verticalAlignment>
-                <width>
-                    <stringValue>12</stringValue>
-                </width>
-            </styleProperties>
-        </fields>
-        <showFooter>true</showFooter>
-        <showHeader>true</showHeader>
-    </screens>
-    <screens>
-        <name>Tela_Resultado</name>
-        <label>Resultado</label>
-        <locationX>176</locationX>
-        <locationY>384</locationY>
-        <allowBack>false</allowBack>
-        <allowFinish>true</allowFinish>
-        <allowPause>false</allowPause>
-        <fields>
-            <name>Texto_Resultado</name>
-            <fieldText>&lt;p&gt;{!Registrar_Solicitacao.mensagem}&lt;/p&gt;&lt;p&gt;Atualize a página para ver o campo.&lt;/p&gt;</fieldText>
-            <fieldType>DisplayText</fieldType>
-            <styleProperties>
-                <verticalAlignment>
-                    <stringValue>top</stringValue>
-                </verticalAlignment>
-                <width>
-                    <stringValue>12</stringValue>
-                </width>
-            </styleProperties>
-        </fields>
         <showFooter>true</showFooter>
         <showHeader>true</showHeader>
     </screens>

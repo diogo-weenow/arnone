@@ -18,7 +18,7 @@
     </actionCalls>
     <apiVersion>66.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
-    <description>CLICKUP-9418 — Aciona SOLOptOutInvocable quando uma tarefa de contato SOL (SOL_Tipo_Tarefa__c = "Contato", WhoId preenchido) é concluída com Resultado do contato = "Opt-out". Sem bloqueio por horário/dia. A desqualificação do Lead (Status "Desqualificado" + motivo "Opt-out"), o cancelamento das tarefas pendentes e o bloqueio de novas tarefas ficam no Apex (bulk, FOR UPDATE, atômico). Não altera campos aqui. Não modifica outros Flows.</description>
+    <description>CLICKUP-9418 — Aciona SOLOptOutInvocable quando uma tarefa de contato SOL (SOL_Tipo_Tarefa__c = &quot;Contato&quot;, WhoId preenchido) é concluída com Resultado do contato = &quot;Opt-out&quot;. Sem bloqueio por horário/dia. A desqualificação do Lead (Status &quot;Desqualificado&quot; + motivo &quot;Opt-out&quot;), o cancelamento das tarefas pendentes e o bloqueio de novas tarefas ficam no Apex (bulk, FOR UPDATE, atômico). Não altera campos aqui. Não modifica outros Flows.</description>
     <environments>Default</environments>
     <interviewLabel>SOL_Opt_Out {!$Flow.CurrentDateTime}</interviewLabel>
     <label>SOL_Opt_Out</label>
