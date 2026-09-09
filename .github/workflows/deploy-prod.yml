@@ -1,0 +1,248 @@
+name: Deploy Producao
+
+# A branch "production" e o espelho do que esta em producao: fazer merge nela
+# significa deployar. O delta sai de github.event.before (o topo anterior da
+# branch, ou seja, o que ja esta na org) ate o novo commit.
+#
+# Sao dois jobs de proposito:
+#   validar  -> sf project deploy validate com testes. Nao muda nada na org,
+#               entao roda sem esperar aprovacao: se um teste quebra, ninguem
+#               foi incomodado para aprovar um deploy que ia falhar.
+#   aplicar  -> gated pelo environment "production" (required reviewer). Roda
+#               sf project deploy quick sobre o pacote ja validado: aplica em
+#               minutos, sem reexecutar a bateria de testes.
+on:
+  push:
+    branches: [production]
+    paths:
+      - "force-app/**"
+      - "sfdx-project.json"
+  workflow_dispatch:
+    inputs:
+      from_ref:
+        description: "Commit/tag inicial do delta (vazio = topo anterior da production)"
+        required: false
+        default: ""
+        type: string
+      test_level:
+        description: "Nivel de teste da validacao"
+        required: false
+        default: "RunLocalTests"
+        type: choice
+        options:
+          - RunLocalTests
+          - RunAllTestsInOrg
+
+concurrency:
+  group: deploy-prod
+  cancel-in-progress: false
+
+jobs:
+  validar:
+    name: Validar na producao (com testes)
+    runs-on: ubuntu-latest
+    outputs:
+      job_id: ${{ steps.validacao.outputs.job_id }}
+      has_changes: ${{ steps.delta.outputs.has_changes }}
+      has_destructive: ${{ steps.delta.outputs.has_destructive }}
+      from: ${{ steps.delta.outputs.from }}
+    steps:
+      - name: Checkout com historico completo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar Salesforce CLI e sfdx-git-delta
+        run: |
+          npm install --global @salesforce/cli@latest
+          echo y | sf plugins install sfdx-git-delta@latest
+          sf version
+
+      - name: Autenticar na arnone-prod
+        env:
+          SF_AUTH_URL_PROD: ${{ secrets.SF_AUTH_URL_PROD }}
+        run: |
+          if [ -z "$SF_AUTH_URL_PROD" ]; then
+            echo "::error::Secret SF_AUTH_URL_PROD nao configurado no repositorio."
+            exit 1
+          fi
+          printf '%s' "$SF_AUTH_URL_PROD" > "$RUNNER_TEMP/auth_url.txt"
+          sf org login sfdx-url --sfdx-url-file "$RUNNER_TEMP/auth_url.txt" --alias arnone-prod --set-default
+          rm -f "$RUNNER_TEMP/auth_url.txt"
+          sf org display --target-org arnone-prod --json \
+            | jq -r '"Org: \(.result.username) | \(.result.instanceUrl)"'
+
+      - name: Calcular delta
+        id: delta
+        run: |
+          FROM="${{ inputs.from_ref }}"
+          if [ -z "$FROM" ]; then
+            FROM="${{ github.event.before }}"
+          fi
+          # Branch recem criada, force-push ou disparo manual chegam sem before valido.
+          if [ -z "$FROM" ] || [ "$FROM" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "${FROM}^{commit}" 2>/dev/null; then
+            echo "::error::Nao foi possivel determinar o que ja esta em producao."
+            echo "::error::Informe from_ref com o commit/tag que representa o estado atual da org."
+            exit 1
+          fi
+
+          echo "from=$FROM" >> "$GITHUB_OUTPUT"
+          echo "Delta: $FROM -> ${{ github.sha }}"
+
+          mkdir -p delta
+          sf sgd source delta \
+            --from "$FROM" \
+            --to "${{ github.sha }}" \
+            --output-dir delta \
+            --source-dir force-app \
+            --ignore-whitespace
+
+          echo "--- package.xml (a validar) ---"
+          cat delta/package/package.xml
+
+          if grep -q "<types>" delta/package/package.xml; then
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Nenhum componente alterado. Nada a deployar."
+          fi
+
+          # Remocoes nao sao aplicadas: deploy destrutivo em producao e manual.
+          if [ -f delta/destructiveChanges/destructiveChanges.xml ] \
+             && grep -q "<types>" delta/destructiveChanges/destructiveChanges.xml; then
+            echo "has_destructive=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_destructive=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Guardar o package.xml validado
+        if: steps.delta.outputs.has_changes == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: delta-producao
+          path: delta/
+          retention-days: 30
+
+      - name: Validar com testes
+        id: validacao
+        if: steps.delta.outputs.has_changes == 'true'
+        run: |
+          set +e
+          # deploy validate (e nao deploy start --dry-run): so ele produz um
+          # job id que o deploy quick consegue aplicar depois.
+          sf project deploy validate \
+            --manifest delta/package/package.xml \
+            --target-org arnone-prod \
+            --test-level "${{ inputs.test_level || 'RunLocalTests' }}" \
+            --wait 120 \
+            --json > "$RUNNER_TEMP/validacao.json"
+          STATUS=$?
+          set -e
+
+          JOB_ID="$(jq -r '.result.id // empty' "$RUNNER_TEMP/validacao.json")"
+          echo "job_id=$JOB_ID" >> "$GITHUB_OUTPUT"
+          echo "Job id da validacao: $JOB_ID"
+
+          if [ "$STATUS" -ne 0 ]; then
+            echo "--- componentes com falha ---"
+            jq -r '
+              (.result.details.componentFailures // .data.details.componentFailures // [])[]
+              | "\(.componentType) \(.fullName): \(.problem)"
+            ' "$RUNNER_TEMP/validacao.json" 2>/dev/null | head -n 40
+            echo "--- testes com falha ---"
+            jq -r '
+              (.result.details.runTestResult.failures
+               // .data.details.runTestResult.failures // [])[]
+              | "\(.name).\(.methodName): \(.message)"
+            ' "$RUNNER_TEMP/validacao.json" 2>/dev/null | head -n 40
+          fi
+          exit $STATUS
+
+      - name: Resumo da validacao
+        if: always()
+        run: |
+          {
+            echo "## Validação em produção"
+            echo ""
+            echo "- Delta: \`${{ steps.delta.outputs.from }}\` → \`${{ github.sha }}\`"
+            echo "- Nível de teste: \`${{ inputs.test_level || 'RunLocalTests' }}\`"
+            echo "- Componentes alterados: ${{ steps.delta.outputs.has_changes }}"
+            echo "- Resultado: ${{ steps.validacao.outcome }}"
+            if [ -f delta/package/package.xml ]; then
+              echo ""
+              echo "<details><summary>package.xml validado</summary>"
+              echo ""
+              echo '```xml'
+              cat delta/package/package.xml
+              echo '```'
+              echo ""
+              echo "</details>"
+            fi
+            if [ "${{ steps.delta.outputs.has_destructive }}" = "true" ]; then
+              echo ""
+              echo "> [!WARNING]"
+              echo "> Há remoções de metadados neste delta. Elas **não são aplicadas** pela pipeline."
+              echo "> Deploy destrutivo em produção é manual e revisado."
+              echo ""
+              echo '```xml'
+              cat delta/destructiveChanges/destructiveChanges.xml
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  aplicar:
+    name: Aplicar em producao
+    needs: validar
+    if: needs.validar.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    # Portao de aprovacao: o environment production exige revisor obrigatorio,
+    # entao o run fica parado aqui ate alguem aprovar no GitHub.
+    environment:
+      name: production
+      url: ${{ vars.PROD_INSTANCE_URL }}
+    steps:
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Instalar Salesforce CLI
+        run: |
+          npm install --global @salesforce/cli@latest
+          sf version
+
+      - name: Autenticar na arnone-prod
+        env:
+          SF_AUTH_URL_PROD: ${{ secrets.SF_AUTH_URL_PROD }}
+        run: |
+          printf '%s' "$SF_AUTH_URL_PROD" > "$RUNNER_TEMP/auth_url.txt"
+          sf org login sfdx-url --sfdx-url-file "$RUNNER_TEMP/auth_url.txt" --alias arnone-prod --set-default
+          rm -f "$RUNNER_TEMP/auth_url.txt"
+
+      - name: Aplicar o deploy validado
+        id: quick
+        run: |
+          # Pacote ja validado com testes no job anterior: o quick deploy
+          # aplica sem reexecutar a bateria.
+          sf project deploy quick \
+            --job-id "${{ needs.validar.outputs.job_id }}" \
+            --target-org arnone-prod \
+            --wait 120 \
+            --verbose
+
+      - name: Resumo do deploy
+        if: always()
+        run: |
+          {
+            echo "## Deploy em produção"
+            echo ""
+            echo "- Commit: \`${{ github.sha }}\`"
+            echo "- Job id validado: \`${{ needs.validar.outputs.job_id }}\`"
+            echo "- Resultado: ${{ steps.quick.outcome }}"
+          } >> "$GITHUB_STEP_SUMMARY"
