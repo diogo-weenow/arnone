@@ -107,7 +107,8 @@ jobs:
             --to "${{ github.sha }}" \
             --output-dir delta \
             --source-dir force-app \
-            --ignore-whitespace
+            --ignore-whitespace \
+            --ignore-file .forceignore
 
           echo "--- package.xml (a validar) ---"
           cat delta/package/package.xml

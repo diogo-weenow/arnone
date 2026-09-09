@@ -2,8 +2,8 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Dias_Calculo_Juridico__c</fullName>
     <description>Etapa 4: dias ÚTEIS entre a solicitação do cálculo ao jurídico (SOL_Data_Solicitacao_Calculo__c, exclusiva) e o recebimento do cálculo (SOL_Data_Recebimento_Calculo__c, inclusiva). Mesmo dia útil = 0. Exclusivo de Recuperação Tributária: em ART 360 não há etapa de cálculo e o campo permanece VAZIO, nunca zero. Congelado na primeira conclusão válida. Campo técnico, somente leitura. CLICKUP-9439 / CLICKUP-9429 (absorvido).</description>
-    <label>Dias úteis do cálculo jurídico (SOL)</label>
     <externalId>false</externalId>
+    <label>Dias úteis do cálculo jurídico (SOL)</label>
     <precision>4</precision>
     <required>false</required>
     <scale>0</scale>

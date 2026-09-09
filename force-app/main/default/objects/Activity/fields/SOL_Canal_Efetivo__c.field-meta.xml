@@ -12,10 +12,8 @@
     &quot;Sem canal informado&quot;
   )
 )</formula>
-    <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
     <label>Canal efetivo do contato SOL</label>
     <required>false</required>
-    <trackHistory>false</trackHistory>
     <type>Text</type>
     <unique>false</unique>
 </CustomField>

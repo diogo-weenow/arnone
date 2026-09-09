@@ -3,4 +3,6 @@
     <enableALMDevopsCorePref>false</enableALMDevopsCorePref>
     <enableALMSimpleDeployDataPref>false</enableALMSimpleDeployDataPref>
     <enableALMSimpleDeployPref>false</enableALMSimpleDeployPref>
+    <enableDevopsCenterMigrationPref>false</enableDevopsCenterMigrationPref>
+    <enableDevopsTestingPref>false</enableDevopsTestingPref>
 </DevHubSettings>

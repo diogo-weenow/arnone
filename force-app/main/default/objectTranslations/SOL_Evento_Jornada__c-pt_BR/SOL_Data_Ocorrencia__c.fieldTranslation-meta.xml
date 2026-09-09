@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Data da ocorrência --></label>
+    <name>SOL_Data_Ocorrencia__c</name>
+</CustomFieldTranslation>

@@ -20,7 +20,6 @@
     <tabs>standard-MarketingCalendar</tabs>
     <tabs>standard-Brief</tabs>
     <tabs>standard-Consent</tabs>
-    <tabs>standard-ContentStudio</tabs>
     <tabs>standard-MarketingSites</tabs>
     <uiType>Lightning</uiType>
 </CustomApplication>

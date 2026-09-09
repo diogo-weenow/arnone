@@ -283,6 +283,24 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>SOL_Duracao_Pendencia_Motivo__c</picklist>
+        <values>
+            <fullName>Calendário indisponível</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Intervalo inconsistente</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SOL_Motivo_Desqualificacao__c</picklist>
+        <values>
+            <fullName>Opt-out</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>SOL_Produto_Interesse__c</picklist>
         <values>
             <fullName>ART 360</fullName>
@@ -290,6 +308,25 @@
         </values>
         <values>
             <fullName>Recuperação Tributária</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SOL_Status_Distribuicao__c</picklist>
+        <values>
+            <fullName>Distribuido</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Erro</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fallback</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendente</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -305,6 +342,21 @@
         </values>
         <values>
             <fullName>Solicitada</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SOL_Status_Reatribuicao__c</picklist>
+        <values>
+            <fullName>Em acompanhamento</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reatribuido</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sem outro vendedor</fullName>
             <default>false</default>
         </values>
     </picklistValues>

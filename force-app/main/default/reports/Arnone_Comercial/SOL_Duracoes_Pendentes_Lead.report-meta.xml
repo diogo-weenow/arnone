@@ -30,7 +30,7 @@
     <columns>
         <field>Lead.SOL_Dias_Reuniao_Procuracao__c</field>
     </columns>
-    <description>CLICKUP-9439 / 9429 — Leads SOL com os marcos da etapa completos e a duração não calculada. "Calendário indisponível" é transitório: reative o Business Hours e a varredura do minuto 45 resolve. "Intervalo inconsistente": corrija as datas e rode o Batch.</description>
+    <description>CLICKUP-9439 / 9429 — Leads SOL com os marcos da etapa completos e a duração não calculada. &quot;Calendário indisponível&quot; é transitório: reative o Business Hours e a varredura do minuto 45 resolve. &quot;Intervalo inconsistente&quot;: corrija as datas e rode o Batch.</description>
     <filter>
         <criteriaItems>
             <column>Lead.SOL_Duracao_Pendente__c</column>
@@ -56,4 +56,8 @@
     <showDetails>true</showDetails>
     <showGrandTotal>true</showGrandTotal>
     <showSubTotals>true</showSubTotals>
+    <timeFrameFilter>
+        <dateColumn>CREATED_DATE</dateColumn>
+        <interval>INTERVAL_CUSTOM</interval>
+    </timeFrameFilter>
 </Report>

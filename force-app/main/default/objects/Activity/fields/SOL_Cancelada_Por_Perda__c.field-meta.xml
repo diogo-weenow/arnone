@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Cancelada_Por_Perda__c</fullName>
-    <description>Checkbox técnico: true somente quando SOLNegocioPerdidoService cancelou esta Task porque o negócio da Arnone Soluções foi perdido — Lead desqualificado com motivo "Negócio perdido" (sem opt-out) ou Oportunidade em "Perdido". Gravado junto de Status = "Cancelada" e SOL_Motivo_Cancelamento__c = "Negócio perdido", o que distingue a tarefa cancelada pela perda de uma tarefa executada ou cancelada por outro motivo. É este checkbox, combinado com o motivo, que autoriza a VR SOL_Cancelada_Exige_Classificacao a aceitar tarefa MANUAL sem SOL_Tipo_Tarefa__c; qualquer outro cancelamento continua exigindo tipo e motivo. Somente leitura para Comercial e Distribuição Admin; sem exceção por Subject, perfil ou usuário. CLICKUP-9425.</description>
-    <label>Cancelada por perda do negócio</label>
     <defaultValue>false</defaultValue>
-    <trackFeedHistory>false</trackFeedHistory>
-    <trackHistory>false</trackHistory>
+    <description>Checkbox técnico: true somente quando SOLNegocioPerdidoService cancelou esta Task porque o negócio da Arnone Soluções foi perdido — Lead desqualificado com motivo &quot;Negócio perdido&quot; (sem opt-out) ou Oportunidade em &quot;Perdido&quot;. Gravado junto de Status = &quot;Cancelada&quot; e SOL_Motivo_Cancelamento__c = &quot;Negócio perdido&quot;, o que distingue a tarefa cancelada pela perda de uma tarefa executada ou cancelada por outro motivo. É este checkbox, combinado com o motivo, que autoriza a VR SOL_Cancelada_Exige_Classificacao a aceitar tarefa MANUAL sem SOL_Tipo_Tarefa__c; qualquer outro cancelamento continua exigindo tipo e motivo. Somente leitura para Comercial e Distribuição Admin; sem exceção por Subject, perfil ou usuário. CLICKUP-9425.</description>
+    <label>Cancelada por perda do negócio</label>
     <type>Checkbox</type>
 </CustomField>
