@@ -1,10 +1,13 @@
 name: Validar PR
 
-# Valida na arnone-uat, sem aplicar nada, tudo que um PR pretende levar para a main.
-# Pega erro de metadado e falha de teste antes do merge, em vez de sujar a UAT.
+# Valida o PR contra a org da branch de DESTINO, sem aplicar nada:
+#   PR -> dev         valida na arnone-dev
+#   PR -> uat         valida na arnone-uat
+#   PR -> production  valida na arnone-prod (sempre com testes)
+# Pega erro de metadado e falha de teste antes do merge.
 on:
   pull_request:
-    branches: [main]
+    branches: [dev, uat, production]
     types: [opened, synchronize, reopened]
     paths:
       - "force-app/**"
@@ -21,11 +24,19 @@ concurrency:
 
 jobs:
   validate:
-    name: Dry-run na arnone-uat
+    name: Dry-run na org de destino
     runs-on: ubuntu-latest
-    # Repo publico: PR vindo de fork nao recebe os secrets, entao a validacao
-    # falharia na autenticacao. Fork nao valida — so PR de branch deste repo.
+    # Repo publico: PR de fork nao recebe os secrets e falharia na autenticacao.
     if: github.event.pull_request.head.repo.full_name == github.repository
+    env:
+      ORG_ALIAS: >-
+        ${{ github.base_ref == 'production' && 'arnone-prod'
+         || github.base_ref == 'uat' && 'arnone-uat'
+         || 'arnone-dev' }}
+      SF_AUTH_URL: >-
+        ${{ github.base_ref == 'production' && secrets.SF_AUTH_URL_PROD
+         || github.base_ref == 'uat' && secrets.SF_AUTH_URL_UAT
+         || secrets.SF_AUTH_URL_DEV }}
     steps:
       - name: Checkout com historico completo
         uses: actions/checkout@v4
@@ -43,18 +54,17 @@ jobs:
           echo y | sf plugins install sfdx-git-delta@latest
           sf version
 
-      - name: Autenticar na arnone-uat
-        env:
-          SF_AUTH_URL_UAT: ${{ secrets.SF_AUTH_URL_UAT }}
+      - name: Autenticar na org de destino
         run: |
-          if [ -z "$SF_AUTH_URL_UAT" ]; then
-            echo "::error::Secret SF_AUTH_URL_UAT nao configurado no repositorio."
+          if [ -z "$SF_AUTH_URL" ]; then
+            echo "::error::Secret de autenticacao vazio para $ORG_ALIAS (base: ${{ github.base_ref }})."
             exit 1
           fi
-          printf '%s' "$SF_AUTH_URL_UAT" > "$RUNNER_TEMP/auth_url.txt"
-          sf org login sfdx-url --sfdx-url-file "$RUNNER_TEMP/auth_url.txt" --alias arnone-uat --set-default
+          printf '%s' "$SF_AUTH_URL" > "$RUNNER_TEMP/auth_url.txt"
+          sf org login sfdx-url --sfdx-url-file "$RUNNER_TEMP/auth_url.txt" \
+            --alias "$ORG_ALIAS" --set-default
           rm -f "$RUNNER_TEMP/auth_url.txt"
-          sf org display --target-org arnone-uat --json \
+          sf org display --target-org "$ORG_ALIAS" --json \
             | jq -r '"Org: \(.result.username) | \(.result.instanceUrl)"'
 
       - name: Calcular delta do PR
@@ -65,7 +75,7 @@ jobs:
           # HEAD aqui e o merge commit do PR: o delta e o estado pos-merge.
           FROM="$(git merge-base "origin/$BASE_REF" HEAD)"
           echo "from=$FROM" >> "$GITHUB_OUTPUT"
-          echo "Delta: $FROM -> HEAD"
+          echo "Delta: $FROM -> HEAD (destino: $ORG_ALIAS)"
 
           mkdir -p delta
           sf sgd source delta \
@@ -85,9 +95,12 @@ jobs:
             echo "Nenhum componente alterado no delta."
           fi
 
-          # Só roda a bateria de testes se o PR mexe em Apex — senão a validação
-          # gastaria minutos rodando testes que nada no delta pode ter quebrado.
-          if grep -qE "<name>(ApexClass|ApexTrigger)</name>" delta/package/package.xml; then
+          # PR para producao sempre roda a bateria: e o ultimo portao antes da org
+          # real. Nas outras branches, so quando o delta mexe em Apex — nao faz
+          # sentido gastar minutos num PR que so mexe em layout ou relatorio.
+          if [ "$BASE_REF" = "production" ]; then
+            echo "test_level=RunLocalTests" >> "$GITHUB_OUTPUT"
+          elif grep -qE "<name>(ApexClass|ApexTrigger)</name>" delta/package/package.xml; then
             echo "test_level=RunLocalTests" >> "$GITHUB_OUTPUT"
           else
             echo "test_level=NoTestRun" >> "$GITHUB_OUTPUT"
@@ -107,13 +120,12 @@ jobs:
           set +e
           sf project deploy start \
             --manifest delta/package/package.xml \
-            --target-org arnone-uat \
+            --target-org "$ORG_ALIAS" \
             --test-level "${{ steps.delta.outputs.test_level }}" \
             --dry-run \
             --wait 60 \
             --verbose 2>&1 | tee "$RUNNER_TEMP/deploy.log"
           STATUS=${PIPESTATUS[0]}
-          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
           exit $STATUS
 
       - name: Comentar resultado no PR
@@ -122,11 +134,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ "${{ steps.dryrun.outcome }}" = "success" ]; then
-            ICONE="✅"
-            TITULO="Validação passou na \`arnone-uat\`"
+            ICONE="✅"; TITULO="Validação passou em \`$ORG_ALIAS\`"
           else
-            ICONE="❌"
-            TITULO="Validação falhou na \`arnone-uat\`"
+            ICONE="❌"; TITULO="Validação falhou em \`$ORG_ALIAS\`"
           fi
 
           {
@@ -135,6 +145,7 @@ jobs:
             echo ""
             echo "Dry-run — **nada foi aplicado na org**."
             echo ""
+            echo "- Destino: \`${{ github.base_ref }}\` → \`$ORG_ALIAS\`"
             echo "- Nível de teste: \`${{ steps.delta.outputs.test_level }}\`"
             echo "- Delta a partir de: \`${{ steps.delta.outputs.from }}\`"
             echo "- [Log completo do run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
@@ -150,7 +161,7 @@ jobs:
             if [ "${{ steps.delta.outputs.has_destructive }}" = "true" ]; then
               echo ""
               echo "> [!WARNING]"
-              echo "> Este PR remove metadados. A pipeline de UAT **não aplica remoções**;"
+              echo "> Este PR remove metadados. As pipelines **não aplicam remoções**;"
               echo "> após o merge, o deploy destrutivo é manual e revisado."
               echo ""
               echo '```xml'
@@ -181,6 +192,7 @@ jobs:
           {
             echo "## Validação do PR #${{ github.event.pull_request.number }}"
             echo ""
+            echo "- Destino: \`${{ github.base_ref }}\` → \`$ORG_ALIAS\`"
             echo "- Componentes alterados: ${{ steps.delta.outputs.has_changes }}"
             echo "- Nível de teste: ${{ steps.delta.outputs.test_level }}"
             echo "- Resultado: ${{ steps.dryrun.outcome }}"
