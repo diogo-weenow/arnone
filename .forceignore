@@ -12,3 +12,40 @@ package.xml
 **/__tests__/**
 
 node_modules/
+
+# ---------------------------------------------------------------------------
+# Metadado de plataforma que NAO e deployavel entre orgs.
+# Nada aqui e removido da org nem do Git: estes arquivos seguem versionados
+# como retrato do que existe na dev. O que este arquivo faz e impedir que o
+# CLI tente retriar/deployar componentes que a propria Salesforce rejeita.
+# Cada bloco corresponde a falhas reais medidas no dry-run do PR #41.
+# ---------------------------------------------------------------------------
+
+# Data Cloud: Data Lake/Model Objects. Deploy falha com
+# "Must specify a non-empty label for the CustomObject" (45 falhas).
+**/objects/*__dlm/**
+**/objects/*__dll/**
+**/objects/ssot__*/**
+
+# Profiles standard: referenciam tabs de Data Cloud/DevOps Center que existem
+# na dev mas nao sao validas em deploy — "You can't edit tab settings for X,
+# as it's not a valid tab" (135 falhas em Admin, ContractManager,
+# MarketingProfile, SolutionManager, Standard). O modelo de permissao do
+# projeto e por Permission Set, que segue versionado e deployavel.
+**/profiles/**
+
+# Settings: configuracao de nivel de org, nao promovivel entre ambientes.
+# Analytics vem com elemento duplicado do proprio retrieve; Security exige
+# direitos que a org nao concede (MFA) (3 falhas).
+**/settings/**
+
+# Policy rules: deploy retorna erro interno da Salesforce (2 falhas).
+**/policyRuleDefinitions/**
+**/policyRuleDefinitionSets/**
+
+# Traducoes geradas pelo retrieve com genero invalido para pt_BR
+# ("Invalid gender 'Neuter' for language PORTUGUESE_BR").
+**/objectTranslations/**
+
+# Blob binario do site que muda a cada retrieve, gerando delta falso.
+**/siteDotComSites/**
