@@ -1,10 +1,10 @@
-name: Deploy UAT
+name: Deploy Dev
 
-# Merge na branch uat deploya na org arnone-uat. O passo a passo vive em
-# _deploy-delta.yml, compartilhado com o deploy de dev.
+# Merge na branch dev deploya na org arnone-dev. O passo a passo vive em
+# _deploy-delta.yml, compartilhado com o deploy de uat.
 on:
   push:
-    branches: [uat]
+    branches: [dev]
     paths:
       - "force-app/**"
       - "sfdx-project.json"
@@ -32,16 +32,16 @@ on:
 
 # Um deploy por vez nesta org: dois merges seguidos entram em fila.
 concurrency:
-  group: deploy-uat
+  group: deploy-dev
   cancel-in-progress: false
 
 jobs:
   deploy:
     uses: ./.github/workflows/_deploy-delta.yml
     with:
-      org_alias: arnone-uat
+      org_alias: arnone-dev
       test_level: ${{ inputs.test_level || 'NoTestRun' }}
       from_ref: ${{ inputs.from_ref || '' }}
       dry_run: ${{ inputs.dry_run || false }}
     secrets:
-      SF_AUTH_URL: ${{ secrets.SF_AUTH_URL_UAT }}
+      SF_AUTH_URL: ${{ secrets.SF_AUTH_URL_DEV }}
