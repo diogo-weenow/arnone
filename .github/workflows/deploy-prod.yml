@@ -55,7 +55,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Instalar Salesforce CLI e sfdx-git-delta
         run: |
@@ -71,6 +71,12 @@ jobs:
             echo "::error::Secret SF_AUTH_URL_PROD nao configurado no repositorio."
             exit 1
           fi
+          case "$SF_AUTH_URL_PROD" in
+            force://*) ;;
+            *) echo "::error::Secret de arnone-prod nao e uma auth URL valida (nao comeca com force://)."
+               echo "::error::Gere com: sf org auth show-sfdx-auth-url --target-org <alias> --json | jq -r .result.sfdxAuthUrl"
+               exit 1 ;;
+          esac
           printf '%s' "$SF_AUTH_URL_PROD" > "$RUNNER_TEMP/auth_url.txt"
           sf org login sfdx-url --sfdx-url-file "$RUNNER_TEMP/auth_url.txt" --alias arnone-prod --set-default
           rm -f "$RUNNER_TEMP/auth_url.txt"
@@ -210,7 +216,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Instalar Salesforce CLI
         run: |
