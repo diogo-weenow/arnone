@@ -6,6 +6,7 @@
         <developerName>FORMULA1</developerName>
         <downGroupingContext>OWNER</downGroupingContext>
         <isActive>true</isActive>
+        <isCrossBlock>false</isCrossBlock>
         <masterLabel>Dias úteis (média)</masterLabel>
         <scale>1</scale>
     </aggregates>
@@ -42,6 +43,10 @@
         <sortOrder>Asc</sortOrder>
     </groupingsDown>
     <name>SOL — Tempo médio contato efetivado</name>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
     <reportType>LeadList</reportType>
     <scope>org</scope>
     <showDetails>false</showDetails>

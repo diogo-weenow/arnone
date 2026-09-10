@@ -20,5 +20,5 @@
   )
 )</errorConditionFormula>
     <errorDisplayField>SOL_Motivo_Desqualificacao__c</errorDisplayField>
-    <errorMessage>Motivo da desqualificação incoerente. Use "Negócio perdido" para perda comercial (sem opt-out) ou deixe a automação registrar "Opt-out" quando o lead pedir para não ser contatado. Desqualificar exige um destes dois motivos.</errorMessage>
+    <errorMessage>Motivo da desqualificação incoerente. Use &quot;Negócio perdido&quot; para perda comercial (sem opt-out) ou deixe a automação registrar &quot;Opt-out&quot; quando o lead pedir para não ser contatado. Desqualificar exige um destes dois motivos.</errorMessage>
 </ValidationRule>

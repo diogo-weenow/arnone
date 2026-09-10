@@ -7,6 +7,7 @@
         <description>Set of ways to identify a party e.g. driving license, birth certificate</description>
         <isEnabled>true</isEnabled>
         <isSegmentable>false</isSegmentable>
+        <isSqlDmo>false</isSqlDmo>
         <isUsedForMetrics>false</isUsedForMetrics>
         <labelOverride>Party Identification</labelOverride>
         <masterLabel>Party Identification</masterLabel>

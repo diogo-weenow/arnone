@@ -2,7 +2,7 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Reuniao_Final_Exige_Data</fullName>
     <active>true</active>
-    <description>CLICKUP-9422: a tarefa de tipo "Reunião final" só conclui quando SOL_Data_Reuniao_Final__c está preenchida. Usa SOL_Tipo_Tarefa__c, nunca o Subject; não afeta outras Tasks. Concluir a reunião final não cria a tarefa de fechamento (CLICKUP-9423).</description>
+    <description>CLICKUP-9422: a tarefa de tipo &quot;Reunião final&quot; só conclui quando SOL_Data_Reuniao_Final__c está preenchida. Usa SOL_Tipo_Tarefa__c, nunca o Subject; não afeta outras Tasks. Concluir a reunião final não cria a tarefa de fechamento (CLICKUP-9423).</description>
     <errorConditionFormula>AND(
   ISPICKVAL( SOL_Tipo_Tarefa__c , &quot;Reunião final&quot; ),
   ISPICKVAL( Status , &quot;Completed&quot; ),

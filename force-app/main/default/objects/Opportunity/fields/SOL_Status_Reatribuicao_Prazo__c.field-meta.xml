@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Status_Reatribuicao_Prazo__c</fullName>
-    <description>Situação da reatribuição por estouro do prazo total (CLICKUP-9424). "Reatribuido" = trocou de proprietário. "Sem outro vendedor" = prazo venceu mas não havia outro vendedor ativo na fila; a Oportunidade NÃO foi marcada como processada e será reavaliada. Campo técnico, somente leitura.</description>
+    <description>Situação da reatribuição por estouro do prazo total (CLICKUP-9424). &quot;Reatribuido&quot; = trocou de proprietário. &quot;Sem outro vendedor&quot; = prazo venceu mas não havia outro vendedor ativo na fila; a Oportunidade NÃO foi marcada como processada e será reavaliada. Campo técnico, somente leitura.</description>
     <label>Status da reatribuição por prazo</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>

@@ -2,7 +2,7 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Data_Reuniao_Final_Nao_Futura</fullName>
     <active>true</active>
-    <description>CLICKUP-9422: SOL_Data_Reuniao_Final__c aceita a data de hoje ou uma data passada — rejeita data futura. Restrita à tarefa de tipo "Reunião final" (SOL_Tipo_Tarefa__c), sem afetar outras Tasks.</description>
+    <description>CLICKUP-9422: SOL_Data_Reuniao_Final__c aceita a data de hoje ou uma data passada — rejeita data futura. Restrita à tarefa de tipo &quot;Reunião final&quot; (SOL_Tipo_Tarefa__c), sem afetar outras Tasks.</description>
     <errorConditionFormula>AND(
   ISPICKVAL( SOL_Tipo_Tarefa__c , &quot;Reunião final&quot; ),
   NOT( ISBLANK( SOL_Data_Reuniao_Final__c ) ),

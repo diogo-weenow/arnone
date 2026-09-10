@@ -133,10 +133,6 @@
         <type>CustomApplication</type>
     </appMenuItems>
     <appMenuItems>
-        <name>standard__ScaleTestApp</name>
-        <type>CustomApplication</type>
-    </appMenuItems>
-    <appMenuItems>
         <name>Slack_Solicitacoes</name>
         <type>ExternalClientApplication</type>
     </appMenuItems>

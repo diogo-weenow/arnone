@@ -9,5 +9,5 @@
   NOT( ISBLANK( TEXT( SOL_Resultado_Contato__c ) ) )
 )</errorConditionFormula>
     <errorDisplayField>SOL_Resultado_Contato__c</errorDisplayField>
-    <errorMessage>Esta é uma tarefa de e-mail: use o campo "Resultado do envio". O "Resultado do contato" é exclusivo das tarefas de ligação, porque seus valores acionam contato efetivado, opt-out e reatribuição.</errorMessage>
+    <errorMessage>Esta é uma tarefa de e-mail: use o campo &quot;Resultado do envio&quot;. O &quot;Resultado do contato&quot; é exclusivo das tarefas de ligação, porque seus valores acionam contato efetivado, opt-out e reatribuição.</errorMessage>
 </ValidationRule>

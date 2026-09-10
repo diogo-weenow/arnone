@@ -6,6 +6,7 @@
         <dataSpaceName>default</dataSpaceName>
         <isEnabled>true</isEnabled>
         <isSegmentable>true</isSegmentable>
+        <isSqlDmo>false</isSqlDmo>
         <isUsedForMetrics>false</isUsedForMetrics>
         <labelOverride>Identity Match</labelOverride>
         <masterLabel>Identity Match</masterLabel>

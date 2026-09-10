@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Duracao_Pendente__c</fullName>
+    <defaultValue>false</defaultValue>
     <description>Marca que os DOIS marcos de alguma etapa já existem, mas a duração em dias úteis não pôde ser calculada. Nunca significa zero: a duração fica VAZIA e a média do relatório gerencial a exclui, em vez de ser puxada por um número falso. É este campo que impede a falha silenciosa — sem ele, a política &quot;marco sempre, duração tolerante&quot; seria falha silenciosa com outro nome. Escrito e limpo apenas por SOLDuracaoEtapaService. Falta de marco NÃO marca pendência: etapa não concluída é vazia, não pendente. CLICKUP-9439 / CLICKUP-9429 (absorvido).</description>
     <label>Duração pendente de cálculo (SOL)</label>
-    <defaultValue>false</defaultValue>
     <trackFeedHistory>false</trackFeedHistory>
     <trackHistory>false</trackHistory>
     <type>Checkbox</type>

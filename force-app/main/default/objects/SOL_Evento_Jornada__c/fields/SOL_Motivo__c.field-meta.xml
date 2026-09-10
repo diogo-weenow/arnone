@@ -4,8 +4,6 @@
     <description>Motivo exato da ocorrência — é a LINHA do relatório de reatribuições e perdas. Quatro valores, um por serviço da jornada: &quot;Reatribuição por falta de contato&quot; (SOLDistribuicaoService.reatribuirPorFaltaDeContato), &quot;Reatribuição por estouro do prazo total&quot; (SOLPrazoTotalService.reatribuirPorPrazoTotal), &quot;Lead perdido por opt-out&quot; (SOLDistribuicaoService.registrarOptOut) e &quot;Oportunidade perdida&quot; (SOLNegocioPerdidoService.encerrarPorOportunidadePerdida). Restrito de propósito: valor novo exige motivo de negócio novo e gravação nova no serviço. CLICKUP-9438.</description>
     <label>Motivo</label>
     <required>true</required>
-    <trackFeedHistory>false</trackFeedHistory>
-    <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
     <type>Picklist</type>
     <valueSet>

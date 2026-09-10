@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Data_Solicitacao_Ref__c</fullName>
-    <description>Referência técnica estável da solicitação de procuração à qual a tarefa de acompanhamento pertence: cópia de Lead.SOL_Data_Solicitacao_Procuracao__c no momento da criação. Chave de idempotência (Lead + esta data) — no máximo uma tarefa "Acompanhamento da procuração" por Lead e por solicitação. Uma solicitação com nova data pode gerar nova tarefa. Preenchido apenas pela automação SOL. CLICKUP-9426.</description>
+    <description>Referência técnica estável da solicitação de procuração à qual a tarefa de acompanhamento pertence: cópia de Lead.SOL_Data_Solicitacao_Procuracao__c no momento da criação. Chave de idempotência (Lead + esta data) — no máximo uma tarefa &quot;Acompanhamento da procuração&quot; por Lead e por solicitação. Uma solicitação com nova data pode gerar nova tarefa. Preenchido apenas pela automação SOL. CLICKUP-9426.</description>
     <label>Data da solicitação (ref. SOL)</label>
     <required>false</required>
     <type>Date</type>
