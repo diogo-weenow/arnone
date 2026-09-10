@@ -85,3 +85,13 @@ node_modules/
 **/mktDataConnections/**
 **/notificationTypeConfig/**
 **/appMenus/**
+
+# Filas: a membresia referencia usuarios reais, e o repo carrega usernames que
+# existem em uma org so -- omar.faruk@weenow.devarnone (sufixo do sandbox de
+# dev), gustavo.silva@grupoarnone.com.dev, os @grupoarnone.demo. Deploy de fila
+# SUBSTITUI a lista de membros, entao versionar isso quebra a promocao em
+# qualquer org que nao seja a de origem.
+#
+# As 13 filas ja existem identicas em dev, uat e producao. A membresia passa a
+# ser configuracao por org, no Setup. Nada e removido de org nenhuma.
+**/queues/**
