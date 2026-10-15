@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Lote__c</fullName>
+    <description>Lote de enriquecimento ao qual esta linha pertence. OWD das linhas é controlada por este pai.</description>
+    <externalId>false</externalId>
+    <label>Lote</label>
+    <deleteConstraint>Cascade</deleteConstraint>
+    <referenceTo>SOL_Enriquecimento_Lote__c</referenceTo>
+    <relationshipLabel>Linhas</relationshipLabel>
+    <relationshipName>Linhas</relationshipName>
+    <required>true</required>
+    <trackHistory>false</trackHistory>
+    <type>Lookup</type>
+</CustomField>

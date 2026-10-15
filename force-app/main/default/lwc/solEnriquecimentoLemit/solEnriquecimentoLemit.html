@@ -1,0 +1,187 @@
+<template>
+    <lightning-card title="Enriquecimento Lemit — atualizar e criar Leads por CNPJ" icon-name="standard:lead">
+        <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+            <template lwc:if={carregando}>
+                <lightning-spinner alternative-text="Processando" size="medium"></lightning-spinner>
+                <template lwc:if={mensagemProgresso}>
+                    <p class="slds-text-body_small slds-m-top_x-small" aria-live="polite">{mensagemProgresso}</p>
+                </template>
+            </template>
+
+            <!-- Passo 1: upload -->
+            <template lwc:if={ehUpload}>
+                <p class="slds-text-body_regular slds-m-bottom_small">
+                    Envie um arquivo CSV da Lemit. O arquivo é lido no navegador; nada é enviado antes de você confirmar o preview.
+                </p>
+                <lightning-input
+                    type="file"
+                    label="Arquivo CSV"
+                    accept=".csv,.txt"
+                    onchange={handleArquivo}
+                ></lightning-input>
+            </template>
+
+            <!-- Passo 2: mapeamento -->
+            <template lwc:if={ehMapping}>
+                <h2 class="slds-text-heading_small slds-m-bottom_x-small">Designe as colunas</h2>
+                <p class="slds-text-body_small slds-m-bottom_small">
+                    Arquivo: <strong>{nomeArquivo}</strong> — {linhasArquivo.length} linha(s).
+                </p>
+                <div class="slds-grid slds-wrap slds-gutters">
+                    <div class="slds-col slds-size_1-of-3">
+                        <lightning-combobox
+                            label="Coluna do CNPJ (chave de casamento)"
+                            value={colunaCnpj}
+                            options={opcoesColunas}
+                            onchange={handleCnpj}
+                            required
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3">
+                        <lightning-combobox
+                            label="Coluna de Company (criação)"
+                            value={colunaCompany}
+                            options={opcoesColunas}
+                            onchange={handleCompany}
+                            field-level-help="Obrigatória para criar Lead novo. Pode ser a Razão Social."
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3">
+                        <lightning-combobox
+                            label="Coluna de LastName (criação)"
+                            value={colunaLastName}
+                            options={opcoesColunas}
+                            onchange={handleLastName}
+                            field-level-help="Obrigatória para criar Lead novo. Pode ser a mesma Razão Social."
+                        ></lightning-combobox>
+                    </div>
+                </div>
+
+                <h3 class="slds-text-title_caps slds-m-top_medium slds-m-bottom_x-small">Campos de enriquecimento</h3>
+                <template for:each={mapeamentos} for:item="m">
+                    <div key={m.campoLead} class="slds-grid slds-gutters slds-m-bottom_xx-small slds-grid_vertical-align-end">
+                        <div class="slds-col slds-size_1-of-2">
+                            <lightning-combobox
+                                label={m.label}
+                                data-campo={m.campoLead}
+                                value={m.coluna}
+                                options={opcoesColunas}
+                                onchange={handleMapeamento}
+                            ></lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2 slds-text-body_small slds-p-bottom_x-small">
+                            {m.campoLead} · {m.politica} · {m.tipoConversao}
+                        </div>
+                    </div>
+                </template>
+
+                <div class="slds-m-top_medium">
+                    <lightning-button
+                        variant="brand"
+                        label="Gerar preview"
+                        onclick={gerarPreview}
+                        disabled={carregando}
+                    ></lightning-button>
+                </div>
+            </template>
+
+            <!-- Passo 3: preview -->
+            <template lwc:if={ehPreview}>
+                <h2 class="slds-text-heading_small slds-m-bottom_small">Preview — {preview.loteNome}</h2>
+                <div class="slds-grid slds-wrap slds-gutters slds-m-bottom_medium">
+                    <template for:each={resumoBaldes} for:item="b">
+                        <div key={b.k} class="slds-col slds-size_1-of-3 slds-p-vertical_xx-small">
+                            <div class="slds-box slds-box_x-small">
+                                <p class="slds-text-title">{b.rotulo}</p>
+                                <p class="slds-text-heading_medium">{b.valor}</p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <template lwc:if={temMultiplos}>
+                    <h3 class="slds-text-title_caps slds-m-bottom_x-small">
+                        Match múltiplo — selecione os Leads a atualizar
+                    </h3>
+                    <template for:each={multiplos} for:item="l">
+                        <div key={l.linhaId} class="slds-box slds-box_x-small slds-m-bottom_x-small">
+                            <p class="slds-text-body_small">
+                                Linha {l.numeroLinha} — CNPJ {l.cnpjNormalizado}
+                            </p>
+                            <template for:each={l.leadsAlvo} for:item="a">
+                                <div key={a.id}>
+                                    <lightning-input
+                                        type="checkbox"
+                                        label={a.nome}
+                                        checked={a.selecionado}
+                                        data-linha={l.linhaId}
+                                        data-lead={a.id}
+                                        onchange={handleSelecaoLead}
+                                    ></lightning-input>
+                                    <span class="slds-text-body_small slds-m-left_small">
+                                        {a.empresa} · Owner: {a.owner}
+                                    </span>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </template>
+
+                <div class="slds-m-top_medium">
+                    <lightning-button
+                        variant="brand"
+                        label="Confirmar e processar"
+                        onclick={confirmarProcessamento}
+                        disabled={carregando}
+                    ></lightning-button>
+                    <lightning-button
+                        class="slds-m-left_x-small"
+                        label="Cancelar"
+                        onclick={recomecar}
+                    ></lightning-button>
+                </div>
+            </template>
+
+            <!-- Passo 4: processando -->
+            <template lwc:if={ehProcessing}>
+                <h2 class="slds-text-heading_small">Processando o lote...</h2>
+                <p class="slds-text-body_small" aria-live="polite">
+                    O batch está aplicando as atualizações e criações. Esta tela atualiza sozinha.
+                </p>
+            </template>
+
+            <!-- Passo 5: concluído -->
+            <template lwc:if={ehDone}>
+                <h2 class="slds-text-heading_small slds-m-bottom_small">Resultado — {status.loteNome}</h2>
+                <template lwc:if={temStatus}>
+                    <dl class="slds-list_horizontal slds-wrap">
+                        <dt class="slds-item_label slds-text-color_weak slds-size_1-of-2">Status</dt>
+                        <dd class="slds-item_detail slds-size_1-of-2">{status.status}</dd>
+                        <dt class="slds-item_label slds-text-color_weak slds-size_1-of-2">Atualizados</dt>
+                        <dd class="slds-item_detail slds-size_1-of-2">{status.qtdAtualizados}</dd>
+                        <dt class="slds-item_label slds-text-color_weak slds-size_1-of-2">Criados</dt>
+                        <dd class="slds-item_detail slds-size_1-of-2">{status.qtdCriados}</dd>
+                        <dt class="slds-item_label slds-text-color_weak slds-size_1-of-2">Múltiplos</dt>
+                        <dd class="slds-item_detail slds-size_1-of-2">{status.qtdMultiplos}</dd>
+                        <dt class="slds-item_label slds-text-color_weak slds-size_1-of-2">Sem match</dt>
+                        <dd class="slds-item_detail slds-size_1-of-2">{status.qtdSemMatch}</dd>
+                        <dt class="slds-item_label slds-text-color_weak slds-size_1-of-2">Convertidos</dt>
+                        <dd class="slds-item_detail slds-size_1-of-2">{status.qtdConvertidos}</dd>
+                        <dt class="slds-item_label slds-text-color_weak slds-size_1-of-2">Inválidos</dt>
+                        <dd class="slds-item_detail slds-size_1-of-2">{status.qtdInvalidos}</dd>
+                        <dt class="slds-item_label slds-text-color_weak slds-size_1-of-2">Ignorados</dt>
+                        <dd class="slds-item_detail slds-size_1-of-2">{status.qtdIgnorados}</dd>
+                        <dt class="slds-item_label slds-text-color_weak slds-size_1-of-2">Erros</dt>
+                        <dd class="slds-item_detail slds-size_1-of-2">{status.qtdErros}</dd>
+                    </dl>
+                    <template lwc:if={status.mensagens}>
+                        <p class="slds-text-body_small slds-m-top_small">{status.mensagens}</p>
+                    </template>
+                </template>
+                <div class="slds-m-top_medium">
+                    <lightning-button label="Novo upload" onclick={recomecar}></lightning-button>
+                </div>
+            </template>
+        </div>
+    </lightning-card>
+</template>

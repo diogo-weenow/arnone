@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_CNPJ_Normalizado__c</fullName>
+    <description>Upload enriquecimento Lemit — CNPJ somente dígitos (14), derivado de CNPJ__c pela remoção de ponto, barra, hífen e espaço. É a CHAVE de casamento do enriquecimento: CNPJ__c é texto livre com máscara variável, então comparar por ele produziria falsos negativos; este campo normaliza a comparação. externalId=true para indexar o SOQL `WHERE SOL_CNPJ_Normalizado__c IN` do casamento em massa. NÃO é unique (a org admite legitimamente mais de um Lead por CNPJ, inclusive o match múltiplo que o preview trata). Populado pelo Flow before-save Lead_BeforeSave_Normalizar_CNPJ em toda criação/alteração e pelo backfill único SOLCnpjBackfillBatch nos Leads preexistentes. NÃO substitui CNPJ__c, que permanece o campo de exibição.</description>
+    <externalId>true</externalId>
+    <label>CNPJ Normalizado (SOL)</label>
+    <length>14</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

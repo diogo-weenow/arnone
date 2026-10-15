@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Industry</label>
+    <protected>false</protected>
+    <values>
+        <field>Coluna_Lemit__c</field>
+        <value xsi:type="xsd:string">Setor</value>
+    </values>
+    <values>
+        <field>Campo_Lead__c</field>
+        <value xsi:type="xsd:string">Industry</value>
+    </values>
+    <values>
+        <field>Politica__c</field>
+        <value xsi:type="xsd:string">OVERWRITE</value>
+    </values>
+    <values>
+        <field>Tipo_Conversao__c</field>
+        <value xsi:type="xsd:string">PICKLIST</value>
+    </values>
+    <values>
+        <field>Usar_Na_Criacao__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>Ativo__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Ordem__c</field>
+        <value xsi:type="xsd:double">30.0</value>
+    </values>
+</CustomMetadata>

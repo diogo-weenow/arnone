@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Usar_Na_Criacao__c</fullName>
+    <description>Quando marcado, o campo também é preenchido na CRIAÇÃO de Lead novo (balde SEM_MATCH). Company e LastName são obrigatórios e mapeados à parte, no componente; este flag é para os demais campos de enriquecimento que devem nascer já preenchidos.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Usar na Criação</label>
+    <type>Checkbox</type>
+    <defaultValue>false</defaultValue>
+</CustomField>
