@@ -201,6 +201,10 @@
             <fullName>Recuperação Tributária</fullName>
             <default>false</default>
         </values>
+        <values>
+            <fullName>Revisão trabalhista</fullName>
+            <default>false</default>
+        </values>
     </picklistValues>
     <picklistValues>
         <picklist>SOL_Resultado_Apresentacao__c</picklist>

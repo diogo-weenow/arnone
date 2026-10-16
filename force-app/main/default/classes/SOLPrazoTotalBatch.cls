@@ -96,7 +96,7 @@ public without sharing class SOLPrazoTotalBatch implements Database.Batchable<SO
         FROM Opportunity
         WHERE
           RecordType.DeveloperName = 'SOL'
-          AND SOL_Produto_Negocio__c IN ('Recuperação Tributária', 'ART 360')
+          AND SOL_Produto_Negocio__c INCLUDES ('Recuperação Tributária', 'ART 360', 'Revisão trabalhista')
           AND IsClosed = FALSE
           AND SOL_Data_Inicio_Ciclo_Comercial__c != NULL
           AND SOL_Prazo_Total_Comercial__c != NULL

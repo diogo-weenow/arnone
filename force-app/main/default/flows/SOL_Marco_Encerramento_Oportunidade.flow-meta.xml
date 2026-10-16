@@ -30,8 +30,9 @@
         <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
         <filterFormula>AND(
   OR(
-    ISPICKVAL({!$Record.SOL_Produto_Negocio__c}, &apos;Recuperação Tributária&apos;),
-    ISPICKVAL({!$Record.SOL_Produto_Negocio__c}, &apos;ART 360&apos;)
+    INCLUDES({!$Record.SOL_Produto_Negocio__c}, &apos;Recuperação Tributária&apos;),
+    INCLUDES({!$Record.SOL_Produto_Negocio__c}, &apos;ART 360&apos;),
+    INCLUDES({!$Record.SOL_Produto_Negocio__c}, &apos;Revisão trabalhista&apos;)
   ),
   OR(
     ISPICKVAL({!$Record.StageName}, &apos;Ganho&apos;),

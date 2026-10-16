@@ -81,10 +81,11 @@ public without sharing class SOLNegocioPerdidoService {
   @TestVisible
   private static final String RECORD_TYPE_SOL = 'SOL';
 
-  /** Os DOIS produtos no escopo do card. */
+  /** Os TRÊS produtos no escopo (Revisão trabalhista incluída). */
   public static final Set<String> PRODUTOS_NO_ESCOPO = new Set<String>{
     'Recuperação Tributária',
-    'ART 360'
+    'ART 360',
+    'Revisão trabalhista'
   };
 
   /** Status de perda do Lead (não existe "Perdido" em LeadStatus). */
@@ -209,7 +210,8 @@ public without sharing class SOLNegocioPerdidoService {
         encontrados.add(l.Id);
         Boolean noEscopo =
           l.RecordType.DeveloperName == RECORD_TYPE_SOL &&
-          PRODUTOS_NO_ESCOPO.contains(l.SOL_Produto_Interesse__c) &&
+          // Escopo por multi-valor: o Lead INCLUI qualquer um dos três produtos.
+          SOLProdutoHelper.contemAlgum(l.SOL_Produto_Interesse__c, PRODUTOS_NO_ESCOPO) &&
           // Perda ANTES da conversão.
           l.IsConverted == false &&
           leadPerdido(l);
@@ -295,7 +297,8 @@ public without sharing class SOLNegocioPerdidoService {
         encontradas.add(o.Id);
         Boolean noEscopo =
           o.RecordType.DeveloperName == RECORD_TYPE_SOL &&
-          PRODUTOS_NO_ESCOPO.contains(o.SOL_Produto_Negocio__c) &&
+          // Escopo por multi-valor: a Opp INCLUI qualquer um dos três produtos.
+          SOLProdutoHelper.contemAlgum(o.SOL_Produto_Negocio__c, PRODUTOS_NO_ESCOPO) &&
           oportunidadePerdida(o);
         if (noEscopo) {
           perdidas.put(o.Id, o);
@@ -340,7 +343,7 @@ public without sharing class SOLNegocioPerdidoService {
         if (o.SOL_Qtd_Perdas__c == null || o.SOL_Qtd_Perdas__c <= 0) {
           throw new NegocioPerdidoException(MSG_TRANSICAO_NAO_CARIMBADA);
         }
-        eventos.add(
+        eventos.addAll(
           SOLEventoJornadaService.oportunidadePerdida(
             o,
             etapaAnterior,

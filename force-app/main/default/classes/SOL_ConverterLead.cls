@@ -98,21 +98,28 @@ public with sharing class SOL_ConverterLead {
     if (String.isBlank(l.CNPJ__c)) {
       return 'Informe o CNPJ no lead antes de converter. É por ele que a ação encontra uma Conta já existente e evita duplicata.';
     }
-    // Desde 25/08/2026 a procuração vale para todos os produtos da unidade.
-    // Antes só Recuperação Tributária passava por aqui, e ART 360 entrava pelo
-    // checkbox de liberação — que deixou de ser porta de entrada.
-    if (l.SOL_Status_Procuracao__c != 'Recebida') {
-      return 'A procuração ainda não foi recebida. A entrega do documento assinado é o gatilho da conversão — use a ação "Procuração (e-CAC)" antes desta.';
-    }
-    if (arquivos == 0) {
-      return 'A procuração está marcada como recebida, mas não há arquivo anexado ao lead. Anexe o documento assinado antes de converter.';
+    // Procuração é portão de Recuperação Tributária e ART 360 (união do mais
+    // exigente). Revisão trabalhista SOZINHA dispensa a procuração — decisões de
+    // negócio #2 e #4 do card: fluxo simples, sem o documento assinado como trava
+    // de conversão. Qualquer mix que inclua RT ou ART volta a exigir a procuração.
+    Boolean exigeProcuracao = SOLProdutoHelper.contemAlgum(
+      l.SOL_Produto_Interesse__c,
+      new Set<String>{ PRODUTO_RECUPERACAO, PRODUTO_ART }
+    );
+    if (exigeProcuracao) {
+      if (l.SOL_Status_Procuracao__c != 'Recebida') {
+        return 'A procuração ainda não foi recebida. A entrega do documento assinado é o gatilho da conversão — use a ação "Procuração (e-CAC)" antes desta.';
+      }
+      if (arquivos == 0) {
+        return 'A procuração está marcada como recebida, mas não há arquivo anexado ao lead. Anexe o documento assinado antes de converter.';
+      }
     }
     return null;
   }
 
   public static String resumoDe(Lead l, Integer arquivos) {
     // Todo produto passa pela procuração, então o resumo é o mesmo para todos.
-    return l.SOL_Produto_Interesse__c +
+    return SOLProdutoHelper.paraRotulo(l.SOL_Produto_Interesse__c) +
       ' · procuração recebida' +
       (l.SOL_Data_Recebimento_Procuracao__c == null
         ? ''
@@ -313,7 +320,11 @@ public with sharing class SOL_ConverterLead {
       if (String.isNotBlank(p.contatoId)) {
         pedido.setContactId(p.contatoId);
       }
-      pedido.setOpportunityName(l.SOL_Produto_Interesse__c + ' — ' + l.Company);
+      pedido.setOpportunityName(
+        SOLProdutoHelper.paraRotulo(l.SOL_Produto_Interesse__c) +
+          ' — ' +
+          l.Company
+      );
       pedido.setDoNotCreateOpportunity(false);
 
       Database.LeadConvertResult r = Database.convertLead(pedido, false);
@@ -512,9 +523,16 @@ public with sharing class SOL_ConverterLead {
       );
     }
 
-    String destino = l.SOL_Produto_Interesse__c == PRODUTO_ART
-      ? ETAPA_ART
-      : ETAPA_RECUPERACAO;
+    // União do mais exigente: se os produtos selecionados INCLUEM Recuperação
+    // Tributária, a Oportunidade entra no Diagnóstico (e-CAC). Qualquer outro mix
+    // (só ART, só Revisão trabalhista, ou ART+Revisão) não tem diagnóstico e vai
+    // direto para a Negociação.
+    String destino = SOLProdutoHelper.contem(
+        l.SOL_Produto_Interesse__c,
+        PRODUTO_RECUPERACAO
+      )
+      ? ETAPA_RECUPERACAO
+      : ETAPA_ART;
     update new Opportunity(Id = oportunidadeId, StageName = destino);
     return destino;
   }

@@ -298,6 +298,10 @@
             <fullName>Recuperação Tributária</fullName>
             <default>false</default>
         </values>
+        <values>
+            <fullName>Revisão trabalhista</fullName>
+            <default>false</default>
+        </values>
     </picklistValues>
     <picklistValues>
         <picklist>SOL_Status_Procuracao__c</picklist>

@@ -824,7 +824,8 @@ public without sharing class SOLDistribuicaoService {
         // (CLICKUP-9438) A sequência é o contador JÁ incrementado: a 2ª
         // reatribuição legítima do mesmo Lead nasce com chave diferente da 1ª,
         // e um reprocessamento da mesma reatribuição reencontra a mesma chave.
-        eventos.add(
+        // UM evento por produto selecionado no Lead (addAll, não add).
+        eventos.addAll(
           SOLEventoJornadaService.reatribuicaoPorFaltaDeContato(
             l,
             vendedorAnterior,
@@ -1223,7 +1224,7 @@ public without sharing class SOLDistribuicaoService {
       if (!leadsParaDesqualificar.isEmpty()) {
         List<SOL_Evento_Jornada__c> eventos = new List<SOL_Evento_Jornada__c>();
         for (Lead l : leadsParaDesqualificar) {
-          eventos.add(SOLEventoJornadaService.leadPerdidoPorOptOut(l, agora));
+          eventos.addAll(SOLEventoJornadaService.leadPerdidoPorOptOut(l, agora));
         }
         SOLEventoJornadaService.registrar(eventos);
       }

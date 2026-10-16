@@ -178,7 +178,9 @@ public without sharing class SOLFechamentoService {
         Boolean elegivel =
           o != null &&
           o.RecordType.DeveloperName == RECORD_TYPE_SOL &&
-          o.SOL_Produto_Negocio__c == PRODUTO_RECUPERACAO &&
+          // Cadeia da jornada RT (reunião final -> fechamento): basta a Opp
+          // INCLUIR Recuperação Tributária (multi-valor).
+          SOLProdutoHelper.contem(o.SOL_Produto_Negocio__c, PRODUTO_RECUPERACAO) &&
           o.IsClosed == false &&
           // (CLICKUP-9425) explícito: negócio perdido não avança mais.
           !SOLNegocioPerdidoService.oportunidadePerdida(o) &&
@@ -298,7 +300,7 @@ public without sharing class SOLFechamentoService {
       ]) {
         if (
           o.RecordType.DeveloperName == RECORD_TYPE_SOL &&
-          o.SOL_Produto_Negocio__c == PRODUTO_RECUPERACAO &&
+          SOLProdutoHelper.contem(o.SOL_Produto_Negocio__c, PRODUTO_RECUPERACAO) &&
           ETAPAS_ENCERRAMENTO.contains(o.StageName)
         ) {
           elegiveis.add(o.Id);

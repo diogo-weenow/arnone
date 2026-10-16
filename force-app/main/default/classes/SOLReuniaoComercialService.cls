@@ -108,8 +108,12 @@ public without sharing class SOLReuniaoComercialService {
 
           l.IsConverted == false &&
           l.SOL_Opt_Out__c != true &&
-          (l.SOL_Produto_Interesse__c == PRODUTO_RECUPERACAO ||
-          l.SOL_Produto_Interesse__c == PRODUTO_ART);
+          // Reunião comercial nasce para QUALQUER produto SOL selecionado,
+          // Revisão trabalhista incluída (contém qualquer um dos três).
+          SOLProdutoHelper.contemAlgum(
+            l.SOL_Produto_Interesse__c,
+            SOLProdutoHelper.PRODUTOS_SOL
+          );
         if (elegivel) {
           donoPorLead.put(l.Id, l.OwnerId);
         } else {

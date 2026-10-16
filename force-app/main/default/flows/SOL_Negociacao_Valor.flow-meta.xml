@@ -35,7 +35,11 @@
             <targetReference>Calcular_Amount</targetReference>
         </connector>
         <filterFormula>AND(
-  ISPICKVAL({!$Record.SOL_Produto_Negocio__c}, &quot;Recuperação Tributária&quot;),
+  AND(
+    INCLUDES({!$Record.SOL_Produto_Negocio__c}, &quot;Recuperação Tributária&quot;),
+    NOT(INCLUDES({!$Record.SOL_Produto_Negocio__c}, &quot;ART 360&quot;)),
+    NOT(INCLUDES({!$Record.SOL_Produto_Negocio__c}, &quot;Revisão trabalhista&quot;))
+  ),
   OR(
     NOT(ISBLANK({!$Record.SOL_Percentual_Comissao__c})),
     NOT(ISBLANK({!$Record.SOL_Valor_Servico__c}))

@@ -161,7 +161,9 @@ public without sharing class SOLReuniaoFinalService {
         Boolean elegivel =
           o != null &&
           o.RecordType.DeveloperName == RECORD_TYPE_SOL &&
-          o.SOL_Produto_Negocio__c == PRODUTO_RECUPERACAO &&
+          // Reunião final só na jornada RT: basta a Opp INCLUIR Recuperação
+          // Tributária (união do mais exigente num mix).
+          SOLProdutoHelper.contem(o.SOL_Produto_Negocio__c, PRODUTO_RECUPERACAO) &&
           o.IsClosed == false &&
           // (CLICKUP-9425) explícito: negócio perdido não avança mais.
           !SOLNegocioPerdidoService.oportunidadePerdida(o) &&

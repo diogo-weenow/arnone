@@ -39,8 +39,9 @@
         <filterFormula>AND(
   {!$Record.RecordType.DeveloperName} = &apos;SOL&apos;,
   OR(
-    ISPICKVAL({!$Record.SOL_Produto_Negocio__c}, &apos;Recuperação Tributária&apos;),
-    ISPICKVAL({!$Record.SOL_Produto_Negocio__c}, &apos;ART 360&apos;)
+    INCLUDES({!$Record.SOL_Produto_Negocio__c}, &apos;Recuperação Tributária&apos;),
+    INCLUDES({!$Record.SOL_Produto_Negocio__c}, &apos;ART 360&apos;),
+    INCLUDES({!$Record.SOL_Produto_Negocio__c}, &apos;Revisão trabalhista&apos;)
   ),
   ISPICKVAL({!$Record.StageName}, &apos;Perdido&apos;)
 )</filterFormula>

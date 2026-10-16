@@ -2,11 +2,15 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Conversao_Exige_Procuracao_Ou_Apto</fullName>
     <active>true</active>
-    <description>Bloqueia a conversão do lead da Arnone Soluções a menos que a procuração esteja Recebida.</description>
+    <description>Bloqueia a conversão do lead SOL sem procuração Recebida. Só exige procuração quando o produto INCLUI Recuperação Tributária ou ART 360; Lead só-Revisão trabalhista é isento.</description>
     <errorConditionFormula>AND(
 RecordType.DeveloperName = &quot;SOL&quot;,
 ISCHANGED(IsConverted),
 IsConverted = TRUE,
+OR(
+  INCLUDES(SOL_Produto_Interesse__c, &quot;Recuperação Tributária&quot;),
+  INCLUDES(SOL_Produto_Interesse__c, &quot;ART 360&quot;)
+),
 NOT(ISPICKVAL(SOL_Status_Procuracao__c, &quot;Recebida&quot;))
 )</errorConditionFormula>
     <errorMessage>Não é possível converter: é preciso a procuração Recebida.</errorMessage>
