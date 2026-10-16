@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  PASSO 3 — REATAR: changeset final do card "Revisão trabalhista + multi-select
+  de produto SOL (Opção A)". Deployar DEPOIS do flip manual dos campos na Setup
+  UI (campos já Multi-Select). Usa INCLUDES (válido em multiselect).
+  Deploy: sf project deploy start --manifest manifest/package-revisao-trabalhista.xml --target-org <org> --test-level RunLocalTests
+-->
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>SOLProdutoHelper</members>
+        <members>SOLProdutoHelperTest</members>
+        <members>SOL_ConverterLead</members>
+        <members>SOL_ConverterLeadTest</members>
+        <members>SOLReuniaoComercialService</members>
+        <members>SOLProcuracaoAcompanhamentoService</members>
+        <members>SOLSolicitarCalculoService</members>
+        <members>SOLReuniaoFinalService</members>
+        <members>SOLPrazoTotalService</members>
+        <members>SOLPrazoTotalBatch</members>
+        <members>SOLFechamentoService</members>
+        <members>SOLNegocioPerdidoService</members>
+        <members>SOLEventoJornadaService</members>
+        <members>SOLEventoJornadaTest</members>
+        <members>SOLDistribuicaoService</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>Lead.SOL_Produto_Interesse__c</members>
+        <members>Opportunity.SOL_Produto_Negocio__c</members>
+        <members>SOL_Evento_Jornada__c.SOL_Produto__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>Lead.SOL</members>
+        <members>Opportunity.SOL</members>
+        <name>RecordType</name>
+    </types>
+    <types>
+        <members>Lead.SOL_Recuperacao_Exige_Compromisso</members>
+        <members>Lead.SOL_Conversao_Exige_Procuracao_Ou_Apto</members>
+        <members>Opportunity.SOL_ECAC_Antes_De_Negociar</members>
+        <members>Opportunity.SOL_ECAC_Consulta_Exige_Dados</members>
+        <members>Opportunity.SOL_ECAC_Valor_Conforme_Resultado</members>
+        <members>Opportunity.SOL_Ganho_ART_Exige_Catalogo</members>
+        <members>Opportunity.SOL_Ganho_Exige_Termos_Financeiros</members>
+        <members>Opportunity.SOL_Perda_Sem_Valor_Tem_Motivo_Proprio</members>
+        <name>ValidationRule</name>
+    </types>
+    <types>
+        <members>SOL_Encerrar_Fechamento_Ganho_Perdido</members>
+        <members>SOL_Encerrar_Tarefas_Lead_Perdido</members>
+        <members>SOL_Encerrar_Tarefas_Oportunidade_Perdida</members>
+        <members>SOL_Marco_Encerramento_Oportunidade</members>
+        <members>SOL_Marco_Perda_Oportunidade</members>
+        <members>SOL_Negociacao_Valor</members>
+        <members>SOL_Tarefa_Acompanhamento_Calculo</members>
+        <members>SOL_Tarefa_Acompanhamento_Procuracao</members>
+        <members>SOL_Tarefa_Reuniao_Comercial</members>
+        <members>SOL_Validar_Avanco_Reuniao_Procuracao</members>
+        <name>Flow</name>
+    </types>
+    <version>62.0</version>
+</Package>
