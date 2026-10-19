@@ -24,11 +24,23 @@ public without sharing class SOLProdutoBackfillBatch implements Database.Batchab
   private final String campoAntigo;
   @TestVisible
   private final String campoNovo;
+  /**
+   * false (padrão) = só registros ATIVOS. true = só registros TERMINAIS (Opp
+   * fechada / Lead convertido) — rodar SOMENTE com os flows terminais
+   * desativados (ver runbook), senão marcos/perdas re-disparam.
+   */
+  @TestVisible
+  private final Boolean terminais;
 
   public class BackfillException extends Exception {
   }
 
   public SOLProdutoBackfillBatch(String objeto) {
+    this(objeto, false);
+  }
+
+  public SOLProdutoBackfillBatch(String objeto, Boolean terminais) {
+    this.terminais = terminais == true;
     this.objeto = objeto;
     if (objeto == 'Lead') {
       this.campoAntigo = 'SOL_Produto_Interesse__c';
@@ -53,8 +65,8 @@ public without sharing class SOLProdutoBackfillBatch implements Database.Batchab
     // (ver runbook). O recorte "novo vazio" fica no execute (semântica de null
     // do multi-select em SOQL).
     String filtroAtivo = (objeto == 'Lead')
-      ? ' AND IsConverted = false'
-      : ' AND IsClosed = false';
+      ? (terminais ? ' AND IsConverted = true' : ' AND IsConverted = false')
+      : (terminais ? ' AND IsClosed = true' : ' AND IsClosed = false');
     String q =
       'SELECT Id, ' +
       campoAntigo +

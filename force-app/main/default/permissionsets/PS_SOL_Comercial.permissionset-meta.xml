@@ -298,11 +298,6 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Lead.SOL_Produto_Interesse__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>Lead.SOL_Produtos_Interesse__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -527,11 +522,6 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Opportunity.SOL_Prazo_Total_Comercial__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Opportunity.SOL_Produto_Negocio__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

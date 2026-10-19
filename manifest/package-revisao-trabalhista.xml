@@ -5,7 +5,10 @@
   SOL_Produtos_Negocio__c multi-select, com toda a lógica reapontada.
   Deploy: sf project deploy start --manifest manifest/package-revisao-trabalhista.xml --target-org <org> --test-level RunLocalTests
   (desagende os 4 schedulers SOL antes, pois toca Apex agendado; reagende depois.)
-  Após o deploy, rodar o backfill (Database.executeBatch SOLProdutoBackfillBatch 'Lead'/'Opportunity').
+  Após o deploy: scripts/apex/revisao-trabalhista-backfill-ativos.apex (seguro com flows ativos).
+  Terminais: snapshot -> desativar os 5 flows terminais -> revisao-trabalhista-backfill-terminais.apex
+  -> reativar as MESMAS versões -> snapshot de novo (ver pacote de validação).
+  FLS dos campos antigos: removida por DML cirúrgico em FieldPermissions (não por deploy de PS).
 -->
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <types>
@@ -86,6 +89,7 @@
     <types>
         <members>Lead-Lead Layout</members>
         <members>Opportunity-Opportunity Layout</members>
+        <members>Opportunity-ADV Layout</members>
         <name>Layout</name>
     </types>
     <types>
