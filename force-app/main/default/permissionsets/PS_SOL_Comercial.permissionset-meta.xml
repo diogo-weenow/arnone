@@ -183,6 +183,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Lead.SOL_CNAE__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Lead.SOL_Contato_Com_Decisor__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -257,6 +262,11 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.SOL_Divida__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>false</editable>
         <field>Lead.SOL_Duracao_Pendencia_Detalhe__c</field>
         <readable>true</readable>
@@ -269,6 +279,11 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Lead.SOL_Duracao_Pendente__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.SOL_Faturamento__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -301,22 +316,9 @@
         <field>Lead.SOL_Produtos_Interesse__c</field>
         <readable>true</readable>
     </fieldPermissions>
-    <!-- Reconciliação do drift org vs repo: FLS dos campos de enriquecimento Lemit
-         (WIP de outra branch) já existentes no org. Incluídos aqui para que o deploy
-         deste PS seja SUPERSET e NÃO apague essas permissões (lição do silent-wipe). -->
     <fieldPermissions>
-        <editable>true</editable>
-        <field>Lead.SOL_CNAE__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Lead.SOL_Divida__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Lead.SOL_Faturamento__c</field>
+        <editable>false</editable>
+        <field>Lead.SOL_Quantidade_Reatribuicoes__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -336,22 +338,17 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>Lead.SOL_Telefones_Socios__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>Lead.SOL_Quantidade_Reatribuicoes__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
         <field>Lead.SOL_Status_Procuracao__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
         <field>Lead.SOL_Status_Reatribuicao__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.SOL_Telefones_Socios__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
