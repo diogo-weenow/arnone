@@ -125,7 +125,7 @@
             <componentInstance>
                 <componentInstanceProperties>
                     <name>columns</name>
-                    <value>Facet-a645f0e7-ab69-52fc-873f-fff739c9301e</value>
+                    <value>Facet-9d37e53f-2768-50a0-921d-fae73e4cc42c</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>horizontalAlignment</name>
@@ -133,10 +133,10 @@
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>label</name>
-                    <value>Sócios e contato — Arnone Soluções</value>
+                    <value>Contato — Arnone Soluções</value>
                 </componentInstanceProperties>
                 <componentName>flexipage:fieldSection</componentName>
-                <identifier>lsol_secao_socios</identifier>
+                <identifier>lsol_secao_contato</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>
@@ -602,6 +602,10 @@
                 <identifier>RecordEmailField</identifier>
             </fieldInstance>
         </itemInstances>
+        <name>Facet-bb2c5d1d-8ae0-510f-93f2-c0be7d3504ec</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
         <itemInstances>
             <fieldInstance>
                 <fieldInstanceProperties>
@@ -612,31 +616,7 @@
                 <identifier>RecordMobilePhoneField</identifier>
             </fieldInstance>
         </itemInstances>
-        <name>Facet-cbb5a701-71f2-57aa-b291-c82077c7709e</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.SOL_Socios__c</fieldItem>
-                <identifier>RecordSOLSocioscField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.SOL_Telefones_Socios__c</fieldItem>
-                <identifier>RecordSOLTelefonesSocioscField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <name>Facet-de5c9bdb-a1ee-50f4-8c98-615dc3c3e1fc</name>
+        <name>Facet-6d6a92b8-b083-55e3-8aaf-ed6b59b6bb42</name>
         <type>Facet</type>
     </flexiPageRegions>
     <flexiPageRegions>
@@ -644,23 +624,23 @@
             <componentInstance>
                 <componentInstanceProperties>
                     <name>body</name>
-                    <value>Facet-cbb5a701-71f2-57aa-b291-c82077c7709e</value>
+                    <value>Facet-bb2c5d1d-8ae0-510f-93f2-c0be7d3504ec</value>
                 </componentInstanceProperties>
                 <componentName>flexipage:column</componentName>
-                <identifier>lsol_secao_socios_coluna1</identifier>
+                <identifier>lsol_secao_contato_coluna1</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
                     <name>body</name>
-                    <value>Facet-de5c9bdb-a1ee-50f4-8c98-615dc3c3e1fc</value>
+                    <value>Facet-6d6a92b8-b083-55e3-8aaf-ed6b59b6bb42</value>
                 </componentInstanceProperties>
                 <componentName>flexipage:column</componentName>
-                <identifier>lsol_secao_socios_coluna2</identifier>
+                <identifier>lsol_secao_contato_coluna2</identifier>
             </componentInstance>
         </itemInstances>
-        <name>Facet-a645f0e7-ab69-52fc-873f-fff739c9301e</name>
+        <name>Facet-9d37e53f-2768-50a0-921d-fae73e4cc42c</name>
         <type>Facet</type>
     </flexiPageRegions>
     <flexiPageRegions>
