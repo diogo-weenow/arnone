@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Dynamic Forms por BU — Fase 1 (piloto Oportunidade ADV).
+    Exclusivo deste card. Nao inclui Apex, Profile, PermissionSet, CustomObject nem Flow.
+    Ordem de merge no main: feature/revisao-trabalhista-multiselect-produto -> feature/adv-funil-to-be -> esta branch.
+-->
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Opportunity_ADV</members>
+        <name>FlexiPage</name>
+    </types>
+    <types>
+        <members>Opportunity.ADV_Oportunidade</members>
+        <name>CompactLayout</name>
+    </types>
+    <types>
+        <members>Opportunity.ADV</members>
+        <name>RecordType</name>
+    </types>
+    <types>
+        <members>Arnone</members>
+        <members>Arnone_Atendimento</members>
+        <members>standard__LightningSales</members>
+        <members>standard__LightningSalesConsole</members>
+        <name>CustomApplication</name>
+    </types>
+    <types>
+        <members>Opportunity-Opportunity Layout</members>
+        <name>Layout</name>
+    </types>
+    <types>
+        <members>DynamicForms</members>
+        <name>Settings</name>
+    </types>
+    <version>66.0</version>
+</Package>

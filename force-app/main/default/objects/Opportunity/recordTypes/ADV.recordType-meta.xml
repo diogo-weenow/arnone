@@ -3,6 +3,7 @@
     <fullName>ADV</fullName>
     <active>true</active>
     <businessProcess>Funil_ADV</businessProcess>
+    <compactLayoutAssignment>ADV_Oportunidade</compactLayoutAssignment>
     <description>Oportunidades da unidade Arnone Advogados.</description>
     <label>Arnone Advogados</label>
     <picklistValues>

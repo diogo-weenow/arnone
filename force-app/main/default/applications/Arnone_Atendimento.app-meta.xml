@@ -23,6 +23,24 @@
     <isOmniPinnedViewEnabled>false</isOmniPinnedViewEnabled>
     <label>Arnone Atendimento</label>
     <navType>Console</navType>
+    <profileActionOverrides>
+        <actionName>View</actionName>
+        <content>Opportunity_ADV</content>
+        <formFactor>Large</formFactor>
+        <pageOrSobjectType>Opportunity</pageOrSobjectType>
+        <recordType>Opportunity.ADV</recordType>
+        <type>Flexipage</type>
+        <profile>Admin</profile>
+    </profileActionOverrides>
+    <profileActionOverrides>
+        <actionName>View</actionName>
+        <content>Opportunity_ADV</content>
+        <formFactor>Large</formFactor>
+        <pageOrSobjectType>Opportunity</pageOrSobjectType>
+        <recordType>Opportunity.ADV</recordType>
+        <type>Flexipage</type>
+        <profile>Standard</profile>
+    </profileActionOverrides>
     <tabs>standard-MessagingSession</tabs>
     <tabs>standard-Lead</tabs>
     <tabs>standard-Contact</tabs>
