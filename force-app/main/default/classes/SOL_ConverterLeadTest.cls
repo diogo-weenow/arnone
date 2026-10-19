@@ -26,7 +26,7 @@ private class SOL_ConverterLeadTest {
       Status = 'Apto para Conversão',
       Unidade_Origem__c = 'SOL',
       CNPJ__c = cnpj,
-      SOL_Produto_Interesse__c = produto
+      SOL_Produtos_Interesse__c = produto
     );
     // As regras de duplicidade da org só alertam na interface, mas em Apex o
     // alerta vira exceção. Nos cenários de reaproveitamento existe de propósito
@@ -243,7 +243,7 @@ private class SOL_ConverterLeadTest {
         StageName,
         RecordType.DeveloperName,
         AccountId,
-        SOL_Produto_Negocio__c
+        SOL_Produtos_Negocio__c
       FROM Opportunity
       WHERE Id = :r.oportunidadeId
     ];
@@ -259,7 +259,7 @@ private class SOL_ConverterLeadTest {
     );
     Assert.areEqual(
       'Recuperação Tributária',
-      o.SOL_Produto_Negocio__c,
+      o.SOL_Produtos_Negocio__c,
       'O produto de interesse vira produto de negócio.'
     );
     Assert.areEqual(a.Id, o.AccountId, 'Oportunidade ligada à conta.');
@@ -485,7 +485,7 @@ private class SOL_ConverterLeadTest {
     Assert.isTrue(r.convertido, 'Deveria converter: ' + r.mensagem);
 
     Opportunity o = [
-      SELECT StageName, SOL_Produto_Negocio__c
+      SELECT StageName, SOL_Produtos_Negocio__c
       FROM Opportunity
       WHERE Id = :r.oportunidadeId
     ];
@@ -494,12 +494,12 @@ private class SOL_ConverterLeadTest {
       o.StageName,
       'ART 360 não tem diagnóstico e-CAC: vai direto para a Negociação.'
     );
-    Assert.areEqual('ART 360', o.SOL_Produto_Negocio__c, 'Produto mapeado.');
+    Assert.areEqual('ART 360', o.SOL_Produtos_Negocio__c, 'Produto mapeado.');
   }
 
   // ------------------------------- Revisão trabalhista — produto multi-select
   //
-  // NOTA: estes testes dependem do campo SOL_Produto_Interesse__c já convertido
+  // NOTA: estes testes dependem do campo SOL_Produtos_Interesse__c já convertido
   // para Multi-Select Picklist com o valor "Revisão trabalhista" (flip via Setup
   // UI, passo manual do runbook). Antes do flip o campo é Picklist restrita e os
   // inserts com valor múltiplo/Revisão falham — por isso só rodam depois do flip.
@@ -529,7 +529,7 @@ private class SOL_ConverterLeadTest {
 
     Assert.isTrue(r.convertido, 'Revisão sozinha dispensa procuração: ' + r.mensagem);
     Opportunity o = [
-      SELECT StageName, SOL_Produto_Negocio__c
+      SELECT StageName, SOL_Produtos_Negocio__c
       FROM Opportunity
       WHERE Id = :r.oportunidadeId
     ];
@@ -540,7 +540,7 @@ private class SOL_ConverterLeadTest {
     );
     Assert.areEqual(
       'Revisão trabalhista',
-      o.SOL_Produto_Negocio__c,
+      o.SOL_Produtos_Negocio__c,
       'Produto de interesse copiado para o de negócio.'
     );
   }
@@ -561,7 +561,7 @@ private class SOL_ConverterLeadTest {
 
     Assert.isTrue(r.convertido, 'Mix com procuração converte: ' + r.mensagem);
     Opportunity o = [
-      SELECT Name, StageName, SOL_Produto_Negocio__c
+      SELECT Name, StageName, SOL_Produtos_Negocio__c
       FROM Opportunity
       WHERE Id = :r.oportunidadeId
     ];
@@ -572,7 +572,7 @@ private class SOL_ConverterLeadTest {
     );
     Assert.areEqual(
       'Recuperação Tributária;Revisão trabalhista',
-      o.SOL_Produto_Negocio__c,
+      o.SOL_Produtos_Negocio__c,
       'Os dois produtos viajam inteiros para a Oportunidade.'
     );
     Assert.isTrue(
@@ -597,7 +597,7 @@ private class SOL_ConverterLeadTest {
 
     Assert.isTrue(r.convertido, 'Mix ART+Revisão converte com procuração: ' + r.mensagem);
     Opportunity o = [
-      SELECT StageName, SOL_Produto_Negocio__c
+      SELECT StageName, SOL_Produtos_Negocio__c
       FROM Opportunity
       WHERE Id = :r.oportunidadeId
     ];
@@ -608,7 +608,7 @@ private class SOL_ConverterLeadTest {
     );
     Assert.areEqual(
       'ART 360;Revisão trabalhista',
-      o.SOL_Produto_Negocio__c
+      o.SOL_Produtos_Negocio__c
     );
   }
 

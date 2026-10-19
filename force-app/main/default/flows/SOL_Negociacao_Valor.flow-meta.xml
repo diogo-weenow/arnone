@@ -36,9 +36,9 @@
         </connector>
         <filterFormula>AND(
   AND(
-    INCLUDES({!$Record.SOL_Produto_Negocio__c}, &quot;Recuperação Tributária&quot;),
-    NOT(INCLUDES({!$Record.SOL_Produto_Negocio__c}, &quot;ART 360&quot;)),
-    NOT(INCLUDES({!$Record.SOL_Produto_Negocio__c}, &quot;Revisão trabalhista&quot;))
+    INCLUDES({!$Record.SOL_Produtos_Negocio__c}, &quot;Recuperação Tributária&quot;),
+    NOT(INCLUDES({!$Record.SOL_Produtos_Negocio__c}, &quot;ART 360&quot;)),
+    NOT(INCLUDES({!$Record.SOL_Produtos_Negocio__c}, &quot;Revisão trabalhista&quot;))
   ),
   OR(
     NOT(ISBLANK({!$Record.SOL_Percentual_Comissao__c})),

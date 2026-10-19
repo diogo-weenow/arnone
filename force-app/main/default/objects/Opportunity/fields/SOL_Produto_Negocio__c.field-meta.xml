@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Produto_Negocio__c</fullName>
-    <description>Produtos contratados. Multi-seleção (Opção A): uma Oportunidade pode carregar vários produtos. Controla a jornada e a tela por união do mais exigente: se inclui Recuperação Tributária passa pelo Diagnóstico e-CAC; sem RT (só ART 360 e/ou Revisão trabalhista) vai de Oportunidade Criada direto para a Negociação. Pricing: qualquer produto de catálogo (ART/Revisão) usa Amount pelo rollup do catálogo; só Opp RT PURA usa a fórmula de comissão + taxa.</description>
+    <description>DEPRECADO (substituído por SOL_Produtos_Negocio__c, multi-select). Campo single histórico mantido só para leitura/migração; a lógica do funil passou a usar SOL_Produtos_Negocio__c. Produto contratado (Recuperação Tributária ou ART 360). Será removido quando nenhum consumidor externo (relatórios, list views) o referenciar.</description>
     <label>Produto de negócio</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
     <trackHistory>false</trackHistory>
-    <type>MultiselectPicklist</type>
-    <visibleLines>3</visibleLines>
+    <type>Picklist</type>
     <valueSet>
         <restricted>true</restricted>
         <valueSetDefinition>
@@ -21,11 +20,6 @@
                 <fullName>ART 360</fullName>
                 <default>false</default>
                 <label>ART 360</label>
-            </value>
-            <value>
-                <fullName>Revisão trabalhista</fullName>
-                <default>false</default>
-                <label>Revisão trabalhista</label>
             </value>
         </valueSetDefinition>
     </valueSet>

@@ -16,7 +16,7 @@
             </value>
         </assignmentItems>
     </assignments>
-    <description>CLICKUP-9439 / CLICKUP-9429 (absorvido) — grava Opportunity.SOL_Data_Encerramento__c no instante em que a Oportunidade da unidade passa REALMENTE para Ganho ou Perdido, fechando a etapa 6. NÃO usa CloseDate: aquela é data PREVISTA e editável pelo vendedor, e serviria de marco falso. BEFORE-SAVE de propósito: grava no próprio save, sem DML extra, sem consultar calendário e sem depender de nenhum Apex — assim o fechamento do negócio não fica acoplado à medição analítica e não pode ser abortado por ela. O recálculo da duração vem depois, no Flow after-save SOL_Duracao_Apos_Encerramento. doesRequireRecordChangedToMeetCriteria = true garante a TRANSIÇÃO real: uma Oportunidade que já estava fechada há meses e recebe qualquer outra edição NÃO é carimbada com a data de hoje. O filtro usa SOL_Produto_Negocio__c, e não o Record Type, porque critério de entrada de flow antes de salvar não alcança campo de registro relacionado — o produto é campo exclusivo desta BU e delimita o mesmo conjunto. O campo só é gravado quando está vazio: reabrir e fechar de novo não reescreve o primeiro encerramento.</description>
+    <description>CLICKUP-9439 / CLICKUP-9429 (absorvido) — grava Opportunity.SOL_Data_Encerramento__c no instante em que a Oportunidade da unidade passa REALMENTE para Ganho ou Perdido, fechando a etapa 6. NÃO usa CloseDate: aquela é data PREVISTA e editável pelo vendedor, e serviria de marco falso. BEFORE-SAVE de propósito: grava no próprio save, sem DML extra, sem consultar calendário e sem depender de nenhum Apex — assim o fechamento do negócio não fica acoplado à medição analítica e não pode ser abortado por ela. O recálculo da duração vem depois, no Flow after-save SOL_Duracao_Apos_Encerramento. doesRequireRecordChangedToMeetCriteria = true garante a TRANSIÇÃO real: uma Oportunidade que já estava fechada há meses e recebe qualquer outra edição NÃO é carimbada com a data de hoje. O filtro usa SOL_Produtos_Negocio__c, e não o Record Type, porque critério de entrada de flow antes de salvar não alcança campo de registro relacionado — o produto é campo exclusivo desta BU e delimita o mesmo conjunto. O campo só é gravado quando está vazio: reabrir e fechar de novo não reescreve o primeiro encerramento.</description>
     <environments>Default</environments>
     <interviewLabel>SOL_Marco_Encerramento_Oportunidade {!$Flow.CurrentDateTime}</interviewLabel>
     <label>SOL_Marco_Encerramento_Oportunidade</label>
@@ -30,9 +30,9 @@
         <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
         <filterFormula>AND(
   OR(
-    INCLUDES({!$Record.SOL_Produto_Negocio__c}, &apos;Recuperação Tributária&apos;),
-    INCLUDES({!$Record.SOL_Produto_Negocio__c}, &apos;ART 360&apos;),
-    INCLUDES({!$Record.SOL_Produto_Negocio__c}, &apos;Revisão trabalhista&apos;)
+    INCLUDES({!$Record.SOL_Produtos_Negocio__c}, &apos;Recuperação Tributária&apos;),
+    INCLUDES({!$Record.SOL_Produtos_Negocio__c}, &apos;ART 360&apos;),
+    INCLUDES({!$Record.SOL_Produtos_Negocio__c}, &apos;Revisão trabalhista&apos;)
   ),
   OR(
     ISPICKVAL({!$Record.StageName}, &apos;Ganho&apos;),

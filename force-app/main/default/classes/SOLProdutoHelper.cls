@@ -3,8 +3,8 @@
  * VÁRIOS produtos). Fonte ÚNICA de leitura dos dois campos de produto da Arnone
  * Soluções agora multivalorados:
  *
- *   - Lead.SOL_Produto_Interesse__c
- *   - Opportunity.SOL_Produto_Negocio__c
+ *   - Lead.SOL_Produtos_Interesse__c
+ *   - Opportunity.SOL_Produtos_Negocio__c
  *
  * Os dois passaram de Picklist para Multi-Select Picklist. O valor é uma string
  * com os produtos separados por ';' (uma seleção única continua sendo a string

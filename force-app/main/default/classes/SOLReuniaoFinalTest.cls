@@ -79,7 +79,7 @@ private class SOLReuniaoFinalTest {
       AccountId = a.Id,
       CloseDate = Date.today().addDays(60),
       StageName = 'Diagnóstico',
-      SOL_Produto_Negocio__c = prodOpp
+      SOL_Produtos_Negocio__c = prodOpp
     );
     if (oppSOL) {
       o.RecordTypeId = rtOppSOL();

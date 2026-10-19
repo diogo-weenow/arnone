@@ -182,7 +182,7 @@ public without sharing class SOLPrazoTotalService {
           OwnerId,
           StageName,
           IsClosed,
-          SOL_Produto_Negocio__c,
+          SOL_Produtos_Negocio__c,
           RecordType.DeveloperName,
           SOL_Data_Inicio_Ciclo_Comercial__c,
           SOL_Prazo_Total_Comercial__c,
@@ -201,7 +201,7 @@ public without sharing class SOLPrazoTotalService {
           o.RecordType.DeveloperName == RECORD_TYPE_SOL &&
           // Régua de 30 dias úteis vale se a Opp INCLUI qualquer um dos três
           // produtos (multi-valor; não compare por igualdade de string).
-          SOLProdutoHelper.contemAlgum(o.SOL_Produto_Negocio__c, PRODUTOS_NO_ESCOPO) &&
+          SOLProdutoHelper.contemAlgum(o.SOL_Produtos_Negocio__c, PRODUTOS_NO_ESCOPO) &&
           // Ganho e Perdido têm IsClosed = true: nunca são reatribuídas.
           o.IsClosed == false &&
           // (CLICKUP-9425) explícito: negócio perdido não avança mais.

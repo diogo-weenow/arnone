@@ -5,7 +5,7 @@
     <description>Cenário 3 do card: aceitação registrada exige percentual de comissão e valor do serviço preenchidos antes do Ganho. Sem eles a Oportunidade fecha sem dizer quanto a Arnone recebe.</description>
     <errorConditionFormula>AND(
   $RecordType.DeveloperName = &apos;SOL&apos;,
-  INCLUDES(SOL_Produto_Negocio__c, &apos;Recuperação Tributária&apos;),
+  INCLUDES(SOL_Produtos_Negocio__c, &apos;Recuperação Tributária&apos;),
   ISPICKVAL(StageName, &apos;Ganho&apos;),
   OR(
     BLANKVALUE(SOL_Percentual_Comissao__c, 0) &lt;= 0,

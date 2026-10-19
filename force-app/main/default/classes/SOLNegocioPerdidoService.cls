@@ -200,7 +200,7 @@ public without sharing class SOLNegocioPerdidoService {
           Status,
           IsConverted,
           RecordType.DeveloperName,
-          SOL_Produto_Interesse__c,
+          SOL_Produtos_Interesse__c,
           SOL_Motivo_Desqualificacao__c,
           SOL_Opt_Out__c
         FROM Lead
@@ -211,7 +211,7 @@ public without sharing class SOLNegocioPerdidoService {
         Boolean noEscopo =
           l.RecordType.DeveloperName == RECORD_TYPE_SOL &&
           // Escopo por multi-valor: o Lead INCLUI qualquer um dos três produtos.
-          SOLProdutoHelper.contemAlgum(l.SOL_Produto_Interesse__c, PRODUTOS_NO_ESCOPO) &&
+          SOLProdutoHelper.contemAlgum(l.SOL_Produtos_Interesse__c, PRODUTOS_NO_ESCOPO) &&
           // Perda ANTES da conversão.
           l.IsConverted == false &&
           leadPerdido(l);
@@ -287,7 +287,7 @@ public without sharing class SOLNegocioPerdidoService {
           Id,
           OwnerId,
           StageName,
-          SOL_Produto_Negocio__c,
+          SOL_Produtos_Negocio__c,
           SOL_Qtd_Perdas__c,
           RecordType.DeveloperName
         FROM Opportunity
@@ -298,7 +298,7 @@ public without sharing class SOLNegocioPerdidoService {
         Boolean noEscopo =
           o.RecordType.DeveloperName == RECORD_TYPE_SOL &&
           // Escopo por multi-valor: a Opp INCLUI qualquer um dos três produtos.
-          SOLProdutoHelper.contemAlgum(o.SOL_Produto_Negocio__c, PRODUTOS_NO_ESCOPO) &&
+          SOLProdutoHelper.contemAlgum(o.SOL_Produtos_Negocio__c, PRODUTOS_NO_ESCOPO) &&
           oportunidadePerdida(o);
         if (noEscopo) {
           perdidas.put(o.Id, o);

@@ -8,8 +8,8 @@ RecordType.DeveloperName = &quot;SOL&quot;,
 ISCHANGED(IsConverted),
 IsConverted = TRUE,
 OR(
-  INCLUDES(SOL_Produto_Interesse__c, &quot;Recuperação Tributária&quot;),
-  INCLUDES(SOL_Produto_Interesse__c, &quot;ART 360&quot;)
+  INCLUDES(SOL_Produtos_Interesse__c, &quot;Recuperação Tributária&quot;),
+  INCLUDES(SOL_Produtos_Interesse__c, &quot;ART 360&quot;)
 ),
 NOT(ISPICKVAL(SOL_Status_Procuracao__c, &quot;Recebida&quot;))
 )</errorConditionFormula>

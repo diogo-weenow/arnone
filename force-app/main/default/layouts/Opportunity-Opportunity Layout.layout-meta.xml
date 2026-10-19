@@ -329,7 +329,7 @@
         <layoutColumns>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>SOL_Produto_Negocio__c</field>
+                <field>SOL_Produtos_Negocio__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns/>

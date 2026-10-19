@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Produto_Interesse__c</fullName>
-    <description>Produtos que o lead procura: Recuperação Tributária, ART 360 e/ou Revisão trabalhista. Multi-seleção (Opção A): a conversão gera UMA Oportunidade carregando os produtos escolhidos. Pode ficar em branco na captação e ser completado pelo SDR. É a origem do Produto de negócio da Oportunidade na conversão. A semântica é união do mais exigente: se qualquer produto exige um portão, o portão vale.</description>
+    <description>DEPRECADO (substituído por SOL_Produtos_Interesse__c, multi-select). Campo single histórico mantido só para leitura/migração; a lógica do funil passou a usar SOL_Produtos_Interesse__c. Produto que o lead procura: Recuperação Tributária ou ART 360. Será removido quando nenhum consumidor externo (ex.: Driva, relatórios, list views) o referenciar.</description>
     <label>Produto de interesse</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
     <trackHistory>false</trackHistory>
-    <type>MultiselectPicklist</type>
-    <visibleLines>3</visibleLines>
+    <type>Picklist</type>
     <valueSet>
         <restricted>true</restricted>
         <valueSetDefinition>
@@ -21,11 +20,6 @@
                 <fullName>ART 360</fullName>
                 <default>false</default>
                 <label>ART 360</label>
-            </value>
-            <value>
-                <fullName>Revisão trabalhista</fullName>
-                <default>false</default>
-                <label>Revisão trabalhista</label>
             </value>
         </valueSetDefinition>
     </valueSet>

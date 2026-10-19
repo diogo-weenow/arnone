@@ -609,7 +609,7 @@ public without sharing class SOLDistribuicaoService {
       // sobre Leads antigos, e concorre com a desqualificação por perda — que
       // também trava o Lead. O lock serializa os dois e garante que o estado
       // lido abaixo é o atual.
-      // (CLICKUP-9438) SOL_Produto_Interesse__c entra na projeção porque o
+      // (CLICKUP-9438) SOL_Produtos_Interesse__c entra na projeção porque o
       // evento da jornada congela o produto do instante da ocorrência — o
       // relatório filtra por ele e não pode depender do valor atual do Lead.
       List<Lead> carregados = [
@@ -619,7 +619,7 @@ public without sharing class SOLDistribuicaoService {
           RecordType.DeveloperName,
           SOL_Data_Inicio_Ciclo_Contato__c,
           SOL_Quantidade_Reatribuicoes__c,
-          SOL_Produto_Interesse__c,
+          SOL_Produtos_Interesse__c,
           SOL_Opt_Out__c,
           Status,
           SOL_Motivo_Desqualificacao__c
@@ -1143,7 +1143,7 @@ public without sharing class SOLDistribuicaoService {
     try {
       sp = Database.setSavepoint();
       // Trava os Leads: serializa dois opt-outs concorrentes do mesmo Lead.
-      // (CLICKUP-9438) OwnerId e SOL_Produto_Interesse__c entram na projeção
+      // (CLICKUP-9438) OwnerId e SOL_Produtos_Interesse__c entram na projeção
       // para o evento da jornada registrar o vendedor responsável e o produto
       // do instante da perda.
       List<Lead> carregados = [
@@ -1151,7 +1151,7 @@ public without sharing class SOLDistribuicaoService {
           Id,
           OwnerId,
           RecordType.DeveloperName,
-          SOL_Produto_Interesse__c,
+          SOL_Produtos_Interesse__c,
           SOL_Opt_Out__c,
           Status,
           SOL_Motivo_Desqualificacao__c

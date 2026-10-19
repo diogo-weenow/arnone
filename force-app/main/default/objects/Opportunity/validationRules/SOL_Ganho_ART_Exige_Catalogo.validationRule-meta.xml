@@ -6,8 +6,8 @@
     <errorConditionFormula>AND(
   $RecordType.DeveloperName = &apos;SOL&apos;,
   OR(
-    INCLUDES(SOL_Produto_Negocio__c, &apos;ART 360&apos;),
-    INCLUDES(SOL_Produto_Negocio__c, &apos;Revisão trabalhista&apos;)
+    INCLUDES(SOL_Produtos_Negocio__c, &apos;ART 360&apos;),
+    INCLUDES(SOL_Produtos_Negocio__c, &apos;Revisão trabalhista&apos;)
   ),
   ISPICKVAL(StageName, &apos;Ganho&apos;),
   OR(

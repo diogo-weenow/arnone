@@ -88,7 +88,7 @@ public without sharing class SOLReuniaoComercialService {
           Status,
           IsConverted,
           SOL_Opt_Out__c,
-          SOL_Produto_Interesse__c,
+          SOL_Produtos_Interesse__c,
           RecordType.DeveloperName,
           SOL_Motivo_Desqualificacao__c
         FROM Lead
@@ -111,7 +111,7 @@ public without sharing class SOLReuniaoComercialService {
           // Reunião comercial nasce para QUALQUER produto SOL selecionado,
           // Revisão trabalhista incluída (contém qualquer um dos três).
           SOLProdutoHelper.contemAlgum(
-            l.SOL_Produto_Interesse__c,
+            l.SOL_Produtos_Interesse__c,
             SOLProdutoHelper.PRODUTOS_SOL
           );
         if (elegivel) {

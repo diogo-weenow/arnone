@@ -106,7 +106,7 @@ public without sharing class SOLProcuracaoAcompanhamentoService {
           OwnerId,
           Status,
           IsConverted,
-          SOL_Produto_Interesse__c,
+          SOL_Produtos_Interesse__c,
           SOL_Status_Procuracao__c,
           SOL_Data_Solicitacao_Procuracao__c,
           RecordType.DeveloperName,
@@ -134,7 +134,7 @@ public without sharing class SOLProcuracaoAcompanhamentoService {
           // Procuração é portão de RT e ART. Lead só-Revisão trabalhista NÃO
           // cria task de procuração (união do mais exigente, mas Revisão isenta).
           SOLProdutoHelper.contemAlgum(
-            l.SOL_Produto_Interesse__c,
+            l.SOL_Produtos_Interesse__c,
             new Set<String>{ PRODUTO_RECUPERACAO, PRODUTO_ART }
           );
         if (solicitacaoValida) {

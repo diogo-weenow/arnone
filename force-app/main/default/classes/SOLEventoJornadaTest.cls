@@ -173,7 +173,7 @@ private class SOLEventoJornadaTest {
       Company = 'C ' + rnd().left(6),
       Status = statusLead(),
       CNPJ__c = CNPJ,
-      SOL_Produto_Interesse__c = produto
+      SOL_Produtos_Interesse__c = produto
     );
     insert l;
     delete [SELECT Id FROM Task WHERE WhoId = :l.Id AND Subject = '1ª Ligação'];
@@ -191,7 +191,7 @@ private class SOLEventoJornadaTest {
   }
 
   /**
-   * `RecordType.DeveloperName` e `SOL_Produto_Interesse__c` fazem parte da
+   * `RecordType.DeveloperName` e `SOL_Produtos_Interesse__c` fazem parte da
    * projeção porque os construtores de `SOLEventoJornadaService` os leem
    * diretamente — e estouram `SObjectException` se faltarem, de propósito:
    * evento sem Record Type sairia do filtro travado do relatório em silêncio.
@@ -206,7 +206,7 @@ private class SOLEventoJornadaTest {
         SOL_Opt_Out__c,
         SOL_Quantidade_Reatribuicoes__c,
         SOL_Motivo_Desqualificacao__c,
-        SOL_Produto_Interesse__c
+        SOL_Produtos_Interesse__c
       FROM Lead
       WHERE Id = :id
     ];
@@ -266,7 +266,7 @@ private class SOLEventoJornadaTest {
       AccountId = a.Id,
       CloseDate = Date.today().addDays(60),
       StageName = 'Diagnóstico',
-      SOL_Produto_Negocio__c = produto,
+      SOL_Produtos_Negocio__c = produto,
       SOL_ECAC_Consulta_Realizada__c = true,
       SOL_ECAC_Data_Consulta__c = Date.today(),
       SOL_ECAC_Resultado__c = 'Valor a recuperar',
@@ -1171,7 +1171,7 @@ private class SOLEventoJornadaTest {
           Company = 'C ' + i,
           Status = statusLead(),
           CNPJ__c = CNPJ,
-          SOL_Produto_Interesse__c = Math.mod(i, 2) == 0
+          SOL_Produtos_Interesse__c = Math.mod(i, 2) == 0
             ? PRODUTO_RT
             : PRODUTO_ART
         )
@@ -1359,7 +1359,7 @@ private class SOLEventoJornadaTest {
       StageName = 'Pré-Matrícula',
       // O vetor: produto da Arnone Soluções preenchido num registro que não é
       // da Arnone Soluções.
-      SOL_Produto_Negocio__c = PRODUTO_RT
+      SOL_Produtos_Negocio__c = PRODUTO_RT
     );
     insert outraBU;
     Task t = new Task(
@@ -1380,7 +1380,7 @@ private class SOLEventoJornadaTest {
     Test.stopTest();
 
     Opportunity depois = [
-      SELECT StageName, RecordTypeId, SOL_Qtd_Perdas__c, SOL_Produto_Negocio__c
+      SELECT StageName, RecordTypeId, SOL_Qtd_Perdas__c, SOL_Produtos_Negocio__c
       FROM Opportunity
       WHERE Id = :outraBU.Id
     ];
@@ -1391,7 +1391,7 @@ private class SOLEventoJornadaTest {
     );
     System.assertEquals(
       PRODUTO_RT,
-      depois.SOL_Produto_Negocio__c,
+      depois.SOL_Produtos_Negocio__c,
       'E o produto SOL continua preenchido — o vetor está de fato armado.'
     );
     System.assertEquals(

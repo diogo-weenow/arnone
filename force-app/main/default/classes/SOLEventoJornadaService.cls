@@ -190,7 +190,7 @@ public without sharing class SOLEventoJornadaService {
    * Reatribuição por falta de contato (CLICKUP-9400) — origem Lead.
    *
    * @param lead Lead JÁ carregado, com `RecordType.DeveloperName` e
-   *   `SOL_Produto_Interesse__c` na projeção. Se faltarem, a leitura estoura
+   *   `SOL_Produtos_Interesse__c` na projeção. Se faltarem, a leitura estoura
    *   `SObjectException` e a transação inteira cai — de propósito: evento sem
    *   Record Type sairia do filtro travado do relatório em silêncio.
    * @param vendedorAnterior proprietário ANTES da troca (capture antes de
@@ -207,7 +207,7 @@ public without sharing class SOLEventoJornadaService {
     Datetime quando
   ) {
     List<SOL_Evento_Jornada__c> eventos = new List<SOL_Evento_Jornada__c>();
-    String multiProduto = lead == null ? null : lead.SOL_Produto_Interesse__c;
+    String multiProduto = lead == null ? null : lead.SOL_Produtos_Interesse__c;
     // UM evento por produto selecionado (Lead sem produto -> um evento com
     // SOL_Produto__c = null; a ocorrência não é descartada).
     for (String produto : SOLProdutoHelper.paraEventos(multiProduto)) {
@@ -241,7 +241,7 @@ public without sharing class SOLEventoJornadaService {
    * origem Oportunidade.
    *
    * @param oportunidade Oportunidade JÁ carregada, com
-   *   `RecordType.DeveloperName` e `SOL_Produto_Negocio__c` na projeção.
+   *   `RecordType.DeveloperName` e `SOL_Produtos_Negocio__c` na projeção.
    * @param vendedorAnterior proprietário ANTES da troca.
    * @param novoVendedor proprietário escolhido pelo round-robin.
    * @param sequencia `SOL_Qtd_Reatribuicoes_Prazo__c` JÁ incrementado.
@@ -257,7 +257,7 @@ public without sharing class SOLEventoJornadaService {
     List<SOL_Evento_Jornada__c> eventos = new List<SOL_Evento_Jornada__c>();
     String multiProduto = oportunidade == null
       ? null
-      : oportunidade.SOL_Produto_Negocio__c;
+      : oportunidade.SOL_Produtos_Negocio__c;
     for (String produto : SOLProdutoHelper.paraEventos(multiProduto)) {
       SOL_Evento_Jornada__c e = base(
         TIPO_REATRIBUICAO,
@@ -292,7 +292,7 @@ public without sharing class SOLEventoJornadaService {
    * por Lead. Um segundo disparo não chega até aqui.
    *
    * @param lead Lead JÁ carregado, com `OwnerId`, `RecordType.DeveloperName` e
-   *   `SOL_Produto_Interesse__c` na projeção.
+   *   `SOL_Produtos_Interesse__c` na projeção.
    * @param quando instante do opt-out — o mesmo carimbado no Lead.
    */
   public static List<SOL_Evento_Jornada__c> leadPerdidoPorOptOut(
@@ -300,7 +300,7 @@ public without sharing class SOLEventoJornadaService {
     Datetime quando
   ) {
     List<SOL_Evento_Jornada__c> eventos = new List<SOL_Evento_Jornada__c>();
-    String multiProduto = lead == null ? null : lead.SOL_Produto_Interesse__c;
+    String multiProduto = lead == null ? null : lead.SOL_Produtos_Interesse__c;
     for (String produto : SOLProdutoHelper.paraEventos(multiProduto)) {
       SOL_Evento_Jornada__c e = base(
         TIPO_PERDA,
@@ -338,7 +338,7 @@ public without sharing class SOLEventoJornadaService {
    * linha errada no relatório do gestor.
    *
    * @param oportunidade Oportunidade JÁ carregada, com `OwnerId`,
-   *   `RecordType.DeveloperName` e `SOL_Produto_Negocio__c` na projeção.
+   *   `RecordType.DeveloperName` e `SOL_Produtos_Negocio__c` na projeção.
    * @param etapaAnterior etapa imediatamente anterior à perda.
    * @param sequencia `Opportunity.SOL_Qtd_Perdas__c` — o número desta TRANSIÇÃO
    *   para "Perdido", já incrementado pelo Flow before-save no mesmo save. É o
@@ -355,7 +355,7 @@ public without sharing class SOLEventoJornadaService {
     List<SOL_Evento_Jornada__c> eventos = new List<SOL_Evento_Jornada__c>();
     String multiProduto = oportunidade == null
       ? null
-      : oportunidade.SOL_Produto_Negocio__c;
+      : oportunidade.SOL_Produtos_Negocio__c;
     for (String produto : SOLProdutoHelper.paraEventos(multiProduto)) {
       SOL_Evento_Jornada__c e = base(
         TIPO_PERDA,

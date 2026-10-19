@@ -32,7 +32,7 @@
         <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
         <filterFormula>AND(
   {!$Record.RecordType.DeveloperName} = &apos;SOL&apos;,
-  INCLUDES({!$Record.SOL_Produto_Negocio__c}, &apos;Recuperação Tributária&apos;),
+  INCLUDES({!$Record.SOL_Produtos_Negocio__c}, &apos;Recuperação Tributária&apos;),
   ISPICKVAL({!$Record.StageName}, &apos;Ganho&apos;)
 )</filterFormula>
         <object>Opportunity</object>

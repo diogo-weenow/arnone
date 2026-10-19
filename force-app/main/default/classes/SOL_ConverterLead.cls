@@ -46,7 +46,7 @@ public with sharing class SOL_ConverterLead {
 
   public static final String CAMPOS_LEAD =
     'Id, Name, FirstName, LastName, Company, Email, Phone, IsConverted, ' +
-    'CNPJ__c, RecordType.DeveloperName, SOL_Produto_Interesse__c, ' +
+    'CNPJ__c, RecordType.DeveloperName, SOL_Produtos_Interesse__c, ' +
     'SOL_Status_Procuracao__c, SOL_Data_Recebimento_Procuracao__c, ' +
     'SOL_Apto_Conversao__c, SOL_Data_Contato_Efetivado__c, ' +
     // CLICKUP-9439 / CLICKUP-9429 (absorvido) — medicao por etapa. Sao
@@ -89,7 +89,7 @@ public with sharing class SOL_ConverterLead {
     if (l.RecordType.DeveloperName != RT_LEAD) {
       return 'Este lead não é da Arnone Soluções. Esta ação só vale para o funil da unidade.';
     }
-    if (String.isBlank(l.SOL_Produto_Interesse__c)) {
+    if (String.isBlank(l.SOL_Produtos_Interesse__c)) {
       return 'Informe o produto de interesse no lead. É ele que decide o portão da conversão e a etapa em que a Oportunidade nasce.';
     }
     // A Conta é pessoa jurídica e o CNPJ é a identidade dela: sem o número não
@@ -103,7 +103,7 @@ public with sharing class SOL_ConverterLead {
     // negócio #2 e #4 do card: fluxo simples, sem o documento assinado como trava
     // de conversão. Qualquer mix que inclua RT ou ART volta a exigir a procuração.
     Boolean exigeProcuracao = SOLProdutoHelper.contemAlgum(
-      l.SOL_Produto_Interesse__c,
+      l.SOL_Produtos_Interesse__c,
       new Set<String>{ PRODUTO_RECUPERACAO, PRODUTO_ART }
     );
     if (exigeProcuracao) {
@@ -119,7 +119,7 @@ public with sharing class SOL_ConverterLead {
 
   public static String resumoDe(Lead l, Integer arquivos) {
     // Todo produto passa pela procuração, então o resumo é o mesmo para todos.
-    return SOLProdutoHelper.paraRotulo(l.SOL_Produto_Interesse__c) +
+    return SOLProdutoHelper.paraRotulo(l.SOL_Produtos_Interesse__c) +
       ' · procuração recebida' +
       (l.SOL_Data_Recebimento_Procuracao__c == null
         ? ''
@@ -321,7 +321,7 @@ public with sharing class SOL_ConverterLead {
         pedido.setContactId(p.contatoId);
       }
       pedido.setOpportunityName(
-        SOLProdutoHelper.paraRotulo(l.SOL_Produto_Interesse__c) +
+        SOLProdutoHelper.paraRotulo(l.SOL_Produtos_Interesse__c) +
           ' — ' +
           l.Company
       );
@@ -434,7 +434,7 @@ public with sharing class SOL_ConverterLead {
       Id = oportunidadeId,
       RecordTypeId = recordTypeId(Opportunity.SObjectType, RT_OPORTUNIDADE),
       StageName = ETAPA_NASCIMENTO,
-      SOL_Produto_Negocio__c = l.SOL_Produto_Interesse__c
+      SOL_Produtos_Negocio__c = l.SOL_Produtos_Interesse__c
     );
 
     // CLICKUP-9424 — o prazo total de 30 dias úteis começa no contato efetivado
@@ -528,7 +528,7 @@ public with sharing class SOL_ConverterLead {
     // (só ART, só Revisão trabalhista, ou ART+Revisão) não tem diagnóstico e vai
     // direto para a Negociação.
     String destino = SOLProdutoHelper.contem(
-        l.SOL_Produto_Interesse__c,
+        l.SOL_Produtos_Interesse__c,
         PRODUTO_RECUPERACAO
       )
       ? ETAPA_RECUPERACAO
