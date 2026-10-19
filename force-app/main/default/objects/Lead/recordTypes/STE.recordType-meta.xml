@@ -3,6 +3,7 @@
     <fullName>STE</fullName>
     <active>true</active>
     <businessProcess>Captacao_STE</businessProcess>
+    <compactLayoutAssignment>STE_Lead</compactLayoutAssignment>
     <description>Leads captados para a unidade Instituto STech (funil Stech Telecom). Usa o processo Captacao_STE, que inclui a etapa Validação — exclusiva desta BU.</description>
     <label>Instituto STech</label>
     <picklistValues>
@@ -312,6 +313,36 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>SOL_Produtos_Interesse__c</picklist>
+        <values>
+            <fullName>ART 360</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recuperação Tributária</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Revisão trabalhista</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SOL_Regime_Tributario__c</picklist>
+        <values>
+            <fullName>Lucro Presumido</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lucro Real</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Simples Nacional</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>SOL_Status_Distribuicao__c</picklist>
         <values>
             <fullName>Distribuido</fullName>
@@ -387,6 +418,49 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>STE_Etapa_Bot__c</picklist>
+        <values>
+            <fullName>Aguardando arquivo da CNH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando e-mail</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando empresa anterior</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando escolha da CNH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando experiência</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando faixa etária</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando nome</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando pré-inscrição</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Concluído</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Desqualificado</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>STE_Faixa_Etaria__c</picklist>
         <values>
             <fullName>De 20 a 50 anos</fullName>
@@ -435,6 +509,25 @@
         </values>
         <values>
             <fullName>Sim</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>STE_Motivo_Desqualificacao__c</picklist>
+        <values>
+            <fullName>CNH provisória</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fora da faixa etária</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Não atende ao perfil da turma</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sem CNH</fullName>
             <default>false</default>
         </values>
     </picklistValues>
