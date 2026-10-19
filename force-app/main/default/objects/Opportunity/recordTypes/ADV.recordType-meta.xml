@@ -280,6 +280,21 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>SOL_Produtos_Negocio__c</picklist>
+        <values>
+            <fullName>ART 360</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recuperação Tributária</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Revisão trabalhista</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>SOL_Resultado_Apresentacao__c</picklist>
         <values>
             <fullName>Aguardando retorno</fullName>
