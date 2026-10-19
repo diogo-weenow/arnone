@@ -1,0 +1,94 @@
+<template>
+    <div class="slds-grid slds-wrap" role="list" aria-label="Diagnóstico do arquivo">
+        <template for:each={cards} for:item="c">
+            <div key={c.id} class={classeCard} role="listitem">
+                <div class={c.classe}>
+                    <p class="slds-text-title">{c.rotulo}</p>
+                    <p class="slds-text-heading_small">{c.valor}</p>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <template lwc:if={temBloqueios}>
+        <div class="slds-m-top_small bloqueios" role="alert">
+            <template for:each={bloqueios} for:item="b">
+                <div key={b.id} class="slds-notify slds-notify_alert slds-alert_error slds-m-bottom_x-small bloqueio">
+                    <lightning-icon icon-name="utility:error" size="x-small" variant="inverse" class="slds-m-right_x-small" alternative-text="Bloqueio"></lightning-icon>
+                    <p>{b.mensagem}</p>
+                </div>
+            </template>
+        </div>
+    </template>
+
+    <template lwc:if={temAvisos}>
+        <div class="slds-m-top_small avisos" role="status">
+            <template for:each={avisos} for:item="a">
+                <div key={a.id} class="slds-notify slds-notify_alert slds-alert_warning slds-m-bottom_x-small aviso">
+                    <p>{a.mensagem}</p>
+                </div>
+            </template>
+        </div>
+    </template>
+
+    <template lwc:if={temNaoReconhecidas}>
+        <p class="slds-text-body_small slds-text-color_weak slds-m-top_small">
+            Colunas não reconhecidas (não serão importadas): {naoReconhecidasTexto}
+        </p>
+    </template>
+
+    <h3 class="slds-text-heading_small slds-m-top_medium slds-m-bottom_x-small">Mapeamento</h3>
+    <div class={classeMapa}>
+        <div class={classeLinhaMapa}>
+            <div class={classeColunaMapa}>
+                <lightning-combobox
+                    class="coluna-chave"
+                    label={rotuloChave}
+                    value={colunaChave}
+                    options={opcoesColunas}
+                    onchange={handleChave}
+                    required
+                ></lightning-combobox>
+            </div>
+        </div>
+        <template lwc:if={criaLeads}>
+            <div class={classeLinhaMapa}>
+                <div class={classeColunaMapa}>
+                    <lightning-combobox
+                        label="Coluna da Empresa (criação)"
+                        value={colunaCompany}
+                        options={opcoesColunas}
+                        onchange={handleCompany}
+                        field-level-help="Obrigatória para criar lead novo."
+                    ></lightning-combobox>
+                </div>
+                <div class={classeColunaMapa}>
+                    <lightning-combobox
+                        label="Coluna do Sobrenome (criação)"
+                        value={colunaLastName}
+                        options={opcoesColunas}
+                        onchange={handleLastName}
+                        field-level-help="Obrigatória para criar lead novo. Pode ser a mesma Razão Social."
+                    ></lightning-combobox>
+                </div>
+            </div>
+        </template>
+        <template for:each={linhasMapeamento} for:item="m">
+            <div key={m.campoLead} class={classeLinhaMapa}>
+                <div class={classeColunaMapa}>
+                    <lightning-combobox
+                        label={m.label}
+                        data-campo={m.campoLead}
+                        value={m.coluna}
+                        options={opcoesColunas}
+                        onchange={handleMapeamento}
+                    ></lightning-combobox>
+                </div>
+                <div class={classeColunaMapa}>
+                    <span class="slds-badge slds-m-top_x-small">{m.politica}</span>
+                    <span class="slds-text-body_small slds-text-color_weak slds-m-left_x-small">{m.politicaTexto}</span>
+                </div>
+            </div>
+        </template>
+    </div>
+</template>

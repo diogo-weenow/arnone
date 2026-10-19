@@ -8,19 +8,19 @@
         <locationX>176</locationX>
         <locationY>288</locationY>
         <assignmentItems>
-            <assignToReference>$Record.SOL_CNPJ_Normalizado__c</assignToReference>
+            <assignToReference>$Record.CNPJ_Normalizado__c</assignToReference>
             <operator>Assign</operator>
             <value>
                 <elementReference>fCNPJNormalizado</elementReference>
             </value>
         </assignmentItems>
     </assignments>
-    <description>Upload enriquecimento Lemit — popula Lead.SOL_CNPJ_Normalizado__c com o CNPJ__c somente dígitos (remove ponto, barra, hífen e espaço), em before-save (sem DML extra) na criação e quando o CNPJ muda. É a chave de casamento do enriquecimento. Roda para qualquer Record Type; para Lead sem CNPJ grava vazio. NÃO altera CNPJ__c nem qualquer outro campo, e é independente de Lead_AfterCreate_DefinirUnidade e SOL_Distribuir_Lead.</description>
+    <description>Importação de leads — popula Lead.CNPJ_Normalizado__c com o CNPJ__c sem ponto, barra, hífen e espaço e em maiúsculas (aceita o CNPJ alfanumérico), em before-save (sem DML extra) na criação e quando o CNPJ muda. É a chave de casamento da Importação de leads e precisa ser idêntica à normalização de ImportacaoLeadsDocumento.normalizarCnpj (exceto o zero à esquerda, que só a importação completa). Roda para qualquer Record Type; para Lead sem CNPJ grava vazio. NÃO altera CNPJ__c nem qualquer outro campo, e é independente de Lead_AfterCreate_DefinirUnidade e SOL_Distribuir_Lead.</description>
     <environments>Default</environments>
     <formulas>
         <name>fCNPJNormalizado</name>
         <dataType>String</dataType>
-        <expression>SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(IF(ISBLANK({!$Record.CNPJ__c}), &apos;&apos;, {!$Record.CNPJ__c}), &apos;.&apos;, &apos;&apos;), &apos;/&apos;, &apos;&apos;), &apos;-&apos;, &apos;&apos;), &apos; &apos;, &apos;&apos;)</expression>
+        <expression>UPPER(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(SUBSTITUTE(IF(ISBLANK({!$Record.CNPJ__c}), &apos;&apos;, {!$Record.CNPJ__c}), &apos;.&apos;, &apos;&apos;), &apos;/&apos;, &apos;&apos;), &apos;-&apos;, &apos;&apos;), &apos; &apos;, &apos;&apos;))</expression>
     </formulas>
     <interviewLabel>Lead_BeforeSave_Normalizar_CNPJ {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Lead_BeforeSave_Normalizar_CNPJ</label>

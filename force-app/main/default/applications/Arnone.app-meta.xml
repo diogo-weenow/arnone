@@ -49,6 +49,7 @@
     <tabs>standard-Task</tabs>
     <tabs>standard-report</tabs>
     <tabs>standard-Dashboard</tabs>
+    <tabs>Importacao_Leads</tabs>
     <uiType>Lightning</uiType>
     <utilityBar>Arnone_UtilityBar</utilityBar>
 </CustomApplication>

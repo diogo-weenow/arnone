@@ -1,0 +1,16 @@
+.carregando {
+    position: relative;
+    min-height: 4rem;
+}
+
+.perfil-card {
+    border-left: 4px solid var(--slds-g-color-brand-base-50, #0176d3);
+}
+
+/* Celular: botões empilhados e com largura total, sem rolagem horizontal. */
+.acoes-pequeno lightning-button {
+    display: block;
+    width: 100%;
+    margin-left: 0;
+    margin-bottom: 0.5rem;
+}
