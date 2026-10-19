@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <BusinessProcess xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Funil_ADV</fullName>
-    <description>Funil comercial da unidade Arnone Advogados: Oportunidade Recebida → Aguardando Assinatura → Ganho ou Perdido.</description>
+    <description>Funil comercial da unidade Arnone Advogados (TO-BE v1): Oportunidade Recebida → Em Precificação → Proposta Enviada → Aguardando Assinatura → Ganho ou Perdido.</description>
     <isActive>true</isActive>
     <values>
         <fullName>Aguardando Assinatura</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Em Precificação</fullName>
         <default>false</default>
     </values>
     <values>
@@ -17,6 +21,10 @@
     </values>
     <values>
         <fullName>Perdido</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Proposta Enviada</fullName>
         <default>false</default>
     </values>
 </BusinessProcess>

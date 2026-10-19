@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>ADV_Area_Juridica__c</fullName>
-    <description>Área do Direito do caso da BU Arnone Advogados. Exigida para sair de Qualificação (VR ADV_Classificacao_Exige_Preenchimento).</description>
+    <description>Área do Direito do caso da BU Arnone Advogados. Exigida para sair de Oportunidade Recebida (VR ADV_Classificacao_Exige_Preenchimento).</description>
     <label>Área jurídica</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>

@@ -5,9 +5,41 @@
     <fieldName>StageName</fieldName>
     <masterLabel>Arnone Advogados</masterLabel>
     <pathAssistantSteps>
+        <fieldNames>AccountId</fieldNames>
+        <fieldNames>ADV_Area_Juridica__c</fieldNames>
+        <fieldNames>ADV_Advogado_Responsavel__c</fieldNames>
+        <fieldNames>ADV_Origem_Proposta__c</fieldNames>
+        <fieldNames>Description</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; equipe comercial.&lt;/p&gt;&lt;p&gt;Cadastre o caso captado pelo advogado (sem Lead): conta do cliente, dados do caso na descrição, área jurídica e advogado responsável. Área jurídica e advogado são obrigatórios para avançar; a origem é opcional.&lt;/p&gt;</info>
+        <picklistValueName>Oportunidade Recebida</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>ADV_Valor_Honorarios__c</fieldNames>
+        <fieldNames>Amount</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; Antônio com o advogado responsável.&lt;/p&gt;&lt;p&gt;O Antônio recebe um aviso por e-mail ao entrar nesta etapa. Registre os honorários e o valor da proposta (campo Valor). A proposta só sai com o aval do Antônio: só avance para Proposta Enviada depois dele.&lt;/p&gt;</info>
+        <picklistValueName>Em Precificação</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>ADV_Data_Envio_Proposta__c</fieldNames>
+        <fieldNames>Amount</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; comercial (a confirmar com o cliente).&lt;/p&gt;&lt;p&gt;Envie a proposta personalizada ao cliente e anexe o arquivo em Arquivos. A data de envio é preenchida automaticamente com o dia de hoje; corrija se a proposta saiu em outra data.&lt;/p&gt;</info>
+        <picklistValueName>Proposta Enviada</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>ADV_Data_Envio_Proposta__c</fieldNames>
+        <fieldNames>ADV_Data_Assinatura__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; comercial.&lt;/p&gt;&lt;p&gt;Acompanhe o retorno do cliente. Se em 5 dias a Oportunidade continuar nesta etapa, você recebe uma tarefa para cobrar a assinatura. Assinou: Ganho. Não assinou ou recusou: Perdido.&lt;/p&gt;</info>
+        <picklistValueName>Aguardando Assinatura</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>ADV_Data_Assinatura__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; comercial.&lt;/p&gt;&lt;p&gt;Proposta assinada pelo cliente. A data de assinatura é obrigatória para marcar como Ganho.&lt;/p&gt;</info>
+        <picklistValueName>Ganho</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
         <fieldNames>ADV_Motivo_Perda__c</fieldNames>
         <fieldNames>ADV_Detalhe_Perda__c</fieldNames>
-        <info>Informe o motivo da perda. Se for Outros, descreva no Detalhe da perda.</info>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; comercial.&lt;/p&gt;&lt;p&gt;Informe o motivo da perda. Se for Outros, descreva no Detalhe da perda.&lt;/p&gt;</info>
         <picklistValueName>Perdido</picklistValueName>
     </pathAssistantSteps>
     <recordTypeName>ADV</recordTypeName>
