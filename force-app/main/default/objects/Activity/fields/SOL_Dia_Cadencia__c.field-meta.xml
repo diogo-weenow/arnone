@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Dia_Cadencia__c</fullName>
-    <description>Dia ATIVO da cadência de contato da Arnone Soluções que esta tarefa representa (1, 2 ou 3). Gravado só pelas automações SOL. O dia 1 é a tarefa "1ª Ligação" criada pela distribuição/reatribuição (CLICKUP-9396/9400); os dias 2 e 3 são criados pelo motor da cadência (CLICKUP-9398) através de SOLCadenciaContatoService, com vencimento no dia útil que o motor informa. Junto de SOL_Ciclo_Contato__c e SOL_Canal_Contato__c é o que torna a criação idempotente: Lead + ciclo + canal + dia nunca gera uma segunda tarefa. Vazio nas tarefas anteriores ao CLICKUP-9434 e nas manuais. CLICKUP-9434.</description>
+    <description>Dia ATIVO da cadência de contato da Arnone Soluções que esta tarefa representa (1, 2 ou 3). Gravado só pelas automações SOL. O dia 1 é a tarefa &quot;1ª Ligação&quot; criada pela distribuição/reatribuição (CLICKUP-9396/9400); os dias 2 e 3 são criados pelo motor da cadência (CLICKUP-9398) através de SOLCadenciaContatoService, com vencimento no dia útil que o motor informa. Junto de SOL_Ciclo_Contato__c e SOL_Canal_Contato__c é o que torna a criação idempotente: Lead + ciclo + canal + dia nunca gera uma segunda tarefa. Vazio nas tarefas anteriores ao CLICKUP-9434 e nas manuais. CLICKUP-9434.</description>
     <externalId>false</externalId>
     <label>Dia da cadência SOL</label>
     <precision>2</precision>
     <required>false</required>
     <scale>0</scale>
-    <trackFeedHistory>false</trackFeedHistory>
-    <trackHistory>false</trackHistory>
     <type>Number</type>
     <unique>false</unique>
 </CustomField>

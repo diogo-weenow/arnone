@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Prazo_Contato__c</fullName>
-    <description>Prazo operacional da nova tentativa de contato: preenchido pela automação de reatribuição SOL com 5 minutos após a troca de proprietário, na tarefa "1ª Ligação" criada para o novo vendedor. Não é um indicador de SLA. CLICKUP-9400.</description>
+    <description>Prazo operacional da nova tentativa de contato: preenchido pela automação de reatribuição SOL com 5 minutos após a troca de proprietário, na tarefa &quot;1ª Ligação&quot; criada para o novo vendedor. Não é um indicador de SLA. CLICKUP-9400.</description>
     <label>Prazo do contato</label>
     <required>false</required>
     <type>DateTime</type>

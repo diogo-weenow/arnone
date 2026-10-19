@@ -5,6 +5,7 @@
     <changePasswordTemplate>unfiled$public/CommunityChangePasswordEmailTemplate</changePasswordTemplate>
     <communityRoles/>
     <description>Um site padrão que hospeda páginas e formulários das páginas de destino.</description>
+    <disablePvtPagesForPwdResetInLWR>false</disablePvtPagesForPwdResetInLWR>
     <disableReputationRecordConversations>true</disableReputationRecordConversations>
     <emailSenderAddress>joao.silva@weenow.com.br</emailSenderAddress>
     <emailSenderName>Páginas de destino de marketing</emailSenderName>
@@ -46,6 +47,7 @@
         <selfRegProfilePageOverrideSetting>Designer</selfRegProfilePageOverrideSetting>
     </networkPageOverrides>
     <picassoSite>pginas_de_destino_de_marketing_7pc1</picassoSite>
+    <secondaryEmailSenderEnabled>false</secondaryEmailSenderEnabled>
     <selfRegistration>false</selfRegistration>
     <sendWelcomeEmail>false</sendWelcomeEmail>
     <site>pginas_de_destino_de_marketing_7pc</site>

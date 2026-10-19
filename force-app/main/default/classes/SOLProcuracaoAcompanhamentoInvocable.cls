@@ -7,11 +7,9 @@
  * não faz SOQL nem DML.
  *
  * Tratamento de falha ATÔMICO: se a tarefa não puder ser criada (inclusive
- * calendário ausente), a exceção controlada é RELANÇADA para o Flow. Como o
- * Flow chama esta ação com flowTransactionModel = CurrentTransaction, a exceção
- * aborta a transação inteira — e é isso que desfaz o registro da solicitação
- * (Status + campos do Lead). O vendedor recebe a mensagem controlada. Detalhe
- * técnico só no log de debug.
+ * calendário ausente), a exceção controlada é RELANÇADA para o Flow, abortando
+ * a transação inteira — o registro da solicitação é desfeito junto. O vendedor
+ * recebe a mensagem controlada. Detalhe técnico só no log de debug.
  *
  * Mesmo comportamento em teste e em produção.
  */

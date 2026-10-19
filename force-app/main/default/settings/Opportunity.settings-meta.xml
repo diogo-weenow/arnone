@@ -11,6 +11,7 @@
     <enableOpportunityTeam>false</enableOpportunityTeam>
     <enablePipelineChangesMetrics>true</enablePipelineChangesMetrics>
     <enablePipelineInspection>true</enablePipelineInspection>
+    <enablePipelineInspectionHideMyPipeline>false</enablePipelineInspectionHideMyPipeline>
     <enablePipelineInspectionSingleCategoryRollup>true</enablePipelineInspectionSingleCategoryRollup>
     <enableServiceCaseInsights>true</enableServiceCaseInsights>
     <enableUpdateReminders>true</enableUpdateReminders>

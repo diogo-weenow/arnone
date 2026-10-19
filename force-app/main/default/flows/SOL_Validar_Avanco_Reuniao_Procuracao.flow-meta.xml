@@ -228,7 +228,6 @@
         <connector>
             <targetReference>Tem_Reuniao_Realizada</targetReference>
         </connector>
-        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
         <filterFormula>AND(
   {!$Record.RecordType.DeveloperName} = &apos;SOL&apos;,
   OR(
