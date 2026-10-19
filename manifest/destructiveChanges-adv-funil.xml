@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Funil TO-BE ADV: o layout dedicado criado direto na org (30/09) foi substituido pelas secoes ADV no
+     layout compartilhado "Opportunity Layout". Aplicar SO depois de reatribuir o RT Opportunity.ADV ao
+     "Opportunity Layout" em todos os perfis (senao a exclusao falha por layout atribuido). -->
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Opportunity-ADV Layout</members>
+        <name>Layout</name>
+    </types>
+    <version>66.0</version>
+</Package>
