@@ -18,7 +18,7 @@
     </actionCalls>
     <apiVersion>66.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
-    <description>CLICKUP-9426 — Card 07B. Quando um Lead da Arnone Soluções (Recuperação Tributária ou ART 360, não convertido) registra EFETIVAMENTE a solicitação da procuração — Status = "Procuração Solicitada" E SOL_Status_Procuracao__c = "Solicitada" E SOL_Data_Solicitacao_Procuracao__c preenchida — aciona SOLProcuracaoAcompanhamentoInvocable para criar UMA Task "Acompanhar recebimento da procuração" (vencimento 7 dias úteis). A fórmula exige a mudança de SOL_Status_Procuracao__c ou de SOL_Data_Solicitacao_Procuracao__c: alterar só o Status do Lead NÃO dispara. Não altera campos aqui. Não modifica SOL_Procuracao. Idempotência (Lead + data da solicitação) e prazo ficam no Apex (bulk, FOR UPDATE, atômico).</description>
+    <description>CLICKUP-9426 — Card 07B. Quando um Lead da Arnone Soluções (Recuperação Tributária ou ART 360, não convertido) registra EFETIVAMENTE a solicitação da procuração — Status = &quot;Procuração Solicitada&quot; E SOL_Status_Procuracao__c = &quot;Solicitada&quot; E SOL_Data_Solicitacao_Procuracao__c preenchida — aciona SOLProcuracaoAcompanhamentoInvocable para criar UMA Task &quot;Acompanhar recebimento da procuração&quot; (vencimento 7 dias úteis). A fórmula exige a mudança de SOL_Status_Procuracao__c ou de SOL_Data_Solicitacao_Procuracao__c: alterar só o Status do Lead NÃO dispara. Não altera campos aqui. Não modifica SOL_Procuracao. Idempotência (Lead + data da solicitação) e prazo ficam no Apex (bulk, FOR UPDATE, atômico).</description>
     <environments>Default</environments>
     <interviewLabel>SOL_Tarefa_Acompanhamento_Procuracao {!$Flow.CurrentDateTime}</interviewLabel>
     <label>SOL_Tarefa_Acompanhamento_Procuracao</label>
@@ -29,7 +29,6 @@
         <connector>
             <targetReference>Chamar_Criar_Acompanhamento</targetReference>
         </connector>
-        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
         <filterFormula>AND(
   {!$Record.RecordType.DeveloperName} = &apos;SOL&apos;,
   OR(

@@ -49,3 +49,6 @@ $RECYCLE.BIN/
 
 # Contratos e respostas operacionais dos agentes (registro local, não versionado)
 .agent-handoffs/
+
+# Saída do sfdx-git-delta (gerada em cada execução da pipeline)
+delta/

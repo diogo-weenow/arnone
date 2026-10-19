@@ -2,8 +2,8 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Dias_Contato_Efetivado__c</fullName>
     <description>Etapa 2: dias ÚTEIS entre a primeira ligação concluída (exclusiva) e o início do ciclo comercial (SOL_Data_Inicio_Ciclo_Comercial__c, que é a cópia do contato efetivado do Lead, inclusiva). Mesmo dia útil = 0. Chega copiado do Lead na conversão; se vier vazio, é recalculado aqui a partir dos marcos da própria Oportunidade. Nunca sobrescrito depois de preenchido. Campo técnico, somente leitura. CLICKUP-9439 / CLICKUP-9429 (absorvido).</description>
-    <label>Dias úteis até o contato efetivado (SOL)</label>
     <externalId>false</externalId>
+    <label>Dias úteis até o contato efetivado (SOL)</label>
     <precision>4</precision>
     <required>false</required>
     <scale>0</scale>

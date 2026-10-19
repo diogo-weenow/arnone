@@ -29,6 +29,14 @@
     </groupingsDown>
     <name>SOL — Oportunidades por Etapa e Vendedor</name>
     <params>
+        <name>open</name>
+        <value>all</value>
+    </params>
+    <params>
+        <name>probability</name>
+        <value>&gt;0</value>
+    </params>
+    <params>
         <name>co</name>
         <value>1</value>
     </params>

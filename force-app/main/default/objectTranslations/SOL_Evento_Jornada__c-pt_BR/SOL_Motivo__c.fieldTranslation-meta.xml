@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Motivo --></label>
+    <name>SOL_Motivo__c</name>
+    <picklistValues>
+        <masterLabel>Lead perdido por opt-out</masterLabel>
+        <translation><!-- Lead perdido por opt-out --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Oportunidade perdida</masterLabel>
+        <translation><!-- Oportunidade perdida --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Reatribuição por estouro do prazo total</masterLabel>
+        <translation><!-- Reatribuição por estouro do prazo total --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Reatribuição por falta de contato</masterLabel>
+        <translation><!-- Reatribuição por falta de contato --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

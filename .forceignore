@@ -12,3 +12,76 @@ package.xml
 **/__tests__/**
 
 node_modules/
+
+# ---------------------------------------------------------------------------
+# Metadado de plataforma que NAO e deployavel entre orgs.
+# Nada aqui e removido da org nem do Git: estes arquivos seguem versionados
+# como retrato do que existe na dev. O que este arquivo faz e impedir que o
+# CLI tente retriar/deployar componentes que a propria Salesforce rejeita.
+# Cada bloco corresponde a falhas reais medidas no dry-run do PR #41.
+# ---------------------------------------------------------------------------
+
+# Data Cloud: Data Lake/Model Objects. Deploy falha com
+# "Must specify a non-empty label for the CustomObject" (45 falhas).
+**/objects/*__dlm/**
+**/objects/*__dll/**
+**/objects/ssot__*/**
+
+# Profiles standard: referenciam tabs de Data Cloud/DevOps Center que existem
+# na dev mas nao sao validas em deploy — "You can't edit tab settings for X,
+# as it's not a valid tab" (135 falhas em Admin, ContractManager,
+# MarketingProfile, SolutionManager, Standard). O modelo de permissao do
+# projeto e por Permission Set, que segue versionado e deployavel.
+**/profiles/**
+
+# Settings: configuracao de nivel de org, nao promovivel entre ambientes.
+# Analytics vem com elemento duplicado do proprio retrieve; Security exige
+# direitos que a org nao concede (MFA) (3 falhas).
+**/settings/**
+
+# Policy rules: deploy retorna erro interno da Salesforce (2 falhas).
+**/policyRuleDefinitions/**
+**/policyRuleDefinitionSets/**
+
+# Traducoes geradas pelo retrieve com genero invalido para pt_BR
+# ("Invalid gender 'Neuter' for language PORTUGUESE_BR").
+**/objectTranslations/**
+
+# Blob binario do site que muda a cada retrieve, gerando delta falso.
+**/siteDotComSites/**
+
+# ---------------------------------------------------------------------------
+# Segunda leva: componentes que a promocao dev -> uat -> production tentou
+# deployar e a Salesforce recusou. Medidos no dry-run do delta contra a
+# arnone-prod (29 falhas, 28 delas aqui). Nada e removido de org nenhuma.
+# ---------------------------------------------------------------------------
+
+# FlowDefinition e o tipo legado que fixava a versao ativa do flow. O retrieve
+# ainda o emite, e o deploy falha com "Invalid version number" porque a
+# numeracao e local de cada org (13 falhas). O Flow em si continua versionado.
+**/flowDefinitions/**
+
+# Experience Cloud / Digital Experiences: "Not available for deploy for this
+# organization" onde a feature nao esta habilitada (5 falhas).
+**/networks/**
+**/siteDotComSites/**
+**/experiences/**
+
+# Namespace de pacote ou da plataforma: "Cannot create a new component with
+# the namespace" / permission sets de pacote que referenciam objetos ausentes.
+**/applications/standard__*
+**/permissionsets/sfdcInternalInt__*
+**/permissionsets/force__*
+**/permissionsetgroups/force__*
+
+# Objeto de plataforma sem sufixo valido: "does not resolve to a valid sObject
+# type, fullName must end with __b, __c, __dll, __dlm, __e, __kav, __mdt, __x".
+**/objects/AiGroundingLibFileDef/**
+
+# Configuracoes que o retrieve emite incompletas ou que dependem de feature
+# em pilot / de conector especifico da org.
+**/extlClntAppGlobalOauthSets/**
+**/messagingChannels/**
+**/mktDataConnections/**
+**/notificationTypeConfig/**
+**/appMenus/**

@@ -5,6 +5,7 @@
     <changePasswordTemplate>unfiled$public/CommunityChangePasswordEmailTemplate</changePasswordTemplate>
     <communityRoles/>
     <description>Site da implementação do Chat da Web aprimorado: Chat_Web_ADV.</description>
+    <disablePvtPagesForPwdResetInLWR>false</disablePvtPagesForPwdResetInLWR>
     <disableReputationRecordConversations>true</disableReputationRecordConversations>
     <emailSenderAddress>joao.silva@weenow.com.br</emailSenderAddress>
     <emailSenderName>ESW_Chat_Web_ADV_1784647608387</emailSenderName>
@@ -46,6 +47,7 @@
         <selfRegProfilePageOverrideSetting>Designer</selfRegProfilePageOverrideSetting>
     </networkPageOverrides>
     <picassoSite>ESW_Chat_Web_ADV_17846476083871</picassoSite>
+    <secondaryEmailSenderEnabled>false</secondaryEmailSenderEnabled>
     <selfRegistration>false</selfRegistration>
     <sendWelcomeEmail>false</sendWelcomeEmail>
     <site>ESW_Chat_Web_ADV_1784647608387</site>

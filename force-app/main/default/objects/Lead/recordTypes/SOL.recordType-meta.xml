@@ -269,11 +269,11 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Intervalo inconsistente</fullName>
+            <fullName>Falha técnica</fullName>
             <default>false</default>
         </values>
         <values>
-            <fullName>Falha técnica</fullName>
+            <fullName>Intervalo inconsistente</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -300,6 +300,25 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>SOL_Status_Distribuicao__c</picklist>
+        <values>
+            <fullName>Distribuido</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Erro</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fallback</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendente</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>SOL_Status_Procuracao__c</picklist>
         <values>
             <fullName>Não aplicável</fullName>
@@ -311,6 +330,21 @@
         </values>
         <values>
             <fullName>Solicitada</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SOL_Status_Reatribuicao__c</picklist>
+        <values>
+            <fullName>Em acompanhamento</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reatribuido</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sem outro vendedor</fullName>
             <default>false</default>
         </values>
     </picklistValues>

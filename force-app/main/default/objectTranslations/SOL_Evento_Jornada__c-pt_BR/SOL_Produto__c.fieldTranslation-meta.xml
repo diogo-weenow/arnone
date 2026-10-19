@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Produto --></label>
+    <name>SOL_Produto__c</name>
+    <picklistValues>
+        <masterLabel>ART 360</masterLabel>
+        <translation><!-- ART 360 --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Recuperação Tributária</masterLabel>
+        <translation><!-- Recuperação Tributária --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Motivo_Ultima_Reatribuicao__c</fullName>
-    <description>Motivo registrado na última reatribuição automática deste Lead (só Record Type SOL). Ex.: "Sem contato após 3 tentativas" ou, quando não havia outro vendedor ativo, o registro dessa condição. Escrito apenas pelo serviço SOLDistribuicaoService. CLICKUP-9400.</description>
+    <description>Motivo registrado na última reatribuição automática deste Lead (só Record Type SOL). Ex.: &quot;Sem contato após 3 tentativas&quot; ou, quando não havia outro vendedor ativo, o registro dessa condição. Escrito apenas pelo serviço SOLDistribuicaoService. CLICKUP-9400.</description>
+    <externalId>false</externalId>
     <label>Motivo da última reatribuição SOL</label>
     <length>255</length>
     <required>false</required>
