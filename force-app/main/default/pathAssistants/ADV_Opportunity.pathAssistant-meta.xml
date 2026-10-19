@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathAssistant xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <entityName>Opportunity</entityName>
+    <fieldName>StageName</fieldName>
+    <masterLabel>Arnone Advogados</masterLabel>
+    <pathAssistantSteps>
+        <fieldNames>ADV_Motivo_Perda__c</fieldNames>
+        <fieldNames>ADV_Detalhe_Perda__c</fieldNames>
+        <info>Informe o motivo da perda. Se for Outros, descreva no Detalhe da perda.</info>
+        <picklistValueName>Perdido</picklistValueName>
+    </pathAssistantSteps>
+    <recordTypeName>ADV</recordTypeName>
+</PathAssistant>

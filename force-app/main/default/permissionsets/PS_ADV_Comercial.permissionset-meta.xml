@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Campos exclusivos da BU Arnone Advogados (prefixo ADV_). Complementa o PS_Comercial, que tem só o acesso base compartilhado entre as unidades.</description>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Opportunity.ADV_Advogado_Responsavel__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Opportunity.ADV_Area_Juridica__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Opportunity.ADV_Detalhe_Perda__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Opportunity.ADV_Motivo_Perda__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Opportunity.ADV_Origem_Proposta__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Arnone Advogados — Comercial</label>
+</PermissionSet>

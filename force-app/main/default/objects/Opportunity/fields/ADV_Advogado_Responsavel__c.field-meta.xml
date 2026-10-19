@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ADV_Advogado_Responsavel__c</fullName>
+    <description>Advogado da BU Arnone Advogados responsável pelo caso. Informativo: não é lookup de usuário e não afeta visibilidade. Quando alguém sair do escritório, desative o valor; não exclua. Exigido para sair de Qualificação.</description>
+    <label>Advogado responsável</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Caroline Dagostino</fullName>
+                <default>false</default>
+                <label>Caroline Dagostino</label>
+            </value>
+            <value>
+                <fullName>Renato Chiappim</fullName>
+                <default>false</default>
+                <label>Renato Chiappim</label>
+            </value>
+            <value>
+                <fullName>Bruno Junqueira</fullName>
+                <default>false</default>
+                <label>Bruno Junqueira</label>
+            </value>
+            <value>
+                <fullName>Fernando Pauli</fullName>
+                <default>false</default>
+                <label>Fernando Pauli</label>
+            </value>
+            <value>
+                <fullName>Glaucia Uliana</fullName>
+                <default>false</default>
+                <label>Glaucia Uliana</label>
+            </value>
+            <value>
+                <fullName>Larissa Billa</fullName>
+                <default>false</default>
+                <label>Larissa Billa</label>
+            </value>
+            <value>
+                <fullName>Filipe Gonzaga</fullName>
+                <default>false</default>
+                <label>Filipe Gonzaga</label>
+            </value>
+            <value>
+                <fullName>Lucas Hygino</fullName>
+                <default>false</default>
+                <label>Lucas Hygino</label>
+            </value>
+            <value>
+                <fullName>Gabriela Medeiros</fullName>
+                <default>false</default>
+                <label>Gabriela Medeiros</label>
+            </value>
+            <value>
+                <fullName>Jose Evangelista</fullName>
+                <default>false</default>
+                <label>Jose Evangelista</label>
+            </value>
+            <value>
+                <fullName>Ana Luiza</fullName>
+                <default>false</default>
+                <label>Ana Luiza</label>
+            </value>
+            <value>
+                <fullName>Marcelo Lervonino</fullName>
+                <default>false</default>
+                <label>Marcelo Lervonino</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

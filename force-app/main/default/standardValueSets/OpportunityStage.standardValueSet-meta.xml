@@ -32,6 +32,15 @@
         <won>false</won>
     </standardValue>
     <standardValue>
+        <fullName>Reunião Realizada</fullName>
+        <default>false</default>
+        <label>Reunião Realizada</label>
+        <closed>false</closed>
+        <forecastCategory>BestCase</forecastCategory>
+        <probability>60</probability>
+        <won>false</won>
+    </standardValue>
+    <standardValue>
         <fullName>Proposta</fullName>
         <default>false</default>
         <description>Proposta/honorários apresentados ao cliente.</description>
@@ -62,6 +71,26 @@
         <won>false</won>
     </standardValue>
     <standardValue>
+        <fullName>Oportunidade Recebida</fullName>
+        <default>false</default>
+        <description>Arnone Advogados: caso recebido, em análise e proposta.</description>
+        <label>Oportunidade Recebida</label>
+        <closed>false</closed>
+        <forecastCategory>Pipeline</forecastCategory>
+        <probability>30</probability>
+        <won>false</won>
+    </standardValue>
+    <standardValue>
+        <fullName>Aguardando Assinatura</fullName>
+        <default>false</default>
+        <description>Arnone Advogados: proposta aceita, aguardando assinatura do contrato.</description>
+        <label>Aguardando Assinatura</label>
+        <closed>false</closed>
+        <forecastCategory>Forecast</forecastCategory>
+        <probability>80</probability>
+        <won>false</won>
+    </standardValue>
+    <standardValue>
         <fullName>Ganho</fullName>
         <default>false</default>
         <description>Contrato assinado — oportunidade ganha.</description>
@@ -79,6 +108,15 @@
         <closed>true</closed>
         <forecastCategory>Omitted</forecastCategory>
         <probability>0</probability>
+        <won>false</won>
+    </standardValue>
+    <standardValue>
+        <fullName>Aguardando Resposta</fullName>
+        <default>false</default>
+        <label>Aguardando Resposta</label>
+        <closed>false</closed>
+        <forecastCategory>Pipeline</forecastCategory>
+        <probability>80</probability>
         <won>false</won>
     </standardValue>
     <standardValue>

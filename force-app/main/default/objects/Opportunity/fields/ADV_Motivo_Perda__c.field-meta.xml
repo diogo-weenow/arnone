@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ADV_Motivo_Perda__c</fullName>
+    <description>Por que o caso da BU Arnone Advogados não foi fechado, em lista padronizada para o relatório de funil. Obrigatório ao levar a Oportunidade para Perdido e vazio quando ela é ganha.</description>
+    <label>Motivo da perda (ADV)</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Falta de Retorno</fullName>
+                <default>false</default>
+                <label>Falta de Retorno</label>
+            </value>
+            <value>
+                <fullName>Sem Interesse</fullName>
+                <default>false</default>
+                <label>Sem Interesse</label>
+            </value>
+            <value>
+                <fullName>Desistência</fullName>
+                <default>false</default>
+                <label>Desistência</label>
+            </value>
+            <value>
+                <fullName>Honorários (Custo)</fullName>
+                <default>false</default>
+                <label>Honorários (Custo)</label>
+            </value>
+            <value>
+                <fullName>Sem Fit</fullName>
+                <default>false</default>
+                <label>Sem Fit</label>
+            </value>
+            <value>
+                <fullName>Outros</fullName>
+                <default>false</default>
+                <label>Outros</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

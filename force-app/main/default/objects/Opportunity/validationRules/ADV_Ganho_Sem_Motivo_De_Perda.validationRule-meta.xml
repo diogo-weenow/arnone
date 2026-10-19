@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ADV_Ganho_Sem_Motivo_De_Perda</fullName>
+    <active>true</active>
+    <description>Oportunidade ADV ganha não pode carregar motivo de perda.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;ADV&apos;,
+  ISPICKVAL(StageName, &apos;Ganho&apos;),
+  NOT(ISPICKVAL(ADV_Motivo_Perda__c, &apos;&apos;))
+)</errorConditionFormula>
+    <errorMessage>Esta Oportunidade está sendo fechada como Ganho: limpe o motivo da perda antes de salvar.</errorMessage>
+</ValidationRule>
