@@ -13,6 +13,7 @@
         <type>HelpResponse</type>
     </automatedResponses>
     <isEstimatedWaitTimeEnabled>false</isEstimatedWaitTimeEnabled>
+    <isFeedbackEnabled>false</isFeedbackEnabled>
     <isQueuePositionEnabled>false</isQueuePositionEnabled>
     <isSynchronousChatEnabled>false</isSynchronousChatEnabled>
     <isVoiceModeEnabled>false</isVoiceModeEnabled>

@@ -4,8 +4,6 @@
     <description>Produto SOL do registro no instante da ocorrência: copiado de Lead.SOL_Produto_Interesse__c ou de Opportunity.SOL_Produto_Negocio__c. Fica CONGELADO no evento — se o produto do registro mudar depois, o relatório continua contando a ocorrência sob o produto que ela realmente teve. Pode ficar vazio quando o Lead ainda não tinha produto definido na captação. CLICKUP-9438.</description>
     <label>Produto</label>
     <required>false</required>
-    <trackFeedHistory>false</trackFeedHistory>
-    <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
     <type>Picklist</type>
     <valueSet>

@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Canal_Contato__c</fullName>
-    <description>Canal da tarefa de contato da cadência Arnone Soluções. Classificador ESTRUTURADO, gravado só pelas automações SOL — nunca o Subject, que é editável pelo vendedor. Combinado com SOL_Tipo_Tarefa__c = "Contato", SOL_Ciclo_Contato__c e SOL_Dia_Cadencia__c forma a chave lógica (Lead, ciclo, canal, dia) que garante no máximo uma tarefa por dia ativo e deixa os três canais coexistirem no mesmo dia. Os três valores são criados por SOLCadenciaContatoService e reutilizam este mesmo campo em vez de flags soltas por canal: "Ligação" (CLICKUP-9434), "E-mail" (CLICKUP-9435) e "WhatsApp" (CLICKUP-9436). "WhatsApp" é SOMENTE o nome e o classificador técnico da Task: não há envio de mensagem nem integração de mensageria — o vendedor envia por fora e registra o desfecho em SOL_Resultado_Envio__c. Vazio nas tarefas de contato anteriores ao CLICKUP-9434 e nas tarefas manuais.</description>
+    <description>Canal da tarefa de contato da cadência Arnone Soluções. Classificador ESTRUTURADO, gravado só pelas automações SOL — nunca o Subject, que é editável pelo vendedor. Combinado com SOL_Tipo_Tarefa__c = &quot;Contato&quot;, SOL_Ciclo_Contato__c e SOL_Dia_Cadencia__c forma a chave lógica (Lead, ciclo, canal, dia) que garante no máximo uma tarefa por dia ativo e deixa os três canais coexistirem no mesmo dia. Os três valores são criados por SOLCadenciaContatoService e reutilizam este mesmo campo em vez de flags soltas por canal: &quot;Ligação&quot; (CLICKUP-9434), &quot;E-mail&quot; (CLICKUP-9435) e &quot;WhatsApp&quot; (CLICKUP-9436). &quot;WhatsApp&quot; é SOMENTE o nome e o classificador técnico da Task: não há envio de mensagem nem integração de mensageria — o vendedor envia por fora e registra o desfecho em SOL_Resultado_Envio__c. Vazio nas tarefas de contato anteriores ao CLICKUP-9434 e nas tarefas manuais.</description>
     <label>Canal do contato SOL</label>
     <required>false</required>
-    <trackFeedHistory>false</trackFeedHistory>
-    <trackHistory>false</trackHistory>
     <type>Picklist</type>
     <valueSet>
         <restricted>true</restricted>

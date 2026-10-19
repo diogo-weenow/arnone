@@ -18,7 +18,7 @@
     </actionCalls>
     <apiVersion>66.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
-    <description>CLICKUP-9401 — Card 07A. Quando um Lead da Arnone Soluções (Recuperação Tributária ou ART 360, não convertido e sem opt-out) tem o Status ALTERADO nesta atualização para "Reunião Agendada - SQL", aciona SOLReuniaoComercialInvocable para criar UMA Task "Realizar reunião comercial" (vencimento 7 dias úteis, Business Hours). A fórmula exige ISCHANGED(Status): só dispara na transição real do Status. Não altera campos aqui. Não modifica SOL_Reuniao_Agendada_SQL nem SOL_Atualizar_Data_Compromisso. Idempotência e prazo ficam no Apex (bulk, FOR UPDATE, atômico).</description>
+    <description>CLICKUP-9401 — Card 07A. Quando um Lead da Arnone Soluções (Recuperação Tributária ou ART 360, não convertido e sem opt-out) tem o Status ALTERADO nesta atualização para &quot;Reunião Agendada - SQL&quot;, aciona SOLReuniaoComercialInvocable para criar UMA Task &quot;Realizar reunião comercial&quot; (vencimento 7 dias úteis, Business Hours). A fórmula exige ISCHANGED(Status): só dispara na transição real do Status. Não altera campos aqui. Não modifica SOL_Reuniao_Agendada_SQL nem SOL_Atualizar_Data_Compromisso. Idempotência e prazo ficam no Apex (bulk, FOR UPDATE, atômico).</description>
     <environments>Default</environments>
     <interviewLabel>SOL_Tarefa_Reuniao_Comercial {!$Flow.CurrentDateTime}</interviewLabel>
     <label>SOL_Tarefa_Reuniao_Comercial</label>
@@ -29,7 +29,6 @@
         <connector>
             <targetReference>Chamar_Criar_Tarefa_Reuniao</targetReference>
         </connector>
-        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
         <filterFormula>AND(
   {!$Record.RecordType.DeveloperName} = &apos;SOL&apos;,
   OR(

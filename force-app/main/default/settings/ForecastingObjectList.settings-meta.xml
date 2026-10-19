@@ -2,6 +2,14 @@
 <ForecastingObjectListSettings xmlns="http://soap.sforce.com/2006/04/metadata">
     <forecastingTypeObjectListSettings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.CLOSE_DATE</field>
             <label>Close Date</label>
         </forecastingObjectListLabelMappings>
@@ -38,8 +46,20 @@
             <label>Probability (%)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028Fju</field>
             <label>Protocolo de contato criado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_QUARTER</field>
@@ -66,8 +86,24 @@
             <label>Entrada em Negociação</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQZ</field>
             <label>Formulário de saúde em atraso</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>CriticalInsights</field>
+            <label>__MISSING LABEL__ PropertyFile - val CriticalInsights not found in section ForecastingOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQX</field>
@@ -78,8 +114,24 @@
             <label>Opportunity Name</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQY</field>
             <label>Formulário de saúde enviado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -138,8 +190,20 @@
             <label>Produto de negócio</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>SalesMethodology</field>
+            <label>__MISSING LABEL__ PropertyFile - val SalesMethodology not found in section ForecastingOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>DESCRIPTION</field>
             <label>Description</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>__MISSING LABEL__ PropertyFile - val ActivityHeatmap not found in section ForecastingOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.QUANTITY</field>
@@ -158,8 +222,16 @@
             <label>Fiscal Year</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>CORE.USERS.FIRST_NAME</field>
             <label>Owner First Name</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>Contacts</field>
+            <label>__MISSING LABEL__ PropertyFile - val Contacts not found in section ForecastingOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000029t2X</field>
@@ -178,12 +250,28 @@
             <label>Created By Alias</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.AMOUNT</field>
             <label>Amount</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mZ</field>
             <label>Agência</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mc</field>
@@ -222,8 +310,16 @@
             <label>Complemento</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mf</field>
             <label>Conta</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mk</field>
@@ -286,6 +382,10 @@
             <label>Synced Quote</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <label>Important</label>
         </forecastingObjectListLabelMappings>
@@ -324,6 +424,10 @@
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FVN</field>
             <label>Entrada em Pré-Matrícula</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>AgentActivity</field>
+            <label>__MISSING LABEL__ PropertyFile - val AgentActivity not found in section ForecastingOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nas00000IfTF1</field>
@@ -378,8 +482,16 @@
             <label>Push Count</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_PERIOD</field>
             <label>Fiscal Period</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>FULL_NAME</field>
@@ -474,11 +586,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -487,26 +615,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -524,11 +659,24 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </forecastingObjectListUnselectedSettings>
         <forecastingTypeDeveloperName>OpportunityRevenue</forecastingTypeDeveloperName>
     </forecastingTypeObjectListSettings>
     <forecastingTypeObjectListSettings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.CLOSE_DATE</field>
             <label>Close Date</label>
         </forecastingObjectListLabelMappings>
@@ -565,8 +713,20 @@
             <label>Probability (%)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028Fju</field>
             <label>Protocolo de contato criado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>FORECASTEDMFJVALUE</field>
@@ -593,8 +753,24 @@
             <label>Entrada em Negociação</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>CriticalInsights</field>
+            <label>__MISSING LABEL__ PropertyFile - val CriticalInsights not found in section ForecastingOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQZ</field>
             <label>Formulário de saúde em atraso</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQX</field>
@@ -605,8 +781,24 @@
             <label>Opportunity Name</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQY</field>
             <label>Formulário de saúde enviado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -665,8 +857,20 @@
             <label>Produto de negócio</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>SalesMethodology</field>
+            <label>__MISSING LABEL__ PropertyFile - val SalesMethodology not found in section ForecastingOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>DESCRIPTION</field>
             <label>Description</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>__MISSING LABEL__ PropertyFile - val ActivityHeatmap not found in section ForecastingOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.QUANTITY</field>
@@ -683,6 +887,14 @@
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_YEAR</field>
             <label>Fiscal Year</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>Contacts</field>
+            <label>__MISSING LABEL__ PropertyFile - val Contacts not found in section ForecastingOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>CORE.USERS.FIRST_NAME</field>
@@ -705,12 +917,28 @@
             <label>Created By Alias</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.AMOUNT</field>
             <label>Amount</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mZ</field>
             <label>Agência</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mc</field>
@@ -749,8 +977,16 @@
             <label>Complemento</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mf</field>
             <label>Conta</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mk</field>
@@ -813,6 +1049,10 @@
             <label>Synced Quote</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <label>Important</label>
         </forecastingObjectListLabelMappings>
@@ -847,6 +1087,10 @@
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FVP</field>
             <label>Setor de aprovados</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>AgentActivity</field>
+            <label>__MISSING LABEL__ PropertyFile - val AgentActivity not found in section ForecastingOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FVN</field>
@@ -905,8 +1149,16 @@
             <label>Push Count</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_PERIOD</field>
             <label>Fiscal Period</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>FULL_NAME</field>
@@ -954,6 +1206,11 @@
             <field>OPPORTUNITY.PROBABILITY</field>
             <field>FORECAST_CATEGORY</field>
             <field>FULL_NAME</field>
+            <field>AgentActivity</field>
+            <field>CriticalInsights</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>Contacts</field>
         </forecastingObjectListSelectedSettings>
         <forecastingObjectListUnselectedSettings>
             <field>CONTRACT.CONTRACT_NUMBER</field>
@@ -1001,11 +1258,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -1014,26 +1287,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -1056,6 +1336,14 @@
     </forecastingTypeObjectListSettings>
     <forecastingTypeObjectListSettings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.CLOSE_DATE</field>
             <label>Close Date</label>
         </forecastingObjectListLabelMappings>
@@ -1092,8 +1380,20 @@
             <label>Probability (%)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028Fju</field>
             <label>Protocolo de contato criado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_QUARTER</field>
@@ -1120,8 +1420,24 @@
             <label>Entrada em Negociação</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQZ</field>
             <label>Formulário de saúde em atraso</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>CriticalInsights</field>
+            <label>__MISSING LABEL__ PropertyFile - val CriticalInsights not found in section ForecastingOppQtyListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQX</field>
@@ -1132,8 +1448,24 @@
             <label>Opportunity Name</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQY</field>
             <label>Formulário de saúde enviado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -1192,8 +1524,20 @@
             <label>Produto de negócio</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>SalesMethodology</field>
+            <label>__MISSING LABEL__ PropertyFile - val SalesMethodology not found in section ForecastingOppQtyListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>DESCRIPTION</field>
             <label>Description</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>__MISSING LABEL__ PropertyFile - val ActivityHeatmap not found in section ForecastingOppQtyListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.QUANTITY</field>
@@ -1212,8 +1556,16 @@
             <label>Fiscal Year</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>CORE.USERS.FIRST_NAME</field>
             <label>Owner First Name</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>Contacts</field>
+            <label>__MISSING LABEL__ PropertyFile - val Contacts not found in section ForecastingOppQtyListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000029t2X</field>
@@ -1232,12 +1584,28 @@
             <label>Created By Alias</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.AMOUNT</field>
             <label>Amount</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mZ</field>
             <label>Agência</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mc</field>
@@ -1276,8 +1644,16 @@
             <label>Complemento</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mf</field>
             <label>Conta</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mk</field>
@@ -1340,6 +1716,10 @@
             <label>Synced Quote</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <label>Important</label>
         </forecastingObjectListLabelMappings>
@@ -1378,6 +1758,10 @@
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FVN</field>
             <label>Entrada em Pré-Matrícula</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>AgentActivity</field>
+            <label>__MISSING LABEL__ PropertyFile - val AgentActivity not found in section ForecastingOppQtyListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nas00000IfTF1</field>
@@ -1432,8 +1816,16 @@
             <label>Push Count</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_PERIOD</field>
             <label>Fiscal Period</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>FULL_NAME</field>
@@ -1528,11 +1920,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -1541,26 +1949,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -1578,11 +1993,24 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </forecastingObjectListUnselectedSettings>
         <forecastingTypeDeveloperName>OpportunityQuantity</forecastingTypeDeveloperName>
     </forecastingTypeObjectListSettings>
     <forecastingTypeObjectListSettings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.CLOSE_DATE</field>
             <label>Close Date</label>
         </forecastingObjectListLabelMappings>
@@ -1619,8 +2047,20 @@
             <label>Probability (%)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028Fju</field>
             <label>Protocolo de contato criado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_QUARTER</field>
@@ -1647,8 +2087,24 @@
             <label>Entrada em Negociação</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQZ</field>
             <label>Formulário de saúde em atraso</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>CriticalInsights</field>
+            <label>__MISSING LABEL__ PropertyFile - val CriticalInsights not found in section ForecastingProductFamilyOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQX</field>
@@ -1659,8 +2115,24 @@
             <label>Opportunity Name</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQY</field>
             <label>Formulário de saúde enviado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -1719,8 +2191,20 @@
             <label>Produto de negócio</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>SalesMethodology</field>
+            <label>__MISSING LABEL__ PropertyFile - val SalesMethodology not found in section ForecastingProductFamilyOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>DESCRIPTION</field>
             <label>Description</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>__MISSING LABEL__ PropertyFile - val ActivityHeatmap not found in section ForecastingProductFamilyOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.QUANTITY</field>
@@ -1739,8 +2223,16 @@
             <label>Fiscal Year</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>CORE.USERS.FIRST_NAME</field>
             <label>Owner First Name</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>Contacts</field>
+            <label>__MISSING LABEL__ PropertyFile - val Contacts not found in section ForecastingProductFamilyOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000029t2X</field>
@@ -1759,12 +2251,28 @@
             <label>Created By Alias</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.AMOUNT</field>
             <label>Amount</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mZ</field>
             <label>Agência</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mc</field>
@@ -1803,8 +2311,16 @@
             <label>Complemento</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mf</field>
             <label>Conta</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mk</field>
@@ -1871,6 +2387,10 @@
             <label>Synced Quote</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <label>Important</label>
         </forecastingObjectListLabelMappings>
@@ -1909,6 +2429,10 @@
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FVN</field>
             <label>Entrada em Pré-Matrícula</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>AgentActivity</field>
+            <label>__MISSING LABEL__ PropertyFile - val AgentActivity not found in section ForecastingProductFamilyOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nas00000IfTF1</field>
@@ -1963,8 +2487,16 @@
             <label>Push Count</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_PERIOD</field>
             <label>Fiscal Period</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>FULL_NAME</field>
@@ -2060,11 +2592,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -2073,26 +2621,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -2110,11 +2665,24 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </forecastingObjectListUnselectedSettings>
         <forecastingTypeDeveloperName>OpportunityLineItemRevenue</forecastingTypeDeveloperName>
     </forecastingTypeObjectListSettings>
     <forecastingTypeObjectListSettings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.CLOSE_DATE</field>
             <label>Close Date</label>
         </forecastingObjectListLabelMappings>
@@ -2151,8 +2719,20 @@
             <label>Probability (%)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028Fju</field>
             <label>Protocolo de contato criado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_QUARTER</field>
@@ -2179,8 +2759,24 @@
             <label>Entrada em Negociação</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQZ</field>
             <label>Formulário de saúde em atraso</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>CriticalInsights</field>
+            <label>__MISSING LABEL__ PropertyFile - val CriticalInsights not found in section ForecastingProductFamilyOppQtyListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQX</field>
@@ -2191,8 +2787,24 @@
             <label>Opportunity Name</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQY</field>
             <label>Formulário de saúde enviado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -2251,8 +2863,20 @@
             <label>Produto de negócio</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>SalesMethodology</field>
+            <label>__MISSING LABEL__ PropertyFile - val SalesMethodology not found in section ForecastingProductFamilyOppQtyListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>DESCRIPTION</field>
             <label>Description</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>__MISSING LABEL__ PropertyFile - val ActivityHeatmap not found in section ForecastingProductFamilyOppQtyListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.QUANTITY</field>
@@ -2271,8 +2895,16 @@
             <label>Fiscal Year</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>CORE.USERS.FIRST_NAME</field>
             <label>Owner First Name</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>Contacts</field>
+            <label>__MISSING LABEL__ PropertyFile - val Contacts not found in section ForecastingProductFamilyOppQtyListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000029t2X</field>
@@ -2291,12 +2923,28 @@
             <label>Created By Alias</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.AMOUNT</field>
             <label>Amount</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mZ</field>
             <label>Agência</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mc</field>
@@ -2335,8 +2983,16 @@
             <label>Complemento</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mf</field>
             <label>Conta</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mk</field>
@@ -2399,6 +3055,10 @@
             <label>Synced Quote</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <label>Important</label>
         </forecastingObjectListLabelMappings>
@@ -2437,6 +3097,10 @@
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FVN</field>
             <label>Entrada em Pré-Matrícula</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>AgentActivity</field>
+            <label>__MISSING LABEL__ PropertyFile - val AgentActivity not found in section ForecastingProductFamilyOppQtyListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nas00000IfTF1</field>
@@ -2491,8 +3155,16 @@
             <label>Push Count</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_PERIOD</field>
             <label>Fiscal Period</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>FULL_NAME</field>
@@ -2587,11 +3259,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -2600,26 +3288,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -2637,11 +3332,24 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </forecastingObjectListUnselectedSettings>
         <forecastingTypeDeveloperName>OpportunityLineItemQuantity</forecastingTypeDeveloperName>
     </forecastingTypeObjectListSettings>
     <forecastingTypeObjectListSettings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.CLOSE_DATE</field>
             <label>Close Date</label>
         </forecastingObjectListLabelMappings>
@@ -2678,8 +3386,20 @@
             <label>Probability (%)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028Fju</field>
             <label>Protocolo de contato criado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_QUARTER</field>
@@ -2706,8 +3426,24 @@
             <label>Entrada em Negociação</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQZ</field>
             <label>Formulário de saúde em atraso</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>CriticalInsights</field>
+            <label>__MISSING LABEL__ PropertyFile - val CriticalInsights not found in section ForecastingOpportunityRevenueProductDateOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQX</field>
@@ -2718,8 +3454,24 @@
             <label>Opportunity Name</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQY</field>
             <label>Formulário de saúde enviado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -2778,8 +3530,20 @@
             <label>Produto de negócio</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>SalesMethodology</field>
+            <label>__MISSING LABEL__ PropertyFile - val SalesMethodology not found in section ForecastingOpportunityRevenueProductDateOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>DESCRIPTION</field>
             <label>Description</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>__MISSING LABEL__ PropertyFile - val ActivityHeatmap not found in section ForecastingOpportunityRevenueProductDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.QUANTITY</field>
@@ -2798,8 +3562,16 @@
             <label>Fiscal Year</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>CORE.USERS.FIRST_NAME</field>
             <label>Owner First Name</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>Contacts</field>
+            <label>__MISSING LABEL__ PropertyFile - val Contacts not found in section ForecastingOpportunityRevenueProductDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000029t2X</field>
@@ -2818,12 +3590,28 @@
             <label>Created By Alias</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.AMOUNT</field>
             <label>Amount</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mZ</field>
             <label>Agência</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mc</field>
@@ -2862,8 +3650,16 @@
             <label>Complemento</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mf</field>
             <label>Conta</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mk</field>
@@ -2930,6 +3726,10 @@
             <label>Synced Quote</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <label>Important</label>
         </forecastingObjectListLabelMappings>
@@ -2968,6 +3768,10 @@
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FVN</field>
             <label>Entrada em Pré-Matrícula</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>AgentActivity</field>
+            <label>__MISSING LABEL__ PropertyFile - val AgentActivity not found in section ForecastingOpportunityRevenueProductDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nas00000IfTF1</field>
@@ -3022,8 +3826,16 @@
             <label>Push Count</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_PERIOD</field>
             <label>Fiscal Period</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>FULL_NAME</field>
@@ -3119,11 +3931,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -3132,26 +3960,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -3169,11 +4004,24 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </forecastingObjectListUnselectedSettings>
         <forecastingTypeDeveloperName>OpportunityRevenueProductDate</forecastingTypeDeveloperName>
     </forecastingTypeObjectListSettings>
     <forecastingTypeObjectListSettings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.CLOSE_DATE</field>
             <label>Close Date</label>
         </forecastingObjectListLabelMappings>
@@ -3210,8 +4058,20 @@
             <label>Probability (%)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028Fju</field>
             <label>Protocolo de contato criado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_QUARTER</field>
@@ -3238,8 +4098,24 @@
             <label>Entrada em Negociação</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQZ</field>
             <label>Formulário de saúde em atraso</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>CriticalInsights</field>
+            <label>__MISSING LABEL__ PropertyFile - val CriticalInsights not found in section ForecastingOpportunityQuantityProductDateOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQX</field>
@@ -3250,8 +4126,24 @@
             <label>Opportunity Name</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQY</field>
             <label>Formulário de saúde enviado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -3310,8 +4202,20 @@
             <label>Produto de negócio</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>SalesMethodology</field>
+            <label>__MISSING LABEL__ PropertyFile - val SalesMethodology not found in section ForecastingOpportunityQuantityProductDateOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>DESCRIPTION</field>
             <label>Description</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>__MISSING LABEL__ PropertyFile - val ActivityHeatmap not found in section ForecastingOpportunityQuantityProductDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.QUANTITY</field>
@@ -3330,8 +4234,16 @@
             <label>Fiscal Year</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>CORE.USERS.FIRST_NAME</field>
             <label>Owner First Name</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>Contacts</field>
+            <label>__MISSING LABEL__ PropertyFile - val Contacts not found in section ForecastingOpportunityQuantityProductDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000029t2X</field>
@@ -3350,12 +4262,28 @@
             <label>Created By Alias</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.AMOUNT</field>
             <label>Amount</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mZ</field>
             <label>Agência</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mc</field>
@@ -3394,8 +4322,16 @@
             <label>Complemento</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mf</field>
             <label>Conta</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mk</field>
@@ -3458,6 +4394,10 @@
             <label>Synced Quote</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <label>Important</label>
         </forecastingObjectListLabelMappings>
@@ -3496,6 +4436,10 @@
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FVN</field>
             <label>Entrada em Pré-Matrícula</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>AgentActivity</field>
+            <label>__MISSING LABEL__ PropertyFile - val AgentActivity not found in section ForecastingOpportunityQuantityProductDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nas00000IfTF1</field>
@@ -3550,8 +4494,16 @@
             <label>Push Count</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_PERIOD</field>
             <label>Fiscal Period</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>FULL_NAME</field>
@@ -3646,11 +4598,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -3659,26 +4627,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -3696,11 +4671,24 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </forecastingObjectListUnselectedSettings>
         <forecastingTypeDeveloperName>OpportunityQuantityProductDate</forecastingTypeDeveloperName>
     </forecastingTypeObjectListSettings>
     <forecastingTypeObjectListSettings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.CLOSE_DATE</field>
             <label>Close Date</label>
         </forecastingObjectListLabelMappings>
@@ -3737,8 +4725,20 @@
             <label>Probability (%)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028Fju</field>
             <label>Protocolo de contato criado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_QUARTER</field>
@@ -3765,8 +4765,24 @@
             <label>Entrada em Negociação</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQZ</field>
             <label>Formulário de saúde em atraso</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>CriticalInsights</field>
+            <label>__MISSING LABEL__ PropertyFile - val CriticalInsights not found in section ForecastingProductFamilyRevenueProductDateOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQX</field>
@@ -3777,8 +4793,24 @@
             <label>Opportunity Name</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQY</field>
             <label>Formulário de saúde enviado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -3837,8 +4869,20 @@
             <label>Produto de negócio</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>SalesMethodology</field>
+            <label>__MISSING LABEL__ PropertyFile - val SalesMethodology not found in section ForecastingProductFamilyRevenueProductDateOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>DESCRIPTION</field>
             <label>Description</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>__MISSING LABEL__ PropertyFile - val ActivityHeatmap not found in section ForecastingProductFamilyRevenueProductDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.QUANTITY</field>
@@ -3857,8 +4901,16 @@
             <label>Fiscal Year</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>CORE.USERS.FIRST_NAME</field>
             <label>Owner First Name</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>Contacts</field>
+            <label>__MISSING LABEL__ PropertyFile - val Contacts not found in section ForecastingProductFamilyRevenueProductDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000029t2X</field>
@@ -3877,12 +4929,28 @@
             <label>Created By Alias</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.AMOUNT</field>
             <label>Amount</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mZ</field>
             <label>Agência</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mc</field>
@@ -3921,8 +4989,16 @@
             <label>Complemento</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mf</field>
             <label>Conta</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mk</field>
@@ -3989,6 +5065,10 @@
             <label>Synced Quote</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <label>Important</label>
         </forecastingObjectListLabelMappings>
@@ -4027,6 +5107,10 @@
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FVN</field>
             <label>Entrada em Pré-Matrícula</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>AgentActivity</field>
+            <label>__MISSING LABEL__ PropertyFile - val AgentActivity not found in section ForecastingProductFamilyRevenueProductDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nas00000IfTF1</field>
@@ -4081,8 +5165,16 @@
             <label>Push Count</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_PERIOD</field>
             <label>Fiscal Period</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>FULL_NAME</field>
@@ -4178,11 +5270,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -4191,26 +5299,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -4228,11 +5343,24 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </forecastingObjectListUnselectedSettings>
         <forecastingTypeDeveloperName>LineItemRevenueProductDate</forecastingTypeDeveloperName>
     </forecastingTypeObjectListSettings>
     <forecastingTypeObjectListSettings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.CLOSE_DATE</field>
             <label>Close Date</label>
         </forecastingObjectListLabelMappings>
@@ -4269,8 +5397,20 @@
             <label>Probability (%)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028Fju</field>
             <label>Protocolo de contato criado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_QUARTER</field>
@@ -4297,8 +5437,24 @@
             <label>Entrada em Negociação</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQZ</field>
             <label>Formulário de saúde em atraso</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>CriticalInsights</field>
+            <label>__MISSING LABEL__ PropertyFile - val CriticalInsights not found in section ForecastingProductFamilyQuantityProductDateOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQX</field>
@@ -4309,8 +5465,24 @@
             <label>Opportunity Name</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQY</field>
             <label>Formulário de saúde enviado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -4369,8 +5541,20 @@
             <label>Produto de negócio</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>SalesMethodology</field>
+            <label>__MISSING LABEL__ PropertyFile - val SalesMethodology not found in section ForecastingProductFamilyQuantityProductDateOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>DESCRIPTION</field>
             <label>Description</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>__MISSING LABEL__ PropertyFile - val ActivityHeatmap not found in section ForecastingProductFamilyQuantityProductDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.QUANTITY</field>
@@ -4389,8 +5573,16 @@
             <label>Fiscal Year</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>CORE.USERS.FIRST_NAME</field>
             <label>Owner First Name</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>Contacts</field>
+            <label>__MISSING LABEL__ PropertyFile - val Contacts not found in section ForecastingProductFamilyQuantityProductDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000029t2X</field>
@@ -4409,12 +5601,28 @@
             <label>Created By Alias</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.AMOUNT</field>
             <label>Amount</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mZ</field>
             <label>Agência</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mc</field>
@@ -4453,8 +5661,16 @@
             <label>Complemento</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mf</field>
             <label>Conta</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mk</field>
@@ -4517,6 +5733,10 @@
             <label>Synced Quote</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <label>Important</label>
         </forecastingObjectListLabelMappings>
@@ -4555,6 +5775,10 @@
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FVN</field>
             <label>Entrada em Pré-Matrícula</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>AgentActivity</field>
+            <label>__MISSING LABEL__ PropertyFile - val AgentActivity not found in section ForecastingProductFamilyQuantityProductDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nas00000IfTF1</field>
@@ -4609,8 +5833,16 @@
             <label>Push Count</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_PERIOD</field>
             <label>Fiscal Period</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>FULL_NAME</field>
@@ -4705,11 +5937,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -4718,26 +5966,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -4755,11 +6010,24 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </forecastingObjectListUnselectedSettings>
         <forecastingTypeDeveloperName>LineItemQuantityProductDate</forecastingTypeDeveloperName>
     </forecastingTypeObjectListSettings>
     <forecastingTypeObjectListSettings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.CLOSE_DATE</field>
             <label>Close Date</label>
         </forecastingObjectListLabelMappings>
@@ -4796,8 +6064,20 @@
             <label>Probability (%)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028Fju</field>
             <label>Protocolo de contato criado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_QUARTER</field>
@@ -4824,8 +6104,24 @@
             <label>Entrada em Negociação</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQZ</field>
             <label>Formulário de saúde em atraso</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>CriticalInsights</field>
+            <label>__MISSING LABEL__ PropertyFile - val CriticalInsights not found in section ForecastingOpportunityRevenueScheduleDateOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQX</field>
@@ -4836,8 +6132,24 @@
             <label>Opportunity Name</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQY</field>
             <label>Formulário de saúde enviado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -4896,8 +6208,20 @@
             <label>Produto de negócio</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>SalesMethodology</field>
+            <label>__MISSING LABEL__ PropertyFile - val SalesMethodology not found in section ForecastingOpportunityRevenueScheduleDateOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>DESCRIPTION</field>
             <label>Description</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>__MISSING LABEL__ PropertyFile - val ActivityHeatmap not found in section ForecastingOpportunityRevenueScheduleDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.QUANTITY</field>
@@ -4916,8 +6240,16 @@
             <label>Fiscal Year</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>CORE.USERS.FIRST_NAME</field>
             <label>Owner First Name</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>Contacts</field>
+            <label>__MISSING LABEL__ PropertyFile - val Contacts not found in section ForecastingOpportunityRevenueScheduleDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000029t2X</field>
@@ -4936,12 +6268,28 @@
             <label>Created By Alias</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.AMOUNT</field>
             <label>Amount</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mZ</field>
             <label>Agência</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mc</field>
@@ -4980,8 +6328,16 @@
             <label>Complemento</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mf</field>
             <label>Conta</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mk</field>
@@ -5048,6 +6404,10 @@
             <label>Synced Quote</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <label>Important</label>
         </forecastingObjectListLabelMappings>
@@ -5086,6 +6446,10 @@
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FVN</field>
             <label>Entrada em Pré-Matrícula</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>AgentActivity</field>
+            <label>__MISSING LABEL__ PropertyFile - val AgentActivity not found in section ForecastingOpportunityRevenueScheduleDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nas00000IfTF1</field>
@@ -5140,8 +6504,16 @@
             <label>Push Count</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_PERIOD</field>
             <label>Fiscal Period</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>FULL_NAME</field>
@@ -5237,11 +6609,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -5250,26 +6638,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -5287,11 +6682,24 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </forecastingObjectListUnselectedSettings>
         <forecastingTypeDeveloperName>OpportunityRevenueScheduleDate</forecastingTypeDeveloperName>
     </forecastingTypeObjectListSettings>
     <forecastingTypeObjectListSettings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.CLOSE_DATE</field>
             <label>Close Date</label>
         </forecastingObjectListLabelMappings>
@@ -5328,8 +6736,20 @@
             <label>Probability (%)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028Fju</field>
             <label>Protocolo de contato criado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_QUARTER</field>
@@ -5356,8 +6776,24 @@
             <label>Entrada em Negociação</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQZ</field>
             <label>Formulário de saúde em atraso</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>CriticalInsights</field>
+            <label>__MISSING LABEL__ PropertyFile - val CriticalInsights not found in section ForecastingOpportunityQuantityScheduleDateOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQX</field>
@@ -5368,8 +6804,24 @@
             <label>Opportunity Name</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQY</field>
             <label>Formulário de saúde enviado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -5428,8 +6880,20 @@
             <label>Produto de negócio</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>SalesMethodology</field>
+            <label>__MISSING LABEL__ PropertyFile - val SalesMethodology not found in section ForecastingOpportunityQuantityScheduleDateOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>DESCRIPTION</field>
             <label>Description</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>__MISSING LABEL__ PropertyFile - val ActivityHeatmap not found in section ForecastingOpportunityQuantityScheduleDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.QUANTITY</field>
@@ -5448,8 +6912,16 @@
             <label>Fiscal Year</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>CORE.USERS.FIRST_NAME</field>
             <label>Owner First Name</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>Contacts</field>
+            <label>__MISSING LABEL__ PropertyFile - val Contacts not found in section ForecastingOpportunityQuantityScheduleDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000029t2X</field>
@@ -5468,12 +6940,28 @@
             <label>Created By Alias</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.AMOUNT</field>
             <label>Amount</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mZ</field>
             <label>Agência</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mc</field>
@@ -5512,8 +7000,16 @@
             <label>Complemento</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mf</field>
             <label>Conta</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mk</field>
@@ -5576,6 +7072,10 @@
             <label>Synced Quote</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <label>Important</label>
         </forecastingObjectListLabelMappings>
@@ -5614,6 +7114,10 @@
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FVN</field>
             <label>Entrada em Pré-Matrícula</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>AgentActivity</field>
+            <label>__MISSING LABEL__ PropertyFile - val AgentActivity not found in section ForecastingOpportunityQuantityScheduleDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nas00000IfTF1</field>
@@ -5668,8 +7172,16 @@
             <label>Push Count</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_PERIOD</field>
             <label>Fiscal Period</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>FULL_NAME</field>
@@ -5764,11 +7276,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -5777,26 +7305,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -5814,10 +7349,23 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </forecastingObjectListUnselectedSettings>
         <forecastingTypeDeveloperName>OpportunityQuantityScheduleDate</forecastingTypeDeveloperName>
     </forecastingTypeObjectListSettings>
     <forecastingTypeObjectListSettings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.CLOSE_DATE</field>
             <label>Close Date</label>
@@ -5855,8 +7403,20 @@
             <label>Probability (%)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028Fju</field>
             <label>Protocolo de contato criado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_QUARTER</field>
@@ -5883,8 +7443,24 @@
             <label>Entrada em Negociação</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQZ</field>
             <label>Formulário de saúde em atraso</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>CriticalInsights</field>
+            <label>__MISSING LABEL__ PropertyFile - val CriticalInsights not found in section ForecastingProductFamilyRevenueScheduleDateOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQX</field>
@@ -5895,8 +7471,24 @@
             <label>Opportunity Name</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQY</field>
             <label>Formulário de saúde enviado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -5955,8 +7547,20 @@
             <label>Produto de negócio</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>SalesMethodology</field>
+            <label>__MISSING LABEL__ PropertyFile - val SalesMethodology not found in section ForecastingProductFamilyRevenueScheduleDateOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>DESCRIPTION</field>
             <label>Description</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>__MISSING LABEL__ PropertyFile - val ActivityHeatmap not found in section ForecastingProductFamilyRevenueScheduleDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.QUANTITY</field>
@@ -5975,8 +7579,16 @@
             <label>Fiscal Year</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>CORE.USERS.FIRST_NAME</field>
             <label>Owner First Name</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>Contacts</field>
+            <label>__MISSING LABEL__ PropertyFile - val Contacts not found in section ForecastingProductFamilyRevenueScheduleDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000029t2X</field>
@@ -5995,12 +7607,28 @@
             <label>Created By Alias</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.AMOUNT</field>
             <label>Amount</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mZ</field>
             <label>Agência</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mc</field>
@@ -6039,8 +7667,16 @@
             <label>Complemento</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mf</field>
             <label>Conta</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mk</field>
@@ -6107,6 +7743,10 @@
             <label>Synced Quote</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <label>Important</label>
         </forecastingObjectListLabelMappings>
@@ -6145,6 +7785,10 @@
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FVN</field>
             <label>Entrada em Pré-Matrícula</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>AgentActivity</field>
+            <label>__MISSING LABEL__ PropertyFile - val AgentActivity not found in section ForecastingProductFamilyRevenueScheduleDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nas00000IfTF1</field>
@@ -6199,8 +7843,16 @@
             <label>Push Count</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_PERIOD</field>
             <label>Fiscal Period</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>FULL_NAME</field>
@@ -6296,11 +7948,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -6309,26 +7977,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -6346,10 +8021,23 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </forecastingObjectListUnselectedSettings>
         <forecastingTypeDeveloperName>LineItemRevenueScheduleDate</forecastingTypeDeveloperName>
     </forecastingTypeObjectListSettings>
     <forecastingTypeObjectListSettings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.CLOSE_DATE</field>
             <label>Close Date</label>
@@ -6387,8 +8075,20 @@
             <label>Probability (%)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028Fju</field>
             <label>Protocolo de contato criado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_QUARTER</field>
@@ -6415,8 +8115,24 @@
             <label>Entrada em Negociação</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQZ</field>
             <label>Formulário de saúde em atraso</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>CriticalInsights</field>
+            <label>__MISSING LABEL__ PropertyFile - val CriticalInsights not found in section ForecastingProductFamilyQuantityScheduleDateOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQX</field>
@@ -6427,8 +8143,24 @@
             <label>Opportunity Name</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQY</field>
             <label>Formulário de saúde enviado</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -6487,8 +8219,20 @@
             <label>Produto de negócio</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>SalesMethodology</field>
+            <label>__MISSING LABEL__ PropertyFile - val SalesMethodology not found in section ForecastingProductFamilyQuantityScheduleDateOppListFilter</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>DESCRIPTION</field>
             <label>Description</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>__MISSING LABEL__ PropertyFile - val ActivityHeatmap not found in section ForecastingProductFamilyQuantityScheduleDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.QUANTITY</field>
@@ -6507,8 +8251,16 @@
             <label>Fiscal Year</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>CORE.USERS.FIRST_NAME</field>
             <label>Owner First Name</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>Contacts</field>
+            <label>__MISSING LABEL__ PropertyFile - val Contacts not found in section ForecastingProductFamilyQuantityScheduleDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000029t2X</field>
@@ -6527,12 +8279,28 @@
             <label>Created By Alias</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.AMOUNT</field>
             <label>Amount</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mZ</field>
             <label>Agência</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mc</field>
@@ -6571,8 +8339,16 @@
             <label>Complemento</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mf</field>
             <label>Conta</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nbe00000289mk</field>
@@ -6635,6 +8411,10 @@
             <label>Synced Quote</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.ISPRIORITYRECORD</field>
             <label>Important</label>
         </forecastingObjectListLabelMappings>
@@ -6673,6 +8453,10 @@
         <forecastingObjectListLabelMappings>
             <field>00Nbe0000028FVN</field>
             <label>Entrada em Pré-Matrícula</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>AgentActivity</field>
+            <label>__MISSING LABEL__ PropertyFile - val AgentActivity not found in section ForecastingProductFamilyQuantityScheduleDateOppListFilter</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>00Nas00000IfTF1</field>
@@ -6727,8 +8511,16 @@
             <label>Push Count</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
             <field>OPPORTUNITY.FISCAL_PERIOD</field>
             <label>Fiscal Period</label>
+        </forecastingObjectListLabelMappings>
+        <forecastingObjectListLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
         </forecastingObjectListLabelMappings>
         <forecastingObjectListLabelMappings>
             <field>FULL_NAME</field>
@@ -6823,11 +8615,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -6836,26 +8644,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -6873,6 +8688,11 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </forecastingObjectListUnselectedSettings>
         <forecastingTypeDeveloperName>LineItemQuantityScheduleDate</forecastingTypeDeveloperName>
     </forecastingTypeObjectListSettings>
