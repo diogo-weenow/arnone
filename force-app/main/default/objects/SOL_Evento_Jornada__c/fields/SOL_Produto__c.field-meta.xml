@@ -22,6 +22,11 @@
                 <default>false</default>
                 <label>ART 360</label>
             </value>
+            <value>
+                <fullName>Revisão trabalhista</fullName>
+                <default>false</default>
+                <label>Revisão trabalhista</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

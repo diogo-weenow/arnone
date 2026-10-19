@@ -5,7 +5,7 @@
     <description>Recuperação Tributária: bloqueia sair de &quot;Recebido - MQL&quot; sem compromisso até hoje. Exceções, só com o sinal completo: opt-out (CLICKUP-9418) e perda, motivo &quot;Negócio perdido&quot; sem opt-out (CLICKUP-9425). Outra saída manual segue bloqueada.</description>
     <errorConditionFormula>AND(
   RecordType.DeveloperName = &quot;SOL&quot;,
-  ISPICKVAL(SOL_Produto_Interesse__c, &quot;Recuperação Tributária&quot;),
+  INCLUDES(SOL_Produtos_Interesse__c, &quot;Recuperação Tributária&quot;),
   ISCHANGED(Status),
   ISPICKVAL(PRIORVALUE(Status), &quot;Recebido - MQL&quot;),
   NOT(

@@ -117,7 +117,7 @@ private class SOLProcuracaoAcompanhamentoTest {
       Company = 'C',
       Status = STATUS_INICIAL,
       CNPJ__c = CNPJ,
-      SOL_Produto_Interesse__c = produto
+      SOL_Produtos_Interesse__c = produto
     );
     insert l;
     return recarregar(l.Id);
@@ -130,7 +130,7 @@ private class SOLProcuracaoAcompanhamentoTest {
         OwnerId,
         Status,
         IsConverted,
-        SOL_Produto_Interesse__c,
+        SOL_Produtos_Interesse__c,
         SOL_Status_Procuracao__c,
         SOL_Data_Solicitacao_Procuracao__c
       FROM Lead
@@ -536,7 +536,7 @@ private class SOLProcuracaoAcompanhamentoTest {
           Company = 'C',
           Status = STATUS_INICIAL,
           CNPJ__c = CNPJ,
-          SOL_Produto_Interesse__c = (Math.mod(i, 2) == 0 ? 'Recuperação Tributária' : 'ART 360')
+          SOL_Produtos_Interesse__c = (Math.mod(i, 2) == 0 ? 'Recuperação Tributária' : 'ART 360')
         )
       );
     }

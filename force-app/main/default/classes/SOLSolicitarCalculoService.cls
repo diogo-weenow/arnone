@@ -89,7 +89,7 @@ public with sharing class SOLSolicitarCalculoService {
             Id,
             StageName,
             IsClosed,
-            SOL_Produto_Negocio__c,
+            SOL_Produtos_Negocio__c,
             SOL_Data_Solicitacao_Calculo__c,
             RecordType.DeveloperName
           FROM Opportunity
@@ -105,7 +105,9 @@ public with sharing class SOLSolicitarCalculoService {
         if (
           o != null &&
           o.RecordType.DeveloperName == RT_OPP &&
-          o.SOL_Produto_Negocio__c == PRODUTO_RECUPERACAO &&
+          // Cálculo jurídico só existe na jornada RT: basta a Opp INCLUIR
+          // Recuperação Tributária (união do mais exigente num mix).
+          SOLProdutoHelper.contem(o.SOL_Produtos_Negocio__c, PRODUTO_RECUPERACAO) &&
           o.IsClosed == false &&
           // (CLICKUP-9425) explícito: negócio perdido não avança mais.
           !SOLNegocioPerdidoService.oportunidadePerdida(o) &&
@@ -166,7 +168,7 @@ public with sharing class SOLSolicitarCalculoService {
           r.mensagem = 'Esta Oportunidade não é da Arnone Soluções.';
           continue;
         }
-        if (o.SOL_Produto_Negocio__c != PRODUTO_RECUPERACAO) {
+        if (!SOLProdutoHelper.contem(o.SOL_Produtos_Negocio__c, PRODUTO_RECUPERACAO)) {
           r.mensagem = 'O cálculo jurídico só existe em Recuperação Tributária. ART 360 vai direto para a Negociação.';
           continue;
         }

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Changeset do card "Revisão trabalhista + multi-select de produto SOL (Opção A)".
+  Abordagem CAMPOS NOVOS (sem flip in-place): SOL_Produtos_Interesse__c /
+  SOL_Produtos_Negocio__c multi-select, com toda a lógica reapontada.
+  Deploy: sf project deploy start --manifest manifest/package-revisao-trabalhista.xml --target-org <org> --test-level RunLocalTests
+  (desagende os 4 schedulers SOL antes, pois toca Apex agendado; reagende depois.)
+  Após o deploy: scripts/apex/revisao-trabalhista-backfill-ativos.apex (seguro com flows ativos).
+  Terminais: snapshot -> desativar os 5 flows terminais -> revisao-trabalhista-backfill-terminais.apex
+  -> reativar as MESMAS versões -> snapshot de novo (ver pacote de validação).
+  FLS dos campos antigos: removida por DML cirúrgico em FieldPermissions (não por deploy de PS).
+-->
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>SOLProdutoHelper</members>
+        <members>SOLProdutoHelperTest</members>
+        <members>SOLProdutoBackfillBatch</members>
+        <members>SOLProdutoBackfillBatchTest</members>
+        <members>SOL_ConverterLead</members>
+        <members>SOL_ConverterLeadTest</members>
+        <members>SOLReuniaoComercialService</members>
+        <members>SOLReuniaoComercialTest</members>
+        <members>SOLProcuracaoAcompanhamentoService</members>
+        <members>SOLProcuracaoAcompanhamentoTest</members>
+        <members>SOLSolicitarCalculoService</members>
+        <members>SOLSolicitarCalculoTest</members>
+        <members>SOLReuniaoFinalService</members>
+        <members>SOLReuniaoFinalTest</members>
+        <members>SOLPrazoTotalService</members>
+        <members>SOLPrazoTotalTest</members>
+        <members>SOLPrazoTotalBatch</members>
+        <members>SOLFechamentoService</members>
+        <members>SOLFechamentoTest</members>
+        <members>SOLNegocioPerdidoService</members>
+        <members>SOLNegocioPerdidoTest</members>
+        <members>SOLEventoJornadaService</members>
+        <members>SOLEventoJornadaTest</members>
+        <members>SOLDistribuicaoService</members>
+        <members>SOLAcompanhamentoCalculoService</members>
+        <members>SOLAcompanhamentoCalculoTest</members>
+        <members>SOLReatribuicaoContatoServiceTest</members>
+        <members>SOLOptOutTest</members>
+        <members>SOLValidacaoAvancoTest</members>
+        <members>SOLConsolidarReuniaoTest</members>
+        <members>SOLContatoEfetivadoTest</members>
+        <members>SOLCancelamentoContatoEfetivadoTest</members>
+        <members>SOLDuracaoEtapaTest</members>
+        <members>SOLCadenciaMotorTest</members>
+        <members>SOLCadenciaContatoTest</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>Lead.SOL_Produto_Interesse__c</members>
+        <members>Lead.SOL_Produtos_Interesse__c</members>
+        <members>Opportunity.SOL_Produto_Negocio__c</members>
+        <members>Opportunity.SOL_Produtos_Negocio__c</members>
+        <members>SOL_Evento_Jornada__c.SOL_Produto__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>Lead.SOL</members>
+        <members>Opportunity.SOL</members>
+        <name>RecordType</name>
+    </types>
+    <types>
+        <members>Lead.SOL_Recuperacao_Exige_Compromisso</members>
+        <members>Lead.SOL_Conversao_Exige_Procuracao_Ou_Apto</members>
+        <members>Opportunity.SOL_ECAC_Antes_De_Negociar</members>
+        <members>Opportunity.SOL_ECAC_Consulta_Exige_Dados</members>
+        <members>Opportunity.SOL_ECAC_Valor_Conforme_Resultado</members>
+        <members>Opportunity.SOL_Ganho_ART_Exige_Catalogo</members>
+        <members>Opportunity.SOL_Ganho_Exige_Termos_Financeiros</members>
+        <members>Opportunity.SOL_Perda_Sem_Valor_Tem_Motivo_Proprio</members>
+        <name>ValidationRule</name>
+    </types>
+    <types>
+        <members>SOL_Encerrar_Fechamento_Ganho_Perdido</members>
+        <members>SOL_Encerrar_Tarefas_Lead_Perdido</members>
+        <members>SOL_Encerrar_Tarefas_Oportunidade_Perdida</members>
+        <members>SOL_Marco_Encerramento_Oportunidade</members>
+        <members>SOL_Marco_Perda_Oportunidade</members>
+        <members>SOL_Negociacao_Valor</members>
+        <members>SOL_Tarefa_Acompanhamento_Calculo</members>
+        <members>SOL_Tarefa_Acompanhamento_Procuracao</members>
+        <members>SOL_Tarefa_Reuniao_Comercial</members>
+        <members>SOL_Validar_Avanco_Reuniao_Procuracao</members>
+        <name>Flow</name>
+    </types>
+    <types>
+        <members>Lead-Lead Layout</members>
+        <members>Opportunity-Opportunity Layout</members>
+        <name>Layout</name>
+    </types>
+    <types>
+        <members>PS_SOL_Comercial</members>
+        <name>PermissionSet</name>
+    </types>
+    <version>66.0</version>
+</Package>

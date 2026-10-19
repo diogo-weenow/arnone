@@ -33,8 +33,8 @@
         <filterFormula>AND(
   {!$Record.RecordType.DeveloperName} = &apos;SOL&apos;,
   OR(
-    ISPICKVAL({!$Record.SOL_Produto_Interesse__c}, &apos;Recuperação Tributária&apos;),
-    ISPICKVAL({!$Record.SOL_Produto_Interesse__c}, &apos;ART 360&apos;)
+    INCLUDES({!$Record.SOL_Produtos_Interesse__c}, &apos;Recuperação Tributária&apos;),
+    INCLUDES({!$Record.SOL_Produtos_Interesse__c}, &apos;ART 360&apos;)
   ),
   ISPICKVAL({!$Record.Status}, &apos;Procuração Solicitada&apos;),
   ISPICKVAL({!$Record.SOL_Status_Procuracao__c}, &apos;Solicitada&apos;),

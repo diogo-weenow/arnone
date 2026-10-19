@@ -117,7 +117,7 @@ private class SOLContatoEfetivadoTest {
       Company = 'C',
       Status = statusLead(),
       CNPJ__c = CNPJ,
-      SOL_Produto_Interesse__c = produto
+      SOL_Produtos_Interesse__c = produto
     );
     insert l;
     return recarregar(l.Id);
