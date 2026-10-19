@@ -19,6 +19,7 @@
     <countryCode>US</countryCode>
     <externalAccountId>1559786725334846</externalAccountId>
     <isEstimatedWaitTimeEnabled>false</isEstimatedWaitTimeEnabled>
+    <isFeedbackEnabled>false</isFeedbackEnabled>
     <isQueuePositionEnabled>false</isQueuePositionEnabled>
     <isSynchronousChatEnabled>false</isSynchronousChatEnabled>
     <isVoiceModeEnabled>false</isVoiceModeEnabled>

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Quantidade_Reatribuicoes__c</fullName>
-    <description>Quantas vezes este Lead já foi reatribuído automaticamente por falta de contato (só Record Type SOL). Dá ao gestor a visão de quantos vendedores já tentaram o contato. Incrementado apenas pelo serviço SOLDistribuicaoService. CLICKUP-9400.</description>
-    <label>Quantidade de reatribuições SOL</label>
     <defaultValue>0</defaultValue>
+    <description>Quantas vezes este Lead já foi reatribuído automaticamente por falta de contato (só Record Type SOL). Dá ao gestor a visão de quantos vendedores já tentaram o contato. Incrementado apenas pelo serviço SOLDistribuicaoService. CLICKUP-9400.</description>
+    <externalId>false</externalId>
+    <label>Quantidade de reatribuições SOL</label>
     <precision>4</precision>
     <required>false</required>
     <scale>0</scale>

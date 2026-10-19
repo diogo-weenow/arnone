@@ -6,6 +6,7 @@
         <dataSpaceName>default</dataSpaceName>
         <isEnabled>true</isEnabled>
         <isSegmentable>false</isSegmentable>
+        <isSqlDmo>false</isSqlDmo>
         <isUsedForMetrics>false</isUsedForMetrics>
         <labelOverride>Bulk Email Message</labelOverride>
         <masterLabel>Bulk Email Message</masterLabel>

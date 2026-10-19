@@ -269,11 +269,11 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Intervalo inconsistente</fullName>
+            <fullName>Falha técnica</fullName>
             <default>false</default>
         </values>
         <values>
-            <fullName>Falha técnica</fullName>
+            <fullName>Intervalo inconsistente</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -315,6 +315,40 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>SOL_Regime_Tributario__c</picklist>
+        <values>
+            <fullName>Lucro Presumido</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lucro Real</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Simples Nacional</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SOL_Status_Distribuicao__c</picklist>
+        <values>
+            <fullName>Distribuido</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Erro</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fallback</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Pendente</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>SOL_Status_Procuracao__c</picklist>
         <values>
             <fullName>Não aplicável</fullName>
@@ -326,6 +360,21 @@
         </values>
         <values>
             <fullName>Solicitada</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SOL_Status_Reatribuicao__c</picklist>
+        <values>
+            <fullName>Em acompanhamento</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reatribuido</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sem outro vendedor</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -352,6 +401,45 @@
         </values>
         <values>
             <fullName>Quente</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>STE_Etapa_Bot__c</picklist>
+        <values>
+            <fullName>Aguardando arquivo da CNH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando e-mail</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando empresa anterior</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando escolha da CNH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando experiência</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando faixa etária</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando nome</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando pré-inscrição</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Concluído</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -404,6 +492,25 @@
         </values>
         <values>
             <fullName>Sim</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>STE_Motivo_Desqualificacao__c</picklist>
+        <values>
+            <fullName>CNH provisória</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fora da faixa etária</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Não atende ao perfil da turma</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sem CNH</fullName>
             <default>false</default>
         </values>
     </picklistValues>

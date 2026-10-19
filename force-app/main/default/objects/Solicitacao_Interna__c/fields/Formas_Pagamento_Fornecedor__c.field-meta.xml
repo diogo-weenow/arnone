@@ -12,32 +12,32 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>Boleto</fullName>
+                <fullName>boleto</fullName>
                 <default>false</default>
                 <label>Boleto</label>
             </value>
             <value>
-                <fullName>PIX</fullName>
+                <fullName>pix</fullName>
                 <default>false</default>
                 <label>PIX</label>
             </value>
             <value>
-                <fullName>Transferência (TED)</fullName>
+                <fullName>ted</fullName>
                 <default>false</default>
                 <label>Transferência (TED)</label>
             </value>
             <value>
-                <fullName>Cartão corporativo</fullName>
+                <fullName>cartao</fullName>
                 <default>false</default>
                 <label>Cartão corporativo</label>
             </value>
             <value>
-                <fullName>Depósito em conta</fullName>
+                <fullName>deposito</fullName>
                 <default>false</default>
                 <label>Depósito em conta</label>
             </value>
             <value>
-                <fullName>Outro</fullName>
+                <fullName>outro</fullName>
                 <default>false</default>
                 <label>Outro</label>
             </value>

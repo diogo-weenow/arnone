@@ -6,6 +6,7 @@
         <developerName>FORMULA1</developerName>
         <downGroupingContext>FULL_NAME</downGroupingContext>
         <isActive>true</isActive>
+        <isCrossBlock>false</isCrossBlock>
         <masterLabel>Dias úteis (média)</masterLabel>
         <scale>1</scale>
     </aggregates>
@@ -42,6 +43,18 @@
         <sortOrder>Asc</sortOrder>
     </groupingsDown>
     <name>SOL — Tempo médio cálculo jurídico</name>
+    <params>
+        <name>open</name>
+        <value>all</value>
+    </params>
+    <params>
+        <name>probability</name>
+        <value>&gt;0</value>
+    </params>
+    <params>
+        <name>co</name>
+        <value>1</value>
+    </params>
     <reportType>Opportunity</reportType>
     <scope>organization</scope>
     <showDetails>false</showDetails>
