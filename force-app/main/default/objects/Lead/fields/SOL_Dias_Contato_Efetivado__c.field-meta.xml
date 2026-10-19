@@ -2,8 +2,8 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Dias_Contato_Efetivado__c</fullName>
     <description>Etapa 2: dias ÚTEIS entre a primeira ligação concluída (exclusiva) e o contato efetivado (SOL_Data_Contato_Efetivado__c, inclusiva). Mesmo dia útil = 0. Vazio enquanto faltar qualquer um dos dois marcos — um Lead efetivado por e-mail ou WhatsApp sem nenhuma ligação concluída não tem esta etapa, e o campo permanece vazio, nunca zero. Congelado na primeira conclusão válida. Campo técnico, somente leitura. CLICKUP-9439 / CLICKUP-9429 (absorvido).</description>
-    <label>Dias úteis até o contato efetivado (SOL)</label>
     <externalId>false</externalId>
+    <label>Dias úteis até o contato efetivado (SOL)</label>
     <precision>4</precision>
     <required>false</required>
     <scale>0</scale>

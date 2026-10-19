@@ -328,12 +328,48 @@
             <label>Data da consulta ao e-CAC</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4h</field>
             <label>Data de envio da CNH</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mg</field>
             <label>Data de início da turma</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7p</field>
@@ -344,8 +380,36 @@
             <label>Dias em Negociação</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nas00000IfTF2</field>
             <label>Discovery Completed</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BKok</field>
@@ -380,6 +444,10 @@
             <label>Gênero</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mi</field>
             <label>Logradouro</label>
         </opportunityListFieldsLabelMappings>
@@ -388,12 +456,20 @@
             <label>Loss Reason</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7q</field>
             <label>Motivo da perda</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FOv</field>
             <label>Motivo da perda (STech)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BOsI</field>
@@ -416,6 +492,10 @@
             <label>Percentual de comissão Arnone</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4k</field>
             <label>Posse de CNH</label>
         </opportunityListFieldsLabelMappings>
@@ -428,6 +508,10 @@
             <label>Prazo dos antecedentes</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029YxO</field>
             <label>Produto de negócio</label>
         </opportunityListFieldsLabelMappings>
@@ -438,6 +522,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqX</field>
             <label>Quantidade de produtos</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqV</field>
@@ -458,6 +546,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FVP</field>
             <label>Setor de aprovados</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -527,6 +619,26 @@
             <field>OPPORTUNITY.PUSH_COUNT</field>
             <label>Push Count</label>
         </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>SalesMethodology</field>
+            <label>Sales Methodology</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>AgentActivity</field>
+            <label>Agent Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>Contacts</field>
+            <label>Contacts</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>CriticalInsights</field>
+            <label>Alerts</label>
+        </opportunityListFieldsLabelMappings>
         <opportunityListFieldsSelectedSettings>
             <field>OPPORTUNITY.NAME</field>
             <field>ACCOUNT.NAME</field>
@@ -584,11 +696,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -597,26 +725,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -634,6 +769,11 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </opportunityListFieldsUnselectedSettings>
     </forecastingTypeSettings>
     <forecastingTypeSettings>
@@ -876,12 +1016,48 @@
             <label>Data da consulta ao e-CAC</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4h</field>
             <label>Data de envio da CNH</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mg</field>
             <label>Data de início da turma</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7p</field>
@@ -892,8 +1068,36 @@
             <label>Dias em Negociação</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nas00000IfTF2</field>
             <label>Discovery Completed</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BKok</field>
@@ -928,6 +1132,10 @@
             <label>Gênero</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mi</field>
             <label>Logradouro</label>
         </opportunityListFieldsLabelMappings>
@@ -936,12 +1144,20 @@
             <label>Loss Reason</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7q</field>
             <label>Motivo da perda</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FOv</field>
             <label>Motivo da perda (STech)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BOsI</field>
@@ -964,6 +1180,10 @@
             <label>Percentual de comissão Arnone</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4k</field>
             <label>Posse de CNH</label>
         </opportunityListFieldsLabelMappings>
@@ -976,6 +1196,10 @@
             <label>Prazo dos antecedentes</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029YxO</field>
             <label>Produto de negócio</label>
         </opportunityListFieldsLabelMappings>
@@ -986,6 +1210,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqX</field>
             <label>Quantidade de produtos</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqV</field>
@@ -1006,6 +1234,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FVP</field>
             <label>Setor de aprovados</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -1075,6 +1307,26 @@
             <field>OPPORTUNITY.PUSH_COUNT</field>
             <label>Push Count</label>
         </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>SalesMethodology</field>
+            <label>Sales Methodology</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>AgentActivity</field>
+            <label>Agent Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>Contacts</field>
+            <label>Contacts</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>CriticalInsights</field>
+            <label>Alerts</label>
+        </opportunityListFieldsLabelMappings>
         <opportunityListFieldsSelectedSettings>
             <field>OPPORTUNITY.NAME</field>
             <field>ACCOUNT.NAME</field>
@@ -1132,11 +1384,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -1145,26 +1413,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -1182,6 +1457,11 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </opportunityListFieldsUnselectedSettings>
     </forecastingTypeSettings>
     <forecastingTypeSettings>
@@ -1428,12 +1708,48 @@
             <label>Data da consulta ao e-CAC</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4h</field>
             <label>Data de envio da CNH</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mg</field>
             <label>Data de início da turma</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7p</field>
@@ -1444,8 +1760,36 @@
             <label>Dias em Negociação</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nas00000IfTF2</field>
             <label>Discovery Completed</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BKok</field>
@@ -1480,6 +1824,10 @@
             <label>Gênero</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mi</field>
             <label>Logradouro</label>
         </opportunityListFieldsLabelMappings>
@@ -1488,12 +1836,20 @@
             <label>Loss Reason</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7q</field>
             <label>Motivo da perda</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FOv</field>
             <label>Motivo da perda (STech)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BOsI</field>
@@ -1516,6 +1872,10 @@
             <label>Percentual de comissão Arnone</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4k</field>
             <label>Posse de CNH</label>
         </opportunityListFieldsLabelMappings>
@@ -1528,6 +1888,10 @@
             <label>Prazo dos antecedentes</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029YxO</field>
             <label>Produto de negócio</label>
         </opportunityListFieldsLabelMappings>
@@ -1538,6 +1902,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqX</field>
             <label>Quantidade de produtos</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqV</field>
@@ -1558,6 +1926,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FVP</field>
             <label>Setor de aprovados</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -1627,6 +1999,26 @@
             <field>OPPORTUNITY.PUSH_COUNT</field>
             <label>Push Count</label>
         </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>SalesMethodology</field>
+            <label>Sales Methodology</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>AgentActivity</field>
+            <label>Agent Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>Contacts</field>
+            <label>Contacts</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>CriticalInsights</field>
+            <label>Alerts</label>
+        </opportunityListFieldsLabelMappings>
         <opportunityListFieldsSelectedSettings>
             <field>OPPORTUNITY.NAME</field>
             <field>ACCOUNT.NAME</field>
@@ -1685,11 +2077,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -1698,26 +2106,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -1735,6 +2150,11 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </opportunityListFieldsUnselectedSettings>
     </forecastingTypeSettings>
     <forecastingTypeSettings>
@@ -1977,12 +2397,48 @@
             <label>Data da consulta ao e-CAC</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4h</field>
             <label>Data de envio da CNH</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mg</field>
             <label>Data de início da turma</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7p</field>
@@ -1993,8 +2449,36 @@
             <label>Dias em Negociação</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nas00000IfTF2</field>
             <label>Discovery Completed</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BKok</field>
@@ -2029,6 +2513,10 @@
             <label>Gênero</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mi</field>
             <label>Logradouro</label>
         </opportunityListFieldsLabelMappings>
@@ -2037,12 +2525,20 @@
             <label>Loss Reason</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7q</field>
             <label>Motivo da perda</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FOv</field>
             <label>Motivo da perda (STech)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BOsI</field>
@@ -2065,6 +2561,10 @@
             <label>Percentual de comissão Arnone</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4k</field>
             <label>Posse de CNH</label>
         </opportunityListFieldsLabelMappings>
@@ -2077,6 +2577,10 @@
             <label>Prazo dos antecedentes</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029YxO</field>
             <label>Produto de negócio</label>
         </opportunityListFieldsLabelMappings>
@@ -2087,6 +2591,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqX</field>
             <label>Quantidade de produtos</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqV</field>
@@ -2107,6 +2615,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FVP</field>
             <label>Setor de aprovados</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -2176,6 +2688,26 @@
             <field>OPPORTUNITY.PUSH_COUNT</field>
             <label>Push Count</label>
         </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>SalesMethodology</field>
+            <label>Sales Methodology</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>AgentActivity</field>
+            <label>Agent Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>Contacts</field>
+            <label>Contacts</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>CriticalInsights</field>
+            <label>Alerts</label>
+        </opportunityListFieldsLabelMappings>
         <opportunityListFieldsSelectedSettings>
             <field>OPPORTUNITY.NAME</field>
             <field>ACCOUNT.NAME</field>
@@ -2233,11 +2765,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -2246,26 +2794,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -2283,6 +2838,11 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </opportunityListFieldsUnselectedSettings>
     </forecastingTypeSettings>
     <forecastingTypeSettings>
@@ -2529,12 +3089,48 @@
             <label>Data da consulta ao e-CAC</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4h</field>
             <label>Data de envio da CNH</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mg</field>
             <label>Data de início da turma</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7p</field>
@@ -2545,8 +3141,36 @@
             <label>Dias em Negociação</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nas00000IfTF2</field>
             <label>Discovery Completed</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BKok</field>
@@ -2581,6 +3205,10 @@
             <label>Gênero</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mi</field>
             <label>Logradouro</label>
         </opportunityListFieldsLabelMappings>
@@ -2589,12 +3217,20 @@
             <label>Loss Reason</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7q</field>
             <label>Motivo da perda</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FOv</field>
             <label>Motivo da perda (STech)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BOsI</field>
@@ -2617,6 +3253,10 @@
             <label>Percentual de comissão Arnone</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4k</field>
             <label>Posse de CNH</label>
         </opportunityListFieldsLabelMappings>
@@ -2629,6 +3269,10 @@
             <label>Prazo dos antecedentes</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029YxO</field>
             <label>Produto de negócio</label>
         </opportunityListFieldsLabelMappings>
@@ -2639,6 +3283,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqX</field>
             <label>Quantidade de produtos</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqV</field>
@@ -2659,6 +3307,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FVP</field>
             <label>Setor de aprovados</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -2728,6 +3380,26 @@
             <field>OPPORTUNITY.PUSH_COUNT</field>
             <label>Push Count</label>
         </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>SalesMethodology</field>
+            <label>Sales Methodology</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>AgentActivity</field>
+            <label>Agent Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>Contacts</field>
+            <label>Contacts</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>CriticalInsights</field>
+            <label>Alerts</label>
+        </opportunityListFieldsLabelMappings>
         <opportunityListFieldsSelectedSettings>
             <field>OPPORTUNITY.NAME</field>
             <field>ACCOUNT.NAME</field>
@@ -2786,11 +3458,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -2799,26 +3487,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -2836,6 +3531,11 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </opportunityListFieldsUnselectedSettings>
     </forecastingTypeSettings>
     <forecastingTypeSettings>
@@ -3078,12 +3778,48 @@
             <label>Data da consulta ao e-CAC</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4h</field>
             <label>Data de envio da CNH</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mg</field>
             <label>Data de início da turma</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7p</field>
@@ -3094,8 +3830,36 @@
             <label>Dias em Negociação</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nas00000IfTF2</field>
             <label>Discovery Completed</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BKok</field>
@@ -3130,6 +3894,10 @@
             <label>Gênero</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mi</field>
             <label>Logradouro</label>
         </opportunityListFieldsLabelMappings>
@@ -3138,12 +3906,20 @@
             <label>Loss Reason</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7q</field>
             <label>Motivo da perda</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FOv</field>
             <label>Motivo da perda (STech)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BOsI</field>
@@ -3166,6 +3942,10 @@
             <label>Percentual de comissão Arnone</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4k</field>
             <label>Posse de CNH</label>
         </opportunityListFieldsLabelMappings>
@@ -3178,6 +3958,10 @@
             <label>Prazo dos antecedentes</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029YxO</field>
             <label>Produto de negócio</label>
         </opportunityListFieldsLabelMappings>
@@ -3188,6 +3972,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqX</field>
             <label>Quantidade de produtos</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqV</field>
@@ -3208,6 +3996,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FVP</field>
             <label>Setor de aprovados</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -3277,6 +4069,26 @@
             <field>OPPORTUNITY.PUSH_COUNT</field>
             <label>Push Count</label>
         </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>SalesMethodology</field>
+            <label>Sales Methodology</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>AgentActivity</field>
+            <label>Agent Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>Contacts</field>
+            <label>Contacts</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>CriticalInsights</field>
+            <label>Alerts</label>
+        </opportunityListFieldsLabelMappings>
         <opportunityListFieldsSelectedSettings>
             <field>OPPORTUNITY.NAME</field>
             <field>ACCOUNT.NAME</field>
@@ -3334,11 +4146,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -3347,26 +4175,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -3384,6 +4219,11 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </opportunityListFieldsUnselectedSettings>
     </forecastingTypeSettings>
     <forecastingTypeSettings>
@@ -3630,12 +4470,48 @@
             <label>Data da consulta ao e-CAC</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4h</field>
             <label>Data de envio da CNH</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mg</field>
             <label>Data de início da turma</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7p</field>
@@ -3646,8 +4522,36 @@
             <label>Dias em Negociação</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nas00000IfTF2</field>
             <label>Discovery Completed</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BKok</field>
@@ -3682,6 +4586,10 @@
             <label>Gênero</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mi</field>
             <label>Logradouro</label>
         </opportunityListFieldsLabelMappings>
@@ -3690,12 +4598,20 @@
             <label>Loss Reason</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7q</field>
             <label>Motivo da perda</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FOv</field>
             <label>Motivo da perda (STech)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BOsI</field>
@@ -3718,6 +4634,10 @@
             <label>Percentual de comissão Arnone</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4k</field>
             <label>Posse de CNH</label>
         </opportunityListFieldsLabelMappings>
@@ -3730,6 +4650,10 @@
             <label>Prazo dos antecedentes</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029YxO</field>
             <label>Produto de negócio</label>
         </opportunityListFieldsLabelMappings>
@@ -3740,6 +4664,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqX</field>
             <label>Quantidade de produtos</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqV</field>
@@ -3760,6 +4688,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FVP</field>
             <label>Setor de aprovados</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -3829,6 +4761,26 @@
             <field>OPPORTUNITY.PUSH_COUNT</field>
             <label>Push Count</label>
         </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>SalesMethodology</field>
+            <label>Sales Methodology</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>AgentActivity</field>
+            <label>Agent Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>Contacts</field>
+            <label>Contacts</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>CriticalInsights</field>
+            <label>Alerts</label>
+        </opportunityListFieldsLabelMappings>
         <opportunityListFieldsSelectedSettings>
             <field>OPPORTUNITY.NAME</field>
             <field>ACCOUNT.NAME</field>
@@ -3887,11 +4839,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -3900,26 +4868,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -3937,6 +4912,11 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </opportunityListFieldsUnselectedSettings>
     </forecastingTypeSettings>
     <forecastingTypeSettings>
@@ -4179,12 +5159,48 @@
             <label>Data da consulta ao e-CAC</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4h</field>
             <label>Data de envio da CNH</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mg</field>
             <label>Data de início da turma</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7p</field>
@@ -4195,8 +5211,36 @@
             <label>Dias em Negociação</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nas00000IfTF2</field>
             <label>Discovery Completed</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BKok</field>
@@ -4231,6 +5275,10 @@
             <label>Gênero</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mi</field>
             <label>Logradouro</label>
         </opportunityListFieldsLabelMappings>
@@ -4239,12 +5287,20 @@
             <label>Loss Reason</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7q</field>
             <label>Motivo da perda</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FOv</field>
             <label>Motivo da perda (STech)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BOsI</field>
@@ -4267,6 +5323,10 @@
             <label>Percentual de comissão Arnone</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4k</field>
             <label>Posse de CNH</label>
         </opportunityListFieldsLabelMappings>
@@ -4279,6 +5339,10 @@
             <label>Prazo dos antecedentes</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029YxO</field>
             <label>Produto de negócio</label>
         </opportunityListFieldsLabelMappings>
@@ -4289,6 +5353,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqX</field>
             <label>Quantidade de produtos</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqV</field>
@@ -4309,6 +5377,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FVP</field>
             <label>Setor de aprovados</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -4378,6 +5450,26 @@
             <field>OPPORTUNITY.PUSH_COUNT</field>
             <label>Push Count</label>
         </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>SalesMethodology</field>
+            <label>Sales Methodology</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>AgentActivity</field>
+            <label>Agent Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>Contacts</field>
+            <label>Contacts</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>CriticalInsights</field>
+            <label>Alerts</label>
+        </opportunityListFieldsLabelMappings>
         <opportunityListFieldsSelectedSettings>
             <field>OPPORTUNITY.NAME</field>
             <field>ACCOUNT.NAME</field>
@@ -4435,11 +5527,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -4448,26 +5556,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -4485,6 +5600,11 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </opportunityListFieldsUnselectedSettings>
     </forecastingTypeSettings>
     <forecastingTypeSettings>
@@ -4731,12 +5851,48 @@
             <label>Data da consulta ao e-CAC</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4h</field>
             <label>Data de envio da CNH</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mg</field>
             <label>Data de início da turma</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7p</field>
@@ -4747,8 +5903,36 @@
             <label>Dias em Negociação</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nas00000IfTF2</field>
             <label>Discovery Completed</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BKok</field>
@@ -4783,6 +5967,10 @@
             <label>Gênero</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mi</field>
             <label>Logradouro</label>
         </opportunityListFieldsLabelMappings>
@@ -4791,12 +5979,20 @@
             <label>Loss Reason</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7q</field>
             <label>Motivo da perda</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FOv</field>
             <label>Motivo da perda (STech)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BOsI</field>
@@ -4819,6 +6015,10 @@
             <label>Percentual de comissão Arnone</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4k</field>
             <label>Posse de CNH</label>
         </opportunityListFieldsLabelMappings>
@@ -4831,6 +6031,10 @@
             <label>Prazo dos antecedentes</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029YxO</field>
             <label>Produto de negócio</label>
         </opportunityListFieldsLabelMappings>
@@ -4841,6 +6045,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqX</field>
             <label>Quantidade de produtos</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqV</field>
@@ -4861,6 +6069,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FVP</field>
             <label>Setor de aprovados</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -4930,6 +6142,26 @@
             <field>OPPORTUNITY.PUSH_COUNT</field>
             <label>Push Count</label>
         </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>SalesMethodology</field>
+            <label>Sales Methodology</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>AgentActivity</field>
+            <label>Agent Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>Contacts</field>
+            <label>Contacts</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>CriticalInsights</field>
+            <label>Alerts</label>
+        </opportunityListFieldsLabelMappings>
         <opportunityListFieldsSelectedSettings>
             <field>OPPORTUNITY.NAME</field>
             <field>ACCOUNT.NAME</field>
@@ -4988,11 +6220,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -5001,26 +6249,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -5038,6 +6293,11 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </opportunityListFieldsUnselectedSettings>
     </forecastingTypeSettings>
     <forecastingTypeSettings>
@@ -5280,12 +6540,48 @@
             <label>Data da consulta ao e-CAC</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4h</field>
             <label>Data de envio da CNH</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mg</field>
             <label>Data de início da turma</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7p</field>
@@ -5296,8 +6592,36 @@
             <label>Dias em Negociação</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nas00000IfTF2</field>
             <label>Discovery Completed</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BKok</field>
@@ -5332,6 +6656,10 @@
             <label>Gênero</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mi</field>
             <label>Logradouro</label>
         </opportunityListFieldsLabelMappings>
@@ -5340,12 +6668,20 @@
             <label>Loss Reason</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7q</field>
             <label>Motivo da perda</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FOv</field>
             <label>Motivo da perda (STech)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BOsI</field>
@@ -5368,6 +6704,10 @@
             <label>Percentual de comissão Arnone</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4k</field>
             <label>Posse de CNH</label>
         </opportunityListFieldsLabelMappings>
@@ -5380,6 +6720,10 @@
             <label>Prazo dos antecedentes</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029YxO</field>
             <label>Produto de negócio</label>
         </opportunityListFieldsLabelMappings>
@@ -5390,6 +6734,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqX</field>
             <label>Quantidade de produtos</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqV</field>
@@ -5410,6 +6758,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FVP</field>
             <label>Setor de aprovados</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -5479,6 +6831,26 @@
             <field>OPPORTUNITY.PUSH_COUNT</field>
             <label>Push Count</label>
         </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>SalesMethodology</field>
+            <label>Sales Methodology</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>AgentActivity</field>
+            <label>Agent Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>Contacts</field>
+            <label>Contacts</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>CriticalInsights</field>
+            <label>Alerts</label>
+        </opportunityListFieldsLabelMappings>
         <opportunityListFieldsSelectedSettings>
             <field>OPPORTUNITY.NAME</field>
             <field>ACCOUNT.NAME</field>
@@ -5536,11 +6908,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -5549,26 +6937,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -5586,6 +6981,11 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </opportunityListFieldsUnselectedSettings>
     </forecastingTypeSettings>
     <forecastingTypeSettings>
@@ -5832,12 +7232,48 @@
             <label>Data da consulta ao e-CAC</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4h</field>
             <label>Data de envio da CNH</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mg</field>
             <label>Data de início da turma</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7p</field>
@@ -5848,8 +7284,36 @@
             <label>Dias em Negociação</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nas00000IfTF2</field>
             <label>Discovery Completed</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BKok</field>
@@ -5884,6 +7348,10 @@
             <label>Gênero</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mi</field>
             <label>Logradouro</label>
         </opportunityListFieldsLabelMappings>
@@ -5892,12 +7360,20 @@
             <label>Loss Reason</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7q</field>
             <label>Motivo da perda</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FOv</field>
             <label>Motivo da perda (STech)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BOsI</field>
@@ -5920,6 +7396,10 @@
             <label>Percentual de comissão Arnone</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4k</field>
             <label>Posse de CNH</label>
         </opportunityListFieldsLabelMappings>
@@ -5932,6 +7412,10 @@
             <label>Prazo dos antecedentes</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029YxO</field>
             <label>Produto de negócio</label>
         </opportunityListFieldsLabelMappings>
@@ -5942,6 +7426,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqX</field>
             <label>Quantidade de produtos</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqV</field>
@@ -5962,6 +7450,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FVP</field>
             <label>Setor de aprovados</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -6031,6 +7523,26 @@
             <field>OPPORTUNITY.PUSH_COUNT</field>
             <label>Push Count</label>
         </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>SalesMethodology</field>
+            <label>Sales Methodology</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>AgentActivity</field>
+            <label>Agent Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>Contacts</field>
+            <label>Contacts</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>CriticalInsights</field>
+            <label>Alerts</label>
+        </opportunityListFieldsLabelMappings>
         <opportunityListFieldsSelectedSettings>
             <field>OPPORTUNITY.NAME</field>
             <field>ACCOUNT.NAME</field>
@@ -6089,11 +7601,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -6102,26 +7630,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -6139,6 +7674,11 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </opportunityListFieldsUnselectedSettings>
     </forecastingTypeSettings>
     <forecastingTypeSettings>
@@ -6381,12 +7921,48 @@
             <label>Data da consulta ao e-CAC</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0dJ</field>
+            <label>Data da distribuicao (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ow</field>
+            <label>Data da primeira ligação concluída (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHG</field>
+            <label>Data da reatribuição por prazo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oz</field>
+            <label>Data da reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Oy</field>
+            <label>Data da reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DMUb</field>
+            <label>Data da solicitação do cálculo</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4h</field>
             <label>Data de envio da CNH</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mg</field>
             <label>Data de início da turma</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ov</field>
+            <label>Data do encerramento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0Ox</field>
+            <label>Data do recebimento do cálculo (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P6</field>
+            <label>Detalhe da pendência de duração (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7p</field>
@@ -6397,8 +7973,36 @@
             <label>Dias em Negociação</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P3</field>
+            <label>Dias úteis até a primeira ligação (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P4</field>
+            <label>Dias úteis até a reunião final (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P1</field>
+            <label>Dias úteis até o contato efetivado (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P2</field>
+            <label>Dias úteis até o fechamento (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P0</field>
+            <label>Dias úteis do cálculo jurídico (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P5</field>
+            <label>Dias úteis reunião e procuração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nas00000IfTF2</field>
             <label>Discovery Completed</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P8</field>
+            <label>Duração pendente de cálculo (SOL)</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BKok</field>
@@ -6433,6 +8037,10 @@
             <label>Gênero</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHF</field>
+            <label>Início do ciclo comercial</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe00000289mi</field>
             <label>Logradouro</label>
         </opportunityListFieldsLabelMappings>
@@ -6441,12 +8049,20 @@
             <label>Loss Reason</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0P7</field>
+            <label>Motivo da pendência de duração (SOL)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029h7q</field>
             <label>Motivo da perda</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FOv</field>
             <label>Motivo da perda (STech)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHH</field>
+            <label>Motivo da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe000002BOsI</field>
@@ -6469,6 +8085,10 @@
             <label>Percentual de comissão Arnone</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002E0zt</field>
+            <label>Perdas registradas</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000027w4k</field>
             <label>Posse de CNH</label>
         </opportunityListFieldsLabelMappings>
@@ -6481,6 +8101,10 @@
             <label>Prazo dos antecedentes</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHI</field>
+            <label>Prazo total comercial (30 d.ú.)</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029YxO</field>
             <label>Produto de negócio</label>
         </opportunityListFieldsLabelMappings>
@@ -6491,6 +8115,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqX</field>
             <label>Quantidade de produtos</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHJ</field>
+            <label>Reatribuições por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000029bqV</field>
@@ -6511,6 +8139,10 @@
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FVP</field>
             <label>Setor de aprovados</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>00Nbe000002DYHK</field>
+            <label>Status da reatribuição por prazo</label>
         </opportunityListFieldsLabelMappings>
         <opportunityListFieldsLabelMappings>
             <field>00Nbe0000028FQb</field>
@@ -6580,6 +8212,26 @@
             <field>OPPORTUNITY.PUSH_COUNT</field>
             <label>Push Count</label>
         </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>SalesMethodology</field>
+            <label>Sales Methodology</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>ActivityHeatmap</field>
+            <label>Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>AgentActivity</field>
+            <label>Agent Activity</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>Contacts</field>
+            <label>Contacts</label>
+        </opportunityListFieldsLabelMappings>
+        <opportunityListFieldsLabelMappings>
+            <field>CriticalInsights</field>
+            <label>Alerts</label>
+        </opportunityListFieldsLabelMappings>
         <opportunityListFieldsSelectedSettings>
             <field>OPPORTUNITY.NAME</field>
             <field>ACCOUNT.NAME</field>
@@ -6637,11 +8289,27 @@
             <field>00Nbe0000028Fgi</field>
             <field>00Nbe0000029bqT</field>
             <field>00Nbe0000029d5q</field>
+            <field>00Nbe000002E0dJ</field>
+            <field>00Nbe000002E0Ow</field>
+            <field>00Nbe000002DYHG</field>
+            <field>00Nbe000002E0Oz</field>
+            <field>00Nbe000002E0Oy</field>
+            <field>00Nbe000002DMUb</field>
             <field>00Nbe0000027w4h</field>
             <field>00Nbe00000289mg</field>
+            <field>00Nbe000002E0Ov</field>
+            <field>00Nbe000002E0Ox</field>
+            <field>00Nbe000002E0P6</field>
             <field>00Nbe0000029h7p</field>
             <field>00Nbe000002BOsH</field>
+            <field>00Nbe000002E0P3</field>
+            <field>00Nbe000002E0P4</field>
+            <field>00Nbe000002E0P1</field>
+            <field>00Nbe000002E0P2</field>
+            <field>00Nbe000002E0P0</field>
+            <field>00Nbe000002E0P5</field>
             <field>00Nas00000IfTF2</field>
+            <field>00Nbe000002E0P8</field>
             <field>00Nbe000002BKok</field>
             <field>00Nbe0000028FVN</field>
             <field>00Nbe0000028FQX</field>
@@ -6650,26 +8318,33 @@
             <field>00Nbe0000028FQZ</field>
             <field>00Nbe0000028FQY</field>
             <field>00Nbe0000027w4j</field>
+            <field>00Nbe000002DYHF</field>
             <field>00Nbe00000289mi</field>
             <field>00Nas00000IfTF4</field>
+            <field>00Nbe000002E0P7</field>
             <field>00Nbe0000029h7q</field>
             <field>00Nbe0000028FOv</field>
+            <field>00Nbe000002DYHH</field>
             <field>00Nbe000002BOsI</field>
             <field>00Nbe00000289mj</field>
             <field>00Nbe00000289mm</field>
             <field>00Nbe0000029d5s</field>
             <field>00Nbe0000029bqU</field>
+            <field>00Nbe000002E0zt</field>
             <field>00Nbe0000027w4k</field>
             <field>00Nbe0000028FQa</field>
             <field>00Nbe0000028FOw</field>
+            <field>00Nbe000002DYHI</field>
             <field>00Nbe0000029YxO</field>
             <field>00Nbe0000028Fju</field>
             <field>00Nbe0000029bqX</field>
+            <field>00Nbe000002DYHJ</field>
             <field>00Nbe0000029bqV</field>
             <field>00Nbe0000029d5r</field>
             <field>00Nbe0000028FVO</field>
             <field>00Nas00000IfTF3</field>
             <field>00Nbe0000028FVP</field>
+            <field>00Nbe000002DYHK</field>
             <field>00Nbe0000028FQb</field>
             <field>00Nbe00000289mk</field>
             <field>00Nbe00000289mn</field>
@@ -6687,6 +8362,11 @@
             <field>OPPORTUNITY.AGE_IN_DAYS</field>
             <field>OPPORTUNITY.LAST_STAGE_CHANGE</field>
             <field>OPPORTUNITY.PUSH_COUNT</field>
+            <field>SalesMethodology</field>
+            <field>ActivityHeatmap</field>
+            <field>AgentActivity</field>
+            <field>Contacts</field>
+            <field>CriticalInsights</field>
         </opportunityListFieldsUnselectedSettings>
     </forecastingTypeSettings>
     <globalAdjustmentsSettings>

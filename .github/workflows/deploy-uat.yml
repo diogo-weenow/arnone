@@ -1,0 +1,47 @@
+name: Deploy UAT
+
+# Merge na branch uat deploya na org arnone-uat. O passo a passo vive em
+# _deploy-delta.yml, compartilhado com o deploy de dev.
+on:
+  push:
+    branches: [uat]
+    paths:
+      - "force-app/**"
+      - "sfdx-project.json"
+  workflow_dispatch:
+    inputs:
+      test_level:
+        description: "Nivel de teste do deploy"
+        required: false
+        default: "NoTestRun"
+        type: choice
+        options:
+          - NoTestRun
+          - RunLocalTests
+          - RunAllTestsInOrg
+      from_ref:
+        description: "Commit/tag inicial do delta (vazio = topo anterior da branch)"
+        required: false
+        default: ""
+        type: string
+      dry_run:
+        description: "Somente validar, sem aplicar na org"
+        required: false
+        default: false
+        type: boolean
+
+# Um deploy por vez nesta org: dois merges seguidos entram em fila.
+concurrency:
+  group: deploy-uat
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/_deploy-delta.yml
+    with:
+      org_alias: arnone-uat
+      test_level: ${{ inputs.test_level || 'NoTestRun' }}
+      from_ref: ${{ inputs.from_ref || '' }}
+      dry_run: ${{ inputs.dry_run || false }}
+    secrets:
+      SF_AUTH_URL: ${{ secrets.SF_AUTH_URL_UAT }}

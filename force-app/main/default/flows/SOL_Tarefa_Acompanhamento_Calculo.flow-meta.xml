@@ -18,7 +18,7 @@
     </actionCalls>
     <apiVersion>66.0</apiVersion>
     <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
-    <description>CLICKUP-9421 — Card 10. Quando uma Oportunidade da Arnone Soluções (Record Type SOL, produto "Recuperação Tributária", etapa "Diagnóstico", aberta) tem SOL_Data_Solicitacao_Calculo__c preenchida (ação guiada do CLICKUP-9420), aciona SOLAcompanhamentoCalculoInvocable para criar UMA Task "Acompanhar recebimento do cálculo jurídico" (vencimento 7 dias úteis após a data da solicitação, responsável = proprietário atual da Oportunidade). A fórmula exige ISCHANGED de SOL_Data_Solicitacao_Calculo__c e o campo não vazio: o Card 09 grava a data uma única vez e nunca a sobrescreve, então dispara só no primeiro preenchimento. Idempotência (Opportunity + data da solicitação) e prazo ficam no Apex (bulk, FOR UPDATE, atômico). ART 360 fica fora. Não altera a Oportunidade aqui, não avança etapa, não cria a reunião final (CLICKUP-9422).</description>
+    <description>CLICKUP-9421 — Card 10. Quando uma Oportunidade da Arnone Soluções (Record Type SOL, produto &quot;Recuperação Tributária&quot;, etapa &quot;Diagnóstico&quot;, aberta) tem SOL_Data_Solicitacao_Calculo__c preenchida (ação guiada do CLICKUP-9420), aciona SOLAcompanhamentoCalculoInvocable para criar UMA Task &quot;Acompanhar recebimento do cálculo jurídico&quot; (vencimento 7 dias úteis após a data da solicitação, responsável = proprietário atual da Oportunidade). A fórmula exige ISCHANGED de SOL_Data_Solicitacao_Calculo__c e o campo não vazio: o Card 09 grava a data uma única vez e nunca a sobrescreve, então dispara só no primeiro preenchimento. Idempotência (Opportunity + data da solicitação) e prazo ficam no Apex (bulk, FOR UPDATE, atômico). ART 360 fica fora. Não altera a Oportunidade aqui, não avança etapa, não cria a reunião final (CLICKUP-9422).</description>
     <environments>Default</environments>
     <interviewLabel>SOL_Tarefa_Acompanhamento_Calculo {!$Flow.CurrentDateTime}</interviewLabel>
     <label>SOL_Tarefa_Acompanhamento_Calculo</label>
@@ -29,7 +29,6 @@
         <connector>
             <targetReference>Chamar_Criar_Acompanhamento_Calculo</targetReference>
         </connector>
-        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
         <filterFormula>AND(
   {!$Record.RecordType.DeveloperName} = &apos;SOL&apos;,
   ISPICKVAL({!$Record.SOL_Produto_Negocio__c}, &apos;Recuperação Tributária&apos;),

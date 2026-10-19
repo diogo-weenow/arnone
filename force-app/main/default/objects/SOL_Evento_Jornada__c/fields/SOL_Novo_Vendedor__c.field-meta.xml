@@ -8,8 +8,6 @@
     <relationshipLabel>Eventos da Jornada SOL (novo vendedor)</relationshipLabel>
     <relationshipName>Eventos_Jornada_SOL_Novo_Vendedor</relationshipName>
     <required>false</required>
-    <trackFeedHistory>false</trackFeedHistory>
-    <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
     <type>Lookup</type>
 </CustomField>

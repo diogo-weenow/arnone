@@ -2,8 +2,8 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Dias_Reuniao_Final__c</fullName>
     <description>Etapa 5: dias ÚTEIS entre o recebimento do cálculo (exclusivo) e a reunião final (SOL_Data_Reuniao_Final__c, inclusiva). Mesmo dia útil = 0. Exclusivo de Recuperação Tributária: em ART 360 permanece VAZIO, nunca zero. Congelado na primeira conclusão válida. Campo técnico, somente leitura. CLICKUP-9439 / CLICKUP-9429 (absorvido).</description>
-    <label>Dias úteis até a reunião final (SOL)</label>
     <externalId>false</externalId>
+    <label>Dias úteis até a reunião final (SOL)</label>
     <precision>4</precision>
     <required>false</required>
     <scale>0</scale>

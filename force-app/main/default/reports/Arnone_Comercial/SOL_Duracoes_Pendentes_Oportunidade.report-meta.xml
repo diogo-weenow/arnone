@@ -36,7 +36,7 @@
     <columns>
         <field>Opportunity.SOL_Dias_Fechamento__c</field>
     </columns>
-    <description>CLICKUP-9439 / 9429 — Oportunidades SOL com os marcos da etapa completos e a duração não calculada. "Calendário indisponível" é transitório: a varredura do minuto 45 resolve. "Intervalo inconsistente": corrija as datas e rode o Batch.</description>
+    <description>CLICKUP-9439 / 9429 — Oportunidades SOL com os marcos da etapa completos e a duração não calculada. &quot;Calendário indisponível&quot; é transitório: a varredura do minuto 45 resolve. &quot;Intervalo inconsistente&quot;: corrija as datas e rode o Batch.</description>
     <filter>
         <criteriaItems>
             <column>Opportunity.SOL_Duracao_Pendente__c</column>
@@ -53,6 +53,14 @@
         <sortOrder>Asc</sortOrder>
     </groupingsDown>
     <name>SOL — Durações pendentes (Oportunidades)</name>
+    <params>
+        <name>open</name>
+        <value>all</value>
+    </params>
+    <params>
+        <name>probability</name>
+        <value>&gt;0</value>
+    </params>
     <params>
         <name>co</name>
         <value>1</value>
