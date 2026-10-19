@@ -3,6 +3,7 @@
     <fullName>SOL</fullName>
     <active>true</active>
     <businessProcess>Funil_SOL</businessProcess>
+    <compactLayoutAssignment>SOL_Oportunidade</compactLayoutAssignment>
     <description>Oportunidades da unidade Arnone Soluções, para os produtos Recuperação Tributária e ART 360.</description>
     <label>Arnone Soluções</label>
     <picklistValues>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathAssistant xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <entityName>Opportunity</entityName>
+    <fieldName>StageName</fieldName>
+    <masterLabel>Arnone Soluções</masterLabel>
+    <pathAssistantSteps>
+        <fieldNames>SOL_Data_Retorno__c</fieldNames>
+        <fieldNames>SOL_Responsavel_Legal__c</fieldNames>
+        <fieldNames>SOL_Email_Responsavel_Legal__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; comercial.&lt;/p&gt;&lt;p&gt;Proposta com o cliente. Registre a data combinada para o retorno.&lt;/p&gt;</info>
+        <picklistValueName>Aguardando Resposta</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>SOL_ECAC_Consulta_Realizada__c</fieldNames>
+        <fieldNames>SOL_ECAC_Data_Consulta__c</fieldNames>
+        <fieldNames>SOL_ECAC_Resultado__c</fieldNames>
+        <fieldNames>SOL_Valor_Recuperavel__c</fieldNames>
+        <fieldNames>SOL_Valor_Debito__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; comercial.&lt;/p&gt;&lt;p&gt;Em Recuperação Tributária, consulte o e-CAC e registre data, resultado e o valor conforme o resultado (a recuperar ou débito). Para pedir o cálculo ao jurídico, use a ação Solicitar cálculo.&lt;/p&gt;</info>
+        <picklistValueName>Diagnóstico</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>SOL_Resultado_Apresentacao__c</fieldNames>
+        <fieldNames>SOL_Percentual_Comissao__c</fieldNames>
+        <fieldNames>SOL_Valor_Servico__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; comercial.&lt;/p&gt;&lt;p&gt;Só avança para Fechamento com o resultado da apresentação igual a Sucesso.&lt;/p&gt;</info>
+        <picklistValueName>Fechamento</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>SOL_Percentual_Comissao__c</fieldNames>
+        <fieldNames>SOL_Valor_Servico__c</fieldNames>
+        <fieldNames>SOL_Resultado_Apresentacao__c</fieldNames>
+        <fieldNames>SOL_Motivo_Perda__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; comercial.&lt;/p&gt;&lt;p&gt;Recuperação Tributária exige percentual e valor do serviço maiores que zero. ART 360 e Revisão trabalhista exigem catálogo e produtos na Oportunidade. O motivo da perda tem de estar vazio.&lt;/p&gt;</info>
+        <picklistValueName>Ganho</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>SOL_ECAC_Consulta_Realizada__c</fieldNames>
+        <fieldNames>SOL_ECAC_Resultado__c</fieldNames>
+        <fieldNames>SOL_Percentual_Comissao__c</fieldNames>
+        <fieldNames>SOL_Valor_Servico__c</fieldNames>
+        <fieldNames>SOL_Responsavel_Legal__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; comercial.&lt;/p&gt;&lt;p&gt;Em Recuperação Tributária, só entra em Negociação com a consulta ao e-CAC realizada e resultado Valor a recuperar. Registre percentual, valor do serviço e o responsável legal.&lt;/p&gt;</info>
+        <picklistValueName>Negociação</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>SOL_Motivo_Perda__c</fieldNames>
+        <fieldNames>SOL_Detalhe_Perda__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; comercial.&lt;/p&gt;&lt;p&gt;Informe o motivo da perda; Outros exige o detalhe. Em Recuperação Tributária com e-CAC Sem valor, o motivo é Sem valor a recuperar no e-CAC.&lt;/p&gt;</info>
+        <picklistValueName>Perdido</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>SOL_Apresentacao_Realizada__c</fieldNames>
+        <fieldNames>SOL_Data_Apresentacao__c</fieldNames>
+        <fieldNames>SOL_Resultado_Apresentacao__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; comercial.&lt;/p&gt;&lt;p&gt;Registre a apresentação ao cliente. Apresentação realizada exige a data; o resultado só pode ser preenchido com a apresentação marcada.&lt;/p&gt;</info>
+        <picklistValueName>Reunião Realizada</picklistValueName>
+    </pathAssistantSteps>
+    <recordTypeName>SOL</recordTypeName>
+</PathAssistant>
