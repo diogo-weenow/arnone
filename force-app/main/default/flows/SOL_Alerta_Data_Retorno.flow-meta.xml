@@ -19,7 +19,7 @@
                 </rightValue>
             </conditions>
             <conditions>
-                <leftValueReference>Buscar_Oportunidade.DataRetorno__c</leftValueReference>
+                <leftValueReference>Buscar_Oportunidade.SOL_Data_Retorno__c</leftValueReference>
                 <operator>LessThanOrEqualTo</operator>
                 <rightValue>
                     <elementReference>$Flow.CurrentDate</elementReference>
@@ -51,7 +51,7 @@
         <inputAssignments>
             <field>ActivityDate</field>
             <value>
-                <elementReference>Buscar_Oportunidade.DataRetorno__c</elementReference>
+                <elementReference>Buscar_Oportunidade.SOL_Data_Retorno__c</elementReference>
             </value>
         </inputAssignments>
         <inputAssignments>
@@ -109,7 +109,7 @@
         <queriedFields>Id</queriedFields>
         <queriedFields>OwnerId</queriedFields>
         <queriedFields>StageName</queriedFields>
-        <queriedFields>DataRetorno__c</queriedFields>
+        <queriedFields>SOL_Data_Retorno__c</queriedFields>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
@@ -154,7 +154,7 @@
         <filterFormula>AND(
   {!$Record.RecordType.DeveloperName} = &quot;SOL&quot;,
   TEXT({!$Record.StageName}) = &quot;Aguardando Resposta&quot;,
-  NOT(ISBLANK({!$Record.DataRetorno__c}))
+  NOT(ISBLANK({!$Record.SOL_Data_Retorno__c}))
 )</filterFormula>
         <object>Opportunity</object>
         <recordTriggerType>CreateAndUpdate</recordTriggerType>
@@ -166,7 +166,7 @@
             <label>Na data de retorno</label>
             <offsetNumber>0</offsetNumber>
             <offsetUnit>Hours</offsetUnit>
-            <recordField>DataRetorno__c</recordField>
+            <recordField>SOL_Data_Retorno__c</recordField>
             <timeSource>RecordField</timeSource>
         </scheduledPaths>
         <triggerType>RecordAfterSave</triggerType>
