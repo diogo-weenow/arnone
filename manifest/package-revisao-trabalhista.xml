@@ -33,6 +33,8 @@
         <members>SOLEventoJornadaService</members>
         <members>SOLEventoJornadaTest</members>
         <members>SOLDistribuicaoService</members>
+        <members>SOLAcompanhamentoCalculoService</members>
+        <members>SOLAcompanhamentoCalculoTest</members>
         <members>SOLReatribuicaoContatoServiceTest</members>
         <members>SOLOptOutTest</members>
         <members>SOLValidacaoAvancoTest</members>
@@ -90,5 +92,5 @@
         <members>PS_SOL_Comercial</members>
         <name>PermissionSet</name>
     </types>
-    <version>62.0</version>
+    <version>66.0</version>
 </Package>

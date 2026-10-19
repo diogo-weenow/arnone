@@ -44,8 +44,17 @@ public without sharing class SOLProdutoBackfillBatch implements Database.Batchab
   }
 
   public Database.QueryLocator start(Database.BatchableContext bc) {
-    // Registros SOL com o campo antigo preenchido. O recorte final (novo vazio)
-    // é feito no execute, robusto à semântica de null do multi-select em SOQL.
+    // SÓ REGISTROS ATIVOS. Setar o produto num registro TERMINAL (Opp fechada /
+    // Lead convertido) re-dispara os flows de marco/perda/encerramento (critério
+    // produto+etapa vai de false->true), que NÃO são idempotentes e duplicariam
+    // contadores/eventos de perda. Registros ativos são exatamente os que a
+    // lógica viva do funil precisa do campo novo; os terminais mantêm o campo
+    // antigo e devem ser migrados numa janela com esses flows desativados
+    // (ver runbook). O recorte "novo vazio" fica no execute (semântica de null
+    // do multi-select em SOQL).
+    String filtroAtivo = (objeto == 'Lead')
+      ? ' AND IsConverted = false'
+      : ' AND IsClosed = false';
     String q =
       'SELECT Id, ' +
       campoAntigo +
@@ -55,7 +64,8 @@ public without sharing class SOLProdutoBackfillBatch implements Database.Batchab
       objeto +
       ' WHERE RecordType.DeveloperName = \'SOL\' AND ' +
       campoAntigo +
-      ' != null';
+      ' != null' +
+      filtroAtivo;
     return Database.getQueryLocator(q);
   }
 
@@ -72,7 +82,9 @@ public without sharing class SOLProdutoBackfillBatch implements Database.Batchab
       }
     }
     if (!paraAtualizar.isEmpty()) {
-      update paraAtualizar;
+      // Sucesso parcial: uma linha problemática (ex.: automação de borda) não
+      // derruba a migração do lote inteiro. Falhas ficam no resultado do job.
+      Database.update(paraAtualizar, false);
     }
   }
 

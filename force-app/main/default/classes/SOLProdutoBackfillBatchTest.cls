@@ -26,6 +26,7 @@ private class SOLProdutoBackfillBatchTest {
       Company = 'Empresa Backfill',
       Status = 'Recebido - MQL',
       Unidade_Origem__c = 'SOL',
+      CNPJ__c = '11.222.333/0001-81',
       SOL_Produto_Interesse__c = 'ART 360'
     );
     insert l;
@@ -92,6 +93,7 @@ private class SOLProdutoBackfillBatchTest {
       Company = 'Empresa Idem',
       Status = 'Recebido - MQL',
       Unidade_Origem__c = 'SOL',
+      CNPJ__c = '11.222.333/0002-81',
       SOL_Produto_Interesse__c = 'ART 360',
       // Novo já tem seleção MÚLTIPLA, feita após eventual migração anterior.
       SOL_Produtos_Interesse__c = 'ART 360;Revisão trabalhista'
