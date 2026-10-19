@@ -29,6 +29,14 @@ private class SOLEnriquecimentoControllerTest {
     return d;
   }
 
+  // Espelha a LWC: as linhas viajam como string JSON (ver adicionarLinhas).
+  private static void adicionar(
+    Id loteId,
+    List<SOLEnriquecimentoController.LinhaDTO> linhas
+  ) {
+    SOLEnriquecimentoController.adicionarLinhas(loteId, JSON.serialize(linhas));
+  }
+
   private static Map<String, String> valoresPadrao(String funcionarios) {
     return new Map<String, String>{
       'NumberOfEmployees' => funcionarios,
@@ -53,7 +61,7 @@ private class SOLEnriquecimentoControllerTest {
     Lead a = SOLEnriquecimentoTestFactory.novoLeadSOL('A', 'Emp A', CNPJ_A);
 
     Id lote = SOLEnriquecimentoController.iniciarLote('f.csv', 1);
-    SOLEnriquecimentoController.adicionarLinhas(
+    adicionar(
       lote,
       new List<SOLEnriquecimentoController.LinhaDTO>{
         dto(1, '11.222.333/0001-81', valoresPadrao('500'))
@@ -85,7 +93,7 @@ private class SOLEnriquecimentoControllerTest {
     SOLEnriquecimentoTestFactory.novoLeadSOL('A2', 'Emp A2', CNPJ_A);
 
     Id lote = SOLEnriquecimentoController.iniciarLote('f.csv', 1);
-    SOLEnriquecimentoController.adicionarLinhas(
+    adicionar(
       lote,
       new List<SOLEnriquecimentoController.LinhaDTO>{
         dto(1, CNPJ_A, valoresPadrao('500'))
@@ -131,7 +139,7 @@ private class SOLEnriquecimentoControllerTest {
     Database.convertLead(lc);
 
     Id lote = SOLEnriquecimentoController.iniciarLote('f.csv', 1);
-    SOLEnriquecimentoController.adicionarLinhas(
+    adicionar(
       lote,
       new List<SOLEnriquecimentoController.LinhaDTO>{
         dto(1, CNPJ_A, valoresPadrao('900'))
@@ -155,7 +163,7 @@ private class SOLEnriquecimentoControllerTest {
   static void invalidoPorCnpjEPorFaltaDeCompany() {
     SOLEnriquecimentoTestFactory.aplicarOverrides();
     Id lote = SOLEnriquecimentoController.iniciarLote('f.csv', 2);
-    SOLEnriquecimentoController.adicionarLinhas(
+    adicionar(
       lote,
       new List<SOLEnriquecimentoController.LinhaDTO>{
         dto(1, '123', valoresPadrao('100')), // CNPJ curto
@@ -181,7 +189,7 @@ private class SOLEnriquecimentoControllerTest {
   static void duplicadoNoArquivoNaoRecria() {
     SOLEnriquecimentoTestFactory.aplicarOverrides();
     Id lote = SOLEnriquecimentoController.iniciarLote('f.csv', 2);
-    SOLEnriquecimentoController.adicionarLinhas(
+    adicionar(
       lote,
       new List<SOLEnriquecimentoController.LinhaDTO>{
         dto(1, CNPJ_B, valoresPadrao('100')),
@@ -230,7 +238,7 @@ private class SOLEnriquecimentoControllerTest {
     Lead a = SOLEnriquecimentoTestFactory.novoLeadSOL('A', 'Emp A', CNPJ_A);
 
     Id lote = SOLEnriquecimentoController.iniciarLote('f.csv', 1);
-    SOLEnriquecimentoController.adicionarLinhas(
+    adicionar(
       lote,
       new List<SOLEnriquecimentoController.LinhaDTO>{
         dto(1, CNPJ_A, valoresPadrao('777'))

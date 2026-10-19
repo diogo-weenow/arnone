@@ -281,9 +281,20 @@ public with sharing class SOLEnriquecimentoController {
   }
 
   @AuraEnabled
-  public static void adicionarLinhas(Id loteId, List<LinhaDTO> linhas) {
+  public static void adicionarLinhas(Id loteId, String linhasJson) {
     try {
-      if (loteId == null || linhas == null || linhas.isEmpty()) {
+      if (loteId == null || String.isBlank(linhasJson)) {
+        return;
+      }
+      // A LWC envia as linhas como string JSON e desserializamos aqui: um campo
+      // Map<String,String> dentro de um tipo Apex NÃO é preenchido pela
+      // marshalling nativa LWC->Apex (zera o objeto inteiro). JSON.deserialize
+      // preenche corretamente.
+      List<LinhaDTO> linhas = (List<LinhaDTO>) JSON.deserialize(
+        linhasJson,
+        List<LinhaDTO>.class
+      );
+      if (linhas == null || linhas.isEmpty()) {
         return;
       }
       List<SOL_Enriquecimento_Linha__c> registros = new List<SOL_Enriquecimento_Linha__c>();

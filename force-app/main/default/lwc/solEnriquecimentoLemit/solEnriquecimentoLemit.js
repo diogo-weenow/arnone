@@ -199,11 +199,13 @@ export default class SolEnriquecimentoLemit extends LightningElement {
                     i + CHUNK,
                     total
                 )} de ${total}...`;
+                // Enviado como string JSON: um Map<String,String> dentro de um
+                // tipo Apex não é preenchido pela marshalling nativa LWC->Apex.
                 // Sequencial de propósito: limita heap/request por chamada.
                 // eslint-disable-next-line no-await-in-loop
                 await adicionarLinhas({
                     loteId: this.loteId,
-                    linhas: payload.slice(i, i + CHUNK)
+                    linhasJson: JSON.stringify(payload.slice(i, i + CHUNK))
                 });
             }
 
