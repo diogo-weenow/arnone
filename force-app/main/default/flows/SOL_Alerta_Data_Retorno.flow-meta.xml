@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <name>Deve_Criar_Alerta</name>
+        <label>Ainda faz sentido alertar?</label>
+        <locationX>176</locationX>
+        <locationY>384</locationY>
+        <defaultConnectorLabel>Não alertar</defaultConnectorLabel>
+        <rules>
+            <name>Sim_Criar_Alerta</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Buscar_Oportunidade.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Aguardando Resposta</stringValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Buscar_Oportunidade.DataRetorno__c</leftValueReference>
+                <operator>LessThanOrEqualTo</operator>
+                <rightValue>
+                    <elementReference>$Flow.CurrentDate</elementReference>
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>Buscar_Tarefa_Aberta</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Criar_Tarefa_Follow_Up</targetReference>
+            </connector>
+            <label>Sim, criar alerta</label>
+        </rules>
+    </decisions>
+    <description>Na data de retorno, abre uma tarefa de follow up para o dono da oportunidade Arnone Soluções que está aguardando resposta. O caminho agendado já foi marcado quando a data foi preenchida, então as condições são conferidas de novo aqui: a oportunidade pode ter mudado de fase, a data pode ter sido adiada, ou o alerta já pode existir de um agendamento anterior.</description>
+    <environments>Default</environments>
+    <interviewLabel>SOL_Alerta_Data_Retorno {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SOL Alerta de data de retorno</label>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <name>Criar_Tarefa_Follow_Up</name>
+        <label>Criar tarefa de follow up</label>
+        <locationX>50</locationX>
+        <locationY>492</locationY>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value>
+                <elementReference>Buscar_Oportunidade.DataRetorno__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>OwnerId</field>
+            <value>
+                <elementReference>Buscar_Oportunidade.OwnerId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>Normal</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Open</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>Follow Up: Alerta de data de retorno</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhatId</field>
+            <value>
+                <elementReference>Buscar_Oportunidade.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <recordLookups>
+        <name>Buscar_Oportunidade</name>
+        <label>Reler a oportunidade</label>
+        <locationX>176</locationX>
+        <locationY>168</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Buscar_Tarefa_Aberta</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Opportunity</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>OwnerId</queriedFields>
+        <queriedFields>StageName</queriedFields>
+        <queriedFields>DataRetorno__c</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <name>Buscar_Tarefa_Aberta</name>
+        <label>Já existe alerta em aberto?</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Deve_Criar_Alerta</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>WhatId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Subject</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Follow Up: Alerta de data de retorno</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>Status</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Open</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Task</object>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &quot;SOL&quot;,
+  TEXT({!$Record.StageName}) = &quot;Aguardando Resposta&quot;,
+  NOT(ISBLANK({!$Record.DataRetorno__c}))
+)</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <scheduledPaths>
+            <name>Na_Data_De_Retorno</name>
+            <connector>
+                <targetReference>Buscar_Oportunidade</targetReference>
+            </connector>
+            <label>Na data de retorno</label>
+            <offsetNumber>0</offsetNumber>
+            <offsetUnit>Hours</offsetUnit>
+            <recordField>DataRetorno__c</recordField>
+            <timeSource>RecordField</timeSource>
+        </scheduledPaths>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
