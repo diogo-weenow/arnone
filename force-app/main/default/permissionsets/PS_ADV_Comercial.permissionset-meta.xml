@@ -43,4 +43,8 @@
     </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
     <label>Arnone Advogados — Comercial</label>
+    <recordTypeVisibilities>
+        <recordType>Opportunity.ADV</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
 </PermissionSet>
