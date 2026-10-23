@@ -4,21 +4,21 @@
     <standardValue>
         <fullName>Call</fullName>
         <default>false</default>
-        <label>Call</label>
+        <label>Ligação</label>
     </standardValue>
     <standardValue>
         <fullName>Send Letter</fullName>
         <default>false</default>
-        <label>Send Letter</label>
+        <label>Enviar carta</label>
     </standardValue>
     <standardValue>
         <fullName>Send Quote</fullName>
         <default>false</default>
-        <label>Send Quote</label>
+        <label>Enviar proposta</label>
     </standardValue>
     <standardValue>
         <fullName>Other</fullName>
         <default>false</default>
-        <label>Other</label>
+        <label>Outros</label>
     </standardValue>
 </StandardValueSet>

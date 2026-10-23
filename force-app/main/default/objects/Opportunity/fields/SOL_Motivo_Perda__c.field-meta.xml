@@ -29,7 +29,7 @@
             <value>
                 <fullName>Opt Out</fullName>
                 <default>false</default>
-                <label>Opt Out</label>
+                <label>Opt-out</label>
             </value>
             <value>
                 <fullName>Contato Errado</fullName>
