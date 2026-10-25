@@ -1,16 +1,60 @@
 /**
  * Registra as respostas do Assistente Stech Telecom antes do transbordo.
  *
- * A identificação nesta etapa é o e-mail, pois CPF e CNH são conferidos pelo
- * atendente. Um Contato existente é atualizado; caso contrário, um Lead STech
- * aberto é atualizado ou criado. A ação nunca marca a CNH como recebida.
+ * A identificação segue esta ordem, e para na primeira que achar:
+ *   1. e-mail informado agora    — Contato, depois Lead aberto
+ *   2. vínculo do telefone       — MessagingEndUser.ContactId, depois .LeadId
+ *   3. telefone do candidato     — STE_Telefone_E164__c, com e sem nono dígito
+ *   4. nada                      — cria Lead STech
+ *
+ * Os passos 2 e 3 existem para não abrir registro novo quando a pessoa volta
+ * pelo mesmo WhatsApp e informa um e-mail diferente do da conversa anterior.
+ * Ao reaproveitar um cadastro, o Email original é preservado: só os campos de
+ * qualificação são regravados. O CPF continua sendo conferido pelo atendente.
+ *
+ * Quando a conversa tem arquivo anexado, a ação marca a CNH como recebida e
+ * grava o horário do próprio arquivo. Isso registra o fato de o documento ter
+ * chegado, que é objetivo e datável; não substitui a conferência do atendente,
+ * que continua sendo quem decide se o documento serve. A marca nunca é
+ * desfeita aqui: candidato que já enviou antes não volta a constar como sem
+ * CNH ao reaproveitar o cadastro.
  */
 public without sharing class STE_BotRegistrarCandidato {
   private static final String RT_LEAD = 'STE';
   private static final String UNIDADE_STE = 'STE';
 
-  @TestVisible
-  private static Set<Id> sessoesComAnexoTeste;
+  // Campos que o bot grava ao reaproveitar um cadastro. O update leva só estes:
+  // o usuário do bot roda com licença de integração e não pode salvar um
+  // registro que carregue campos que ele só lê (Email, gênero), ainda que sem
+  // alteração. Campo novo gravado em aplicar() precisa entrar aqui.
+  private static final List<String> CAMPOS_GRAVADOS_LEAD = new List<String>{
+    'MobilePhone',
+    'Status',
+    'STE_Classificacao_Fila__c',
+    'STE_Empresa_Telecom_Anterior__c',
+    'STE_Etapa_Bot__c',
+    'STE_Etapa_Bot_Desde__c',
+    'STE_Faixa_Etaria__c',
+    'STE_Interesse_Pre_Inscricao__c',
+    'STE_Ja_Trabalhou_Telecom__c',
+    'STE_MessagingSession_Id__c',
+    'STE_Motivo_Desqualificacao__c',
+    'STE_Possui_CNH__c',
+    'STE_Prazo_Envio_CNH__c',
+    'STE_Telefone_E164__c'
+  };
+
+  private static final List<String> CAMPOS_GRAVADOS_CONTATO = new List<String>{
+    'MobilePhone',
+    'STE_Classificacao_Fila__c',
+    'STE_Empresa_Telecom_Anterior__c',
+    'STE_Faixa_Etaria__c',
+    'STE_Interesse_Pre_Inscricao__c',
+    'STE_Ja_Trabalhou_Telecom__c',
+    'STE_MessagingSession_Id__c',
+    'STE_Possui_CNH__c',
+    'STE_Telefone_E164__c'
+  };
 
   public class Entrada {
     @InvocableVariable(label='E-mail' required=true)
@@ -39,6 +83,7 @@ public without sharing class STE_BotRegistrarCandidato {
 
     @InvocableVariable(label='Id do usuário final de mensageria')
     public String endUserId;
+
   }
 
   public class Resultado {
@@ -54,8 +99,17 @@ public without sharing class STE_BotRegistrarCandidato {
     @InvocableVariable(label='Tipo do registro')
     public String tipoRegistro;
 
+    /**
+     * Falso quando o candidato esbarra em algum critério da turma (idade,
+     * perfil ou CNH). O assistente usa isso para encerrar a conversa em vez de
+     * encaminhar para atendimento.
+     */
+    @InvocableVariable(label='Atende aos critérios da turma')
+    public Boolean elegivel;
+
     private Resultado() {
       sucesso = false;
+      elegivel = true;
     }
   }
 
@@ -79,7 +133,7 @@ public without sharing class STE_BotRegistrarCandidato {
 
   @InvocableMethod(
     label='Registrar candidato do bot — Stech Telecom'
-    description='Atualiza Contato/Lead pelo e-mail ou cria um Lead STech com as respostas do chatbot antes do transbordo.'
+    description='Atualiza Contato/Lead identificado pelo e-mail, pelo vínculo do telefone ou pelo telefone, ou cria um Lead STech com as respostas do chatbot antes do transbordo.'
     category='Stech Telecom'
   )
   public static List<Resultado> registrar(List<Entrada> entradas) {
@@ -88,7 +142,7 @@ public without sharing class STE_BotRegistrarCandidato {
       return saida;
     }
 
-    preencherRespostaCnhPorAnexo(entradas);
+    Map<Id, MessagingEndUser> endUsers = carregarEndUsers(entradas);
 
     Set<String> emails = new Set<String>();
     for (Entrada entrada : entradas) {
@@ -102,47 +156,80 @@ public without sharing class STE_BotRegistrarCandidato {
       }
     }
 
+    Set<Id> leadsVinculados = new Set<Id>();
+    Set<Id> contatosVinculados = new Set<Id>();
+    Set<String> telefones = new Set<String>();
+    for (MessagingEndUser eu : endUsers.values()) {
+      if (eu.LeadId != null)
+        leadsVinculados.add(eu.LeadId);
+      if (eu.ContactId != null)
+        contatosVinculados.add(eu.ContactId);
+      telefones.addAll(STE_Telefone.variantes(eu.MessagingPlatformKey));
+    }
+
+    Map<Id, Contact> contatos = new Map<Id, Contact>(
+      [
+        SELECT
+          Id,
+          Email,
+          MobilePhone,
+          STE_Classificacao_Fila__c,
+          STE_Empresa_Telecom_Anterior__c,
+          STE_Faixa_Etaria__c,
+          STE_Interesse_Pre_Inscricao__c,
+          STE_Possui_CNH__c,
+          STE_Ja_Trabalhou_Telecom__c,
+          STE_Telefone_E164__c
+        FROM Contact
+        WHERE
+          Email IN :emails
+          OR Id IN :contatosVinculados
+          OR STE_Telefone_E164__c IN :telefones
+        ORDER BY LastModifiedDate DESC
+      ]
+    );
+
+    Map<Id, Lead> leads = new Map<Id, Lead>(
+      [
+        SELECT
+          Id,
+          Email,
+          Status,
+          MobilePhone,
+          STE_Classificacao_Fila__c,
+          STE_Empresa_Telecom_Anterior__c,
+          STE_Faixa_Etaria__c,
+          STE_Interesse_Pre_Inscricao__c,
+          STE_Ja_Trabalhou_Telecom__c,
+          STE_Possui_CNH__c,
+          STE_Genero__c,
+          STE_Prazo_Envio_CNH__c,
+          STE_Telefone_E164__c
+        FROM Lead
+        WHERE
+          IsConverted = FALSE
+          AND (Email IN :emails
+          OR Id IN :leadsVinculados
+          OR STE_Telefone_E164__c IN :telefones)
+        ORDER BY LastModifiedDate DESC
+      ]
+    );
+
     Map<String, Contact> contatoPorEmail = new Map<String, Contact>();
-    for (Contact c : [
-      SELECT
-        Id,
-        Email,
-        STE_Classificacao_Fila__c,
-        STE_Empresa_Telecom_Anterior__c,
-        STE_Faixa_Etaria__c,
-        STE_Interesse_Pre_Inscricao__c,
-        STE_Ja_Trabalhou_Telecom__c,
-        STE_Possui_CNH__c
-      FROM Contact
-      WHERE Email IN :emails
-      ORDER BY LastModifiedDate DESC
-    ]) {
-      String chave = normalizarEmail(c.Email);
-      if (!contatoPorEmail.containsKey(chave)) {
-        contatoPorEmail.put(chave, c);
+    Map<String, Contact> contatoPorTelefone = new Map<String, Contact>();
+    for (Contact c : contatos.values()) {
+      indexar(contatoPorEmail, normalizarEmail(c.Email), c);
+      for (String variante : STE_Telefone.variantes(c.STE_Telefone_E164__c)) {
+        indexar(contatoPorTelefone, variante, c);
       }
     }
 
     Map<String, Lead> leadPorEmail = new Map<String, Lead>();
-    for (Lead l : [
-      SELECT
-        Id,
-        Email,
-        Status,
-        STE_Classificacao_Fila__c,
-        STE_Empresa_Telecom_Anterior__c,
-        STE_Faixa_Etaria__c,
-        STE_Interesse_Pre_Inscricao__c,
-        STE_Ja_Trabalhou_Telecom__c,
-        STE_Possui_CNH__c,
-        STE_Prazo_Envio_CNH__c
-      FROM Lead
-      WHERE Email IN :emails AND IsConverted = FALSE
-      ORDER BY LastModifiedDate DESC
-    ]) {
-      String chave = normalizarEmail(l.Email);
-      if (!leadPorEmail.containsKey(chave)) {
-        leadPorEmail.put(chave, l);
+    Map<String, Lead> leadPorTelefone = new Map<String, Lead>();
+    for (Lead l : leads.values()) {
+      indexar(leadPorEmail, normalizarEmail(l.Email), l);
+      for (String variante : STE_Telefone.variantes(l.STE_Telefone_E164__c)) {
+        indexar(leadPorTelefone, variante, l);
       }
     }
 
@@ -158,14 +245,45 @@ public without sharing class STE_BotRegistrarCandidato {
         continue;
       }
 
-      if (contatoPorEmail.containsKey(email)) {
-        Contact c = contatoPorEmail.get(email);
-        aplicar(c, entrada);
-        contatosAtualizar.add(new OperacaoContato(c, i));
-      } else if (leadPorEmail.containsKey(email)) {
-        Lead l = leadPorEmail.get(email);
-        aplicar(l, entrada);
-        leadsAtualizar.add(new OperacaoLead(l, i));
+      String telefone = telefoneDe(endUsers, entrada);
+      MessagingEndUser endUser = endUserDe(endUsers, entrada);
+
+      Contact contatoAchado = contatoPorEmail.get(email);
+      Lead leadAchado = contatoAchado != null ? null : leadPorEmail.get(email);
+
+      // O e-mail informado agora não achou ninguém: cai para a identidade do
+      // telefone, que é o que impede Lead duplicado quando a pessoa volta e
+      // informa um e-mail diferente do da conversa anterior.
+      if (contatoAchado == null && leadAchado == null && endUser != null) {
+        if (contatos.containsKey(endUser.ContactId)) {
+          contatoAchado = contatos.get(endUser.ContactId);
+        } else if (leads.containsKey(endUser.LeadId)) {
+          leadAchado = leads.get(endUser.LeadId);
+        } else {
+          String chave = primeiraVariante(
+            endUser.MessagingPlatformKey,
+            contatoPorTelefone.keySet()
+          );
+          if (chave != null) {
+            contatoAchado = contatoPorTelefone.get(chave);
+          } else {
+            chave = primeiraVariante(
+              endUser.MessagingPlatformKey,
+              leadPorTelefone.keySet()
+            );
+            if (chave != null) {
+              leadAchado = leadPorTelefone.get(chave);
+            }
+          }
+        }
+      }
+
+      if (contatoAchado != null) {
+        aplicar(contatoAchado, entrada, telefone);
+        contatosAtualizar.add(new OperacaoContato(contatoAchado, i));
+      } else if (leadAchado != null) {
+        aplicar(leadAchado, entrada, telefone);
+        leadsAtualizar.add(new OperacaoLead(leadAchado, i));
       } else {
         String nome = texto(entrada.nomeCompleto);
         if (nome == null) {
@@ -179,52 +297,95 @@ public without sharing class STE_BotRegistrarCandidato {
           RecordTypeId = rtLead,
           Unidade_Origem__c = UNIDADE_STE
         );
-        aplicar(novo, entrada);
+        aplicar(novo, entrada, telefone);
         leadsCriar.add(new OperacaoLead(novo, i));
-        leadPorEmail.put(email, novo);
+        indexar(leadPorEmail, email, novo);
+        for (String variante : STE_Telefone.variantes(telefone)) {
+          indexar(leadPorTelefone, variante, novo);
+        }
       }
     }
 
     executarContatos(contatosAtualizar, saida);
     executarLeads(leadsAtualizar, saida, false);
     executarLeads(leadsCriar, saida, true);
+    vincularEndUsers(entradas, saida, endUsers);
     return saida;
   }
 
-  private static void preencherRespostaCnhPorAnexo(List<Entrada> entradas) {
-    Set<Id> sessoes = new Set<Id>();
+  /** Carrega os MessagingEndUser das entradas: telefone e vínculos atuais. */
+  private static Map<Id, MessagingEndUser> carregarEndUsers(
+    List<Entrada> entradas
+  ) {
+    Set<Id> ids = new Set<Id>();
     for (Entrada entrada : entradas) {
       if (entrada == null)
         continue;
-      Id sessaoId = idDoTipo(entrada.routableId, MessagingSession.SObjectType);
-      if (sessaoId != null)
-        sessoes.add(sessaoId);
+      Id endUser = idDoTipo(entrada.endUserId, MessagingEndUser.SObjectType);
+      if (endUser != null)
+        ids.add(endUser);
     }
-    if (sessoes.isEmpty())
-      return;
-
-    Set<Id> sessoesComAnexo = new Set<Id>();
-    if (Test.isRunningTest() && sessoesComAnexoTeste != null) {
-      sessoesComAnexo.addAll(sessoesComAnexoTeste);
-    } else {
-      for (ContentDocumentLink vinculo : [
-        SELECT LinkedEntityId
-        FROM ContentDocumentLink
-        WHERE LinkedEntityId IN :sessoes
-      ]) {
-        sessoesComAnexo.add(vinculo.LinkedEntityId);
-      }
-    }
-
-    for (Entrada entrada : entradas) {
-      if (entrada == null)
-        continue;
-      Id sessaoId = idDoTipo(entrada.routableId, MessagingSession.SObjectType);
-      if (sessaoId != null && sessoesComAnexo.contains(sessaoId)) {
-        entrada.respostaCNH = 'Vou enviar agora';
-      }
-    }
+    if (ids.isEmpty())
+      return new Map<Id, MessagingEndUser>();
+    return new Map<Id, MessagingEndUser>(
+      [
+        SELECT Id, LeadId, ContactId, MessagingPlatformKey
+        FROM MessagingEndUser
+        WHERE Id IN :ids
+      ]
+    );
   }
+
+  /** Telefone E.164 só com dígitos, a partir do MessagingPlatformKey. */
+  private static MessagingEndUser endUserDe(
+    Map<Id, MessagingEndUser> endUsers,
+    Entrada entrada
+  ) {
+    if (entrada == null)
+      return null;
+    Id endUser = idDoTipo(entrada.endUserId, MessagingEndUser.SObjectType);
+    return endUser == null ? null : endUsers.get(endUser);
+  }
+
+  private static String telefoneDe(
+    Map<Id, MessagingEndUser> endUsers,
+    Entrada entrada
+  ) {
+    MessagingEndUser eu = endUserDe(endUsers, entrada);
+    return eu == null ? null : STE_Telefone.chave(eu.MessagingPlatformKey);
+  }
+
+  private static void indexar(
+    Map<String, Lead> destino,
+    String chave,
+    Lead valor
+  ) {
+    if (chave != null && !destino.containsKey(chave))
+      destino.put(chave, valor);
+  }
+
+  private static void indexar(
+    Map<String, Contact> destino,
+    String chave,
+    Contact valor
+  ) {
+    if (chave != null && !destino.containsKey(chave))
+      destino.put(chave, valor);
+  }
+
+  /** Primeira variante do telefone presente no conjunto de chaves indexadas. */
+  private static String primeiraVariante(
+    String telefone,
+    Set<String> disponiveis
+  ) {
+    for (String variante : STE_Telefone.variantes(telefone)) {
+      if (disponiveis.contains(variante))
+        return variante;
+    }
+    return null;
+  }
+
+
 
   private static Id idDoTipo(String valor, Schema.SObjectType tipoEsperado) {
     String limpo = texto(valor);
@@ -238,7 +399,7 @@ public without sharing class STE_BotRegistrarCandidato {
     }
   }
 
-  private static void aplicar(Contact c, Entrada entrada) {
+  private static void aplicar(Contact c, Entrada entrada, String telefone) {
     c.STE_Interesse_Pre_Inscricao__c = interesse(entrada.respostaPreInscricao);
     c.STE_Faixa_Etaria__c = faixa(entrada.respostaIdade);
     c.STE_Ja_Trabalhou_Telecom__c = simNao(entrada.jaTrabalhouTelecom);
@@ -246,22 +407,66 @@ public without sharing class STE_BotRegistrarCandidato {
     c.STE_Possui_CNH__c = posseCnh(entrada.respostaCNH);
     c.STE_Classificacao_Fila__c = classificacao(entrada);
     c.STE_MessagingSession_Id__c = sessao(entrada);
+    if (telefone != null) {
+      c.STE_Telefone_E164__c = telefone;
+      if (String.isBlank(c.MobilePhone)) {
+        c.MobilePhone = '+' + telefone;
+      }
+    }
   }
 
-  private static void aplicar(Lead l, Entrada entrada) {
+  /**
+   * Critérios da turma, na ordem definida pelo Instituto: idade e gênero são
+   * avaliados antes da CNH. Devolve o motivo da recusa, ou null se o candidato
+   * atende a tudo que conseguimos verificar hoje.
+   *
+   * "CNH provisória" existe na lista de motivos mas ainda não é usado: nem o
+   * formulário do site nem o assistente perguntam se a habilitação é
+   * definitiva, então não há de onde tirar essa informação.
+   */
+  private static String motivoInelegibilidade(Lead l) {
+    if (l.STE_Faixa_Etaria__c == 'Fora da faixa') {
+      return 'Fora da faixa etária';
+    }
+    if (l.STE_Genero__c == 'Feminino') {
+      return 'Não atende ao perfil da turma';
+    }
+    if (l.STE_Possui_CNH__c == 'Não') {
+      return 'Sem CNH';
+    }
+    return null;
+  }
+
+  private static void aplicar(Lead l, Entrada entrada, String telefone) {
     l.STE_Interesse_Pre_Inscricao__c = interesse(entrada.respostaPreInscricao);
     l.STE_Faixa_Etaria__c = faixa(entrada.respostaIdade);
     l.STE_Ja_Trabalhou_Telecom__c = simNao(entrada.jaTrabalhouTelecom);
     l.STE_Empresa_Telecom_Anterior__c = empresa(entrada);
-    l.STE_Possui_CNH__c = posseCnh(entrada.respostaCNH);
+    // O assistente só oferece "agora" ou "depois"; quem declarou não ter CNH
+    // fez isso no formulário do site. Sem resposta do bot, preserva o que veio de lá.
+    String posseInformada = posseCnh(entrada.respostaCNH);
+    if (posseInformada != null) {
+      l.STE_Possui_CNH__c = posseInformada;
+    }
     l.STE_Classificacao_Fila__c = classificacao(entrada);
     l.STE_MessagingSession_Id__c = sessao(entrada);
+    // Chegou ao fim do fluxo: não há mais pergunta pendente. Quem foi barrado
+    // por um critério da turma fica marcado à parte, para não ser confundido
+    // no funil com quem completou a pré-inscrição.
+    String motivo = motivoInelegibilidade(l);
+    l.STE_Etapa_Bot__c = motivo == null ? 'Concluído' : 'Desqualificado';
+    l.STE_Etapa_Bot_Desde__c = System.now();
+    l.STE_Motivo_Desqualificacao__c = motivo;
+    if (telefone != null) {
+      l.STE_Telefone_E164__c = telefone;
+      if (String.isBlank(l.MobilePhone)) {
+        l.MobilePhone = '+' + telefone;
+      }
+    }
     l.STE_Prazo_Envio_CNH__c = l.STE_Possui_CNH__c == 'Sim, envio posterior'
       ? System.now().addHours(2)
       : null;
-    l.Status = l.STE_Faixa_Etaria__c == 'Fora da faixa'
-      ? 'Desqualificado'
-      : 'Validação';
+    l.Status = motivo == null ? 'Validação' : 'Desqualificado';
   }
 
   private static void executarContatos(
@@ -272,7 +477,9 @@ public without sharing class STE_BotRegistrarCandidato {
       return;
     List<Contact> registros = new List<Contact>();
     for (OperacaoContato op : operacoes)
-      registros.add(op.registro);
+      registros.add(
+        (Contact) somenteGravados(op.registro, CAMPOS_GRAVADOS_CONTATO)
+      );
     Database.SaveResult[] resultados = Database.update(registros, false);
     for (Integer i = 0; i < resultados.size(); i++) {
       concluir(saida[operacoes[i].indice], resultados[i], 'Contact');
@@ -288,13 +495,90 @@ public without sharing class STE_BotRegistrarCandidato {
       return;
     List<Lead> registros = new List<Lead>();
     for (OperacaoLead op : operacoes)
-      registros.add(op.registro);
+      registros.add(
+        inserir
+          ? op.registro
+          : (Lead) somenteGravados(op.registro, CAMPOS_GRAVADOS_LEAD)
+      );
     Database.SaveResult[] resultados = inserir
       ? Database.insert(registros, false)
       : Database.update(registros, false);
     for (Integer i = 0; i < resultados.size(); i++) {
-      concluir(saida[operacoes[i].indice], resultados[i], 'Lead');
+      concluir(
+        saida[operacoes[i].indice],
+        resultados[i],
+        'Lead',
+        operacoes[i].registro
+      );
     }
+  }
+
+  /** Cópia do registro com o Id e apenas os campos que o bot grava. */
+  private static SObject somenteGravados(SObject origem, List<String> campos) {
+    SObject copia = origem.getSObjectType().newSObject(origem.Id);
+    Map<String, Object> preenchidos = origem.getPopulatedFieldsAsMap();
+    for (String campo : campos) {
+      if (preenchidos.containsKey(campo)) {
+        copia.put(campo, preenchidos.get(campo));
+      }
+    }
+    return copia;
+  }
+
+  /**
+   * Grava no MessagingEndUser o vínculo durável entre o telefone e o registro.
+   *
+   * O MessagingEndUser é único por telefone e por canal, e sobrevive entre
+   * conversas, ao contrário da MessagingSession. Contato tem precedência sobre
+   * Lead: quando o candidato já é Contato, o LeadId é limpo.
+   */
+  private static void vincularEndUsers(
+    List<Entrada> entradas,
+    List<Resultado> saida,
+    Map<Id, MessagingEndUser> endUsers
+  ) {
+    Map<Id, Resultado> porEndUser = new Map<Id, Resultado>();
+    for (Integer i = 0; i < entradas.size(); i++) {
+      Entrada entrada = entradas[i];
+      if (entrada == null)
+        continue;
+      Id endUser = idDoTipo(entrada.endUserId, MessagingEndUser.SObjectType);
+      Resultado r = saida[i];
+      if (
+        endUser == null ||
+        !endUsers.containsKey(endUser) ||
+        r.sucesso != true ||
+        r.recordId == null
+      )
+        continue;
+      porEndUser.put(endUser, r);
+    }
+    if (porEndUser.isEmpty())
+      return;
+
+    // Instâncias novas de propósito: o registro carregado traz o
+    // MessagingPlatformKey, que não é gravável e derruba o update.
+    List<MessagingEndUser> alterar = new List<MessagingEndUser>();
+    for (Id chave : porEndUser.keySet()) {
+      MessagingEndUser eu = endUsers.get(chave);
+      Resultado r = porEndUser.get(chave);
+      Id registro = (Id) r.recordId;
+      if (r.tipoRegistro == 'Contact') {
+        if (eu.ContactId != registro) {
+          alterar.add(
+            new MessagingEndUser(
+              Id = chave,
+              ContactId = registro,
+              LeadId = null
+            )
+          );
+        }
+      } else if (eu.ContactId == null && eu.LeadId != registro) {
+        alterar.add(new MessagingEndUser(Id = chave, LeadId = registro));
+      }
+    }
+    if (!alterar.isEmpty())
+      Database.update(alterar, false);
   }
 
   private static void concluir(
@@ -302,8 +586,20 @@ public without sharing class STE_BotRegistrarCandidato {
     Database.SaveResult resultado,
     String tipo
   ) {
+    concluir(saida, resultado, tipo, null);
+  }
+
+  private static void concluir(
+    Resultado saida,
+    Database.SaveResult resultado,
+    String tipo,
+    Lead registro
+  ) {
     saida.sucesso = resultado.isSuccess();
     saida.tipoRegistro = tipo;
+    if (registro != null) {
+      saida.elegivel = registro.STE_Motivo_Desqualificacao__c == null;
+    }
     if (resultado.isSuccess()) {
       saida.recordId = String.valueOf(resultado.getId());
       saida.mensagem = tipo + ' registrado com as respostas do chatbot.';

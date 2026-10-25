@@ -85,3 +85,10 @@ node_modules/
 **/mktDataConnections/**
 **/notificationTypeConfig/**
 **/appMenus/**
+# SYNC-PROD-HOTFIXES: Marketing Cloud Next / Data Cloud, so existem em producao
+**/flows/flow_701*
+**/flows/STE_Registrar_Aceite_Comunicacoes.flow-meta.xml
+# SYNC-PROD-HOTFIXES: roteamento com Id de fila fixo por org (parametrizar em card proprio)
+**/flows/Route_to_Assistente_STE_Aprimorado.flow-meta.xml
+**/flows/Route_to_Assistente_STE_WhatsApp_Teste.flow-meta.xml
+**/flows/Route_to_Assistente_Arnone_Aprimorado.flow-meta.xml

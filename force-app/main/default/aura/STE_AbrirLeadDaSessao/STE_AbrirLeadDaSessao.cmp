@@ -1,0 +1,24 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global">
+  <!--
+    Abre o Lead da conversa numa subaba do console quando o atendente abre a
+    MessagingSession. Não desenha nada na página.
+
+    O Lead vem da própria sessão (LeadId, gravado pelo roteamento de quem já tem
+    cadastro) ou do MessagingEndUser (LeadId, gravado pelo bot ao registrar o
+    candidato). A sessão tem precedência. Só age em conversa ativa, para que
+    abrir uma sessão já encerrada não abra o Lead junto.
+  -->
+  <aura:attribute name="sessao" type="Object" access="private" />
+  <aura:attribute name="erro" type="String" access="private" />
+  <aura:attribute name="leadAberto" type="String" access="private" />
+
+  <lightning:workspaceAPI aura:id="workspace" />
+  <force:recordData
+    aura:id="dados"
+    recordId="{!v.recordId}"
+    fields="Status,LeadId,MessagingEndUser.LeadId"
+    targetFields="{!v.sessao}"
+    targetError="{!v.erro}"
+    recordUpdated="{!c.aoAtualizarSessao}"
+  />
+</aura:component>

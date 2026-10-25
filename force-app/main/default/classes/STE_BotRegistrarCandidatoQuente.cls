@@ -24,6 +24,19 @@ public without sharing class STE_BotRegistrarCandidatoQuente {
     @InvocableVariable(label='Qual empresa de Telecom')
     public String empresaTelecomAnterior;
 
+    /**
+     * O dialogo Processar CNH recebida envia este parametro. Sem declara-lo
+     * aqui a plataforma recusa a invocacao inteira por parametro desconhecido,
+     * e o metodo nem chega a executar.
+     *
+     * Fica declarado e nao usado de proposito: quem vincula o arquivo ao Lead
+     * e o flow STE_Vincular_Arquivo_CNH, em scheduled path, para rodar como
+     * Automated Process e nao depender de permissao de Content do usuario do
+     * bot.
+     */
+    @InvocableVariable(label='Arquivos de CNH recebidos')
+    public List<Id> arquivosCNH;
+
     @InvocableVariable(label='Id roteavel da sessao')
     public String routableId;
 
@@ -43,6 +56,9 @@ public without sharing class STE_BotRegistrarCandidatoQuente {
 
     @InvocableVariable(label='Tipo do registro')
     public String tipoRegistro;
+
+    @InvocableVariable(label='Atende aos critérios da turma')
+    public Boolean elegivel;
   }
 
   @InvocableMethod(
@@ -82,6 +98,7 @@ public without sharing class STE_BotRegistrarCandidatoQuente {
       resultado.mensagem = base.mensagem;
       resultado.recordId = base.recordId;
       resultado.tipoRegistro = base.tipoRegistro;
+      resultado.elegivel = base.elegivel;
       resultados.add(resultado);
     }
     return resultados;

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ConversationMessageDefinition xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <constants>
+        <constantType>Title</constantType>
+        <primitiveValues>
+            <textValue>Oi! 👋 Para continuar sua pré-inscrição na Stech Telecom, preciso do seu nome completo. É rapidinho.</textValue>
+            <type>Text</type>
+        </primitiveValues>
+    </constants>
+    <contentCategory>Reminder</contentCategory>
+    <label>STech — Chamada nome</label>
+    <language>pt_BR</language>
+    <messageLayouts>
+        <externalTemplates>
+            <accountIdentifier>1782595433067653</accountIdentifier>
+            <accountName>Instituto Stech</accountName>
+            <externalConfigJson>{&quot;templateCategory&quot;:&quot;Utility&quot;,&quot;contentSections&quot;:[{&quot;sectionType&quot;:&quot;BodyContentSection&quot;,&quot;bodyContents&quot;:[{&quot;contentType&quot;:&quot;TextContent&quot;,&quot;text&quot;:&quot;Olá! 👋\n\nSua pré-inscrição na Stech Telecom está quase pronta - só falta o seu nome completo.\n\nMe manda por aqui?&quot;}]}],&quot;assets&quot;:[],&quot;name&quot;:&quot;sfdc_00das00000ffjkh_2bb241ca_a392_47b3_a730_20d5692b5475&quot;,&quot;languageCode&quot;:&quot;pt_BR&quot;,&quot;templateSections&quot;:[]}</externalConfigJson>
+            <language>pt_BR</language>
+            <layoutJson>{&quot;messageType&quot;:&quot;StaticContent&quot;,&quot;layoutItems&quot;:[{&quot;collectionType&quot;:&quot;None&quot;,&quot;itemName&quot;:&quot;externalTemplate&quot;,&quot;itemType&quot;:&quot;Composite&quot;,&quot;id&quot;:&quot;0liN500000010sQ&quot;,&quot;itemValues&quot;:[{&quot;layoutItems&quot;:[{&quot;collectionType&quot;:&quot;None&quot;,&quot;itemName&quot;:&quot;name&quot;,&quot;itemType&quot;:&quot;Primitive&quot;,&quot;id&quot;:&quot;0liN500000010sR&quot;,&quot;itemValues&quot;:[{&quot;valueType&quot;:&quot;Literal&quot;,&quot;id&quot;:&quot;0lvN500000012Ch&quot;,&quot;literalValue&quot;:&quot;Autopopulated&quot;}]},{&quot;collectionType&quot;:&quot;None&quot;,&quot;itemName&quot;:&quot;languageCode&quot;,&quot;itemType&quot;:&quot;Primitive&quot;,&quot;id&quot;:&quot;0liN500000010sS&quot;,&quot;itemValues&quot;:[{&quot;valueType&quot;:&quot;Literal&quot;,&quot;id&quot;:&quot;0lvN500000012Ci&quot;,&quot;literalValue&quot;:&quot;pt_BR&quot;}]},{&quot;collectionType&quot;:&quot;None&quot;,&quot;itemName&quot;:&quot;templateCategory&quot;,&quot;itemType&quot;:&quot;Primitive&quot;,&quot;id&quot;:&quot;0liN500000010sT&quot;,&quot;itemValues&quot;:[{&quot;valueType&quot;:&quot;Literal&quot;,&quot;id&quot;:&quot;0lvN500000012Ck&quot;,&quot;literalValue&quot;:&quot;UTILITY&quot;}]},{&quot;collectionType&quot;:&quot;StaticList&quot;,&quot;itemName&quot;:&quot;contentSections&quot;,&quot;itemType&quot;:&quot;Composite&quot;,&quot;id&quot;:&quot;0liN500000010sU&quot;,&quot;itemValues&quot;:[{&quot;layoutItems&quot;:[{&quot;collectionType&quot;:&quot;StaticList&quot;,&quot;itemName&quot;:&quot;bodyContents&quot;,&quot;itemType&quot;:&quot;Composite&quot;,&quot;id&quot;:&quot;0liN500000010sV&quot;,&quot;itemValues&quot;:[{&quot;layoutItems&quot;:[{&quot;collectionType&quot;:&quot;None&quot;,&quot;itemName&quot;:&quot;text&quot;,&quot;itemType&quot;:&quot;Primitive&quot;,&quot;id&quot;:&quot;0liN500000010sW&quot;,&quot;itemValues&quot;:[{&quot;longLiteralValue&quot;:&quot;Olá! 👋\n\nSua pré-inscrição na Stech Telecom está quase pronta - só falta o seu nome completo.\n\nMe manda por aqui?&quot;,&quot;valueType&quot;:&quot;LongLiteral&quot;,&quot;id&quot;:&quot;0lvN500000012Cm&quot;}]}],&quot;valueType&quot;:&quot;CompositeType&quot;,&quot;id&quot;:&quot;0lvN500000012Cl&quot;,&quot;compositeType&quot;:&quot;TextContent&quot;}]}],&quot;valueType&quot;:&quot;CompositeType&quot;,&quot;id&quot;:&quot;0lvN500000012Cj&quot;,&quot;compositeType&quot;:&quot;BodyContentSection&quot;}]}],&quot;valueType&quot;:&quot;CompositeType&quot;,&quot;id&quot;:&quot;0lvN500000012Cg&quot;,&quot;compositeType&quot;:&quot;ExternalTemplate&quot;}]}],&quot;externalTemplate&quot;:{&quot;templateStatus&quot;:&quot;Pending&quot;,&quot;templateType&quot;:&quot;Template&quot;,&quot;templateVersionIdentifier&quot;:&quot;tempResourceId&quot;,&quot;templateName&quot;:&quot;Autopopulated&quot;,&quot;accountIdentifier&quot;:&quot;1782595433067653&quot;,&quot;templateLanguage&quot;:&quot;pt_BR&quot;,&quot;id&quot;:&quot;15SN5000001xO7N&quot;},&quot;id&quot;:&quot;0mlN50000000zmf&quot;,&quot;formatType&quot;:&quot;ExternalTemplate&quot;,&quot;parentId&quot;:&quot;1mdN5000000BMN5&quot;}</layoutJson>
+            <status>Pending</status>
+            <templateName>sfdc_00das00000ffjkh_2bb241ca_a392_47b3_a730_20d5692b5475</templateName>
+            <templateVersionIdentifier>28410168168642053</templateVersionIdentifier>
+            <type>Template</type>
+        </externalTemplates>
+        <formatType>ExternalTemplate</formatType>
+        <layoutItems>
+            <collectionType>None</collectionType>
+            <compositeValues>
+                <compositeTypeName>ExternalTemplate</compositeTypeName>
+                <layoutItems>
+                    <collectionType>StaticList</collectionType>
+                    <compositeValues>
+                        <compositeTypeName>BodyContentSection</compositeTypeName>
+                        <layoutItems>
+                            <collectionType>StaticList</collectionType>
+                            <compositeValues>
+                                <compositeTypeName>TextContent</compositeTypeName>
+                                <layoutItems>
+                                    <collectionType>None</collectionType>
+                                    <name>text</name>
+                                    <primitiveValues>
+                                        <longLiteralValue>Olá! 👋
+
+Sua pré-inscrição na Stech Telecom está quase pronta - só falta o seu nome completo.
+
+Me manda por aqui?</longLiteralValue>
+                                        <type>LongLiteral</type>
+                                    </primitiveValues>
+                                </layoutItems>
+                            </compositeValues>
+                            <name>bodyContents</name>
+                        </layoutItems>
+                    </compositeValues>
+                    <name>contentSections</name>
+                </layoutItems>
+                <layoutItems>
+                    <collectionType>None</collectionType>
+                    <name>languageCode</name>
+                    <primitiveValues>
+                        <literalValue>pt_BR</literalValue>
+                        <type>Literal</type>
+                    </primitiveValues>
+                </layoutItems>
+                <layoutItems>
+                    <collectionType>None</collectionType>
+                    <name>name</name>
+                    <primitiveValues>
+                        <literalValue>sfdc_00das00000ffjkh_2bb241ca_a392_47b3_a730_20d5692b5475</literalValue>
+                        <type>Literal</type>
+                    </primitiveValues>
+                </layoutItems>
+                <layoutItems>
+                    <collectionType>None</collectionType>
+                    <name>templateCategory</name>
+                    <primitiveValues>
+                        <literalValue>UTILITY</literalValue>
+                        <type>Literal</type>
+                    </primitiveValues>
+                </layoutItems>
+            </compositeValues>
+            <name>externalTemplate</name>
+        </layoutItems>
+        <layoutVariant xsi:nil="true"/>
+        <messageType>StaticContent</messageType>
+    </messageLayouts>
+    <messageLayouts>
+        <formatType>Text</formatType>
+        <layoutItems>
+            <collectionType>None</collectionType>
+            <name>text</name>
+            <primitiveValues>
+                <type>SourcePrimitiveValue</type>
+                <valueSourceReference>Constants.Title</valueSourceReference>
+            </primitiveValues>
+        </layoutItems>
+        <layoutVariant xsi:nil="true"/>
+        <messageType>StaticContent</messageType>
+    </messageLayouts>
+    <type>Notification</type>
+</ConversationMessageDefinition>

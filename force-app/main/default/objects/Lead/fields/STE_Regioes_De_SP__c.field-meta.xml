@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Regioes_De_SP__c</fullName>
+    <label>Regiões de SP</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>true</sorted>
+            <value>
+                <fullName>ABCD Paulista</fullName>
+                <default>false</default>
+                <label>ABCD Paulista</label>
+            </value>
+            <value>
+                <fullName>Centro</fullName>
+                <default>false</default>
+                <label>Centro</label>
+            </value>
+            <value>
+                <fullName>Cotia</fullName>
+                <default>false</default>
+                <label>Cotia</label>
+            </value>
+            <value>
+                <fullName>Guarulhos</fullName>
+                <default>false</default>
+                <label>Guarulhos</label>
+            </value>
+            <value>
+                <fullName>Mairiporã</fullName>
+                <default>false</default>
+                <label>Mairiporã</label>
+            </value>
+            <value>
+                <fullName>Osasco</fullName>
+                <default>false</default>
+                <label>Osasco</label>
+            </value>
+            <value>
+                <fullName>Paranapiacaba</fullName>
+                <default>false</default>
+                <label>Paranapiacaba</label>
+            </value>
+            <value>
+                <fullName>Zona Leste</fullName>
+                <default>false</default>
+                <label>Zona Leste</label>
+            </value>
+            <value>
+                <fullName>Zona Norte</fullName>
+                <default>false</default>
+                <label>Zona Norte</label>
+            </value>
+            <value>
+                <fullName>Zona Oeste</fullName>
+                <default>false</default>
+                <label>Zona Oeste</label>
+            </value>
+            <value>
+                <fullName>Zona Sul</fullName>
+                <default>false</default>
+                <label>Zona Sul</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

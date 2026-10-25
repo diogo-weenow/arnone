@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Etapa_Bot__c</fullName>
+    <description>Ponto da conversa em que o candidato está no assistente. Gravado a cada etapa concluída, para que se saiba onde ele parou quando a conversa é abandonada. Alimenta a retomada automática e o acompanhamento do funil.</description>
+    <label>Etapa no assistente</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Aguardando e-mail</fullName>
+                <default>false</default>
+                <label>Aguardando e-mail</label>
+            </value>
+            <value>
+                <fullName>Aguardando nome</fullName>
+                <default>false</default>
+                <label>Aguardando nome</label>
+            </value>
+            <value>
+                <fullName>Aguardando pré-inscrição</fullName>
+                <default>false</default>
+                <label>Aguardando pré-inscrição</label>
+            </value>
+            <value>
+                <fullName>Aguardando faixa etária</fullName>
+                <default>false</default>
+                <label>Aguardando faixa etária</label>
+            </value>
+            <value>
+                <fullName>Aguardando experiência</fullName>
+                <default>false</default>
+                <label>Aguardando experiência</label>
+            </value>
+            <value>
+                <fullName>Aguardando empresa anterior</fullName>
+                <default>false</default>
+                <label>Aguardando empresa anterior</label>
+            </value>
+            <value>
+                <fullName>Aguardando escolha da CNH</fullName>
+                <default>false</default>
+                <label>Aguardando escolha da CNH</label>
+            </value>
+            <value>
+                <fullName>Aguardando arquivo da CNH</fullName>
+                <default>false</default>
+                <label>Aguardando arquivo da CNH</label>
+            </value>
+            <value>
+                <fullName>Concluído</fullName>
+                <default>false</default>
+                <label>Concluído</label>
+            </value>
+            <value>
+                <fullName>Desqualificado</fullName>
+                <default>false</default>
+                <label>Desqualificado</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

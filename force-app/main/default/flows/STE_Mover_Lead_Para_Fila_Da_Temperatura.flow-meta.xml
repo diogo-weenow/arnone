@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>62.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Definir_Dono</name>
+        <label>Definir dono do Lead</label>
+        <locationX>176</locationX>
+        <locationY>408</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.OwnerId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Buscar_Fila_Da_Temperatura.Id</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <description>Move o Lead para a fila correspondente à sua temperatura sempre que a classificação muda. O candidato entra frio pelo formulário do site e sobe para Morna ou Quente quando o assistente registra como ele vai enviar a CNH; sem isto o cadastro ficaria parado na fila de entrada enquanto a conversa já está em outra fila. Roda só em atualização: na criação quem define o dono é a regra de atribuição, que corre depois deste ponto.</description>
+    <environments>Default</environments>
+    <formulas>
+        <name>Nome_Da_Fila</name>
+        <dataType>String</dataType>
+        <expression>&apos;Fila_STE_&apos; &amp; TEXT({!$Record.STE_Classificacao_Fila__c})</expression>
+    </formulas>
+    <interviewLabel>STE Mover Lead Para Fila Da Temperatura {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>STE Mover Lead Para Fila Da Temperatura</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>Buscar_Fila_Da_Temperatura</name>
+        <label>Buscar fila da temperatura</label>
+        <locationX>176</locationX>
+        <locationY>288</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Definir_Dono</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Nome_Da_Fila</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Type</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Queue</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Group</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Buscar_Fila_Da_Temperatura</targetReference>
+        </connector>
+        <filterFormula>AND(
+  NOT(ISBLANK(TEXT({!$Record.STE_Classificacao_Fila__c}))),
+  ISCHANGED({!$Record.STE_Classificacao_Fila__c})
+)</filterFormula>
+        <object>Lead</object>
+        <recordTriggerType>Update</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
