@@ -666,10 +666,12 @@ private class SOLNegocioPerdidoTest {
   // ============================================ 11. SAÍDA DE "RECEBIDO - MQL"
 
   /**
-   * (11) Sair de "Recebido - MQL" em Recuperação Tributária sem compromisso é
-   * permitido SOMENTE para opt-out ou para perda devidamente identificada;
-   * qualquer outra saída manual segue bloqueada pela VR
-   * SOL_Recuperacao_Exige_Compromisso.
+   * (11) Sair de "Recebido - MQL" em Recuperação Tributária sem compromisso.
+   * A VR SOL_Recuperacao_Exige_Compromisso foi desativada por decisão do PO
+   * (VR-COMPROMISSO-INATIVA, 2026-10-25): a saída manual de MQL deixou de
+   * exigir compromisso. Continuam valendo a perda identificada, o opt-out
+   * (CLICKUP-9418) e a VR de coerência do motivo (D2), que segue barrando
+   * "Desqualificado" sem motivo.
    */
   @IsTest
   static void saidaDeRecebidoMqlSoParaOptOutOuPerda() {
@@ -677,8 +679,8 @@ private class SOLNegocioPerdidoTest {
 
     Lead paraPerder = novoLead(PRODUTO_RT);
     update new Lead(Id = paraPerder.Id, Status = 'Recebido - MQL');
-    Lead paraBloquear = novoLead(PRODUTO_RT);
-    update new Lead(Id = paraBloquear.Id, Status = 'Recebido - MQL');
+    Lead paraAvancar = novoLead(PRODUTO_RT);
+    update new Lead(Id = paraAvancar.Id, Status = 'Recebido - MQL');
     Lead paraOptOut = novoLead(PRODUTO_RT);
     update new Lead(Id = paraOptOut.Id, Status = 'Recebido - MQL');
 
@@ -686,28 +688,19 @@ private class SOLNegocioPerdidoTest {
     // (a) PERDA devidamente identificada: permitida.
     perderLead(paraPerder.Id);
 
-    // (b) Qualquer outra saída manual: BLOQUEADA pela VR do compromisso.
-    // Usamos "Reunião Agendada - SQL" porque "Qualificado" já é barrado antes
-    // pelo Flow de avanço (CLICKUP-9419), com outra mensagem — o que mascararia
-    // o que este teste quer isolar.
-    Boolean bloqueou = false;
-    try {
-      update new Lead(Id = paraBloquear.Id, Status = 'Reunião Agendada - SQL');
-    } catch (DmlException e) {
-      bloqueou = e.getMessage().containsIgnoreCase('compromisso');
-    }
-
-    // (c) Desqualificado sem o motivo de perda: também BLOQUEADO. Desde o D2 da
-    // homologação E2E duas regras cobrem este desvio — a do compromisso e a de
-    // coerência do motivo —, e a plataforma reporta a primeira que avaliar.
+    // (b) Desqualificado sem o motivo de perda: BLOQUEADO pela VR de coerência
+    // do motivo (D2). Roda antes de (c) para o lead ainda estar em MQL.
     Boolean bloqueouSemMotivo = false;
     try {
-      update new Lead(Id = paraBloquear.Id, Status = 'Desqualificado');
+      update new Lead(Id = paraAvancar.Id, Status = 'Desqualificado');
     } catch (DmlException e) {
-      bloqueouSemMotivo =
-        e.getMessage().containsIgnoreCase('compromisso') ||
-        e.getMessage().containsIgnoreCase('incoerente');
+      bloqueouSemMotivo = e.getMessage().containsIgnoreCase('incoerente');
     }
+
+    // (c) Outra saída manual sem compromisso: agora PERMITIDA. Usamos
+    // "Reunião Agendada - SQL" porque "Qualificado" é barrado pelo Flow de
+    // avanço (CLICKUP-9419), regra que não tem relação com o compromisso.
+    update new Lead(Id = paraAvancar.Id, Status = 'Reunião Agendada - SQL');
 
     // (d) OPT-OUT: permitido, como antes do card.
     SOLDistribuicaoService.registrarOptOut(new List<Id>{ paraOptOut.Id });
@@ -718,8 +711,12 @@ private class SOLNegocioPerdidoTest {
       lead(paraPerder.Id).Status,
       'Perda identificada sai de "Recebido - MQL" sem compromisso.'
     );
-    System.assert(bloqueou, 'Saída manual para "Qualificado" segue bloqueada.');
-    System.assert(bloqueouSemMotivo, 'Desqualificação sem motivo de perda segue bloqueada.');
+    System.assert(bloqueouSemMotivo, 'Desqualificação sem motivo de perda segue bloqueada pela VR de coerência.');
+    System.assertEquals(
+      'Reunião Agendada - SQL',
+      lead(paraAvancar.Id).Status,
+      'Sem a VR do compromisso, a saída manual de "Recebido - MQL" não é bloqueada.'
+    );
     System.assertEquals(
       'Opt-out',
       lead(paraOptOut.Id).SOL_Motivo_Desqualificacao__c,
