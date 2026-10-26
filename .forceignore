@@ -92,3 +92,5 @@ node_modules/
 **/flows/Route_to_Assistente_STE_Aprimorado.flow-meta.xml
 **/flows/Route_to_Assistente_STE_WhatsApp_Teste.flow-meta.xml
 **/flows/Route_to_Assistente_Arnone_Aprimorado.flow-meta.xml
+# SYNC-PROD-HOTFIXES: bot STE e versionado como retrato; versao ativa nao aceita deploy e o PO decidiu nao mexer no bot
+**/bots/Assistente_STE_Aprimorado/**
