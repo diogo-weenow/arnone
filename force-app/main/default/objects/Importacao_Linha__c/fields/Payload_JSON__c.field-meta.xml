@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Payload_JSON__c</fullName>
+    <description>JSON {campoLeadApiName: valorTexto} com os valores mapeados desta linha, incluindo as colunas designadas para Company e LastName. É o que o batch converte e aplica. Texto livre do arquivo; nunca interpolado em SOQL.</description>
+    <externalId>false</externalId>
+    <label>Payload JSON</label>
+    <length>131072</length>
+    <trackHistory>false</trackHistory>
+    <type>LongTextArea</type>
+    <visibleLines>6</visibleLines>
+</CustomField>

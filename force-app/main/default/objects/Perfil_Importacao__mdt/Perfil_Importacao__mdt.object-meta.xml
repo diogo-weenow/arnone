@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Importação de leads — perfil de importação por BU. Define a chave de casamento (CNPJ ou CPF), o Record Type dos leads casados e criados, a Unidade de Origem, o layout esperado do arquivo, o modo de dono na criação, a custom permission exigida, se o perfil cria leads sem match, as colunas sugeridas e o teto de linhas. Só perfis ativos, cuja custom permission o usuário possui, aparecem no componente importacaoLeads. Consumido por ImportacaoLeadsController e ImportacaoLeadsBatch.</description>
+    <label>Perfil de Importação</label>
+    <pluralLabel>Perfis de Importação</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

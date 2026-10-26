@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CNPJ_Normalizado__c</fullName>
+    <description>CNPJ só com dígitos e letras maiúsculas, chave de casamento da Importação de leads. Preenchido pelo flow Lead_BeforeSave_Normalizar_CNPJ.</description>
+    <externalId>true</externalId>
+    <inlineHelpText>Preenchido automaticamente a partir do CNPJ.</inlineHelpText>
+    <label>CNPJ normalizado</label>
+    <length>14</length>
+    <required>false</required>
+    <securityClassification>Internal</securityClassification>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

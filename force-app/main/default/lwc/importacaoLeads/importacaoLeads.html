@@ -1,0 +1,167 @@
+<template>
+    <lightning-card title="Importação de leads" icon-name="standard:lead">
+        <div class="slds-p-horizontal_medium slds-p-bottom_medium">
+            <lightning-progress-indicator current-step={passo} type="path" variant="base">
+                <template for:each={passos} for:item="p">
+                    <lightning-progress-step key={p.value} label={p.label} value={p.value}></lightning-progress-step>
+                </template>
+            </lightning-progress-indicator>
+
+            <template lwc:if={carregando}>
+                <div class="carregando slds-m-top_medium">
+                    <lightning-spinner alternative-text="Processando" size="small"></lightning-spinner>
+                    <p class="slds-text-body_small slds-text-align_center" aria-live="polite">{mensagemProgresso}</p>
+                </div>
+            </template>
+
+            <!-- Passo 1: origem -->
+            <template lwc:if={ehOrigem}>
+                <section class="slds-m-top_medium" aria-label="Origem">
+                    <template lwc:if={semBu}>
+                        <div class="slds-box slds-theme_shade" role="status">
+                            <p>Você não tem permissão para importar leads em nenhuma unidade. Fale com o administrador.</p>
+                        </div>
+                    </template>
+                    <template lwc:else>
+                        <div class="slds-grid slds-wrap slds-gutters_small">
+                            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                <lightning-combobox
+                                    class="seletor-bu"
+                                    label="Unidade de negócio"
+                                    placeholder="Escolha a unidade"
+                                    value={buSelecionada}
+                                    options={opcoesBu}
+                                    onchange={handleBu}
+                                    required
+                                ></lightning-combobox>
+                            </div>
+                            <template lwc:if={temPerfis}>
+                                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                    <lightning-combobox
+                                        class="seletor-perfil"
+                                        label="Perfil de importação"
+                                        placeholder="Escolha o perfil"
+                                        value={perfilSelecionado}
+                                        options={opcoesPerfil}
+                                        onchange={handlePerfil}
+                                        required
+                                    ></lightning-combobox>
+                                </div>
+                            </template>
+                        </div>
+
+                        <template lwc:if={perfil}>
+                            <article class="slds-card slds-card_boundary slds-m-top_small perfil-card">
+                                <div class="slds-card__body slds-card__body_inner slds-p-vertical_small">
+                                    <p class="slds-text-title_bold">{perfil.label}</p>
+                                    <p class="slds-text-body_regular slds-m-top_xx-small">{descricaoPerfil}</p>
+                                </div>
+                            </article>
+                            <div class="slds-m-top_medium">
+                                <lightning-input
+                                    class="arquivo"
+                                    type="file"
+                                    label="Arquivo CSV"
+                                    accept=".csv,.txt"
+                                    onchange={handleArquivo}
+                                    disabled={semPerfil}
+                                ></lightning-input>
+                                <p class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">
+                                    Use o arquivo original do Lemit, sem abrir no Excel
+                                </p>
+                            </div>
+                        </template>
+                    </template>
+                </section>
+            </template>
+
+            <!-- Passo 2: diagnóstico -->
+            <template lwc:if={ehDiagnostico}>
+                <section class="slds-m-top_medium" aria-label="Diagnóstico">
+                    <p class="slds-text-body_small slds-m-bottom_small">Arquivo: <strong>{nomeArquivo}</strong></p>
+                    <c-importacao-leads-diagnostico
+                        diagnostico={diagnosticoView}
+                        perfil={perfil}
+                        cabecalhos={cabecalhos}
+                        mapeamentos={mapeamentos}
+                        coluna-chave={colunaChave}
+                        coluna-company={colunaCompany}
+                        coluna-last-name={colunaLastName}
+                        pequeno={pequeno}
+                        oncolunachange={handleColuna}
+                    ></c-importacao-leads-diagnostico>
+                    <div class={classeAcoes}>
+                        <lightning-button
+                            class="botao-analisar"
+                            variant="brand"
+                            label="Analisar"
+                            onclick={analisar}
+                            disabled={naoPodeAnalisar}
+                        ></lightning-button>
+                        <lightning-button
+                            class="slds-m-left_x-small"
+                            label="Escolher outro arquivo"
+                            onclick={recomecar}
+                        ></lightning-button>
+                    </div>
+                </section>
+            </template>
+
+            <!-- Passo 3: revisão -->
+            <template lwc:if={ehRevisao}>
+                <section class="slds-m-top_medium" aria-label="Revisão">
+                    <h2 class="slds-text-heading_small slds-m-bottom_small">Revisão — {preview.loteNome}</h2>
+                    <c-importacao-leads-revisao
+                        preview={preview}
+                        multiplos={multiplos}
+                        pequeno={pequeno}
+                        onselecaochange={handleSelecao}
+                    ></c-importacao-leads-revisao>
+                    <div class="slds-box slds-theme_shade slds-m-top_medium confirmacao" role="region" aria-label="Resumo da confirmação">
+                        <p class="slds-text-title_bold slds-m-bottom_x-small">Ao confirmar:</p>
+                        <ul class="slds-list_dotted">
+                            <template for:each={resumoConfirmacao} for:item="i">
+                                <li key={i.id}>{i.texto}</li>
+                            </template>
+                        </ul>
+                    </div>
+                    <div class={classeAcoes}>
+                        <lightning-button
+                            class="botao-confirmar"
+                            variant="brand"
+                            label="Confirmar"
+                            onclick={confirmarProcessamento}
+                            disabled={carregando}
+                        ></lightning-button>
+                        <lightning-button class="slds-m-left_x-small" label="Cancelar" onclick={recomecar}></lightning-button>
+                    </div>
+                </section>
+            </template>
+
+            <!-- Passo 4: processamento -->
+            <template lwc:if={ehProcessamento}>
+                <section class="slds-m-top_medium" aria-label="Processamento">
+                    <lightning-progress-bar value={progresso} size="large" aria-label="Progresso do processamento"></lightning-progress-bar>
+                    <p class="slds-text-body_small slds-m-top_x-small" aria-live="polite">
+                        <template lwc:if={concluido}>Processamento concluído.</template>
+                        <template lwc:else>Processando o lote. Esta tela atualiza sozinha.</template>
+                    </p>
+                    <template lwc:if={status}>
+                        <dl class="slds-m-top_small resumo-final">
+                            <template for:each={resumoFinal} for:item="r">
+                                <div key={r.id} class="slds-grid slds-p-vertical_xx-small">
+                                    <dt class="slds-text-color_weak slds-size_1-of-2">{r.rotulo}</dt>
+                                    <dd class="slds-size_1-of-2">{r.valor}</dd>
+                                </div>
+                            </template>
+                        </dl>
+                    </template>
+                    <div class={classeAcoes}>
+                        <lightning-button class="botao-lote" label="Abrir o lote" onclick={abrirLote}></lightning-button>
+                        <lightning-button class="slds-m-left_x-small" label="Nova importação" onclick={recomecar}></lightning-button>
+                    </div>
+                </section>
+            </template>
+        </div>
+    </lightning-card>
+</template>
