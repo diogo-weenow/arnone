@@ -2,11 +2,11 @@
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
     <applicationVisibilities>
         <application>Arnone</application>
-        <visible>true</visible>
+        <visible>false</visible>
     </applicationVisibilities>
     <applicationVisibilities>
         <application>Arnone_Atendimento</application>
-        <visible>true</visible>
+        <visible>false</visible>
     </applicationVisibilities>
     <description>Executivo comercial: gestão completa de contas, contatos e oportunidades do seu funil; leitura e edição de leads. Sem exclusão de registros.</description>
     <fieldPermissions>
@@ -37,11 +37,6 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Contact.TipoDocumento__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>Lead.CNPJ__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -155,10 +150,6 @@
     </recordTypeVisibilities>
     <recordTypeVisibilities>
         <recordType>Opportunity.SOL</recordType>
-        <visible>true</visible>
-    </recordTypeVisibilities>
-    <recordTypeVisibilities>
-        <recordType>Opportunity.STE</recordType>
         <visible>true</visible>
     </recordTypeVisibilities>
     <userPermissions>

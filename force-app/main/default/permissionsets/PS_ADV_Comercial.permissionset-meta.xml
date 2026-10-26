@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <applicationVisibilities>
+        <application>ADV</application>
+        <visible>true</visible>
+    </applicationVisibilities>
     <description>Campos exclusivos da BU Arnone Advogados (prefixo ADV_). Complementa o PS_Comercial, que tem só o acesso base compartilhado entre as unidades.</description>
     <fieldPermissions>
         <editable>true</editable>

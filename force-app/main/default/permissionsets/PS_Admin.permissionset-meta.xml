@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
     <applicationVisibilities>
+        <application>ADV</application>
+        <visible>true</visible>
+    </applicationVisibilities>
+    <applicationVisibilities>
         <application>Arnone</application>
         <visible>true</visible>
     </applicationVisibilities>
     <applicationVisibilities>
         <application>Arnone_Atendimento</application>
+        <visible>true</visible>
+    </applicationVisibilities>
+    <applicationVisibilities>
+        <application>SOL</application>
         <visible>true</visible>
     </applicationVisibilities>
     <description>Administrador funcional do CRM: visão e gestão de todos os registros comerciais das 5 unidades, incluindo exclusão e transferência.</description>
