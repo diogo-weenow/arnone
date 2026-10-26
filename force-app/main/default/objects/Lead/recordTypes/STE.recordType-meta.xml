@@ -3,6 +3,7 @@
     <fullName>STE</fullName>
     <active>true</active>
     <businessProcess>Captacao_STE</businessProcess>
+    <compactLayoutAssignment>STE_Lead</compactLayoutAssignment>
     <description>Leads captados para a unidade Instituto STech (funil Stech Telecom). Usa o processo Captacao_STE, que inclui a etapa Validação — exclusiva desta BU.</description>
     <label>Instituto STech</label>
     <picklistValues>
@@ -372,6 +373,28 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>STE_CNH_Status__c</picklist>
+        <values>
+            <fullName>Apto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Não Apto</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>STE_CNH_Validada__c</picklist>
+        <values>
+            <fullName>Não</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sim</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>STE_Classificacao_Fila__c</picklist>
         <values>
             <fullName>Fria</fullName>
@@ -383,6 +406,49 @@
         </values>
         <values>
             <fullName>Quente</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>STE_Etapa_Bot__c</picklist>
+        <values>
+            <fullName>Aguardando arquivo da CNH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando e-mail</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando empresa anterior</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando escolha da CNH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando experiência</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando faixa etária</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando nome</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Aguardando pré-inscrição</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Concluído</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Desqualificado</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -439,6 +505,41 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>STE_Motivo_Desqualificacao__c</picklist>
+        <values>
+            <fullName>CNH provisória</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Contato errado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Desistência - Arrumou trabalho</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Desistência - Mudança de localização</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Disponibilidade - Conflito com data de início do curso</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fora da faixa etária</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Não se aplica - Perfil</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Saúde</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>STE_Possui_CNH__c</picklist>
         <values>
             <fullName>Não</fullName>
@@ -450,6 +551,76 @@
         </values>
         <values>
             <fullName>Sim%2C envio posterior</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>STE_Recuperacao_Etapa__c</picklist>
+        <values>
+            <fullName>E01 %E2%80%94 Lembrete da CNH</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>E02 %E2%80%94 Depoimento</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>E03 %E2%80%94 Benefícios da formação</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>E04 %E2%80%94 Depoimento em vídeo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>E05 %E2%80%94 Última chamada</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>STE_Regioes_De_SP__c</picklist>
+        <values>
+            <fullName>ABCD Paulista</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Centro</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Cotia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Guarulhos</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Mairiporã</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Osasco</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Paranapiacaba</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Zona Leste</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Zona Norte</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Zona Oeste</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Zona Sul</fullName>
             <default>false</default>
         </values>
     </picklistValues>

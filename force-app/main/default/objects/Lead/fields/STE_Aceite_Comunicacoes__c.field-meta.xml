@@ -5,5 +5,6 @@
     <description>Marca que o candidato aceitou receber comunicações do Instituto STech por e-mail, pela caixa do formulário de inscrição (web-to-lead). Quando marcado, o flow STE_Registrar_Aceite_Comunicacoes grava o opt-in na assinatura Marketing Emails do Marketing Cloud.</description>
     <label>Aceita receber comunicações</label>
     <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
     <type>Checkbox</type>
 </CustomField>
