@@ -489,16 +489,6 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.STE_CPF_Confirmado__c</fieldItem>
-                <identifier>RecordSTECPFConfirmadocField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
                 <fieldItem>Record.STE_Telefone_E164__c</fieldItem>
                 <identifier>RecordSTETelefoneE164cField</identifier>
             </fieldInstance>
@@ -521,6 +511,16 @@
                 </fieldInstanceProperties>
                 <fieldItem>Record.STE_Faixa_Etaria__c</fieldItem>
                 <identifier>RecordSTEFaixaEtariacField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.STE_Aceite_Comunicacoes__c</fieldItem>
+                <identifier>RecordSTEAceiteComunicacoescField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-8d7d43d8-ee98-58d6-9c5c-81959cfe1b8e</name>
@@ -605,6 +605,16 @@
                 <identifier>RecordSTEClassificacaoFilacField</identifier>
             </fieldInstance>
         </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.STE_Regioes_De_SP__c</fieldItem>
+                <identifier>RecordSTERegioesDeSPcField</identifier>
+            </fieldInstance>
+        </itemInstances>
         <name>Facet-f968df3c-f711-5706-928b-b5961fefe0a1</name>
         <type>Facet</type>
     </flexiPageRegions>
@@ -665,6 +675,36 @@
                 </fieldInstanceProperties>
                 <fieldItem>Record.STE_Prazo_Envio_CNH__c</fieldItem>
                 <identifier>RecordSTEPrazoEnvioCNHcField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.STE_CNH_Status__c</fieldItem>
+                <identifier>RecordSTECNHStatuscField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.STE_CNH_Validada__c</fieldItem>
+                <identifier>RecordSTECNHValidadacField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.MotivoDaCNHNOValidada__c</fieldItem>
+                <identifier>RecordMotivoDaCNHNOValidadacField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-43892f5c-f62b-5daa-8b17-f76ce3d076b2</name>
@@ -837,6 +877,16 @@
                 <identifier>RecordSTEMessagingSessionIdcField</identifier>
             </fieldInstance>
         </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.STE_Progresso_Bot__c</fieldItem>
+                <identifier>RecordSTEProgressoBotcField</identifier>
+            </fieldInstance>
+        </itemInstances>
         <name>Facet-ed06bf79-14bd-5ded-828d-a26453e33dcc</name>
         <type>Facet</type>
     </flexiPageRegions>
@@ -859,26 +909,6 @@
                 </fieldInstanceProperties>
                 <fieldItem>Record.STE_Retomada_1_Em__c</fieldItem>
                 <identifier>RecordSTERetomada1EmcField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>readonly</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.STE_Retomada_2_Em__c</fieldItem>
-                <identifier>RecordSTERetomada2EmcField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>readonly</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.STE_Retomada_3_Em__c</fieldItem>
-                <identifier>RecordSTERetomada3EmcField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-7090f60b-bde7-579d-8926-b0af2231549c</name>
