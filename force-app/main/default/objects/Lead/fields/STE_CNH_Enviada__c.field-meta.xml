@@ -5,5 +5,6 @@
     <description>Marca que o candidato enviou a foto da CNH. É o evento que dispara o registro do Lead no CRM (US 04).</description>
     <label>CNH recebida</label>
     <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
     <type>Checkbox</type>
 </CustomField>

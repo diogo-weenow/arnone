@@ -4,5 +4,6 @@
     <label>Motivo da CNH não validada</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
     <type>TextArea</type>
 </CustomField>
