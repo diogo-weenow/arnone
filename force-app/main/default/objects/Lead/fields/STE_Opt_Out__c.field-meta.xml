@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Opt_Out__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Pedido de descadastro. Par do campo de mesmo nome na Oportunidade e no Contato, para atravessar a conversão.</description>
+    <label>Opt-out de comunicações</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Checkbox</type>
+</CustomField>

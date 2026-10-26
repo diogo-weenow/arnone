@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Certificado_Emitido__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Marcado quando o certificado é emitido. Junto com o curso concluído, dispara a mensagem final e encerra a jornada.</description>
+    <label>Certificado emitido</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

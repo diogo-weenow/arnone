@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ConversationMessageDefinition xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <constants>
+        <constantType>Title</constantType>
+        <primitiveValues>
+            <textValue>Oi, ! Estamos seguindo com seu cadastro, mas ainda falta uma informação ou documento:
+📌 Pendência: 
+
+Pode enviar por aqui?</textValue>
+            <type>Text</type>
+        </primitiveValues>
+    </constants>
+    <contentCategory>Reminder</contentCategory>
+    <label>STech — Documentação pendente</label>
+    <language>pt_BR</language>
+    <messageLayouts>
+        <externalTemplates>
+            <accountIdentifier>1782595433067653</accountIdentifier>
+            <accountName>Instituto Stech</accountName>
+            <externalConfigJson>{&quot;templateCategory&quot;:&quot;Utility&quot;,&quot;contentSections&quot;:[{&quot;sectionType&quot;:&quot;BodyContentSection&quot;,&quot;bodyContents&quot;:[{&quot;contentType&quot;:&quot;TextContent&quot;,&quot;text&quot;:&quot;Oi, {{1}}! Estamos seguindo com seu cadastro, mas ainda falta uma informação ou documento:\n📌 Pendência: {{2}}\n\nPode enviar por aqui?&quot;}],&quot;examples&quot;:{&quot;1&quot;:{&quot;valueType&quot;:&quot;TextValue&quot;,&quot;textValue&quot;:&quot;Maria&quot;},&quot;2&quot;:{&quot;valueType&quot;:&quot;TextValue&quot;,&quot;textValue&quot;:&quot;foto da CNH&quot;}}}],&quot;assets&quot;:[],&quot;name&quot;:&quot;sfdc_00das00000ffjkh_1325d964_b668_412d_a247_ed536444ef48&quot;,&quot;languageCode&quot;:&quot;pt_BR&quot;,&quot;templateSections&quot;:[]}</externalConfigJson>
+            <language>pt_BR</language>
+            <layoutJson>{&quot;messageType&quot;:&quot;StaticContent&quot;,&quot;layoutItems&quot;:[{&quot;collectionType&quot;:&quot;None&quot;,&quot;itemName&quot;:&quot;externalTemplate&quot;,&quot;itemType&quot;:&quot;Composite&quot;,&quot;id&quot;:&quot;0liN5000000121N&quot;,&quot;itemValues&quot;:[{&quot;layoutItems&quot;:[{&quot;collectionType&quot;:&quot;StaticList&quot;,&quot;itemName&quot;:&quot;contentSections&quot;,&quot;itemType&quot;:&quot;Composite&quot;,&quot;id&quot;:&quot;0liN5000000121P&quot;,&quot;itemValues&quot;:[{&quot;layoutItems&quot;:[{&quot;collectionType&quot;:&quot;StaticList&quot;,&quot;itemName&quot;:&quot;bodyContents&quot;,&quot;itemType&quot;:&quot;Composite&quot;,&quot;id&quot;:&quot;0liN5000000121U&quot;,&quot;itemValues&quot;:[{&quot;layoutItems&quot;:[{&quot;collectionType&quot;:&quot;None&quot;,&quot;itemName&quot;:&quot;text&quot;,&quot;itemType&quot;:&quot;Primitive&quot;,&quot;id&quot;:&quot;0liN5000000121b&quot;,&quot;itemValues&quot;:[{&quot;longLiteralValue&quot;:&quot;Oi, {{1}}! Estamos seguindo com seu cadastro, mas ainda falta uma informação ou documento:\n📌 Pendência: {{2}}\n\nPode enviar por aqui?&quot;,&quot;valueType&quot;:&quot;LongLiteral&quot;,&quot;id&quot;:&quot;0lvN500000013NR&quot;}]}],&quot;valueType&quot;:&quot;CompositeType&quot;,&quot;id&quot;:&quot;0lvN500000013NP&quot;,&quot;compositeType&quot;:&quot;TextContent&quot;}]},{&quot;collectionType&quot;:&quot;None&quot;,&quot;itemName&quot;:&quot;examples&quot;,&quot;itemType&quot;:&quot;Composite&quot;,&quot;id&quot;:&quot;0liN5000000121V&quot;,&quot;itemValues&quot;:[{&quot;layoutItems&quot;:[{&quot;collectionType&quot;:&quot;None&quot;,&quot;itemName&quot;:&quot;1&quot;,&quot;itemType&quot;:&quot;Composite&quot;,&quot;id&quot;:&quot;0liN5000000121X&quot;,&quot;itemValues&quot;:[{&quot;layoutItems&quot;:[{&quot;collectionType&quot;:&quot;None&quot;,&quot;itemName&quot;:&quot;textValue&quot;,&quot;itemType&quot;:&quot;Primitive&quot;,&quot;id&quot;:&quot;0liN5000000121c&quot;,&quot;itemValues&quot;:[{&quot;valueType&quot;:&quot;Literal&quot;,&quot;id&quot;:&quot;0lvN500000013NW&quot;,&quot;literalValue&quot;:&quot;Maria&quot;}]}],&quot;valueType&quot;:&quot;CompositeType&quot;,&quot;id&quot;:&quot;0lvN500000013NU&quot;,&quot;compositeType&quot;:&quot;TextValue&quot;}]},{&quot;collectionType&quot;:&quot;None&quot;,&quot;itemName&quot;:&quot;2&quot;,&quot;itemType&quot;:&quot;Composite&quot;,&quot;id&quot;:&quot;0liN5000000121Y&quot;,&quot;itemValues&quot;:[{&quot;layoutItems&quot;:[{&quot;collectionType&quot;:&quot;None&quot;,&quot;itemName&quot;:&quot;textValue&quot;,&quot;itemType&quot;:&quot;Primitive&quot;,&quot;id&quot;:&quot;0liN5000000121d&quot;,&quot;itemValues&quot;:[{&quot;valueType&quot;:&quot;Literal&quot;,&quot;id&quot;:&quot;0lvN500000013NV&quot;,&quot;literalValue&quot;:&quot;foto da CNH&quot;}]}],&quot;valueType&quot;:&quot;CompositeType&quot;,&quot;id&quot;:&quot;0lvN500000013NS&quot;,&quot;compositeType&quot;:&quot;TextValue&quot;}]}],&quot;valueType&quot;:&quot;CompositeType&quot;,&quot;id&quot;:&quot;0lvN500000013NM&quot;,&quot;compositeType&quot;:&quot;Map&quot;}]}],&quot;valueType&quot;:&quot;CompositeType&quot;,&quot;id&quot;:&quot;0lvN500000013NK&quot;,&quot;compositeType&quot;:&quot;BodyContentSection&quot;}]},{&quot;collectionType&quot;:&quot;None&quot;,&quot;itemName&quot;:&quot;languageCode&quot;,&quot;itemType&quot;:&quot;Primitive&quot;,&quot;id&quot;:&quot;0liN5000000121Q&quot;,&quot;itemValues&quot;:[{&quot;valueType&quot;:&quot;Literal&quot;,&quot;id&quot;:&quot;0lvN500000013NL&quot;,&quot;literalValue&quot;:&quot;pt_BR&quot;}]},{&quot;collectionType&quot;:&quot;None&quot;,&quot;itemName&quot;:&quot;name&quot;,&quot;itemType&quot;:&quot;Primitive&quot;,&quot;id&quot;:&quot;0liN5000000121R&quot;,&quot;itemValues&quot;:[{&quot;valueType&quot;:&quot;Literal&quot;,&quot;id&quot;:&quot;0lvN500000013NJ&quot;,&quot;literalValue&quot;:&quot;Autopopulated&quot;}]},{&quot;collectionType&quot;:&quot;None&quot;,&quot;itemName&quot;:&quot;templateCategory&quot;,&quot;itemType&quot;:&quot;Primitive&quot;,&quot;id&quot;:&quot;0liN5000000121S&quot;,&quot;itemValues&quot;:[{&quot;valueType&quot;:&quot;Literal&quot;,&quot;id&quot;:&quot;0lvN500000013NH&quot;,&quot;literalValue&quot;:&quot;UTILITY&quot;}]},{&quot;collectionType&quot;:&quot;StaticList&quot;,&quot;itemName&quot;:&quot;templateSections&quot;,&quot;itemType&quot;:&quot;Composite&quot;,&quot;id&quot;:&quot;0liN5000000121T&quot;,&quot;itemValues&quot;:[{&quot;layoutItems&quot;:[{&quot;collectionType&quot;:&quot;StaticList&quot;,&quot;itemName&quot;:&quot;parameters&quot;,&quot;itemType&quot;:&quot;Composite&quot;,&quot;id&quot;:&quot;0liN5000000121W&quot;,&quot;itemValues&quot;:[{&quot;layoutItems&quot;:[{&quot;collectionType&quot;:&quot;None&quot;,&quot;itemName&quot;:&quot;textValue&quot;,&quot;itemType&quot;:&quot;Primitive&quot;,&quot;id&quot;:&quot;0liN5000000121Z&quot;,&quot;itemValues&quot;:[{&quot;valueSourceType&quot;:&quot;Parameter&quot;,&quot;valueType&quot;:&quot;SourcePrimitiveValue&quot;,&quot;id&quot;:&quot;0lvN500000013NQ&quot;,&quot;valueSourceApiValue&quot;:&quot;Parameters.Nome_do_candidato&quot;,&quot;valueSource&quot;:&quot;1mpN50000000fw1&quot;}]}],&quot;valueType&quot;:&quot;CompositeType&quot;,&quot;id&quot;:&quot;0lvN500000013NN&quot;,&quot;compositeType&quot;:&quot;TextValue&quot;},{&quot;layoutItems&quot;:[{&quot;collectionType&quot;:&quot;None&quot;,&quot;itemName&quot;:&quot;textValue&quot;,&quot;itemType&quot;:&quot;Primitive&quot;,&quot;id&quot;:&quot;0liN5000000121a&quot;,&quot;itemValues&quot;:[{&quot;valueSourceType&quot;:&quot;Parameter&quot;,&quot;valueType&quot;:&quot;SourcePrimitiveValue&quot;,&quot;id&quot;:&quot;0lvN500000013NT&quot;,&quot;valueSourceApiValue&quot;:&quot;Parameters.Pendencia&quot;,&quot;valueSource&quot;:&quot;1mpN50000000fw2&quot;}]}],&quot;valueType&quot;:&quot;CompositeType&quot;,&quot;id&quot;:&quot;0lvN500000013NO&quot;,&quot;compositeType&quot;:&quot;TextValue&quot;}]}],&quot;valueType&quot;:&quot;CompositeType&quot;,&quot;id&quot;:&quot;0lvN500000013NI&quot;,&quot;compositeType&quot;:&quot;BodyTemplateSection&quot;}]}],&quot;valueType&quot;:&quot;CompositeType&quot;,&quot;id&quot;:&quot;0lvN500000013NF&quot;,&quot;compositeType&quot;:&quot;ExternalTemplate&quot;}]}],&quot;externalTemplate&quot;:{&quot;templateStatus&quot;:&quot;Pending&quot;,&quot;templateType&quot;:&quot;Template&quot;,&quot;templateVersionIdentifier&quot;:&quot;tempResourceId&quot;,&quot;templateName&quot;:&quot;Autopopulated&quot;,&quot;accountIdentifier&quot;:&quot;1782595433067653&quot;,&quot;templateLanguage&quot;:&quot;pt_BR&quot;,&quot;id&quot;:&quot;15SN5000001xPHx&quot;},&quot;id&quot;:&quot;0mlN500000010nZ&quot;,&quot;formatType&quot;:&quot;ExternalTemplate&quot;,&quot;parentId&quot;:&quot;1mdN5000000BPRJ&quot;}</layoutJson>
+            <status>Pending</status>
+            <templateName>sfdc_00das00000ffjkh_1325d964_b668_412d_a247_ed536444ef48</templateName>
+            <templateVersionIdentifier>1101661132252891</templateVersionIdentifier>
+            <type>Template</type>
+        </externalTemplates>
+        <formatType>ExternalTemplate</formatType>
+        <layoutItems>
+            <collectionType>None</collectionType>
+            <compositeValues>
+                <compositeTypeName>ExternalTemplate</compositeTypeName>
+                <layoutItems>
+                    <collectionType>StaticList</collectionType>
+                    <compositeValues>
+                        <compositeTypeName>BodyContentSection</compositeTypeName>
+                        <layoutItems>
+                            <collectionType>StaticList</collectionType>
+                            <compositeValues>
+                                <compositeTypeName>TextContent</compositeTypeName>
+                                <layoutItems>
+                                    <collectionType>None</collectionType>
+                                    <name>text</name>
+                                    <primitiveValues>
+                                        <longLiteralValue>Oi, {{1}}! Estamos seguindo com seu cadastro, mas ainda falta uma informação ou documento:
+📌 Pendência: {{2}}
+
+Pode enviar por aqui?</longLiteralValue>
+                                        <type>LongLiteral</type>
+                                    </primitiveValues>
+                                </layoutItems>
+                            </compositeValues>
+                            <name>bodyContents</name>
+                        </layoutItems>
+                        <layoutItems>
+                            <collectionType>None</collectionType>
+                            <compositeValues>
+                                <compositeTypeName>Map</compositeTypeName>
+                                <layoutItems>
+                                    <collectionType>None</collectionType>
+                                    <compositeValues>
+                                        <compositeTypeName>TextValue</compositeTypeName>
+                                        <layoutItems>
+                                            <collectionType>None</collectionType>
+                                            <name>textValue</name>
+                                            <primitiveValues>
+                                                <literalValue>Maria</literalValue>
+                                                <type>Literal</type>
+                                            </primitiveValues>
+                                        </layoutItems>
+                                    </compositeValues>
+                                    <name>1</name>
+                                </layoutItems>
+                                <layoutItems>
+                                    <collectionType>None</collectionType>
+                                    <compositeValues>
+                                        <compositeTypeName>TextValue</compositeTypeName>
+                                        <layoutItems>
+                                            <collectionType>None</collectionType>
+                                            <name>textValue</name>
+                                            <primitiveValues>
+                                                <literalValue>foto da CNH</literalValue>
+                                                <type>Literal</type>
+                                            </primitiveValues>
+                                        </layoutItems>
+                                    </compositeValues>
+                                    <name>2</name>
+                                </layoutItems>
+                            </compositeValues>
+                            <name>examples</name>
+                        </layoutItems>
+                    </compositeValues>
+                    <name>contentSections</name>
+                </layoutItems>
+                <layoutItems>
+                    <collectionType>None</collectionType>
+                    <name>languageCode</name>
+                    <primitiveValues>
+                        <literalValue>pt_BR</literalValue>
+                        <type>Literal</type>
+                    </primitiveValues>
+                </layoutItems>
+                <layoutItems>
+                    <collectionType>None</collectionType>
+                    <name>name</name>
+                    <primitiveValues>
+                        <literalValue>sfdc_00das00000ffjkh_1325d964_b668_412d_a247_ed536444ef48</literalValue>
+                        <type>Literal</type>
+                    </primitiveValues>
+                </layoutItems>
+                <layoutItems>
+                    <collectionType>None</collectionType>
+                    <name>templateCategory</name>
+                    <primitiveValues>
+                        <literalValue>UTILITY</literalValue>
+                        <type>Literal</type>
+                    </primitiveValues>
+                </layoutItems>
+                <layoutItems>
+                    <collectionType>StaticList</collectionType>
+                    <compositeValues>
+                        <compositeTypeName>BodyTemplateSection</compositeTypeName>
+                        <layoutItems>
+                            <collectionType>StaticList</collectionType>
+                            <compositeValues>
+                                <compositeTypeName>TextValue</compositeTypeName>
+                                <layoutItems>
+                                    <collectionType>None</collectionType>
+                                    <name>textValue</name>
+                                    <primitiveValues>
+                                        <type>SourcePrimitiveValue</type>
+                                        <valueSourceReference>Parameters.Nome_do_candidato</valueSourceReference>
+                                    </primitiveValues>
+                                </layoutItems>
+                            </compositeValues>
+                            <compositeValues>
+                                <compositeTypeName>TextValue</compositeTypeName>
+                                <layoutItems>
+                                    <collectionType>None</collectionType>
+                                    <name>textValue</name>
+                                    <primitiveValues>
+                                        <type>SourcePrimitiveValue</type>
+                                        <valueSourceReference>Parameters.Pendencia</valueSourceReference>
+                                    </primitiveValues>
+                                </layoutItems>
+                            </compositeValues>
+                            <name>parameters</name>
+                        </layoutItems>
+                    </compositeValues>
+                    <name>templateSections</name>
+                </layoutItems>
+            </compositeValues>
+            <name>externalTemplate</name>
+        </layoutItems>
+        <layoutVariant xsi:nil="true"/>
+        <messageType>StaticContent</messageType>
+    </messageLayouts>
+    <messageLayouts>
+        <formatType>Text</formatType>
+        <layoutItems>
+            <collectionType>None</collectionType>
+            <name>text</name>
+            <primitiveValues>
+                <type>SourcePrimitiveValue</type>
+                <valueSourceReference>Constants.Title</valueSourceReference>
+            </primitiveValues>
+        </layoutItems>
+        <layoutVariant xsi:nil="true"/>
+        <messageType>StaticContent</messageType>
+    </messageLayouts>
+    <parameters>
+        <parameterType>CustomPrimitive</parameterType>
+        <primitiveTypeDetails>
+            <isList>false</isList>
+            <isRequired>true</isRequired>
+            <label>Nome do candidato</label>
+            <name>Nome_do_candidato</name>
+            <valueType>Text</valueType>
+        </primitiveTypeDetails>
+    </parameters>
+    <parameters>
+        <parameterType>CustomPrimitive</parameterType>
+        <primitiveTypeDetails>
+            <isList>false</isList>
+            <isRequired>true</isRequired>
+            <label>Pendência</label>
+            <name>Pendencia</name>
+            <valueType>Text</valueType>
+        </primitiveTypeDetails>
+    </parameters>
+    <type>Notification</type>
+</ConversationMessageDefinition>

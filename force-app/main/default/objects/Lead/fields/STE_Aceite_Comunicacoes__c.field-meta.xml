@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Aceite_Comunicacoes__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Marca que o candidato aceitou receber comunicações do Instituto STech por e-mail, pela caixa do formulário de inscrição (web-to-lead). Quando marcado, o flow STE_Registrar_Aceite_Comunicacoes grava o opt-in na assinatura Marketing Emails do Marketing Cloud.</description>
+    <label>Aceita receber comunicações</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Checkbox</type>
+</CustomField>
