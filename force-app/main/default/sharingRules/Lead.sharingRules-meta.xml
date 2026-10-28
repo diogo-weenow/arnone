@@ -1,17 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <SharingRules xmlns="http://soap.sforce.com/2006/04/metadata">
     <sharingCriteriaRules>
-        <fullName>SOL_Leitura_Comercial</fullName>
-        <accessLevel>Read</accessLevel>
-        <description>Da leitura ao papel Comercial SOL em todos os Leads de record type SOL. Lead tem OWD Private e o rodizio SOL (flow SOL_Distribuir_Lead, card 9394) troca o dono de todo Lead SOL, inclusive os criados a mao; sem esta regra o vendedor perde o acesso ao Lead que acabou de criar. Decisao do PO: manter o rodizio e dar leitura. Coordenacao SOL ve pela hierarquia.</description>
-        <label>SOL - Leitura para o Comercial</label>
+        <fullName>Lead_ADV_BU</fullName>
+        <accessLevel>Edit</accessLevel>
+        <description>ACESSO-POR-BU. Todos os usuarios da BU ADV (Diretoria_ADV e subordinados internos) veem e editam todo Lead da BU, inclusive os em fila. Criterio pelo LABEL do record type: renomear o RT quebra a regra.</description>
+        <label>ADV - Lead da BU</label>
         <sharedTo>
-            <role>Comercial_SOL</role>
+            <roleAndSubordinatesInternal>Diretoria_ADV</roleAndSubordinatesInternal>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Arnone Advogados</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+    <sharingCriteriaRules>
+        <fullName>Lead_SOL_BU</fullName>
+        <accessLevel>Edit</accessLevel>
+        <description>ACESSO-POR-BU. Todos os usuarios da BU SOL (Diretoria_SOL e subordinados internos) veem e editam todo Lead da BU, inclusive os em fila. Criterio pelo LABEL do record type: renomear o RT quebra a regra.</description>
+        <label>SOL - Lead da BU</label>
+        <sharedTo>
+            <roleAndSubordinatesInternal>Diretoria_SOL</roleAndSubordinatesInternal>
         </sharedTo>
         <criteriaItems>
             <field>RecordTypeId</field>
             <operation>equals</operation>
             <value>Arnone Soluções</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+    <sharingCriteriaRules>
+        <fullName>Lead_STE_BU</fullName>
+        <accessLevel>Edit</accessLevel>
+        <description>ACESSO-POR-BU. Todos os usuarios da BU STE (Diretoria_STE e subordinados internos) veem e editam todo Lead da BU, inclusive os em fila. Criterio pelo LABEL do record type: renomear o RT quebra a regra.</description>
+        <label>STE - Lead da BU</label>
+        <sharedTo>
+            <roleAndSubordinatesInternal>Diretoria_STE</roleAndSubordinatesInternal>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Instituto STech</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+    <sharingCriteriaRules>
+        <fullName>Lead_ESG_BU</fullName>
+        <accessLevel>Edit</accessLevel>
+        <description>ACESSO-POR-BU. Todos os usuarios da BU ESG (Diretoria_ESG e subordinados internos) veem e editam todo Lead da BU, inclusive os em fila. Criterio pelo LABEL do record type: renomear o RT quebra a regra.</description>
+        <label>ESG - Lead da BU</label>
+        <sharedTo>
+            <roleAndSubordinatesInternal>Diretoria_ESG</roleAndSubordinatesInternal>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Instituto Global ESG</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+    <sharingCriteriaRules>
+        <fullName>Lead_SCO_BU</fullName>
+        <accessLevel>Edit</accessLevel>
+        <description>ACESSO-POR-BU. Todos os usuarios da BU SCO (Diretoria_SCO e subordinados internos) veem e editam todo Lead da BU, inclusive os em fila. Criterio pelo LABEL do record type: renomear o RT quebra a regra.</description>
+        <label>SCO - Lead da BU</label>
+        <sharedTo>
+            <roleAndSubordinatesInternal>Diretoria_SCO</roleAndSubordinatesInternal>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>S.Company</value>
         </criteriaItems>
         <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
     </sharingCriteriaRules>
