@@ -139,11 +139,14 @@ private class AcessoPorBUTest {
     }
     // O rodizio SOL (e outras automacoes de entrada) pode trocar o dono na
     // criacao; o cenario precisa do dono definido, entao fixa depois.
-    List<Lead> fixar = new List<Lead>();
-    for (Lead l : [SELECT Id, LastName FROM Lead WHERE LastName LIKE :(PREFIXO + ' Lead %')]) {
-      fixar.add(new Lead(Id = l.Id, OwnerId = ids.get(criadorPorRt.get(l.LastName.substringAfterLast(' ')))));
+    // Dentro de runAs: a mesma transacao ja fez DML de setup (User, PSA).
+    System.runAs(new User(Id = UserInfo.getUserId())) {
+      List<Lead> fixar = new List<Lead>();
+      for (Lead l : [SELECT Id, LastName FROM Lead WHERE LastName LIKE :(PREFIXO + ' Lead %')]) {
+        fixar.add(new Lead(Id = l.Id, OwnerId = ids.get(criadorPorRt.get(l.LastName.substringAfterLast(' ')))));
+      }
+      update fixar;
     }
-    update fixar;
   }
 
   // ============================================================ helpers

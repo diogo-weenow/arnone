@@ -5,7 +5,7 @@
     <assignments>
         <name>Asg_BU_Oportunidade</name>
         <label>BU pela Oportunidade</label>
-        <locationX>50</locationX>
+        <locationX>314</locationX>
         <locationY>674</locationY>
         <assignmentItems>
             <assignToReference>varBU</assignToReference>
@@ -21,8 +21,8 @@
     <assignments>
         <name>Asg_BU_Lead</name>
         <label>BU pelo Lead</label>
-        <locationX>50</locationX>
-        <locationY>1190</locationY>
+        <locationX>314</locationX>
+        <locationY>1082</locationY>
         <assignmentItems>
             <assignToReference>varBU</assignToReference>
             <operator>Assign</operator>
@@ -37,8 +37,8 @@
     <assignments>
         <name>Asg_BU_Proprietario</name>
         <label>BU pelo Department do proprietário</label>
-        <locationX>50</locationX>
-        <locationY>1598</locationY>
+        <locationX>314</locationX>
+        <locationY>1382</locationY>
         <assignmentItems>
             <assignToReference>varBU</assignToReference>
             <operator>Assign</operator>
@@ -53,8 +53,8 @@
     <assignments>
         <name>Asg_Carimbar</name>
         <label>Carimbar BU na tarefa</label>
-        <locationX>182</locationX>
-        <locationY>1814</locationY>
+        <locationX>446</locationX>
+        <locationY>1598</locationY>
         <assignmentItems>
             <assignToReference>$Record.BU_Atividade__c</assignToReference>
             <operator>Assign</operator>
@@ -64,10 +64,32 @@
         </assignmentItems>
     </assignments>
     <decisions>
+        <name>Dec_So_Troca_De_Dono</name>
+        <label>Só trocou o dono de atividade já carimbada por Opp/Lead?</label>
+        <locationX>446</locationX>
+        <locationY>242</locationY>
+        <defaultConnector>
+            <targetReference>Dec_Oportunidade</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Não</defaultConnectorLabel>
+        <rules>
+            <name>Dec_So_Troca_De_Dono_Sim</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>fManterBU</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <decisions>
         <name>Dec_Oportunidade</name>
         <label>WhatId é Oportunidade?</label>
-        <locationX>182</locationX>
-        <locationY>242</locationY>
+        <locationX>314</locationX>
+        <locationY>458</locationY>
         <defaultConnector>
             <targetReference>Dec_Lead</targetReference>
         </defaultConnector>
@@ -91,7 +113,7 @@
     <decisions>
         <name>Dec_Lead</name>
         <label>Sem BU e há Lead?</label>
-        <locationX>182</locationX>
+        <locationX>314</locationX>
         <locationY>866</locationY>
         <defaultConnector>
             <targetReference>Dec_Proprietario</targetReference>
@@ -116,8 +138,8 @@
     <decisions>
         <name>Dec_Proprietario</name>
         <label>Sem BU e dono é usuário?</label>
-        <locationX>182</locationX>
-        <locationY>1382</locationY>
+        <locationX>314</locationX>
+        <locationY>1274</locationY>
         <defaultConnector>
             <targetReference>Asg_Carimbar</targetReference>
         </defaultConnector>
@@ -133,13 +155,19 @@
                 </rightValue>
             </conditions>
             <connector>
-                <targetReference>Get_Proprietario</targetReference>
+                <targetReference>Asg_BU_Proprietario</targetReference>
             </connector>
             <label>Sim</label>
         </rules>
     </decisions>
-    <description>ACESSO-POR-BU. Carimba Task.BU_Atividade__c antes de salvar, na criacao e quando WhatId, WhoId ou OwnerId mudam. Ordem: (1) WhatId e Oportunidade: BU do RT da Oportunidade (STE_Telecom conta como STE); (2) WhoId ou WhatId e Lead: BU do RT do Lead; (3) senao, Department do proprietario. Cada etapa so roda se a anterior nao achou BU (ex.: Oportunidade sem RT cai para o Lead e depois para o dono). Sem BU o campo fica vazio, inclusive limpando valor antigo. Before-save: sem DML extra; Get Records bulkificados pela plataforma. Contexto de sistema: grava o campo mesmo sem FLS de edicao do usuario. O campo alimenta as Restriction Rules Acesso_BU_Tarefas e Acesso_BU_Eventos.</description>
+    <description>ACESSO-POR-BU. Carimba Task.BU_Atividade__c antes de salvar, na criacao e quando WhatId, WhoId ou OwnerId mudam. Ordem: (1) WhatId e Oportunidade: BU do RT da Oportunidade (STE_Telecom conta como STE); (2) WhoId e Lead: BU do RT do Lead; (3) senao, Department do proprietario. Cada etapa so vale se a anterior nao achou BU. Sem BU o campo fica vazio, inclusive limpando valor antigo. Troca SO de dono numa atividade ja carimbada e ligada a Opp/Lead mantem a BU sem consultar (os testes SOL tem teto absoluto de SOQL e a reatribuicao em massa troca dono de Task). Limite conhecido: se a BU tinha vindo do dono porque a Opp/Lead nao tem RT de BU, a troca so de dono nao a recalcula. Before-save, contexto de sistema: grava o campo mesmo sem FLS de edicao do usuario. Alimenta as Restriction Rules Acesso_BU_Tarefas e Acesso_BU_Eventos.</description>
     <environments>Default</environments>
+    <formulas>
+        <name>fManterBU</name>
+        <description>Update em que so o dono mudou numa atividade ja carimbada e ligada a Oportunidade ou Lead: a BU vem do registro relacionado, que nao mudou; nada a recalcular e nenhuma consulta.</description>
+        <dataType>Boolean</dataType>
+        <expression>AND(NOT(ISBLANK({!$Record__Prior.Id})), {!$Record.WhatId} = {!$Record__Prior.WhatId}, {!$Record.WhoId} = {!$Record__Prior.WhoId}, NOT(ISBLANK({!$Record.BU_Atividade__c})), OR(LEFT({!$Record.WhatId}, 3) = &apos;006&apos;, LEFT({!$Record.WhoId}, 3) = &apos;00Q&apos;))</expression>
+    </formulas>
     <formulas>
         <name>fWhatEhOportunidade</name>
         <description>WhatId aponta para Oportunidade (prefixo 006).</description>
@@ -148,15 +176,9 @@
     </formulas>
     <formulas>
         <name>fBuscarLead</name>
-        <description>Ainda sem BU e WhoId ou WhatId aponta para Lead (prefixo 00Q).</description>
+        <description>Ainda sem BU e WhoId aponta para Lead (prefixo 00Q). WhatId nunca e Lead na plataforma.</description>
         <dataType>Boolean</dataType>
-        <expression>AND(ISBLANK({!varBU}), OR(LEFT({!$Record.WhoId}, 3) = &apos;00Q&apos;, LEFT({!$Record.WhatId}, 3) = &apos;00Q&apos;))</expression>
-    </formulas>
-    <formulas>
-        <name>fIdLead</name>
-        <description>Id do Lead relacionado (WhoId tem precedencia).</description>
-        <dataType>String</dataType>
-        <expression>IF(LEFT({!$Record.WhoId}, 3) = &apos;00Q&apos;, {!$Record.WhoId}, {!$Record.WhatId})</expression>
+        <expression>AND(ISBLANK({!varBU}), LEFT({!$Record.WhoId}, 3) = &apos;00Q&apos;)</expression>
     </formulas>
     <formulas>
         <name>fBuscarProprietario</name>
@@ -168,19 +190,19 @@
         <name>fBUOportunidade</name>
         <description>Codigo da BU pelo DeveloperName do RT da Oportunidade; STE_Telecom pertence a BU STE.</description>
         <dataType>String</dataType>
-        <expression>IF({!Get_RT_Oportunidade.DeveloperName} = &apos;STE_Telecom&apos;, &apos;STE&apos;, IF(CASE({!Get_RT_Oportunidade.DeveloperName}, &apos;ADV&apos;, 1, &apos;SOL&apos;, 1, &apos;STE&apos;, 1, &apos;ESG&apos;, 1, &apos;SCO&apos;, 1, 0) = 1, {!Get_RT_Oportunidade.DeveloperName}, &apos;&apos;))</expression>
+        <expression>IF({!Get_Oportunidade.RecordType.DeveloperName} = &apos;STE_Telecom&apos;, &apos;STE&apos;, IF(CASE({!Get_Oportunidade.RecordType.DeveloperName}, &apos;ADV&apos;, 1, &apos;SOL&apos;, 1, &apos;STE&apos;, 1, &apos;ESG&apos;, 1, &apos;SCO&apos;, 1, 0) = 1, {!Get_Oportunidade.RecordType.DeveloperName}, &apos;&apos;))</expression>
     </formulas>
     <formulas>
         <name>fBULead</name>
         <description>Codigo da BU pelo DeveloperName do RT do Lead.</description>
         <dataType>String</dataType>
-        <expression>IF(CASE({!Get_RT_Lead.DeveloperName}, &apos;ADV&apos;, 1, &apos;SOL&apos;, 1, &apos;STE&apos;, 1, &apos;ESG&apos;, 1, &apos;SCO&apos;, 1, 0) = 1, {!Get_RT_Lead.DeveloperName}, &apos;&apos;)</expression>
+        <expression>IF(CASE({!Get_Lead.RecordType.DeveloperName}, &apos;ADV&apos;, 1, &apos;SOL&apos;, 1, &apos;STE&apos;, 1, &apos;ESG&apos;, 1, &apos;SCO&apos;, 1, 0) = 1, {!Get_Lead.RecordType.DeveloperName}, &apos;&apos;)</expression>
     </formulas>
     <formulas>
         <name>fBUProprietario</name>
         <description>Department do proprietario, so se for um dos cinco codigos de BU (o campo tem 3 caracteres).</description>
         <dataType>String</dataType>
-        <expression>IF(CASE({!Get_Proprietario.Department}, &apos;ADV&apos;, 1, &apos;SOL&apos;, 1, &apos;STE&apos;, 1, &apos;ESG&apos;, 1, &apos;SCO&apos;, 1, 0) = 1, {!Get_Proprietario.Department}, &apos;&apos;)</expression>
+        <expression>IF(CASE({!$Record.Owner:User.Department}, &apos;ADV&apos;, 1, &apos;SOL&apos;, 1, &apos;STE&apos;, 1, &apos;ESG&apos;, 1, &apos;SCO&apos;, 1, 0) = 1, {!$Record.Owner:User.Department}, &apos;&apos;)</expression>
     </formulas>
     <interviewLabel>Acesso_BU_Tarefa_Carimbar {!$Flow.CurrentDateTime}</interviewLabel>
     <label>Acesso_BU_Tarefa_Carimbar</label>
@@ -200,11 +222,11 @@
     <recordLookups>
         <name>Get_Oportunidade</name>
         <label>Buscar Oportunidade</label>
-        <locationX>50</locationX>
-        <locationY>350</locationY>
+        <locationX>182</locationX>
+        <locationY>566</locationY>
         <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>Get_RT_Oportunidade</targetReference>
+            <targetReference>Asg_BU_Oportunidade</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
@@ -221,56 +243,10 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
-        <name>Get_RT_Oportunidade</name>
-        <label>Buscar RT da Oportunidade</label>
-        <locationX>50</locationX>
-        <locationY>458</locationY>
-        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
-        <connector>
-            <targetReference>Asg_BU_Oportunidade</targetReference>
-        </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>Id</field>
-            <operator>EqualTo</operator>
-            <value>
-                <elementReference>Get_Oportunidade.RecordTypeId</elementReference>
-            </value>
-        </filters>
-        <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>RecordType</object>
-        <queriedFields>Id</queriedFields>
-        <queriedFields>DeveloperName</queriedFields>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-    </recordLookups>
-    <recordLookups>
         <name>Get_Lead</name>
         <label>Buscar Lead</label>
-        <locationX>50</locationX>
+        <locationX>182</locationX>
         <locationY>974</locationY>
-        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
-        <connector>
-            <targetReference>Get_RT_Lead</targetReference>
-        </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>Id</field>
-            <operator>EqualTo</operator>
-            <value>
-                <elementReference>fIdLead</elementReference>
-            </value>
-        </filters>
-        <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>Lead</object>
-        <queriedFields>Id</queriedFields>
-        <queriedFields>RecordTypeId</queriedFields>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-    </recordLookups>
-    <recordLookups>
-        <name>Get_RT_Lead</name>
-        <label>Buscar RT do Lead</label>
-        <locationX>50</locationX>
-        <locationY>1082</locationY>
         <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>Asg_BU_Lead</targetReference>
@@ -280,43 +256,20 @@
             <field>Id</field>
             <operator>EqualTo</operator>
             <value>
-                <elementReference>Get_Lead.RecordTypeId</elementReference>
+                <elementReference>$Record.WhoId</elementReference>
             </value>
         </filters>
         <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>RecordType</object>
+        <object>Lead</object>
         <queriedFields>Id</queriedFields>
-        <queriedFields>DeveloperName</queriedFields>
-        <storeOutputAutomatically>true</storeOutputAutomatically>
-    </recordLookups>
-    <recordLookups>
-        <name>Get_Proprietario</name>
-        <label>Buscar proprietário</label>
-        <locationX>50</locationX>
-        <locationY>1490</locationY>
-        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
-        <connector>
-            <targetReference>Asg_BU_Proprietario</targetReference>
-        </connector>
-        <filterLogic>and</filterLogic>
-        <filters>
-            <field>Id</field>
-            <operator>EqualTo</operator>
-            <value>
-                <elementReference>$Record.OwnerId</elementReference>
-            </value>
-        </filters>
-        <getFirstRecordOnly>true</getFirstRecordOnly>
-        <object>User</object>
-        <queriedFields>Id</queriedFields>
-        <queriedFields>Department</queriedFields>
+        <queriedFields>RecordTypeId</queriedFields>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <start>
-        <locationX>56</locationX>
+        <locationX>320</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>Dec_Oportunidade</targetReference>
+            <targetReference>Dec_So_Troca_De_Dono</targetReference>
         </connector>
         <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
         <filterFormula>OR(ISNEW(), ISCHANGED({!$Record.WhatId}), ISCHANGED({!$Record.WhoId}), ISCHANGED({!$Record.OwnerId}))</filterFormula>
