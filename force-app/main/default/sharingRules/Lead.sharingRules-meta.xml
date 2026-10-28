@@ -1,3 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<SharingRules xmlns="http://soap.sforce.com/2006/04/metadata"/>
-
+<SharingRules xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sharingCriteriaRules>
+        <fullName>SOL_Leitura_Comercial</fullName>
+        <accessLevel>Read</accessLevel>
+        <description>Da leitura ao papel Comercial SOL em todos os Leads de record type SOL. Lead tem OWD Private e o rodizio SOL (flow SOL_Distribuir_Lead, card 9394) troca o dono de todo Lead SOL, inclusive os criados a mao; sem esta regra o vendedor perde o acesso ao Lead que acabou de criar. Decisao do PO: manter o rodizio e dar leitura. Coordenacao SOL ve pela hierarquia.</description>
+        <label>SOL - Leitura para o Comercial</label>
+        <sharedTo>
+            <role>Comercial_SOL</role>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Arnone Soluções</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+</SharingRules>

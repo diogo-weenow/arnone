@@ -5,6 +5,6 @@
     <description>Time comercial da unidade Instituto Global ESG — nó de forecast da BU.</description>
     <mayForecastManagerShare>false</mayForecastManagerShare>
     <name>Comercial Instituto Global ESG</name>
-    <opportunityAccessLevel>Edit</opportunityAccessLevel>
+    <opportunityAccessLevel>None</opportunityAccessLevel>
     <parentRole>Diretoria_Grupo</parentRole>
 </Role>
