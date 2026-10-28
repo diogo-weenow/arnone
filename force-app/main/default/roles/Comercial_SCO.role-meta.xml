@@ -6,5 +6,5 @@
     <mayForecastManagerShare>false</mayForecastManagerShare>
     <name>Comercial S.Company</name>
     <opportunityAccessLevel>None</opportunityAccessLevel>
-    <parentRole>Diretoria_Grupo</parentRole>
+    <parentRole>Diretoria_SCO</parentRole>
 </Role>
