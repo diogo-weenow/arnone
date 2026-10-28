@@ -267,6 +267,168 @@ private class AcessoPorBUAtividadeTest {
     );
   }
 
+  // ============================================================ F4: carimbo
+
+  private static Id rtOpp(String dev) {
+    return Schema.SObjectType.Opportunity.getRecordTypeInfosByDeveloperName().get(dev).getRecordTypeId();
+  }
+
+  private static Id novaOpp(String rt, String etapa, Id dono) {
+    Account c = [SELECT Id FROM Account WHERE Name = :(PREFIXO + ' Robson Teste Ltda') LIMIT 1];
+    Opportunity o = new Opportunity(
+      Name = PREFIXO + ' Opp ' + rt,
+      AccountId = c.Id,
+      OwnerId = dono,
+      RecordTypeId = rtOpp(rt),
+      StageName = etapa,
+      CloseDate = Date.today().addDays(30)
+    );
+    insert o;
+    return o.Id;
+  }
+
+  private static Id novoLeadSOL() {
+    Lead l = new Lead(
+      LastName = PREFIXO + ' Lead SOL',
+      Company = PREFIXO + ' Empresa SOL',
+      RecordTypeId = Schema.SObjectType.Lead.getRecordTypeInfosByDeveloperName().get('SOL').getRecordTypeId(),
+      Status = [SELECT ApiName FROM LeadStatus WHERE IsDefault = TRUE LIMIT 1].ApiName
+    );
+    l.put('CNPJ__c', '11222333000181');
+    insert l;
+    return l.Id;
+  }
+
+  /**
+   * Le o campo como o Diretor Global de teste: o campo so tem FLS de leitura
+   * via PS_Acesso_BU_Campos (nem o admin o enxerga, por design), e o Diretor
+   * Global nao e restringido em atividades.
+   */
+  private static String buDe(Id atividadeId) {
+    String o = atividadeId.getSObjectType() == Task.SObjectType ? 'Task' : 'Event';
+    SObject r;
+    System.runAs(usuario('global')) {
+      r = Database.query('SELECT BU_Atividade__c FROM ' + o + ' WHERE Id = \'' + atividadeId + '\'');
+    }
+    return (String) r.get('BU_Atividade__c');
+  }
+
+  private static Task tarefa(String assunto, Id dono, Id whoId, Id whatId) {
+    return new Task(
+      Subject = PREFIXO + ' ' + assunto,
+      OwnerId = dono,
+      WhoId = whoId,
+      WhatId = whatId,
+      Status = 'Open',
+      Priority = 'Normal'
+    );
+  }
+
+  @IsTest
+  static void carimboPeloDonoQuandoNaoHaLeadNemOpp() {
+    Task t = [SELECT Id FROM Task WHERE Subject = :(PREFIXO + ' ADV contato Robson')];
+    Assert.areEqual('ADV', buDe(t.Id), 'Sem Lead nem Opp, a BU vem do Department do dono (ADV).');
+  }
+
+  @IsTest
+  static void carimboPelaOportunidadeTemPrecedenciaSobreODono() {
+    Id oppAdv = novaOpp('ADV', 'Oportunidade Recebida', usuario('advat').Id);
+    Id oppTel = novaOpp('STE_Telecom', 'Verificação de Antecedentes', usuario('advat').Id);
+    // Dono SOL de proposito: a Opp manda, nao o Department do dono.
+    Task tAdv = tarefa('na opp ADV', usuario('solvend').Id, null, oppAdv);
+    Task tTel = tarefa('na opp Telecom', usuario('solvend').Id, null, oppTel);
+    Test.startTest();
+    insert new List<Task>{ tAdv, tTel };
+    Test.stopTest();
+    Assert.areEqual('ADV', buDe(tAdv.Id), 'WhatId Opp ADV carimba ADV.');
+    Assert.areEqual('STE', buDe(tTel.Id), 'WhatId Opp Stech Telecom carimba STE.');
+  }
+
+  @IsTest
+  static void carimboPeloLeadQuandoNaoHaOpp() {
+    Id leadSol = novoLeadSOL();
+    Task t = tarefa('no lead SOL', usuario('advat').Id, leadSol, null);
+    Test.startTest();
+    insert t;
+    Test.stopTest();
+    Assert.areEqual('SOL', buDe(t.Id), 'WhoId Lead SOL carimba SOL mesmo com dono ADV.');
+  }
+
+  @IsTest
+  static void semBUOCampoFicaVazio() {
+    Task t = tarefa('sem BU', usuario('global').Id, null, null);
+    Test.startTest();
+    insert t;
+    Test.stopTest();
+    Assert.isNull(buDe(t.Id), 'Dono sem Department de BU e sem Lead/Opp: campo vazio.');
+  }
+
+  @IsTest
+  static void trocaDeWhatIdRecarimba() {
+    Task t = [SELECT Id FROM Task WHERE Subject = :(PREFIXO + ' ADV contato Robson')];
+    Id oppSol = novaOpp('SOL', 'Diagnóstico', usuario('solvend').Id);
+    Test.startTest();
+    update new Task(Id = t.Id, WhatId = oppSol);
+    Test.stopTest();
+    Assert.areEqual('SOL', buDe(t.Id), 'Ao trocar o WhatId para uma Opp SOL a BU e recalculada.');
+  }
+
+  @IsTest
+  static void eventoECarimbadoERestritoPorBU() {
+    Contact robson = [SELECT Id FROM Contact WHERE LastName = :(PREFIXO + ' Robson')];
+    Event e = new Event(
+      Subject = PREFIXO + ' evento ADV',
+      OwnerId = usuario('advat').Id,
+      WhoId = robson.Id,
+      StartDateTime = System.now().addDays(1),
+      EndDateTime = System.now().addDays(1).addHours(1)
+    );
+    insert e;
+    Assert.areEqual('ADV', buDe(e.Id), 'Evento do dono ADV no Contato Robson carimba ADV.');
+    Integer ste;
+    Integer adv;
+    Integer semCp;
+    String q = 'SELECT Id FROM Event WHERE Id = \'' + e.Id + '\'';
+    System.runAs(usuario('steat')) {
+      ste = Database.query(q, AccessLevel.USER_MODE).size();
+    }
+    System.runAs(usuario('advdir')) {
+      adv = Database.query(q, AccessLevel.USER_MODE).size();
+    }
+    System.runAs(usuario('semcp')) {
+      semCp = Database.query(q, AccessLevel.USER_MODE).size();
+    }
+    Assert.areEqual(0, ste, 'Acesso_BU_Eventos: o atendente STE nao ve o evento ADV.');
+    Assert.areEqual(1, adv, 'O diretor ADV ve o evento ADV.');
+    Assert.areEqual(1, semCp, 'Controle: sem a custom permission o evento continua visivel.');
+  }
+
+  @IsTest
+  static void volume200TarefasCarimbadasEmUmDML() {
+    Contact robson = [SELECT Id FROM Contact WHERE LastName = :(PREFIXO + ' Robson')];
+    Id advat = usuario('advat').Id;
+    List<Task> lote = new List<Task>();
+    for (Integer i = 0; i < 200; i++) {
+      lote.add(tarefa('lote ' + i, advat, robson.Id, null));
+    }
+    Test.startTest();
+    insert lote;
+    Integer soql = Limits.getQueries();
+    Test.stopTest();
+    Integer carimbadas = 0;
+    System.runAs(usuario('global')) {
+      for (Task t : (List<Task>) Database.query(
+        'SELECT BU_Atividade__c FROM Task WHERE Subject LIKE \'' + PREFIXO + ' lote %\''
+      )) {
+        if (t.get('BU_Atividade__c') == 'ADV') {
+          carimbadas++;
+        }
+      }
+    }
+    Assert.areEqual(200, carimbadas, 'As 200 tarefas do lote tem de sair carimbadas com ADV.');
+    Assert.isTrue(soql < 50, 'O carimbo em lote nao pode consumir SOQL por registro. SOQL: ' + soql);
+  }
+
   @IsTest
   static void vendedorSOLContinuaVendoSoAsProprias() {
     Set<String> vistas = visiveisPara('solvend');
