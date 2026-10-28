@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MutingPermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>SOL_Restringir_Tarefas_Ao_Proprietario</name>
+    </customPermissions>
+    <description>ACESSO-POR-BU. Silencia, dentro do PSG_SOL_Diretor, a custom permission do 9430 que restringe tarefas ao proprietario: o diretor SOL fica sob a regra por BU, nao sob a regra do vendedor.</description>
+    <label>PSG_SOL_Diretor_Muting</label>
+</MutingPermissionSet>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>Ver_Historico</name>
+    </customPermissions>
+    <description>ACESSO-POR-BU. Concede a custom permission Ver_Historico (componente de historico nas paginas). Uso: PSGs de diretor.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Ver histórico de campos</label>
+</PermissionSet>

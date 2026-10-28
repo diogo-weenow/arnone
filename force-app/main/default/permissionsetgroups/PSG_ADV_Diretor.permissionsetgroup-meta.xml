@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>ACESSO-POR-BU. Diretor da Arnone Advogados: atendente mais historico e app de gestao.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Arnone Advogados — Diretor</label>
+    <permissionSets>PS_Comercial</permissionSets>
+    <permissionSets>PS_ADV_Comercial</permissionSets>
+    <permissionSets>PS_Atividades_Por_BU</permissionSets>
+    <permissionSets>PS_Acesso_BU_Campos</permissionSets>
+    <permissionSets>PS_Ver_Historico</permissionSets>
+    <permissionSets>PS_Arnone_Gestao</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>

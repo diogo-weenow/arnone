@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>ACESSO-POR-BU. Diretor da Arnone Solucoes: acesso comercial SOL com a restricao de tarefas ao proprietario silenciada, atividades por BU, historico e app de gestao.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Arnone Soluções — Diretor</label>
+    <mutingPermissionSets>PSG_SOL_Diretor_Muting</mutingPermissionSets>
+    <permissionSets>PS_Comercial</permissionSets>
+    <permissionSets>PS_SOL_Comercial</permissionSets>
+    <permissionSets>PS_Atividades_Por_BU</permissionSets>
+    <permissionSets>PS_Acesso_BU_Campos</permissionSets>
+    <permissionSets>PS_Ver_Historico</permissionSets>
+    <permissionSets>PS_Arnone_Gestao</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>

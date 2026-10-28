@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Event.BU_Atividade__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Task.BU_Atividade__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <description>ACESSO-POR-BU. Leitura (sem edicao) do campo BU da atividade em Task e Event.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Acesso por BU — Campos</label>
+</PermissionSet>

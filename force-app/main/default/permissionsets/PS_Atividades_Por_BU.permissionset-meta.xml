@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>Atividades_Restritas_Por_BU</name>
+    </customPermissions>
+    <description>ACESSO-POR-BU. Concede a custom permission Atividades_Restritas_Por_BU, que ativa as Restriction Rules de Task e Event por BU. Uso: PSGs de atendente e diretor das BUs.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Atividades restritas à BU</label>
+</PermissionSet>
