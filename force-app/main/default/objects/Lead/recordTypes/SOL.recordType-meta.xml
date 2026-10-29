@@ -3,6 +3,7 @@
     <fullName>SOL</fullName>
     <active>true</active>
     <businessProcess>Captacao_SOL</businessProcess>
+    <compactLayoutAssignment>SOL_Lead</compactLayoutAssignment>
     <description>Leads captados para a unidade Arnone Soluções. Usa o processo Captacao_SOL, com os estados de MQL, SQL e procuração — exclusivos desta BU.</description>
     <label>Arnone Soluções</label>
     <picklistValues>

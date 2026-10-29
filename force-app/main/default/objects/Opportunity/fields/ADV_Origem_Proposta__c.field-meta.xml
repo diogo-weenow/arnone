@@ -14,7 +14,7 @@
             <value>
                 <fullName>Indicações</fullName>
                 <default>false</default>
-                <label>Indicações</label>
+                <label>Indicação</label>
             </value>
             <value>
                 <fullName>Parceiros</fullName>
@@ -29,7 +29,7 @@
             <value>
                 <fullName>Prospecção Ativa</fullName>
                 <default>false</default>
-                <label>Prospecção Ativa</label>
+                <label>Prospecção ativa</label>
             </value>
             <value>
                 <fullName>Inbound</fullName>
