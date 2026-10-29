@@ -114,7 +114,7 @@ private class SOLOptOutTest {
       Company = 'C',
       Status = String.isBlank(status) ? statusLead() : status,
       CNPJ__c = CNPJ,
-      SOL_Produto_Interesse__c = produto
+      SOL_Produtos_Interesse__c = produto
     );
     insert l;
     return recarregar(l.Id);

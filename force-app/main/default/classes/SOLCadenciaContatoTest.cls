@@ -2399,7 +2399,7 @@ private class SOLCadenciaContatoTest {
     montarCenario(1);
     Lead l = leadsDistribuidos(1)[0];
     // O encerramento por perda (9425) exige produto de interesse SOL.
-    update new Lead(Id = l.Id, SOL_Produto_Interesse__c = PRODUTO_RT);
+    update new Lead(Id = l.Id, SOL_Produtos_Interesse__c = PRODUTO_RT);
     criarEmail(
       new List<SOLCadenciaContatoService.Solicitacao>{
         pedido(l.Id, 2, Date.today().addDays(4))
@@ -3132,7 +3132,7 @@ private class SOLCadenciaContatoTest {
     montarCenario(3);
     List<Lead> ls = leadsDistribuidos(3);
     // O encerramento por perda (9425) exige produto de interesse SOL.
-    update new Lead(Id = ls[2].Id, SOL_Produto_Interesse__c = PRODUTO_RT);
+    update new Lead(Id = ls[2].Id, SOL_Produtos_Interesse__c = PRODUTO_RT);
     for (Lead l : ls) {
       criarWhatsApp(
         new List<SOLCadenciaContatoService.Solicitacao>{
@@ -3266,8 +3266,8 @@ private class SOLCadenciaContatoTest {
     montarCenario(2);
     List<Lead> ls = leadsDistribuidos(2);
     update new List<Lead>{
-      new Lead(Id = ls[0].Id, SOL_Produto_Interesse__c = PRODUTO_RT),
-      new Lead(Id = ls[1].Id, SOL_Produto_Interesse__c = PRODUTO_ART)
+      new Lead(Id = ls[0].Id, SOL_Produtos_Interesse__c = PRODUTO_RT),
+      new Lead(Id = ls[1].Id, SOL_Produtos_Interesse__c = PRODUTO_ART)
     };
 
     Test.startTest();

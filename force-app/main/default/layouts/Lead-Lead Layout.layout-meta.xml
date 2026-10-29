@@ -168,7 +168,7 @@
         <layoutColumns>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>SOL_Produto_Interesse__c</field>
+                <field>SOL_Produtos_Interesse__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>

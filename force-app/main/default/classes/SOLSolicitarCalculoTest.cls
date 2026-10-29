@@ -118,7 +118,7 @@ private class SOLSolicitarCalculoTest {
       AccountId = a.Id,
       CloseDate = Date.today().addDays(60),
       StageName = 'Diagnóstico',
-      SOL_Produto_Negocio__c = cfg.prodOpp
+      SOL_Produtos_Negocio__c = cfg.prodOpp
     );
     if (cfg.oppSOL) {
       o.RecordTypeId = rtOppSOL();
@@ -759,7 +759,7 @@ private class SOLSolicitarCalculoTest {
       Company = 'C',
       CNPJ__c = CNPJ,
       Status = 'Captação - Contato',
-      SOL_Produto_Interesse__c = produto
+      SOL_Produtos_Interesse__c = produto
     );
     insert l;
     if (comReuniao) {
@@ -790,7 +790,7 @@ private class SOLSolicitarCalculoTest {
     update new Opportunity(
       Id = oppId,
       RecordTypeId = rtOppSOL(),
-      SOL_Produto_Negocio__c = produto,
+      SOL_Produtos_Negocio__c = produto,
       StageName = 'Diagnóstico'
     );
     return oppId;

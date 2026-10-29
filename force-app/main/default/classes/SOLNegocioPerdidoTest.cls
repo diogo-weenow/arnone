@@ -123,7 +123,7 @@ private class SOLNegocioPerdidoTest {
       Company = 'C ' + rnd(),
       Status = 'Captação - Contato',
       CNPJ__c = CNPJ,
-      SOL_Produto_Interesse__c = produto
+      SOL_Produtos_Interesse__c = produto
     );
     insert l;
     return l;
@@ -132,7 +132,7 @@ private class SOLNegocioPerdidoTest {
   private static Lead lead(Id id) {
     return [
       SELECT Id, OwnerId, Status, IsConverted, SOL_Opt_Out__c, SOL_Data_Opt_Out__c,
-             SOL_Motivo_Desqualificacao__c, SOL_Produto_Interesse__c
+             SOL_Motivo_Desqualificacao__c, SOL_Produtos_Interesse__c
       FROM Lead
       WHERE Id = :id
     ];
@@ -160,7 +160,7 @@ private class SOLNegocioPerdidoTest {
       AccountId = a.Id,
       CloseDate = Date.today().addDays(60),
       StageName = 'Diagnóstico',
-      SOL_Produto_Negocio__c = produto,
+      SOL_Produtos_Negocio__c = produto,
       SOL_ECAC_Consulta_Realizada__c = true,
       SOL_ECAC_Data_Consulta__c = Date.today(),
       SOL_ECAC_Resultado__c = 'Valor a recuperar',
@@ -189,7 +189,7 @@ private class SOLNegocioPerdidoTest {
 
   private static Opportunity opp(Id id) {
     return [
-      SELECT Id, OwnerId, StageName, IsClosed, SOL_Produto_Negocio__c, SOL_Motivo_Perda__c
+      SELECT Id, OwnerId, StageName, IsClosed, SOL_Produtos_Negocio__c, SOL_Motivo_Perda__c
       FROM Opportunity
       WHERE Id = :id
     ];

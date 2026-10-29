@@ -41,7 +41,7 @@ private class SOL_FlowsSemInvocableTest {
       RecordTypeId = rtOppSOL(),
       CloseDate = Date.today().addDays(60),
       StageName = 'Diagnóstico',
-      SOL_Produto_Negocio__c = PRODUTO,
+      SOL_Produtos_Negocio__c = PRODUTO,
       SOL_ECAC_Consulta_Realizada__c = true,
       SOL_ECAC_Data_Consulta__c = Date.today(),
       SOL_ECAC_Resultado__c = 'Valor a recuperar',

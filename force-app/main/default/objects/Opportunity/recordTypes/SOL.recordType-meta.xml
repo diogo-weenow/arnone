@@ -6,6 +6,130 @@
     <description>Oportunidades da unidade Arnone Soluções, para os produtos Recuperação Tributária e ART 360.</description>
     <label>Arnone Soluções</label>
     <picklistValues>
+        <picklist>ADV_Advogado_Responsavel__c</picklist>
+        <values>
+            <fullName>Ana Luiza</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Bruno Junqueira</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Caroline Dagostino</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fernando Pauli</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Filipe Gonzaga</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Gabriela Medeiros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Glaucia Uliana</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Jose Evangelista</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Larissa Billa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lucas Hygino</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Marcelo Lervonino</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Renato Chiappim</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>ADV_Area_Juridica__c</picklist>
+        <values>
+            <fullName>Cível</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empresarial</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Trabalhista</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Tributário</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>ADV_Motivo_Perda__c</picklist>
+        <values>
+            <fullName>Desistência</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Falta de Retorno</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Honorários %28Custo%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Outros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sem Fit</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sem Interesse</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>ADV_Origem_Proposta__c</picklist>
+        <values>
+            <fullName>Inbound</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Indicações</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Marketing</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Outbound</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Parceiros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Prospecção Ativa</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>ForecastCategoryName</picklist>
         <values>
             <fullName>Best Case</fullName>
@@ -199,6 +323,21 @@
         </values>
         <values>
             <fullName>Recuperação Tributária</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SOL_Produtos_Negocio__c</picklist>
+        <values>
+            <fullName>ART 360</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recuperação Tributária</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Revisão trabalhista</fullName>
             <default>false</default>
         </values>
     </picklistValues>

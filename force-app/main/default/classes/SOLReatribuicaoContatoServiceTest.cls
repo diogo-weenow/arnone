@@ -1111,7 +1111,7 @@ private class SOLReatribuicaoContatoServiceTest {
     );
     update new Lead(
       Id = perdido.Id,
-      SOL_Produto_Interesse__c = 'Recuperação Tributária',
+      SOL_Produtos_Interesse__c = 'Recuperação Tributária',
       Status = 'Desqualificado',
       SOL_Motivo_Desqualificacao__c = 'Negócio perdido'
     );
