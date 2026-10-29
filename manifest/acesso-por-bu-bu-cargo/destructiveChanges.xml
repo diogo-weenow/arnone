@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ACESSO-POR-BU (modelo BU + cargo): PS absorvidos pelos PS de BU, de cargo, de atendimento e de importacao. -->
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>PSG_SOL_Diretor_Muting</members>
+        <name>MutingPermissionSet</name>
+    </types>
+    <types>
+        <members>PS_Acesso_BU_Campos</members>
+        <members>PS_Advogado</members>
+        <members>PS_Arnone_Gestao</members>
+        <members>PS_Atividades_Por_BU</members>
+        <members>PS_Comercial</members>
+        <members>PS_ESG_Importacao_Leads</members>
+        <members>PS_SCO_Importacao_Leads</members>
+        <members>PS_SDR</members>
+        <members>PS_SOL_Importacao_Leads</members>
+        <members>PS_STE_Campos_Lead</members>
+        <members>PS_STE_E2E_Tester</members>
+        <members>PS_STE_Importacao_Leads</members>
+        <members>PS_Ver_Historico</members>
+        <name>PermissionSet</name>
+    </types>
+    <version>64.0</version>
+</Package>

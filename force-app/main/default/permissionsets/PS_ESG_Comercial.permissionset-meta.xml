@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
-    <applicationVisibilities>
-        <application>Arnone</application>
-        <visible>true</visible>
-    </applicationVisibilities>
-    <description>Pré-vendas (SDR): captação e qualificação de leads, conversão em conta/contato/oportunidade. Sem exclusão de registros.</description>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>ESG_Importar_Leads</name>
+    </customPermissions>
+    <description>ACESSO-POR-BU. PS da BU. Base comum (Conta/Contato/Lead/Opp sem delete, FLS comum) + RTs ESG e ESG_Importar_Leads. Sem restricao de visibilidade (vem do cargo).</description>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Account.CNPJ__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Account.Unidades_Atendidas__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>AccountContactRelation.Unidade__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -26,7 +26,7 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Contact.CPF__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -37,11 +37,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Lead.CNPJ__c</field>
+        <field>Event.BU_Atividade__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Lead.CPF__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -60,8 +60,18 @@
         <field>Lead.Unidade_Origem__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Product2.Unidade__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Task.BU_Atividade__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
-    <label>SDR</label>
+    <label>BU — Instituto Global ESG</label>
     <objectPermissions>
         <allowCreate>true</allowCreate>
         <allowDelete>false</allowDelete>
@@ -95,31 +105,29 @@
     <objectPermissions>
         <allowCreate>true</allowCreate>
         <allowDelete>false</allowDelete>
-        <allowEdit>false</allowEdit>
+        <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
         <object>Opportunity</object>
         <viewAllFields>false</viewAllFields>
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
-    <recordTypeVisibilities>
-        <recordType>Lead.ADV</recordType>
-        <visible>true</visible>
-    </recordTypeVisibilities>
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Product2</object>
+        <viewAllFields>false</viewAllFields>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
     <recordTypeVisibilities>
         <recordType>Lead.ESG</recordType>
         <visible>true</visible>
     </recordTypeVisibilities>
     <recordTypeVisibilities>
-        <recordType>Lead.SCO</recordType>
-        <visible>true</visible>
-    </recordTypeVisibilities>
-    <recordTypeVisibilities>
-        <recordType>Lead.SOL</recordType>
-        <visible>true</visible>
-    </recordTypeVisibilities>
-    <recordTypeVisibilities>
-        <recordType>Lead.STE</recordType>
+        <recordType>Opportunity.ESG</recordType>
         <visible>true</visible>
     </recordTypeVisibilities>
     <userPermissions>
@@ -129,6 +137,10 @@
     <userPermissions>
         <enabled>true</enabled>
         <name>EditEvent</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>EditOppLineItemUnitPrice</name>
     </userPermissions>
     <userPermissions>
         <enabled>true</enabled>

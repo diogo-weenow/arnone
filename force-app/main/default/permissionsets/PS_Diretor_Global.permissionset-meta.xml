@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <applicationVisibilities>
+        <application>Arnone</application>
+        <visible>true</visible>
+    </applicationVisibilities>
     <customPermissions>
         <enabled>true</enabled>
         <name>Ver_Historico</name>
     </customPermissions>
-    <description>ACESSO-POR-BU. View All Records em Lead e Oportunidade e a custom permission Ver_Historico, para o Diretor Global. Nao concede Modify All nem View All Data.</description>
+    <description>ACESSO-POR-BU. Cargo Diretor Global: View All Records em Lead e Oportunidade, historico de campos e app Arnone Gestao. Sem custom permission de restricao. Nao concede Modify All nem View All Data.</description>
     <hasActivationRequired>false</hasActivationRequired>
-    <label>Diretor Global — Visão de todas as BUs</label>
+    <label>Cargo — Diretor Global</label>
     <objectPermissions>
         <allowCreate>false</allowCreate>
         <allowDelete>false</allowDelete>

@@ -8,9 +8,11 @@
  *     A prova A/B foi feita rodando esta classe com a regra INATIVA (o teste
  *     `tarefaDeOutraBUFicaInvisivel` FALHA, porque a tarefa de Contato de Conta
  *     pública volta a aparecer) e ATIVA (passa). Apex não lê `RestrictionRule`.
- *   - Spike S2: o muting `PSG_SOL_Diretor_Muting` silencia
- *     `SOL_Restringir_Tarefas_Ao_Proprietario` dentro do `PSG_SOL_Diretor`.
- *   - Convivência com o 9430: o vendedor SOL continua vendo só as próprias.
+ *   - Modelo BU + cargo: o PS da BU nao carrega restricao; o cargo Vendedor
+ *     traz `SOL_Restringir_Tarefas_Ao_Proprietario` (tarefas e compromissos
+ *     somente do proprietario), o Atendente e o Gestor trazem
+ *     `Atividades_Restritas_Por_BU`. Exatamente uma restricao por usuario.
+ *   - Convivência com o 9430: o vendedor continua vendo só as próprias.
  *   - Carimbo da BU pelos flows `Acesso_BU_Tarefa_Carimbar` e
  *     `Acesso_BU_Evento_Carimbar`, inclusive em volume (200 registros).
  *
@@ -43,18 +45,27 @@ private class AcessoPorBUAtividadeTest {
       porApelido.put(u.LastName.removeStart('Atv '), u);
     }
 
-    // O PSG de STE inclui PS_Atendimento e PS_Atendimento_Chat, que exigem
-    // permission set licenses. Sem elas a atribuição do PSG falha.
+    // O atendente STE real tambem recebe PS_Atendimento e PS_Atendimento_Chat,
+    // que exigem permission set licenses.
     atribuirLicencas(porApelido.get('steat').Id);
 
+    // Modelo BU + cargo: PS da BU + exatamente um PS de cargo; o Diretor Global
+    // usa o unico PSG. O controle (semcp) tem so o PS da BU, sem cargo.
     List<PermissionSetAssignment> psas = new List<PermissionSetAssignment>();
-    psas.add(psg(porApelido.get('advat').Id, 'PSG_ADV_Atendente'));
-    psas.add(psg(porApelido.get('advdir').Id, 'PSG_ADV_Diretor'));
-    psas.add(psg(porApelido.get('steat').Id, 'PSG_STE_Atendente'));
-    psas.add(psg(porApelido.get('solvend').Id, 'PSG_SOL_Comercial'));
-    psas.add(psg(porApelido.get('soldir').Id, 'PSG_SOL_Diretor'));
+    psas.add(ps(porApelido.get('advat').Id, 'PS_ADV_Comercial'));
+    psas.add(ps(porApelido.get('advat').Id, 'PS_Cargo_Vendedor'));
+    psas.add(ps(porApelido.get('advdir').Id, 'PS_ADV_Comercial'));
+    psas.add(ps(porApelido.get('advdir').Id, 'PS_Cargo_Gestor'));
+    psas.add(ps(porApelido.get('steat').Id, 'PS_STE_Comercial'));
+    psas.add(ps(porApelido.get('steat').Id, 'PS_Cargo_Atendente'));
+    psas.add(ps(porApelido.get('steat').Id, 'PS_Atendimento'));
+    psas.add(ps(porApelido.get('steat').Id, 'PS_Atendimento_Chat'));
+    psas.add(ps(porApelido.get('solvend').Id, 'PS_SOL_Comercial'));
+    psas.add(ps(porApelido.get('solvend').Id, 'PS_Cargo_Vendedor'));
+    psas.add(ps(porApelido.get('soldir').Id, 'PS_SOL_Comercial'));
+    psas.add(ps(porApelido.get('soldir').Id, 'PS_Cargo_Gestor'));
     psas.add(psg(porApelido.get('global').Id, 'PSG_Diretor_Global'));
-    psas.add(ps(porApelido.get('semcp').Id, 'PS_Comercial'));
+    psas.add(ps(porApelido.get('semcp').Id, 'PS_STE_Comercial'));
     insert psas;
 
     System.runAs(new User(Id = UserInfo.getUserId())) {
@@ -229,7 +240,7 @@ private class AcessoPorBUAtividadeTest {
   // ============================================================ S2 e 9430
 
   @IsTest
-  static void mutingSilenciaARestricaoDoVendedorNoDiretorSOL() {
+  static void cargoDefineARestricaoDeAtividades() {
     Boolean dirSol;
     Boolean dirBu;
     Boolean dirHist;
@@ -244,10 +255,10 @@ private class AcessoPorBUAtividadeTest {
       vendSol = FeatureManagement.checkPermission(CP_SOL);
       vendBu = FeatureManagement.checkPermission(CP_BU);
     }
-    Assert.isFalse(dirSol, 'S2: o muting tem de silenciar ' + CP_SOL + ' no PSG_SOL_Diretor.');
-    Assert.isTrue(dirBu, 'O diretor SOL tem de receber ' + CP_BU + '.');
+    Assert.isFalse(dirSol, 'O diretor SOL (cargo Gestor) NAO pode ter ' + CP_SOL + ': o PS da BU nao carrega restricao.');
+    Assert.isTrue(dirBu, 'O diretor SOL tem de receber ' + CP_BU + ' pelo cargo Gestor.');
     Assert.isTrue(dirHist, 'O diretor SOL tem de receber ' + CP_HIST + '.');
-    Assert.isTrue(vendSol, 'O vendedor SOL continua com a restricao do 9430.');
+    Assert.isTrue(vendSol, 'O vendedor SOL recebe a restricao do 9430 pelo cargo Vendedor.');
     Assert.isFalse(
       vendBu,
       'O vendedor SOL NAO pode ter ' + CP_BU + ': so uma Restriction Rule vale por usuario.'
@@ -301,7 +312,7 @@ private class AcessoPorBUAtividadeTest {
 
   /**
    * Le o campo como o Diretor Global de teste: o campo so tem FLS de leitura
-   * via PS_Acesso_BU_Campos (nem o admin o enxerga, por design), e o Diretor
+   * via o PS da BU (nem o admin o enxerga, por design), e o Diretor
    * Global nao e restringido em atividades.
    */
   private static String buDe(Id atividadeId) {
@@ -388,6 +399,8 @@ private class AcessoPorBUAtividadeTest {
     Integer ste;
     Integer adv;
     Integer semCp;
+    Integer vendOutro;
+    Integer vendDono;
     String q = 'SELECT Id FROM Event WHERE Id = \'' + e.Id + '\'';
     System.runAs(usuario('steat')) {
       ste = Database.query(q, AccessLevel.USER_MODE).size();
@@ -398,9 +411,17 @@ private class AcessoPorBUAtividadeTest {
     System.runAs(usuario('semcp')) {
       semCp = Database.query(q, AccessLevel.USER_MODE).size();
     }
+    System.runAs(usuario('solvend')) {
+      vendOutro = Database.query(q, AccessLevel.USER_MODE).size();
+    }
+    System.runAs(usuario('advat')) {
+      vendDono = Database.query(q, AccessLevel.USER_MODE).size();
+    }
     Assert.areEqual(0, ste, 'Acesso_BU_Eventos: o atendente STE nao ve o evento ADV.');
     Assert.areEqual(1, adv, 'O diretor ADV ve o evento ADV.');
     Assert.areEqual(1, semCp, 'Controle: sem a custom permission o evento continua visivel.');
+    Assert.areEqual(0, vendOutro, 'Eventos_Somente_Do_Proprietario: o vendedor nao ve compromisso alheio.');
+    Assert.areEqual(1, vendDono, 'O vendedor dono ve o proprio compromisso.');
   }
 
   @IsTest

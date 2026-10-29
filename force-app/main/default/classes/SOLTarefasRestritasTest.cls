@@ -34,7 +34,7 @@
 @IsTest
 private class SOLTarefasRestritasTest {
   private static final String PERMISSAO = 'SOL_Restringir_Tarefas_Ao_Proprietario';
-  private static final String PERMISSION_SET = 'PS_SOL_Comercial';
+  private static final String PERMISSION_SET = 'PS_Cargo_Vendedor';
   private static final String PERFIL_SEM_VIEW_ALL = 'Standard User';
 
   private static final String ASSUNTO_PROPRIA = 'E2E_9430 tarefa do restrito';

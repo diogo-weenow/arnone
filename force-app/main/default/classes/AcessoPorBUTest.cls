@@ -11,8 +11,9 @@
  *     ADV, SOL, ESG, SCO: Lead_<BU>_BU / Opp_<BU>_BU para o papel
  *     Diretoria_<BU> e, em ADV e SOL, Lead/Opp_<BU>_Coordenacao para o papel
  *     Coordenador_<BU>. O vendedor dessas BUs ve so o que e dele;
- *   - PSGs por cargo e PS_Diretor_Global (View All em Lead e Opportunity);
- *   - custom permission Ver_Historico só nos PSGs de diretor.
+ *   - PS da BU + PS de cargo (Vendedor, Atendente, Gestor) e o PSG_Diretor_Global
+ *     (5 PS de BU + PS_Diretor_Global com View All em Lead e Opportunity);
+ *   - custom permission Ver_Historico só no cargo Gestor e no Diretor Global.
  *
  * Toda leitura é em AccessLevel.USER_MODE dentro de System.runAs, que aplica
  * sharing e permissão do usuário.
@@ -24,7 +25,7 @@
  * vendedor que NAO ve o colega sao provados no E2E da org com
  * UserRecordAccess dos usuarios reais. Aqui ficam hierarquia, View All,
  * negativos entre BUs, Conta/Contato, conversao e custom permissions. Todos os usuários e registros são criados
- * aqui; papéis, PSGs e record types são resolvidos por DeveloperName.
+ * aqui; papéis, PS/PSG e record types são resolvidos por DeveloperName.
  */
 @IsTest
 private class AcessoPorBUTest {
@@ -58,38 +59,42 @@ private class AcessoPorBUTest {
 
     licencasSTE(new List<Id>{ ids.get('steat'), ids.get('stedir') });
 
-    Map<String, String> psgPorUsuario = new Map<String, String>{
-      'advat' => 'PSG_ADV_Atendente',
-      'advat2' => 'PSG_ADV_Atendente',
-      'advdir' => 'PSG_ADV_Diretor',
-      'solat' => 'PSG_SOL_Comercial',
-      'solat2' => 'PSG_SOL_Comercial',
-      'soldir' => 'PSG_SOL_Diretor',
-      'steat' => 'PSG_STE_Atendente',
-      'stedir' => 'PSG_STE_Diretor',
-      'esgat' => 'PSG_ESG_Atendente',
-      'esgdir' => 'PSG_ESG_Diretor',
-      'scoat' => 'PSG_SCO_Atendente',
-      'scodir' => 'PSG_SCO_Diretor',
-      'global' => 'PSG_Diretor_Global'
+    // Modelo BU + cargo: cada usuario recebe o PS da BU e exatamente um PS de
+    // cargo. O Diretor Global usa o unico PSG (5 PS de BU + cargo global).
+    Map<String, List<String>> psPorUsuario = new Map<String, List<String>>{
+      'advat' => new List<String>{ 'PS_ADV_Comercial', 'PS_Cargo_Vendedor' },
+      'advat2' => new List<String>{ 'PS_ADV_Comercial', 'PS_Cargo_Vendedor' },
+      'advdir' => new List<String>{ 'PS_ADV_Comercial', 'PS_Cargo_Gestor' },
+      'solat' => new List<String>{ 'PS_SOL_Comercial', 'PS_Cargo_Vendedor' },
+      'solat2' => new List<String>{ 'PS_SOL_Comercial', 'PS_Cargo_Vendedor' },
+      'soldir' => new List<String>{ 'PS_SOL_Comercial', 'PS_Cargo_Gestor' },
+      'steat' => new List<String>{ 'PS_STE_Comercial', 'PS_Cargo_Atendente' },
+      'stedir' => new List<String>{ 'PS_STE_Comercial', 'PS_Cargo_Gestor' },
+      'esgat' => new List<String>{ 'PS_ESG_Comercial', 'PS_Cargo_Vendedor' },
+      'esgdir' => new List<String>{ 'PS_ESG_Comercial', 'PS_Cargo_Gestor' },
+      'scoat' => new List<String>{ 'PS_SCO_Comercial', 'PS_Cargo_Vendedor' },
+      'scodir' => new List<String>{ 'PS_SCO_Comercial', 'PS_Cargo_Gestor' }
     };
-    Map<String, Id> psgIds = new Map<String, Id>();
-    for (PermissionSetGroup g : [
-      SELECT Id, DeveloperName
-      FROM PermissionSetGroup
-      WHERE DeveloperName IN :psgPorUsuario.values()
-    ]) {
-      psgIds.put(g.DeveloperName, g.Id);
+    Set<String> nomesPs = new Set<String>();
+    for (List<String> l : psPorUsuario.values()) {
+      nomesPs.addAll(l);
+    }
+    Map<String, Id> psIds = new Map<String, Id>();
+    for (PermissionSet p : [SELECT Id, Name FROM PermissionSet WHERE Name IN :nomesPs]) {
+      psIds.put(p.Name, p.Id);
     }
     List<PermissionSetAssignment> psas = new List<PermissionSetAssignment>();
-    for (String apelido : psgPorUsuario.keySet()) {
-      psas.add(
-        new PermissionSetAssignment(
-          AssigneeId = ids.get(apelido),
-          PermissionSetGroupId = psgIds.get(psgPorUsuario.get(apelido))
-        )
-      );
+    for (String apelido : psPorUsuario.keySet()) {
+      for (String nome : psPorUsuario.get(apelido)) {
+        psas.add(new PermissionSetAssignment(AssigneeId = ids.get(apelido), PermissionSetId = psIds.get(nome)));
+      }
     }
+    psas.add(
+      new PermissionSetAssignment(
+        AssigneeId = ids.get('global'),
+        PermissionSetGroupId = [SELECT Id FROM PermissionSetGroup WHERE DeveloperName = 'PSG_Diretor_Global'].Id
+      )
+    );
     insert psas;
 
     System.runAs(new User(Id = UserInfo.getUserId())) {
@@ -325,12 +330,13 @@ private class AcessoPorBUTest {
 
     Assert.isTrue(res.isSuccess(), 'O atendente SOL tem de converter o Lead SOL na Conta existente da ADV: ' + res.getErrors());
     Assert.areEqual(conta.Id, res.getAccountId(), 'A conversao tem de usar a Conta Robson existente (cadastro unico).');
-    // A conversao padrao cria a Opp SEM record type (documentado em
-    // SOL_ConverterLead.avancarOportunidade, que grava o RT SOL logo depois).
-    // Sem RT nenhuma regra Opp_<BU>_BU casa: so dono, hierarquia e Diretor Global.
-    Assert.isNull(
+    // Modelo BU + cargo: o vendedor SOL so tem o RT de Oportunidade da propria
+    // BU (PS_SOL_Comercial), entao a conversao padrao ja cria a Opp com o RT SOL
+    // (antes, com todos os RTs via PS_Comercial, a Opp nascia sem RT).
+    Assert.areEqual(
+      rtOpp('SOL'),
       [SELECT RecordTypeId FROM Opportunity WHERE Id = :res.getOpportunityId()].RecordTypeId,
-      'Conversao padrao: Opp sem record type. Se mudar, revisar o risco registrado no pacote.'
+      'Conversao padrao: com um unico RT de Opp disponivel, a Opp nasce com o RT da BU.'
     );
     System.runAs(usuario('solat')) {
       Database.update(new Opportunity(Id = res.getOpportunityId(), RecordTypeId = rtOpp('SOL')), AccessLevel.USER_MODE);
@@ -448,11 +454,13 @@ private class AcessoPorBUTest {
       Set<String> opps;
       Boolean hist;
       Boolean atv;
+      Boolean proprio;
       System.runAs(usuario(apelido)) {
         leads = leadsVisiveis();
         opps = oppsVisiveis();
         hist = FeatureManagement.checkPermission('Ver_Historico');
         atv = FeatureManagement.checkPermission('Atividades_Restritas_Por_BU');
+        proprio = FeatureManagement.checkPermission('SOL_Restringir_Tarefas_Ao_Proprietario');
       }
       // Nenhuma persona ve registro de outra BU (vale com ou sem a regra).
       Assert.isTrue(
@@ -471,8 +479,11 @@ private class AcessoPorBUTest {
         Assert.areEqual(new Set<String>{ oppDaBU.get(bu) }, opps, apelido + ' ve a Opp da BU.');
       }
       Assert.areEqual(diretor, hist, apelido + ': Ver_Historico so para diretor.');
-      // O vendedor SOL fica na regra do 9430, nao na regra por BU.
-      Assert.areEqual(apelido != 'solat', atv, apelido + ': Atividades_Restritas_Por_BU.');
+      // Cargo: vendedor (ADV/SOL/ESG/SCO) so ve atividades proprias; atendente
+      // STE e gestores veem as da BU. Exatamente uma restricao por usuario.
+      Boolean vendedor = !diretor && apelido != 'steat';
+      Assert.areEqual(!vendedor, atv, apelido + ': Atividades_Restritas_Por_BU.');
+      Assert.areEqual(vendedor, proprio, apelido + ': atividades somente do proprietario.');
     }
   }
 }
