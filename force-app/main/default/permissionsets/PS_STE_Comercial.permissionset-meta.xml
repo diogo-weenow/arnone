@@ -315,6 +315,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Opportunity.STE_DataEntradaGrupoWhats__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Opportunity.STE_Data_Entrada_PreMatricula__c</field>
         <readable>true</readable>
     </fieldPermissions>
