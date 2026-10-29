@@ -3,8 +3,8 @@
     <fullName>STE_CNH_Enviada__c</fullName>
     <defaultValue>false</defaultValue>
     <description>Marca que o candidato enviou a foto da CNH. É o evento que dispara o registro do Lead no CRM (US 04).</description>
-    <label>CNH enviada</label>
+    <label>Arquivo Recebido</label>
     <trackFeedHistory>false</trackFeedHistory>
-    <trackHistory>false</trackHistory>
+    <trackHistory>true</trackHistory>
     <type>Checkbox</type>
 </CustomField>

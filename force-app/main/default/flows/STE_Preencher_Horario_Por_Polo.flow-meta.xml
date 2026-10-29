@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>68.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Definir_Horario</name>
+        <label>Gravar o horário na oportunidade</label>
+        <locationX>50</locationX>
+        <locationY>374</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.STE_Horario_Turma__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Buscar_Polo.STE_Horario__c</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <name>Polo_Tem_Horario</name>
+        <label>O polo tem horário cadastrado?</label>
+        <locationX>176</locationX>
+        <locationY>254</locationY>
+        <defaultConnectorLabel>Não</defaultConnectorLabel>
+        <rules>
+            <name>Tem_Horario</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Buscar_Polo.STE_Horario__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Definir_Horario</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <description>Preenche o Horário da turma na Oportunidade a partir do polo escolhido em Turma, lendo o horário cadastrado no Custom Metadata Polo STech. Roda antes de gravar, então não consome DML. Só escreve quando o polo tem horário cadastrado — assim nunca apaga um horário digitado à mão enquanto o cadastro do polo estiver vazio.</description>
+    <environments>Default</environments>
+    <interviewLabel>STE Preencher Horario Por Polo {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>STE Preencher Horário Por Polo</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>Buscar_Polo</name>
+        <label>Buscar o polo no cadastro</label>
+        <locationX>176</locationX>
+        <locationY>134</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Polo_Tem_Horario</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>STE_Nome_Polo__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.STE_Turma__c</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>STE_Polo__mdt</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>STE_Horario__c</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>176</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Buscar_Polo</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>STE_Turma__c</field>
+            <operator>IsNull</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

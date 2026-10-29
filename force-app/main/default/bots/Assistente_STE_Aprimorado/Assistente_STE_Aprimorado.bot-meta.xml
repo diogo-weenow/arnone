@@ -7,10 +7,117 @@
             <developerName>Informar_Email</developerName>
             <label>Informar e-mail</label>
         </mlIntents>
+        <mlSlotClasses>
+            <dataType>Text</dataType>
+            <developerName>STE_Opcao_Campo</developerName>
+            <extractionType>Value</extractionType>
+            <label>STE Opção dado a corrigir</label>
+            <mlSlotClassValues>
+                <value>Nome</value>
+            </mlSlotClassValues>
+            <mlSlotClassValues>
+                <value>E-mail</value>
+            </mlSlotClassValues>
+            <mlSlotClassValues>
+                <value>Outro dado</value>
+            </mlSlotClassValues>
+        </mlSlotClasses>
+        <mlSlotClasses>
+            <dataType>Text</dataType>
+            <developerName>STE_Opcao_Campo_2</developerName>
+            <extractionType>Value</extractionType>
+            <label>STE Opção dado a corrigir (2)</label>
+            <mlSlotClassValues>
+                <value>Telefone</value>
+            </mlSlotClassValues>
+            <mlSlotClassValues>
+                <value>Gênero</value>
+            </mlSlotClassValues>
+            <mlSlotClassValues>
+                <value>Voltar</value>
+            </mlSlotClassValues>
+        </mlSlotClasses>
+        <mlSlotClasses>
+            <dataType>Text</dataType>
+            <developerName>STE_Opcao_Confirmar_Dados</developerName>
+            <extractionType>Value</extractionType>
+            <label>STE Opção confirmar dados</label>
+            <mlSlotClassValues>
+                <value>Está tudo certo</value>
+            </mlSlotClassValues>
+            <mlSlotClassValues>
+                <value>Quero corrigir</value>
+            </mlSlotClassValues>
+        </mlSlotClasses>
+        <mlSlotClasses>
+            <dataType>Text</dataType>
+            <developerName>STE_Opcao_Continuar</developerName>
+            <extractionType>Value</extractionType>
+            <label>STE Opção continuar após informações</label>
+            <mlSlotClassValues>
+                <value>Quero fazer parte!</value>
+            </mlSlotClassValues>
+        </mlSlotClasses>
+        <mlSlotClasses>
+            <dataType>Text</dataType>
+            <developerName>STE_Opcao_Genero</developerName>
+            <extractionType>Value</extractionType>
+            <label>STE Opção gênero</label>
+            <mlSlotClassValues>
+                <value>Masculino</value>
+            </mlSlotClassValues>
+            <mlSlotClassValues>
+                <value>Feminino</value>
+            </mlSlotClassValues>
+            <mlSlotClassValues>
+                <value>Outra opção</value>
+            </mlSlotClassValues>
+        </mlSlotClasses>
+        <mlSlotClasses>
+            <dataType>Text</dataType>
+            <developerName>STE_Opcao_Genero_2</developerName>
+            <extractionType>Value</extractionType>
+            <label>STE Opção gênero (2)</label>
+            <mlSlotClassValues>
+                <value>Não binário</value>
+            </mlSlotClassValues>
+            <mlSlotClassValues>
+                <value>Prefiro não informar</value>
+            </mlSlotClassValues>
+        </mlSlotClasses>
+        <mlSlotClasses>
+            <dataType>Text</dataType>
+            <developerName>STE_Opcao_Pre_Inscricao</developerName>
+            <extractionType>Value</extractionType>
+            <label>STE Opção pré-inscrição</label>
+            <mlSlotClassValues>
+                <value>Sim, vamos lá!</value>
+            </mlSlotClassValues>
+            <mlSlotClassValues>
+                <value>Quero saber mais</value>
+            </mlSlotClassValues>
+        </mlSlotClasses>
+        <mlSlotClasses>
+            <dataType>Text</dataType>
+            <developerName>STE_Opcao_Sim_Nao</developerName>
+            <extractionType>Value</extractionType>
+            <label>STE Opção sim ou não</label>
+            <mlSlotClassValues>
+                <value>Sim</value>
+            </mlSlotClassValues>
+            <mlSlotClassValues>
+                <value>Não</value>
+            </mlSlotClassValues>
+        </mlSlotClasses>
         <name>Assistente_STE_Aprimorado</name>
     </botMlDomain>
     <botSource>None</botSource>
     <contextVariables>
+        <contextVariableMappings>
+            <SObjectType>MessagingSession</SObjectType>
+            <fieldName>MessagingSession.ChannelType</fieldName>
+            <messageType>WhatsApp</messageType>
+        </contextVariableMappings>
         <contextVariableMappings>
             <SObjectType>MessagingSession</SObjectType>
             <fieldName>MessagingSession.ChannelType</fieldName>
@@ -23,6 +130,11 @@
         <label>Tipo de canal</label>
     </contextVariables>
     <contextVariables>
+        <contextVariableMappings>
+            <SObjectType>MessagingEndUser</SObjectType>
+            <fieldName>MessagingEndUser.ContactId</fieldName>
+            <messageType>WhatsApp</messageType>
+        </contextVariableMappings>
         <contextVariableMappings>
             <SObjectType>MessagingEndUser</SObjectType>
             <fieldName>MessagingEndUser.ContactId</fieldName>
@@ -40,6 +152,11 @@
             <fieldName>MessagingSession.MessagingEndUserId</fieldName>
             <messageType>EmbeddedMessaging</messageType>
         </contextVariableMappings>
+        <contextVariableMappings>
+            <SObjectType>MessagingSession</SObjectType>
+            <fieldName>MessagingSession.MessagingEndUserId</fieldName>
+            <messageType>WhatsApp</messageType>
+        </contextVariableMappings>
         <dataType>Id</dataType>
         <description>Identificador do usuário final na sessão de mensageria.</description>
         <developerName>EndUserId</developerName>
@@ -47,6 +164,11 @@
         <label>ID de usuário final</label>
     </contextVariables>
     <contextVariables>
+        <contextVariableMappings>
+            <SObjectType>MessagingSession</SObjectType>
+            <fieldName>MessagingSession.Id</fieldName>
+            <messageType>WhatsApp</messageType>
+        </contextVariableMappings>
         <contextVariableMappings>
             <SObjectType>MessagingSession</SObjectType>
             <fieldName>MessagingSession.Id</fieldName>

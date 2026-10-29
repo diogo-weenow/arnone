@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Data_Turma_Texto__c</fullName>
+    <description>A mesma data de início da turma, já escrita em DD/MM/AAAA. Existe porque a personalização do e-mail imprime o valor cru: um campo de data sairia como 2026-11-05 no texto do candidato. O campo de data continua existindo para o segmento calcular D-15, D-7 e companhia.</description>
+    <externalId>false</externalId>
+    <label>Data de início da turma (texto)</label>
+    <length>20</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

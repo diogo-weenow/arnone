@@ -43,6 +43,9 @@
                     <booleanValue>false</booleanValue>
                 </rightValue>
             </conditions>
+            <connector>
+                <targetReference>Buscar_Documento</targetReference>
+            </connector>
             <label>Já existe</label>
         </rules>
     </decisions>
@@ -56,6 +59,9 @@
         <label>Vincular arquivo ao Lead</label>
         <locationX>50</locationX>
         <locationY>708</locationY>
+        <connector>
+            <targetReference>Buscar_Documento</targetReference>
+        </connector>
         <inputAssignments>
             <field>ContentDocumentId</field>
             <value>
@@ -105,6 +111,27 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <recordLookups>
+        <name>Buscar_Documento</name>
+        <label>Buscar data de envio do arquivo</label>
+        <locationX>50</locationX>
+        <locationY>816</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Marcar_CNH_No_Lead</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Buscar_Arquivo_Da_Sessao.ContentDocumentId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>ContentDocument</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
         <name>Buscar_Vinculo_Existente</name>
         <label>Verificar se já está vinculado ao Lead</label>
         <locationX>176</locationX>
@@ -132,6 +159,33 @@
         <object>ContentDocumentLink</object>
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
+    <recordUpdates>
+        <name>Marcar_CNH_No_Lead</name>
+        <label>Marcar CNH recebida no Lead</label>
+        <locationX>50</locationX>
+        <locationY>924</locationY>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <inputAssignments>
+            <field>STE_CNH_Enviada__c</field>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>STE_Data_Envio_CNH__c</field>
+            <value>
+                <elementReference>Buscar_Documento.CreatedDate</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Lead</object>
+    </recordUpdates>
     <start>
         <locationX>50</locationX>
         <locationY>0</locationY>

@@ -3,6 +3,21 @@
     <description>Acesso complementar e restrito para validação ponta a ponta do atendimento STech: sessões de mensagem, classificação de transbordo e presença no Omni-Channel.</description>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Lead.MotivoDaCNHNOValidada__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.STE_CNH_Validada__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.STE_Regioes_De_SP__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>MessagingSession.STE_Classificacao_Fila__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -31,9 +46,5 @@
     <servicePresenceStatusAccesses>
         <enabled>true</enabled>
         <servicePresenceStatus>Disponivel_Geral</servicePresenceStatus>
-    </servicePresenceStatusAccesses>
-    <servicePresenceStatusAccesses>
-        <enabled>true</enabled>
-        <servicePresenceStatus>Disponivel_Mensagens</servicePresenceStatus>
     </servicePresenceStatusAccesses>
 </PermissionSet>

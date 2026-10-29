@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Data_Nascimento_Nao_Futura</fullName>
+    <active>true</active>
+    <description>Data de nascimento no futuro e sempre erro de digitação, normalmente o ano trocado. Barra só esse caso: não existe limite de idade mínima nem máxima no cadastro, porque a seleção por idade e feita pelo assistente e gravada em STE_Faixa_Etaria__c.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;STE&apos;,
+  NOT(ISBLANK(STE_Data_Nascimento__c)),
+  STE_Data_Nascimento__c &gt; TODAY()
+)</errorConditionFormula>
+    <errorDisplayField>STE_Data_Nascimento__c</errorDisplayField>
+    <errorMessage>A data de nascimento não pode estar no futuro. Confira o ano digitado.</errorMessage>
+</ValidationRule>
