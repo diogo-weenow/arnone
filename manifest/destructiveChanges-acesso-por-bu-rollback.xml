@@ -5,6 +5,8 @@
   2) redeploy do baseline 608583c: SharingRules/Lead (SOL_Leitura_Comercial), PSG_SOL_Comercial, roles Coordenador_ADV/SOL e Comercial_ESG/STE/SCO,
      Lead_STE, pastas Arnone_Comercial e STech_Telecom;
   3) remover usuarios dos PSGs novos e esvaziar as pastas novas;
+  Para voltar so a regra antiga (atendente ve a BU inteira): pre-destructive de Lead/Opp_<BU>_BU e _Coordenacao (ADV, SOL, ESG, SCO)
+     e redeploy de sharingRules do commit 2c6f617 (sharedTo roleAndSubordinatesInternal), espelhando o deploy 0Afbe00000BlzGFCAZ.
   4) so entao este destrutivo. Contact NAO volta para ReadWrite: ja era ControlledByParent antes do card.
 -->
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
@@ -19,6 +21,10 @@
         <members>Opportunity.Opp_STE_BU</members>
         <members>Opportunity.Opp_ESG_BU</members>
         <members>Opportunity.Opp_SCO_BU</members>
+        <members>Lead.Lead_ADV_Coordenacao</members>
+        <members>Lead.Lead_SOL_Coordenacao</members>
+        <members>Opportunity.Opp_ADV_Coordenacao</members>
+        <members>Opportunity.Opp_SOL_Coordenacao</members>
         <name>SharingCriteriaRule</name>
     </types>
     <types>

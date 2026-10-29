@@ -5,8 +5,12 @@
  * Mecanismos sob teste (todos já implantados na org):
  *   - OWD Lead e Opportunity Private, Account ReadWrite, Contact ControlledByParent;
  *   - papéis Diretoria_<BU> abaixo de Diretoria_Grupo, com a equipe da BU abaixo;
- *   - sharing rules por critério Lead_<BU>_BU e Opp_<BU>_BU (Edit para
- *     RoleAndSubordinatesInternal Diretoria_<BU>, label do record type);
+ *   - sharing rules por critério (label do record type, Edit):
+ *     STE: Lead_STE_BU / Opp_STE_BU para RoleAndSubordinatesInternal
+ *     Diretoria_STE (o atendente STE ve a BU inteira);
+ *     ADV, SOL, ESG, SCO: Lead_<BU>_BU / Opp_<BU>_BU para o papel
+ *     Diretoria_<BU> e, em ADV e SOL, Lead/Opp_<BU>_Coordenacao para o papel
+ *     Coordenador_<BU>. O vendedor dessas BUs ve so o que e dele;
  *   - PSGs por cargo e PS_Diretor_Global (View All em Lead e Opportunity);
  *   - custom permission Ver_Historico só nos PSGs de diretor.
  *
@@ -15,8 +19,9 @@
  *
  * LIMITE MEDIDO: regra de compartilhamento por CRITERIO nao e calculada em
  * teste Apex (o colega da mesma BU nao enxerga o registro aqui, mas enxerga na
- * org). Por isso os positivos que dependem de Lead_<BU>_BU / Opp_<BU>_BU
- * (colega da BU, fila, upload Lemit) sao provados no E2E da org com
+ * org). Por isso os positivos que dependem das regras (atendente STE ve
+ * registro de colega, coordenacao e diretoria veem fila) e o negativo do
+ * vendedor que NAO ve o colega sao provados no E2E da org com
  * UserRecordAccess dos usuarios reais. Aqui ficam hierarquia, View All,
  * negativos entre BUs, Conta/Contato, conversao e custom permissions. Todos os usuários e registros são criados
  * aqui; papéis, PSGs e record types são resolvidos por DeveloperName.
