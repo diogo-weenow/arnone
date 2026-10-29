@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <applicationVisibilities>
+        <application>SCO</application>
+        <visible>true</visible>
+    </applicationVisibilities>
     <customPermissions>
         <enabled>true</enabled>
         <name>SCO_Importar_Leads</name>
     </customPermissions>
-    <description>ACESSO-POR-BU. PS da BU. Base comum (Conta/Contato/Lead/Opp sem delete, FLS comum) + RTs SCO e SCO_Importar_Leads. Sem restricao de visibilidade (vem do cargo).</description>
+    <description>ACESSO-POR-BU. PS da BU. Base comum (Conta/Contato/Lead/Opp sem delete, FLS comum) + RTs SCO, app SCO e SCO_Importar_Leads. Sem restricao de visibilidade (vem do cargo).</description>
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.CNPJ__c</field>
