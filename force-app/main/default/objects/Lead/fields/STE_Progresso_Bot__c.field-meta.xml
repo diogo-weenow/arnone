@@ -18,6 +18,7 @@ CASE(TEXT(STE_Etapa_Bot__c),
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
     <label>Progresso no assistente</label>
     <required>false</required>
+    <trackHistory>false</trackHistory>
     <type>Text</type>
     <unique>false</unique>
 </CustomField>

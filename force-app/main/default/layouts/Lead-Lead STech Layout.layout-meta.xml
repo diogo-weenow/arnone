@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Layout xmlns="http://soap.sforce.com/2006/04/metadata">
-    <excludeButtons>GenerateKnowledge</excludeButtons>
+    <excludeButtons>DataDotComClean</excludeButtons>
     <excludeButtons>OpenSlackRecordChannel</excludeButtons>
     <excludeButtons>Submit</excludeButtons>
     <layoutSections>
@@ -32,6 +32,10 @@
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>MobilePhone</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Tipo_de_CNH__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>
@@ -135,6 +139,10 @@
             <layoutItems>
                 <behavior>Edit</behavior>
                 <field>STE_CNH_Enviada__c</field>
+            </layoutItems>
+            <layoutItems>
+                <behavior>Edit</behavior>
+                <field>Status_da_CNH_2__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
@@ -485,7 +493,7 @@
     <showRunAssignmentRulesCheckbox>true</showRunAssignmentRulesCheckbox>
     <showSubmitAndAttachButton>false</showSubmitAndAttachButton>
     <summaryLayout>
-        <masterLabel>00has0000036dWc</masterLabel>
+        <masterLabel>00hN500000OVPdp</masterLabel>
         <sizeX>4</sizeX>
         <sizeY>0</sizeY>
         <summaryLayoutStyle>Default</summaryLayoutStyle>

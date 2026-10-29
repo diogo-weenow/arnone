@@ -5,5 +5,6 @@
     <description>Pedido de descadastro. Par do campo de mesmo nome na Oportunidade e no Contato, para atravessar a conversão.</description>
     <label>Opt-out de comunicações</label>
     <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
     <type>Checkbox</type>
 </CustomField>
