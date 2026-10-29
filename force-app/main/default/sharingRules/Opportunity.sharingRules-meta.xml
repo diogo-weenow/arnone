@@ -16,36 +16,6 @@
         <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
     </sharingCriteriaRules>
     <sharingCriteriaRules>
-        <fullName>Opp_SOL_BU</fullName>
-        <accessLevel>Edit</accessLevel>
-        <description>ACESSO-POR-BU. Todos os usuarios da BU SOL (Diretoria_SOL e subordinados internos) veem e editam todo Oportunidade da BU, inclusive os em fila. Criterio pelo LABEL do record type: renomear o RT quebra a regra.</description>
-        <label>SOL - Oportunidade da BU</label>
-        <sharedTo>
-            <roleAndSubordinatesInternal>Diretoria_SOL</roleAndSubordinatesInternal>
-        </sharedTo>
-        <criteriaItems>
-            <field>RecordTypeId</field>
-            <operation>equals</operation>
-            <value>Arnone Soluções</value>
-        </criteriaItems>
-        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
-    </sharingCriteriaRules>
-    <sharingCriteriaRules>
-        <fullName>Opp_STE_BU</fullName>
-        <accessLevel>Edit</accessLevel>
-        <description>ACESSO-POR-BU. Todos os usuarios da BU STE (Diretoria_STE e subordinados internos) veem e editam todo Oportunidade da BU, inclusive os em fila. Criterio pelo LABEL do record type: renomear o RT quebra a regra.</description>
-        <label>STE - Oportunidade da BU</label>
-        <sharedTo>
-            <roleAndSubordinatesInternal>Diretoria_STE</roleAndSubordinatesInternal>
-        </sharedTo>
-        <criteriaItems>
-            <field>RecordTypeId</field>
-            <operation>equals</operation>
-            <value>Stech Telecom</value>
-        </criteriaItems>
-        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
-    </sharingCriteriaRules>
-    <sharingCriteriaRules>
         <fullName>Opp_ESG_BU</fullName>
         <accessLevel>Edit</accessLevel>
         <description>ACESSO-POR-BU. Todos os usuarios da BU ESG (Diretoria_ESG e subordinados internos) veem e editam todo Oportunidade da BU, inclusive os em fila. Criterio pelo LABEL do record type: renomear o RT quebra a regra.</description>
@@ -72,6 +42,36 @@
             <field>RecordTypeId</field>
             <operation>equals</operation>
             <value>S.Company</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+    <sharingCriteriaRules>
+        <fullName>Opp_SOL_BU</fullName>
+        <accessLevel>Edit</accessLevel>
+        <description>ACESSO-POR-BU. Todos os usuarios da BU SOL (Diretoria_SOL e subordinados internos) veem e editam todo Oportunidade da BU, inclusive os em fila. Criterio pelo LABEL do record type: renomear o RT quebra a regra.</description>
+        <label>SOL - Oportunidade da BU</label>
+        <sharedTo>
+            <roleAndSubordinatesInternal>Diretoria_SOL</roleAndSubordinatesInternal>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Arnone Soluções</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+    <sharingCriteriaRules>
+        <fullName>Opp_STE_BU</fullName>
+        <accessLevel>Edit</accessLevel>
+        <description>ACESSO-POR-BU. Todos os usuarios da BU STE (Diretoria_STE e subordinados internos) veem e editam todo Oportunidade da BU, inclusive os em fila. Criterio pelo LABEL do record type: renomear o RT quebra a regra.</description>
+        <label>STE - Oportunidade da BU</label>
+        <sharedTo>
+            <roleAndSubordinatesInternal>Diretoria_STE</roleAndSubordinatesInternal>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Stech Telecom</value>
         </criteriaItems>
         <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
     </sharingCriteriaRules>
