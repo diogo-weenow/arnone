@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ADV_Origem_Proposta__c</fullName>
+    <description>Canal de origem da proposta da BU Arnone Advogados. Opcional em todas as etapas.</description>
+    <label>Origem da proposta</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Indicações</fullName>
+                <default>false</default>
+                <label>Indicações</label>
+            </value>
+            <value>
+                <fullName>Parceiros</fullName>
+                <default>false</default>
+                <label>Parceiros</label>
+            </value>
+            <value>
+                <fullName>Marketing</fullName>
+                <default>false</default>
+                <label>Marketing</label>
+            </value>
+            <value>
+                <fullName>Prospecção Ativa</fullName>
+                <default>false</default>
+                <label>Prospecção Ativa</label>
+            </value>
+            <value>
+                <fullName>Inbound</fullName>
+                <default>false</default>
+                <label>Inbound</label>
+            </value>
+            <value>
+                <fullName>Outbound</fullName>
+                <default>false</default>
+                <label>Outbound</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>
