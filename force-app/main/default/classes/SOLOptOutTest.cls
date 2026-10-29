@@ -273,8 +273,9 @@ private class SOLOptOutTest {
   @IsTest
   static void recuperacaoTributariaEmRecebidoMQLSemCompromisso() {
     Cenario c = montarCenario(2);
-    // Lead que dispararia a VR SOL_Recuperacao_Exige_Compromisso ao sair de
-    // "Recebido - MQL" sem compromisso — o opt-out precisa passar mesmo assim.
+    // Lead em "Recebido - MQL" sem compromisso — o opt-out precisa passar. A VR
+    // SOL_Recuperacao_Exige_Compromisso está inativa (decisão do PO,
+    // 2026-10-25); o cenário fica como regressão caso ela volte.
     Lead l = novoLeadSOLDistribuido('S4', 'Recuperação Tributária', 'Recebido - MQL');
     Task alvo = tarefaContatoAberta(l.Id, l.OwnerId);
 
@@ -296,15 +297,13 @@ private class SOLOptOutTest {
     Test.startTest();
     Boolean bloqueou = false;
     try {
-      // Perda manual, sem opt-out e sem compromisso: segue bloqueada. Desde o
-      // D2 da homologação E2E duas regras cobrem este mesmo desvio — a de
-      // compromisso (CLICKUP-9418) e a de coerência do motivo (D2) —, e a
-      // mensagem devolvida é a da primeira que a plataforma reportar.
+      // Desqualificação manual sem motivo: segue bloqueada pela VR de
+      // coerência do motivo (D2). A VR do compromisso (CLICKUP-9418) foi
+      // desativada por decisão do PO em 2026-10-25 e não participa mais.
       update new Lead(Id = l.Id, Status = 'Desqualificado');
     } catch (DmlException e) {
       bloqueou = true;
       System.assert(
-        e.getMessage().contains('compromisso registrado') ||
         e.getMessage().contains('Motivo da desqualificação incoerente'),
         'Mensagem inesperada: ' + e.getMessage()
       );
