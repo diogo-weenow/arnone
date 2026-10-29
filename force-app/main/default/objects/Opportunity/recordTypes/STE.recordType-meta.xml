@@ -181,6 +181,17 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>STE_CNH_Status__c</picklist>
+        <values>
+            <fullName>Apto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Não Apto</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>STE_Classificacao_Fila__c</picklist>
         <values>
             <fullName>Fria</fullName>
@@ -352,6 +363,68 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>STE_Ja_Trabalhou_Telecom__c</picklist>
+        <values>
+            <fullName>Não</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sim</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>STE_Jornada_PreCurso_Etapa__c</picklist>
+        <values>
+            <fullName>Boas-vindas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Conclusão</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>D-1 É amanhã</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>D-12 Conquistas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>D-15 Inspiração</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>D-3 Três dias</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>D-7 Uma semana</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>D-9 Conteúdo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Dia D Bom dia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Durante o curso</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No-show</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reta final</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>STE_Motivo_Perda__c</picklist>
         <values>
             <fullName>CNH Provisória</fullName>
@@ -470,6 +543,10 @@
         </values>
         <values>
             <fullName>Itaim Paulista</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>República</fullName>
             <default>false</default>
         </values>
     </picklistValues>

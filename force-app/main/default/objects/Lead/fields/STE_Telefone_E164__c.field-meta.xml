@@ -3,10 +3,11 @@
     <fullName>STE_Telefone_E164__c</fullName>
     <description>Telefone em formato E.164 sem pontuação (código do país + DDD + número), gravado pelo assistente a partir do MessagingPlatformKey do MessagingEndUser. Chave técnica de identificação do candidato que retorna pelo WhatsApp; não usar para exibição.</description>
     <externalId>true</externalId>
-    <label>STech — Telefone E.164</label>
+    <label>Telefone</label>
     <length>20</length>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
     <type>Text</type>
     <unique>false</unique>
 </CustomField>

@@ -56,15 +56,15 @@
         <converted>true</converted>
     </standardValue>
     <standardValue>
-        <fullName>Desqualificado</fullName>
-        <default>false</default>
-        <label>Desqualificado</label>
-        <converted>false</converted>
-    </standardValue>
-    <standardValue>
         <fullName>Validação</fullName>
         <default>false</default>
         <label>Validação</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Desqualificado</fullName>
+        <default>false</default>
+        <label>Desqualificado</label>
         <converted>false</converted>
     </standardValue>
 </StandardValueSet>

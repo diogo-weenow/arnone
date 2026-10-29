@@ -159,47 +159,7 @@
     <picklistValues>
         <picklist>LeadSource</picklist>
         <values>
-            <fullName>Advertisement</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Customer Event</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Employee Referral</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>External Referral</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Google AdWords</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Other</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Partner</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Purchased List</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Trade Show</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Webinar</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Website</fullName>
+            <fullName>Formulário</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -511,6 +471,10 @@
             <default>false</default>
         </values>
         <values>
+            <fullName>Categoria A%2F sem CNH</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Contato errado</fullName>
             <default>false</default>
         </values>
@@ -536,6 +500,10 @@
         </values>
         <values>
             <fullName>Saúde</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sem Contato</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -621,6 +589,43 @@
         </values>
         <values>
             <fullName>Zona Sul</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Status_da_CNH_2__c</picklist>
+        <values>
+            <fullName>Inválida</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Válida</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Stech_ArquivoECNH__c</picklist>
+        <values>
+            <fullName>Não</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sim%2C é CNH</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>Tipo_de_CNH__c</picklist>
+        <values>
+            <fullName>%28B%2B%29 DEFINITIVA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>%28B%2B%29 PROVISÓRIA</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>CATEGORIA%3A  A</fullName>
             <default>false</default>
         </values>
     </picklistValues>

@@ -21,14 +21,9 @@
                 <label>Itaim Paulista</label>
             </value>
             <value>
-                <fullName>Santo Amaro</fullName>
+                <fullName>República</fullName>
                 <default>false</default>
-                <label>Santo Amaro</label>
-            </value>
-            <value>
-                <fullName>Guarulhos</fullName>
-                <default>false</default>
-                <label>Guarulhos</label>
+                <label>República</label>
             </value>
         </valueSetDefinition>
     </valueSet>
