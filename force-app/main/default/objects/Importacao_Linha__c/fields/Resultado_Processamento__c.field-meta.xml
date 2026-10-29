@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Resultado_Processamento__c</fullName>
+    <description>Resumo do que o batch fez nesta linha (ex.: "Atualizado: 2 Lead(s)", "Criado", "Erro"). Preenchido marca a linha como processada e é parte da idempotência: linha já processada não é reprocessada num novo disparo do mesmo lote.</description>
+    <externalId>false</externalId>
+    <label>Resultado do Processamento</label>
+    <length>255</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

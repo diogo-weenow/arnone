@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Importação de leads — libera os perfis de importação da BU Instituto STech no componente importacaoLeads. Verificada no servidor por FeatureManagement.checkPermission. Concedida só por Permission Set.</description>
+    <isLicensed>false</isLicensed>
+    <label>Importar leads — Instituto STech</label>
+</CustomPermission>

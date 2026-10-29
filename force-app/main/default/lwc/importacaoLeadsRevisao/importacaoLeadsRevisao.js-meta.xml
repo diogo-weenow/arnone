@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <isExposed>false</isExposed>
+    <masterLabel>Importação de leads — Revisão</masterLabel>
+    <description>Filho do importacaoLeads: tiles por balde e lista do balde (datatable no desktop, acordeão no celular), com a escolha de leads no match múltiplo.</description>
+</LightningComponentBundle>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Leads_Alvo__c</fullName>
+    <description>JSON com os Leads candidatos do casamento (Id, Name, Company, OwnerId) para o preview, e, após a confirmação, os Ids efetivamente SELECIONADOS para atualização. No MATCH_MULTIPLO, só os Ids que o operador escolheu são gravados pelo batch.</description>
+    <externalId>false</externalId>
+    <label>Leads Alvo</label>
+    <length>131072</length>
+    <trackHistory>false</trackHistory>
+    <type>LongTextArea</type>
+    <visibleLines>6</visibleLines>
+</CustomField>

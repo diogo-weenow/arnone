@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Importação de leads F1 — destrutivo na ArnoneDev: remove o Enriquecimento Lemit
+  substituído pela Importação de leads. Aplicado em 6 deploys sequenciais (um único
+  pacote dá erro interno no lookup em cascata Lote__c):
+    1) LWC, tabs, PS e classes (com Apex: desagendar/reagendar os schedulers SOL)
+    2) registros SOL_Lemit_Mapeamento   3) tipo SOL_Lemit_Mapeamento__mdt
+    4) SOL_Enriquecimento_Linha__c      5) SOL_Enriquecimento_Lote__c
+    6) versão 1 (obsoleta) do Lead_BeforeSave_Normalizar_CNPJ, que ainda referenciava
+       o campo, e o campo Lead.SOL_CNPJ_Normalizado__c.
+-->
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>solEnriquecimentoLemit</members>
+        <name>LightningComponentBundle</name>
+    </types>
+    <types>
+        <members>SOL_Enriquecimento_Lemit</members>
+        <members>SOL_Enriquecimento_Linha__c</members>
+        <members>SOL_Enriquecimento_Lote__c</members>
+        <name>CustomTab</name>
+    </types>
+    <types>
+        <members>PS_SOL_Enriquecimento</members>
+        <name>PermissionSet</name>
+    </types>
+    <types>
+        <members>SOLCnpjBackfillBatch</members>
+        <members>SOLCnpjBackfillBatchTest</members>
+        <members>SOLEnriquecimentoBatch</members>
+        <members>SOLEnriquecimentoBatchTest</members>
+        <members>SOLEnriquecimentoController</members>
+        <members>SOLEnriquecimentoControllerTest</members>
+        <members>SOLEnriquecimentoTestFactory</members>
+        <members>SOLEnriquecimentoUtil</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>SOL_Lemit_Mapeamento.Email</members>
+        <members>SOL_Lemit_Mapeamento.Industry</members>
+        <members>SOL_Lemit_Mapeamento.NumberOfEmployees</members>
+        <members>SOL_Lemit_Mapeamento.Phone</members>
+        <members>SOL_Lemit_Mapeamento.Website</members>
+        <name>CustomMetadata</name>
+    </types>
+    <types>
+        <members>SOL_Enriquecimento_Linha__c</members>
+        <members>SOL_Enriquecimento_Lote__c</members>
+        <members>SOL_Lemit_Mapeamento__mdt</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
+        <members>Lead_BeforeSave_Normalizar_CNPJ-1</members>
+        <name>Flow</name>
+    </types>
+    <types>
+        <members>Lead.SOL_CNPJ_Normalizado__c</members>
+        <name>CustomField</name>
+    </types>
+    <version>66.0</version>
+</Package>

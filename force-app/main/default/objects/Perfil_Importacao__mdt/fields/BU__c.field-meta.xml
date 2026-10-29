@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>BU__c</fullName>
+    <description>Unidade de negócio do perfil. O seletor de BU do componente mostra só as BUs com ao menos um perfil ativo e permitido ao usuário.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>BU</label>
+    <required>false</required>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>SOL</fullName>
+                <default>false</default>
+                <label>SOL</label>
+            </value>
+            <value>
+                <fullName>STE</fullName>
+                <default>false</default>
+                <label>STE</label>
+            </value>
+            <value>
+                <fullName>ESG</fullName>
+                <default>false</default>
+                <label>ESG</label>
+            </value>
+            <value>
+                <fullName>SCO</fullName>
+                <default>false</default>
+                <label>SCO</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <type>Picklist</type>
+</CustomField>

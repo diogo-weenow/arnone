@@ -1,0 +1,13 @@
+.card-diag {
+    height: 100%;
+    word-break: break-word;
+}
+
+.card-alerta {
+    border-color: var(--slds-g-color-error-base-50, #ba0517);
+}
+
+.bloqueio p,
+.aviso p {
+    text-align: left;
+}
