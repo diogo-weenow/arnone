@@ -24,7 +24,7 @@
             <value>
                 <fullName>Fallback</fullName>
                 <default>false</default>
-                <label>Fallback</label>
+                <label>Mantido na fila</label>
             </value>
             <value>
                 <fullName>Erro</fullName>

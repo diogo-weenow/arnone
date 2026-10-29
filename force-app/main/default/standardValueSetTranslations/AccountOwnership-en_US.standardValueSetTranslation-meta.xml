@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StandardValueSetTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <valueTranslation>
+        <masterLabel>Capital aberto</masterLabel>
+        <translation>Public</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Capital fechado</masterLabel>
+        <translation>Private</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Subsidiária</masterLabel>
+        <translation>Subsidiary</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Outros</masterLabel>
+        <translation>Other</translation>
+    </valueTranslation>
+</StandardValueSetTranslation>

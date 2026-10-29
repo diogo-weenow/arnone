@@ -45,7 +45,8 @@ node_modules/
 
 # Traducoes geradas pelo retrieve com genero invalido para pt_BR
 # ("Invalid gender 'Neuter' for language PORTUGUESE_BR").
-**/objectTranslations/**
+**/objectTranslations/*-pt_BR/**
+**/objectTranslations/In_App_Checklist_Settings__c-en_US/**
 
 # Blob binario do site que muda a cada retrieve, gerando delta falso.
 **/siteDotComSites/**

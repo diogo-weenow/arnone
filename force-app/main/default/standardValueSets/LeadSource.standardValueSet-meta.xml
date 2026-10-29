@@ -4,47 +4,47 @@
     <standardValue>
         <fullName>Advertisement</fullName>
         <default>false</default>
-        <label>Advertisement</label>
+        <label>Anúncio</label>
     </standardValue>
     <standardValue>
         <fullName>Customer Event</fullName>
         <default>false</default>
-        <label>Customer Event</label>
+        <label>Evento de cliente</label>
     </standardValue>
     <standardValue>
         <fullName>Employee Referral</fullName>
         <default>false</default>
-        <label>Employee Referral</label>
+        <label>Indicação de colaborador</label>
     </standardValue>
     <standardValue>
         <fullName>External Referral</fullName>
         <default>false</default>
-        <label>External Referral</label>
+        <label>Indicação externa</label>
     </standardValue>
     <standardValue>
         <fullName>Google AdWords</fullName>
         <default>false</default>
-        <label>Google AdWords</label>
+        <label>Google Ads</label>
     </standardValue>
     <standardValue>
         <fullName>Other</fullName>
         <default>false</default>
-        <label>Other</label>
+        <label>Outros</label>
     </standardValue>
     <standardValue>
         <fullName>Partner</fullName>
         <default>false</default>
-        <label>Partner</label>
+        <label>Parceiro</label>
     </standardValue>
     <standardValue>
         <fullName>Purchased List</fullName>
         <default>false</default>
-        <label>Purchased List</label>
+        <label>Lista comprada</label>
     </standardValue>
     <standardValue>
         <fullName>Trade Show</fullName>
         <default>false</default>
-        <label>Trade Show</label>
+        <label>Feira de negócios</label>
     </standardValue>
     <standardValue>
         <fullName>Webinar</fullName>
@@ -54,12 +54,12 @@
     <standardValue>
         <fullName>Website</fullName>
         <default>false</default>
-        <label>Website</label>
+        <label>Site</label>
     </standardValue>
     <standardValue>
         <fullName>Meta/Midia Paga</fullName>
         <default>false</default>
-        <label>Meta/Midia Paga</label>
+        <label>Meta/Mídia Paga</label>
     </standardValue>
     <standardValue>
         <fullName>Google</fullName>
@@ -69,12 +69,12 @@
     <standardValue>
         <fullName>Whatsapp</fullName>
         <default>false</default>
-        <label>Whatsapp</label>
+        <label>WhatsApp</label>
     </standardValue>
     <standardValue>
         <fullName>Email</fullName>
         <default>false</default>
-        <label>Email</label>
+        <label>E-mail</label>
     </standardValue>
     <standardValue>
         <fullName>Formulário</fullName>
