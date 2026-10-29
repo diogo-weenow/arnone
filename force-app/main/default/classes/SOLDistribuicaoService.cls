@@ -21,6 +21,17 @@
  * - Participam só usuários DIRETOS, ATIVOS e membros da fila. Grupos, papéis ou
  *   filas aninhados são ignorados.
  * - Manutenção da fila: time administrador Salesforce. Permission Set não é roster.
+ *
+ * (SOL-LEAD-CRIADOR) Lead criado pelo próprio vendedor fica com ele. Um Lead
+ * elegível NÃO entra no rodízio quando, ao mesmo tempo: (a) quem o criou é
+ * vendedor ativo da fila (o mesmo roster do rodízio); (b) quem cria é o usuário
+ * da transação corrente; (c) o canal é interativo (tela, ação rápida, VF,
+ * remote action ou REST — ver `CANAIS_INTERATIVOS`). Carga em massa, batch,
+ * Apex anônimo, integração e web-to-lead seguem no rodízio. O Lead mantido
+ * recebe o MESMO status `Distribuido`, o mesmo ciclo de contato e a mesma Task
+ * "1ª Ligação" do rodízio, mas não consome nem move o ponteiro do singleton.
+ * Kill-switch desligado ou fila sem vendedor: a regra não se aplica e tudo vai
+ * para a fila (fallback), como antes.
  */
 public without sharing class SOLDistribuicaoService {
   /** Record Type de Lead atendido por este serviço. Regra fixa. */
@@ -150,6 +161,43 @@ public without sharing class SOLDistribuicaoService {
   @TestVisible
   private static String queueDeveloperNameOverride;
 
+  // ---- SOL-LEAD-CRIADOR: Lead criado pelo vendedor fica com o vendedor ----
+
+  /**
+   * Canais em que há um usuário criando o Lead na interface (Lightning/Aura,
+   * ação rápida, Visualforce, remote action) ou pela REST API, inclusive o app
+   * móvel. Todo o resto (Bulk API, SOAP, batch, queueable, future, scheduled,
+   * Apex anônimo, e-mail de entrada, invocable via API, testes) NÃO é
+   * interativo e vai para o rodízio.
+   */
+  @TestVisible
+  private static final Set<Quiddity> CANAIS_INTERATIVOS = new Set<Quiddity>{
+    Quiddity.AURA,
+    Quiddity.QUICK_ACTION,
+    Quiddity.VF,
+    Quiddity.REMOTE_ACTION,
+    Quiddity.REST
+  };
+
+  /**
+   * Costura de teste: simula o canal da requisição. Sem ela, o teste roda em
+   * RUNTEST_*, que não é interativo — os testes existentes seguem no rodízio.
+   */
+  @TestVisible
+  private static Quiddity quiddityOverride;
+
+  /** Canal da requisição corrente (ou o simulado pelo teste). */
+  private static Quiddity quiddityAtual() {
+    return quiddityOverride != null
+      ? quiddityOverride
+      : Request.getCurrent().getQuiddity();
+  }
+
+  /** true se a requisição corrente vem de um canal interativo. */
+  private static Boolean canalInterativo() {
+    return CANAIS_INTERATIVOS.contains(quiddityAtual());
+  }
+
   /** Costura de teste: simula ausência do singleton sem apagar dados. */
   @TestVisible
   private static String singletonKeyOverride;
@@ -167,7 +215,10 @@ public without sharing class SOLDistribuicaoService {
 
   /** Resultado controlado da distribuição. Sem detalhe técnico sensível. */
   public class Resultado {
+    /** Leads distribuídos PELO RODÍZIO (os mantidos com o criador não entram). */
     public Integer distribuidos = 0;
+    /** (SOL-LEAD-CRIADOR) Leads que ficaram com o vendedor que os criou. */
+    public Integer mantidosComCriador = 0;
     public Integer emFallback = 0;
     public Integer ignorados = 0;
     public Integer comErro = 0;
@@ -255,6 +306,17 @@ public without sharing class SOLDistribuicaoService {
    * ou DML dentro de laço. Transacional: se a gravação dos Leads falhar, o
    * ponteiro não avança (Savepoint/rollback).
    *
+   * (SOL-LEAD-CRIADOR) Com a distribuição ativa e vendedores na fila, os
+   * elegíveis são divididos em duas listas: `mantidos` (criados pelo vendedor
+   * ativo que está na transação, por canal interativo) e `rodizio` (o resto).
+   * Os mantidos ficam com o dono atual, se ele for vendedor ativo, ou com o
+   * criador (cobre a assignment rule que já pôs a fila como dona). As duas
+   * listas vão no MESMO `update` e no MESMO `insert` de Tasks "1ª Ligação",
+   * dentro do mesmo Savepoint. O índice do rodízio é calculado só sobre a
+   * sublista `rodizio`, e o singleton só é gravado se ela não estiver vazia.
+   * A ordem dos locks não muda (singleton, depois Leads), mesmo que o lote
+   * inteiro fique com o criador.
+   *
    * @param leadIds coleção de IDs de Lead (qualquer Record Type; só os do
    *   Record Type SOL ainda não distribuídos são processados).
    * @return Resultado controlado com as contagens e mensagens seguras.
@@ -267,6 +329,8 @@ public without sharing class SOLDistribuicaoService {
 
     Set<Id> ids = new Set<Id>(leadIds);
     Datetime agora = System.now();
+    Integer qtdMantidos = 0;
+    Integer qtdRodizio = 0;
 
     Savepoint sp = Database.setSavepoint();
     try {
@@ -294,6 +358,7 @@ public without sharing class SOLDistribuicaoService {
         SELECT
           Id,
           OwnerId,
+          CreatedById,
           CreatedDate,
           RecordType.DeveloperName,
           SOL_Status_Distribuicao__c,
@@ -368,6 +433,37 @@ public without sharing class SOLDistribuicaoService {
         return r;
       }
 
+      // (SOL-LEAD-CRIADOR) separa quem fica com o criador de quem vai para o
+      // rodízio. Só em memória: o roster já foi lido acima.
+      Set<Id> idsAtivos = new Map<Id, User>(ativos).keySet();
+      Boolean interativo = canalInterativo();
+      Id usuarioCorrente = UserInfo.getUserId();
+      List<Lead> mantidos = new List<Lead>();
+      List<Lead> rodizio = new List<Lead>();
+      for (Lead l : elegiveis) {
+        if (
+          interativo &&
+          l.CreatedById == usuarioCorrente &&
+          idsAtivos.contains(l.CreatedById)
+        ) {
+          mantidos.add(l);
+        } else {
+          rodizio.add(l);
+        }
+      }
+      qtdMantidos = mantidos.size();
+      qtdRodizio = rodizio.size();
+
+      // (SOL-LEAD-CRIADOR) dono mantido: o atual, se for vendedor ativo ("em
+      // nome de" outro vendedor); senão o criador — a fila posta pela
+      // assignment rule ou um usuário fora do roster não ficam como donos.
+      for (Lead l : mantidos) {
+        if (!idsAtivos.contains(l.OwnerId)) {
+          l.OwnerId = l.CreatedById;
+        }
+        marcarDistribuido(l, agora);
+      }
+
       // (4)(5)(6) ponto de partida na rotação.
       Integer n = ativos.size();
       Integer inicio = 0;
@@ -376,17 +472,15 @@ public without sharing class SOLDistribuicaoService {
         inicio = (k >= 0) ? Math.mod(k + 1, n) : 0;
       }
 
-      // (9) atribui em memória; um único update depois do laço.
-      for (Integer i = 0; i < elegiveis.size(); i++) {
-        Lead l = elegiveis[i];
+      // (9) atribui em memória; um único update depois do laço. O índice é
+      // calculado só sobre a sublista do rodízio (SOL-LEAD-CRIADOR).
+      for (Integer i = 0; i < rodizio.size(); i++) {
+        Lead l = rodizio[i];
         l.OwnerId = ativos[Math.mod(inicio + i, n)].Id;
-        l.SOL_Status_Distribuicao__c = STATUS_DISTRIBUIDO;
-        l.SOL_Data_Distribuicao__c = agora;
-        l.SOL_Erro_Distribuicao__c = null;
-        // CLICKUP-9400: abre o ciclo de contato do vendedor que recebeu o Lead.
-        l.SOL_Data_Inicio_Ciclo_Contato__c = agora;
-        l.SOL_Status_Reatribuicao__c = REATRIB_EM_ACOMPANHAMENTO;
+        marcarDistribuido(l, agora);
       }
+      // Um único update com as duas listas (são os mesmos objetos de
+      // `elegiveis`).
       update elegiveis;
 
       // (CLICKUP-9396) Task "1ª Ligação" — uma por atribuição bem-sucedida.
@@ -400,16 +494,21 @@ public without sharing class SOLDistribuicaoService {
         insert tarefasLigacao;
       }
 
-      // (10) ponteiro/data/total só depois da atribuição bem-sucedida.
-      User ultimo = ativos[Math.mod(inicio + elegiveis.size() - 1, n)];
-      estado.Ultimo_Usuario__c = ultimo.Id;
-      estado.Data_Ultima_Distribuicao__c = agora;
-      estado.Total_Distribuido__c =
-        (estado.Total_Distribuido__c == null ? 0 : estado.Total_Distribuido__c) +
-        elegiveis.size();
-      update estado;
+      // (10) ponteiro/data/total só depois da atribuição bem-sucedida, e só
+      // quando houve rodízio: Lead mantido com o criador não move o ponteiro.
+      if (!rodizio.isEmpty()) {
+        User ultimo = ativos[Math.mod(inicio + rodizio.size() - 1, n)];
+        estado.Ultimo_Usuario__c = ultimo.Id;
+        estado.Data_Ultima_Distribuicao__c = agora;
+        estado.Total_Distribuido__c =
+          (estado.Total_Distribuido__c == null
+            ? 0
+            : estado.Total_Distribuido__c) + rodizio.size();
+        update estado;
+      }
 
-      r.distribuidos = elegiveis.size();
+      r.distribuidos = rodizio.size();
+      r.mantidosComCriador = mantidos.size();
       return r;
     } catch (DistribuicaoException e) {
       // Configuração/estado indisponível (singleton, fila) — rollback total.
@@ -430,7 +529,33 @@ public without sharing class SOLDistribuicaoService {
       );
       marcarErro(ids, MSG_ERRO_GENERICO, agora, r);
       return r;
+    } finally {
+      // (SOL-LEAD-CRIADOR) Uma linha por chamada, para diagnosticar o canal
+      // (ex.: o app móvel) por debug log. Contagens zeradas = não chegou à
+      // divisão (nada elegível, fallback ou erro antes dela).
+      System.debug(
+        LoggingLevel.INFO,
+        'SOLDistribuicaoService.criador: quiddity=' +
+          quiddityAtual() +
+          ' mantidos=' +
+          qtdMantidos +
+          ' rodizio=' +
+          qtdRodizio
+      );
     }
+  }
+
+  /**
+   * Campos que a distribuição grava no Lead que recebeu dono — rodízio ou
+   * mantido com o criador (SOL-LEAD-CRIADOR). O dono é decidido pelo chamador.
+   */
+  private static void marcarDistribuido(Lead l, Datetime agora) {
+    l.SOL_Status_Distribuicao__c = STATUS_DISTRIBUIDO;
+    l.SOL_Data_Distribuicao__c = agora;
+    l.SOL_Erro_Distribuicao__c = null;
+    // CLICKUP-9400: abre o ciclo de contato do vendedor que recebeu o Lead.
+    l.SOL_Data_Inicio_Ciclo_Contato__c = agora;
+    l.SOL_Status_Reatribuicao__c = REATRIB_EM_ACOMPANHAMENTO;
   }
 
   /**
