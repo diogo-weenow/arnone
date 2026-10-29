@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_RG__c</fullName>
+    <description>Número do RG do aluno do Instituto STech, copiado do Lead por STE_ConverterLead no momento da conversão. Aceita letras e números e a pontuação é opcional. Não é único.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Digite o número do RG como está no documento, com ou sem pontos e traço. Pode conter letra (ex.: 12.345.678-X).</inlineHelpText>
+    <label>RG</label>
+    <length>20</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

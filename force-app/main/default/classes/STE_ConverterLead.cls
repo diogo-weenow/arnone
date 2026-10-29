@@ -76,6 +76,8 @@ public with sharing class STE_ConverterLead {
           MobilePhone,
           IsConverted,
           CPF__c,
+          STE_RG__c,
+          STE_Data_Nascimento__c,
           STE_Genero__c,
           STE_Classificacao_Fila__c,
           STE_CNH_Enviada__c,
@@ -189,6 +191,8 @@ public with sharing class STE_ConverterLead {
     update new Contact(
       Id = contatoId,
       CPF__c = l.CPF__c,
+      STE_RG__c = l.STE_RG__c,
+      Birthdate = l.STE_Data_Nascimento__c,
       STE_WhatsApp__c = String.isNotBlank(l.MobilePhone)
         ? l.MobilePhone
         : l.Phone,
