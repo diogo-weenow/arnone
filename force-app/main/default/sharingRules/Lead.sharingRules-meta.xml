@@ -1,3 +1,108 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<SharingRules xmlns="http://soap.sforce.com/2006/04/metadata"/>
-
+<SharingRules xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sharingCriteriaRules>
+        <fullName>Lead_ADV_BU</fullName>
+        <accessLevel>Edit</accessLevel>
+        <description>ACESSO-POR-BU. So o papel Diretoria_ADV ve e edita todo Lead da BU, inclusive os em fila; o vendedor ve so o que e dele. Criterio pelo LABEL do record type: renomear o RT quebra a regra.</description>
+        <label>ADV - Lead da BU (Diretoria)</label>
+        <sharedTo>
+            <role>Diretoria_ADV</role>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Arnone Advogados</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+    <sharingCriteriaRules>
+        <fullName>Lead_ADV_Coordenacao</fullName>
+        <accessLevel>Edit</accessLevel>
+        <description>ACESSO-POR-BU. So o papel Coordenador_ADV ve e edita todo Lead da BU, inclusive os em fila; o vendedor ve so o que e dele. Criterio pelo LABEL do record type: renomear o RT quebra a regra.</description>
+        <label>ADV - Lead da BU (Coordenacao)</label>
+        <sharedTo>
+            <role>Coordenador_ADV</role>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Arnone Advogados</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+    <sharingCriteriaRules>
+        <fullName>Lead_SOL_BU</fullName>
+        <accessLevel>Edit</accessLevel>
+        <description>ACESSO-POR-BU. So o papel Diretoria_SOL ve e edita todo Lead da BU, inclusive os em fila; o vendedor ve so o que e dele. Criterio pelo LABEL do record type: renomear o RT quebra a regra.</description>
+        <label>SOL - Lead da BU (Diretoria)</label>
+        <sharedTo>
+            <role>Diretoria_SOL</role>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Arnone Soluções</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+    <sharingCriteriaRules>
+        <fullName>Lead_SOL_Coordenacao</fullName>
+        <accessLevel>Edit</accessLevel>
+        <description>ACESSO-POR-BU. So o papel Coordenador_SOL ve e edita todo Lead da BU, inclusive os em fila; o vendedor ve so o que e dele. Criterio pelo LABEL do record type: renomear o RT quebra a regra.</description>
+        <label>SOL - Lead da BU (Coordenacao)</label>
+        <sharedTo>
+            <role>Coordenador_SOL</role>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Arnone Soluções</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+    <sharingCriteriaRules>
+        <fullName>Lead_STE_BU</fullName>
+        <accessLevel>Edit</accessLevel>
+        <description>ACESSO-POR-BU. Todos os usuarios da BU STE (Diretoria_STE e subordinados internos) veem e editam todo Lead da BU, inclusive os em fila. Criterio pelo LABEL do record type: renomear o RT quebra a regra.</description>
+        <label>STE - Lead da BU</label>
+        <sharedTo>
+            <roleAndSubordinatesInternal>Diretoria_STE</roleAndSubordinatesInternal>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Instituto STech</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+    <sharingCriteriaRules>
+        <fullName>Lead_ESG_BU</fullName>
+        <accessLevel>Edit</accessLevel>
+        <description>ACESSO-POR-BU. So o papel Diretoria_ESG ve e edita todo Lead da BU, inclusive os em fila; o vendedor ve so o que e dele. Criterio pelo LABEL do record type: renomear o RT quebra a regra.</description>
+        <label>ESG - Lead da BU (Diretoria)</label>
+        <sharedTo>
+            <role>Diretoria_ESG</role>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Instituto Global ESG</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+    <sharingCriteriaRules>
+        <fullName>Lead_SCO_BU</fullName>
+        <accessLevel>Edit</accessLevel>
+        <description>ACESSO-POR-BU. So o papel Diretoria_SCO ve e edita todo Lead da BU, inclusive os em fila; o vendedor ve so o que e dele. Criterio pelo LABEL do record type: renomear o RT quebra a regra.</description>
+        <label>SCO - Lead da BU (Diretoria)</label>
+        <sharedTo>
+            <role>Diretoria_SCO</role>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>S.Company</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+</SharingRules>

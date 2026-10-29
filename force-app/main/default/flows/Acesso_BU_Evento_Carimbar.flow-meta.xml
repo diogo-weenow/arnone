@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Asg_BU_Oportunidade</name>
+        <label>BU pela Oportunidade</label>
+        <locationX>314</locationX>
+        <locationY>674</locationY>
+        <assignmentItems>
+            <assignToReference>varBU</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>fBUOportunidade</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Dec_Lead</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Asg_BU_Lead</name>
+        <label>BU pelo Lead</label>
+        <locationX>314</locationX>
+        <locationY>1082</locationY>
+        <assignmentItems>
+            <assignToReference>varBU</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>fBULead</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Dec_Proprietario</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Asg_BU_Proprietario</name>
+        <label>BU pelo Department do proprietário</label>
+        <locationX>314</locationX>
+        <locationY>1382</locationY>
+        <assignmentItems>
+            <assignToReference>varBU</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>fBUProprietario</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Asg_Carimbar</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>Asg_Carimbar</name>
+        <label>Carimbar BU na evento</label>
+        <locationX>446</locationX>
+        <locationY>1598</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.BU_Atividade__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>varBU</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <name>Dec_So_Troca_De_Dono</name>
+        <label>Só trocou o dono de atividade já carimbada por Opp/Lead?</label>
+        <locationX>446</locationX>
+        <locationY>242</locationY>
+        <defaultConnector>
+            <targetReference>Dec_Oportunidade</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Não</defaultConnectorLabel>
+        <rules>
+            <name>Dec_So_Troca_De_Dono_Sim</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>fManterBU</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Dec_Oportunidade</name>
+        <label>WhatId é Oportunidade?</label>
+        <locationX>314</locationX>
+        <locationY>458</locationY>
+        <defaultConnector>
+            <targetReference>Dec_Lead</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Não</defaultConnectorLabel>
+        <rules>
+            <name>Dec_Oportunidade_Sim</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>fWhatEhOportunidade</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Oportunidade</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Dec_Lead</name>
+        <label>Sem BU e há Lead?</label>
+        <locationX>314</locationX>
+        <locationY>866</locationY>
+        <defaultConnector>
+            <targetReference>Dec_Proprietario</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Não</defaultConnectorLabel>
+        <rules>
+            <name>Dec_Lead_Sim</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>fBuscarLead</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Get_Lead</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Dec_Proprietario</name>
+        <label>Sem BU e dono é usuário?</label>
+        <locationX>314</locationX>
+        <locationY>1274</locationY>
+        <defaultConnector>
+            <targetReference>Asg_Carimbar</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Não</defaultConnectorLabel>
+        <rules>
+            <name>Dec_Proprietario_Sim</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>fBuscarProprietario</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Asg_BU_Proprietario</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <description>ACESSO-POR-BU. Carimba Event.BU_Atividade__c antes de salvar, na criacao e quando WhatId, WhoId ou OwnerId mudam. Ordem: (1) WhatId e Oportunidade: BU do RT da Oportunidade (STE_Telecom conta como STE); (2) WhoId e Lead: BU do RT do Lead; (3) senao, Department do proprietario. Cada etapa so vale se a anterior nao achou BU. Sem BU o campo fica vazio, inclusive limpando valor antigo. Troca SO de dono numa atividade ja carimbada e ligada a Opp/Lead mantem a BU sem consultar (os testes SOL tem teto absoluto de SOQL e a reatribuicao em massa troca dono de Task). Limite conhecido: se a BU tinha vindo do dono porque a Opp/Lead nao tem RT de BU, a troca so de dono nao a recalcula. Before-save, contexto de sistema: grava o campo mesmo sem FLS de edicao do usuario. Alimenta as Restriction Rules Acesso_BU_Tarefas e Acesso_BU_Eventos.</description>
+    <environments>Default</environments>
+    <formulas>
+        <name>fManterBU</name>
+        <description>Update em que so o dono mudou numa atividade ja carimbada e ligada a Oportunidade ou Lead: a BU vem do registro relacionado, que nao mudou; nada a recalcular e nenhuma consulta.</description>
+        <dataType>Boolean</dataType>
+        <expression>AND(NOT(ISBLANK({!$Record__Prior.Id})), {!$Record.WhatId} = {!$Record__Prior.WhatId}, {!$Record.WhoId} = {!$Record__Prior.WhoId}, NOT(ISBLANK({!$Record.BU_Atividade__c})), OR(LEFT({!$Record.WhatId}, 3) = &apos;006&apos;, LEFT({!$Record.WhoId}, 3) = &apos;00Q&apos;))</expression>
+    </formulas>
+    <formulas>
+        <name>fWhatEhOportunidade</name>
+        <description>WhatId aponta para Oportunidade (prefixo 006).</description>
+        <dataType>Boolean</dataType>
+        <expression>LEFT({!$Record.WhatId}, 3) = &apos;006&apos;</expression>
+    </formulas>
+    <formulas>
+        <name>fBuscarLead</name>
+        <description>Ainda sem BU e WhoId aponta para Lead (prefixo 00Q). WhatId nunca e Lead na plataforma.</description>
+        <dataType>Boolean</dataType>
+        <expression>AND(ISBLANK({!varBU}), LEFT({!$Record.WhoId}, 3) = &apos;00Q&apos;)</expression>
+    </formulas>
+    <formulas>
+        <name>fBuscarProprietario</name>
+        <description>Ainda sem BU e o proprietario e um usuario (prefixo 005).</description>
+        <dataType>Boolean</dataType>
+        <expression>AND(ISBLANK({!varBU}), LEFT({!$Record.OwnerId}, 3) = &apos;005&apos;)</expression>
+    </formulas>
+    <formulas>
+        <name>fBUOportunidade</name>
+        <description>Codigo da BU pelo DeveloperName do RT da Oportunidade; STE_Telecom pertence a BU STE.</description>
+        <dataType>String</dataType>
+        <expression>IF({!Get_Oportunidade.RecordType.DeveloperName} = &apos;STE_Telecom&apos;, &apos;STE&apos;, IF(CASE({!Get_Oportunidade.RecordType.DeveloperName}, &apos;ADV&apos;, 1, &apos;SOL&apos;, 1, &apos;STE&apos;, 1, &apos;ESG&apos;, 1, &apos;SCO&apos;, 1, 0) = 1, {!Get_Oportunidade.RecordType.DeveloperName}, &apos;&apos;))</expression>
+    </formulas>
+    <formulas>
+        <name>fBULead</name>
+        <description>Codigo da BU pelo DeveloperName do RT do Lead.</description>
+        <dataType>String</dataType>
+        <expression>IF(CASE({!Get_Lead.RecordType.DeveloperName}, &apos;ADV&apos;, 1, &apos;SOL&apos;, 1, &apos;STE&apos;, 1, &apos;ESG&apos;, 1, &apos;SCO&apos;, 1, 0) = 1, {!Get_Lead.RecordType.DeveloperName}, &apos;&apos;)</expression>
+    </formulas>
+    <formulas>
+        <name>fBUProprietario</name>
+        <description>Department do proprietario, so se for um dos cinco codigos de BU (o campo tem 3 caracteres).</description>
+        <dataType>String</dataType>
+        <expression>IF(CASE({!$Record.Owner:User.Department}, &apos;ADV&apos;, 1, &apos;SOL&apos;, 1, &apos;STE&apos;, 1, &apos;ESG&apos;, 1, &apos;SCO&apos;, 1, 0) = 1, {!$Record.Owner:User.Department}, &apos;&apos;)</expression>
+    </formulas>
+    <interviewLabel>Acesso_BU_Evento_Carimbar {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Acesso_BU_Evento_Carimbar</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>Get_Oportunidade</name>
+        <label>Buscar Oportunidade</label>
+        <locationX>182</locationX>
+        <locationY>566</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Asg_BU_Oportunidade</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.WhatId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Opportunity</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>RecordTypeId</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <name>Get_Lead</name>
+        <label>Buscar Lead</label>
+        <locationX>182</locationX>
+        <locationY>974</locationY>
+        <assignNullValuesIfNoRecordsFound>true</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Asg_BU_Lead</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.WhoId</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Lead</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>RecordTypeId</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>320</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Dec_So_Troca_De_Dono</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>false</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>OR(ISNEW(), ISCHANGED({!$Record.WhatId}), ISCHANGED({!$Record.WhoId}), ISCHANGED({!$Record.OwnerId}))</filterFormula>
+        <object>Event</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+    <triggerOrder>10</triggerOrder>
+    <variables>
+        <name>varBU</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

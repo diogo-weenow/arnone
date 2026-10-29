@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
     <applicationVisibilities>
-        <application>Arnone</application>
-        <visible>false</visible>
+        <application>SCO</application>
+        <visible>true</visible>
     </applicationVisibilities>
-    <applicationVisibilities>
-        <application>Arnone_Atendimento</application>
-        <visible>false</visible>
-    </applicationVisibilities>
-    <description>Executivo comercial: gestão completa de contas, contatos e oportunidades do seu funil; leitura e edição de leads. Sem exclusão de registros.</description>
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>SCO_Importar_Leads</name>
+    </customPermissions>
+    <description>ACESSO-POR-BU. PS da BU. Base comum (Conta/Contato/Lead/Opp sem delete, FLS comum) + RTs SCO, app SCO e SCO_Importar_Leads. Sem restricao de visibilidade (vem do cargo).</description>
     <fieldPermissions>
         <editable>true</editable>
         <field>Account.CNPJ__c</field>
@@ -40,6 +40,11 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>false</editable>
+        <field>Event.BU_Atividade__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>true</editable>
         <field>Lead.CPF__c</field>
         <readable>true</readable>
@@ -64,8 +69,13 @@
         <field>Product2.Unidade__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Task.BU_Atividade__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
-    <label>Comercial</label>
+    <label>BU — S.Company</label>
     <objectPermissions>
         <allowCreate>true</allowCreate>
         <allowDelete>false</allowDelete>
@@ -117,39 +127,11 @@
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
     <recordTypeVisibilities>
-        <recordType>Lead.ADV</recordType>
-        <visible>true</visible>
-    </recordTypeVisibilities>
-    <recordTypeVisibilities>
-        <recordType>Lead.ESG</recordType>
-        <visible>true</visible>
-    </recordTypeVisibilities>
-    <recordTypeVisibilities>
         <recordType>Lead.SCO</recordType>
         <visible>true</visible>
     </recordTypeVisibilities>
     <recordTypeVisibilities>
-        <recordType>Lead.SOL</recordType>
-        <visible>true</visible>
-    </recordTypeVisibilities>
-    <recordTypeVisibilities>
-        <recordType>Lead.STE</recordType>
-        <visible>true</visible>
-    </recordTypeVisibilities>
-    <recordTypeVisibilities>
-        <recordType>Opportunity.ADV</recordType>
-        <visible>true</visible>
-    </recordTypeVisibilities>
-    <recordTypeVisibilities>
-        <recordType>Opportunity.ESG</recordType>
-        <visible>true</visible>
-    </recordTypeVisibilities>
-    <recordTypeVisibilities>
         <recordType>Opportunity.SCO</recordType>
-        <visible>true</visible>
-    </recordTypeVisibilities>
-    <recordTypeVisibilities>
-        <recordType>Opportunity.SOL</recordType>
         <visible>true</visible>
     </recordTypeVisibilities>
     <userPermissions>

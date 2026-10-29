@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Coordenador_ADV</members>
+        <members>Coordenador_SOL</members>
+        <members>Comercial_ESG</members>
+        <members>Comercial_STE</members>
+        <members>Comercial_SCO</members>
+        <name>Role</name>
+    </types>
+    <version>67.0</version>
+</Package>
