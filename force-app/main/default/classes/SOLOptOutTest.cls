@@ -623,7 +623,7 @@ private class SOLOptOutTest {
     List<Profile> ps = [
       SELECT Id
       FROM Profile
-      WHERE UserType = 'Standard'
+      WHERE UserType = 'Standard' AND Name = 'Minimum Access - Salesforce'
       ORDER BY Name
       LIMIT 1
     ];
@@ -704,10 +704,12 @@ private class SOLOptOutTest {
   }
 
   private static User usuarioStandard(String sobrenome, String alias) {
+    // Perfil real do vendedor e do gestor (licenca Salesforce): aceita o
+    // EditTask do PS da BU e da a leitura que o gestor tem em producao.
     List<Profile> ps = [
       SELECT Id
       FROM Profile
-      WHERE UserType = 'Standard'
+      WHERE UserType = 'Standard' AND Name = 'Standard User'
       ORDER BY Name
       LIMIT 1
     ];
@@ -732,10 +734,19 @@ private class SOLOptOutTest {
 
   private static void assertVeSemEditar(String rotulo) {
     Map<String, Schema.SObjectField> f = Schema.SObjectType.Lead.fields.getMap();
+    // SOL_Motivo_Desqualificacao__c: o PS_SOL_Comercial sempre concedeu edicao
+    // (a desqualificacao manual exige o motivo). O "sem editar" so passava
+    // porque o perfil de teste nao tinha Edit em Lead; com o PS da BU trazendo
+    // a base comum (ACESSO-POR-BU) o campo e editavel, como para o vendedor real.
+    {
+      Assert.isTrue(
+        Schema.SObjectType.Lead.fields.getMap().get('SOL_Motivo_Desqualificacao__c').getDescribe().isAccessible(),
+        rotulo + ' deveria enxergar SOL_Motivo_Desqualificacao__c'
+      );
+    }
     for (String campo : new List<String>{
       'SOL_Opt_Out__c',
-      'SOL_Data_Opt_Out__c',
-      'SOL_Motivo_Desqualificacao__c'
+      'SOL_Data_Opt_Out__c'
     }) {
       Schema.DescribeFieldResult d = f.get(campo).getDescribe();
       System.assert(

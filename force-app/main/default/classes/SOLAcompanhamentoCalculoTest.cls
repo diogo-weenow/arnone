@@ -833,7 +833,7 @@ private class SOLAcompanhamentoCalculoTest {
 
   @IsTest
   static void vendedorComercialEnxergaCamposComFLSCorreta() {
-    Id perfil = [SELECT Id FROM Profile WHERE UserType = 'Standard' ORDER BY Name LIMIT 1].Id;
+    Id perfil = [SELECT Id FROM Profile WHERE UserType = 'Standard' AND Name = 'Minimum Access - Salesforce' ORDER BY Name LIMIT 1].Id;
     User v = new User(
       FirstName = 'SOL',
       LastName = 'Calc Acomp',

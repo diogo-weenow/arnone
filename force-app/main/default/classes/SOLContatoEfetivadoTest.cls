@@ -608,7 +608,7 @@ private class SOLContatoEfetivadoTest {
     List<Profile> ps = [
       SELECT Id
       FROM Profile
-      WHERE UserType = 'Standard'
+      WHERE UserType = 'Standard' AND Name = 'Minimum Access - Salesforce'
       ORDER BY Name
       LIMIT 1
     ];
