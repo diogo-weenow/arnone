@@ -4,6 +4,7 @@
     <hasActivationRequired>false</hasActivationRequired>
     <label>Diretor Global</label>
     <permissionSets>PS_Comercial</permissionSets>
+    <permissionSets>PS_STE_Campos_Lead</permissionSets>
     <permissionSets>PS_Diretor_Global</permissionSets>
     <permissionSets>PS_Acesso_BU_Campos</permissionSets>
     <permissionSets>PS_Arnone_Gestao</permissionSets>
