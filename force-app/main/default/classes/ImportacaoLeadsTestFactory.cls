@@ -12,10 +12,12 @@ public class ImportacaoLeadsTestFactory {
   public static final String FILA_DEV = 'Fila_Importacao_Teste';
 
   public static final String PS_BASE = 'PS_Importacao_Leads';
-  public static final String PS_SOL = 'PS_SOL_Importacao_Leads';
-  public static final String PS_STE = 'PS_STE_Importacao_Leads';
-  public static final String PS_ESG = 'PS_ESG_Importacao_Leads';
-  public static final String PS_SCO = 'PS_SCO_Importacao_Leads';
+  // ACESSO-POR-BU: a custom permission <BU>_Importar_Leads vem do PS da BU;
+  // a FLS gravada pela importacao vem do PS_Importacao_Leads.
+  public static final String PS_SOL = 'PS_SOL_Comercial';
+  public static final String PS_STE = 'PS_STE_Comercial';
+  public static final String PS_ESG = 'PS_ESG_Comercial';
+  public static final String PS_SCO = 'PS_SCO_Comercial';
 
   // CNPJs e CPFs com DV válido (algoritmo da Receita).
   public static final String CNPJ_A = '11222333000181';
