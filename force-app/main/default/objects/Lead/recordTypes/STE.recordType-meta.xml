@@ -273,6 +273,36 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>SOL_Produtos_Interesse__c</picklist>
+        <values>
+            <fullName>ART 360</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Recuperação Tributária</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Revisão trabalhista</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SOL_Regime_Tributario__c</picklist>
+        <values>
+            <fullName>Lucro Presumido</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lucro Real</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Simples Nacional</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>SOL_Status_Distribuicao__c</picklist>
         <values>
             <fullName>Distribuido</fullName>
