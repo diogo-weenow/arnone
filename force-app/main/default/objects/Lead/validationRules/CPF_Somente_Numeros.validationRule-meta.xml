@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CPF_Somente_Numeros</fullName>
+    <active>true</active>
+    <description>Exige que o CPF contenha somente números (sem ponto, traço ou letras). Só é avaliada quando o CPF é preenchido ou alterado, para não travar registros antigos.</description>
+    <errorConditionFormula>AND(
+  NOT(ISBLANK(CPF__c)),
+  OR(ISNEW(), ISCHANGED(CPF__c)),
+  NOT(REGEX(CPF__c, &quot;[0-9]+&quot;))
+)</errorConditionFormula>
+    <errorDisplayField>CPF__c</errorDisplayField>
+    <errorMessage>O CPF deve conter somente números, sem ponto, traço ou letras.</errorMessage>
+</ValidationRule>

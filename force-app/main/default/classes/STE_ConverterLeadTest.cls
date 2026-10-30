@@ -61,7 +61,7 @@ private class STE_ConverterLeadTest {
 
   @IsTest
   static void converteCandidatoCompleto() {
-    Lead l = novoCandidato('Souza', '111.111.111-11');
+    Lead l = novoCandidato('Souza', '11111111111');
     insert l;
 
     Test.startTest();
@@ -84,7 +84,7 @@ private class STE_ConverterLeadTest {
       conta.RecordType.DeveloperName,
       'A Conta deveria nascer com o record type de pessoa física.'
     );
-    Assert.areEqual('111.111.111-11', conta.STE_CPF__c);
+    Assert.areEqual('11111111111', conta.STE_CPF__c);
 
     Contact contato = [
       SELECT
@@ -108,7 +108,7 @@ private class STE_ConverterLeadTest {
       contato.STE_WhatsApp__c,
       'Regra 4.2 — WhatsApp.'
     );
-    Assert.areEqual('111.111.111-11', contato.CPF__c);
+    Assert.areEqual('11111111111', contato.CPF__c);
     Assert.areEqual(
       '12.345.678-X',
       contato.STE_RG__c,
@@ -185,7 +185,7 @@ private class STE_ConverterLeadTest {
   static void reaproveitaContaDoMesmoCPF() {
     Account existente = new Account(
       Name = 'Ana Previa',
-      STE_CPF__c = '222.222.222-22',
+      STE_CPF__c = '22222222222',
       RecordTypeId = Account.SObjectType.getDescribe()
         .getRecordTypeInfosByDeveloperName()
         .get('STE_Pessoa_Fisica')
@@ -193,7 +193,7 @@ private class STE_ConverterLeadTest {
     );
     insert existente;
 
-    Lead l = novoCandidato('Previa', '222.222.222-22');
+    Lead l = novoCandidato('Previa', '22222222222');
     insert l;
 
     Test.startTest();
@@ -210,14 +210,14 @@ private class STE_ConverterLeadTest {
     );
     Assert.areEqual(
       1,
-      [SELECT COUNT() FROM Account WHERE STE_CPF__c = '222.222.222-22'],
+      [SELECT COUNT() FROM Account WHERE STE_CPF__c = '22222222222'],
       'O CPF é unique na Conta — não pode haver duplicata.'
     );
   }
 
   @IsTest
   static void bloqueiaSemCNHRecebida() {
-    Lead l = novoCandidato('SemCnh', '333.333.333-33');
+    Lead l = novoCandidato('SemCnh', '33333333333');
     l.STE_CNH_Enviada__c = false;
     insert l;
 
@@ -255,7 +255,7 @@ private class STE_ConverterLeadTest {
 
   @IsTest
   static void bloqueiaLeadJaConvertido() {
-    Lead l = novoCandidato('Repetida', '444.444.444-44');
+    Lead l = novoCandidato('Repetida', '44444444444');
     insert l;
 
     STE_ConverterLead.converter(new List<Id>{ l.Id });
@@ -297,7 +297,7 @@ private class STE_ConverterLeadTest {
   @IsTest
   static void converteCandidatoSemRG() {
     // RG é opcional: a conversão não pode ser bloqueada pela ausência dele.
-    Lead l = novoCandidato('Ribeiro', '333.333.333-33');
+    Lead l = novoCandidato('Ribeiro', '33333333333');
     l.STE_RG__c = null;
     insert l;
 
@@ -323,7 +323,7 @@ private class STE_ConverterLeadTest {
   @IsTest
   static void converteSemDataDeNascimento() {
     // A data de nascimento é opcional: a conversão não pode depender dela.
-    Lead l = novoCandidato('Moraes', '444.444.444-44');
+    Lead l = novoCandidato('Moraes', '44444444444');
     l.STE_Data_Nascimento__c = null;
     insert l;
 
@@ -349,7 +349,7 @@ private class STE_ConverterLeadTest {
   @IsTest
   static void bloqueiaDataDeNascimentoFutura() {
     // Data no futuro é sempre erro de digitação, normalmente o ano trocado.
-    Lead l = novoCandidato('Futuro', '555.555.555-55');
+    Lead l = novoCandidato('Futuro', '55555555555');
     l.STE_Data_Nascimento__c = Date.today().addDays(1);
 
     try {
@@ -366,7 +366,7 @@ private class STE_ConverterLeadTest {
   @IsTest
   static void aceitaDataDeNascimentoDeHoje() {
     // A regra barra apenas datas estritamente futuras.
-    Lead l = novoCandidato('Hoje', '666.666.666-66');
+    Lead l = novoCandidato('Hoje', '66666666666');
     l.STE_Data_Nascimento__c = Date.today();
     insert l;
 
@@ -381,7 +381,7 @@ private class STE_ConverterLeadTest {
   @IsTest
   static void aceitaCandidatoMuitoIdoso() {
     // Não existe limite de idade no cadastro: a seleção é do assistente.
-    Lead l = novoCandidato('Centenaria', '777.777.777-77');
+    Lead l = novoCandidato('Centenaria', '77777777777');
     l.STE_Data_Nascimento__c = Date.newInstance(1920, 1, 1);
     insert l;
 
@@ -396,7 +396,7 @@ private class STE_ConverterLeadTest {
   @IsTest
   static void dataNaoInterfereNaFaixaEtaria() {
     // A data não recalcula nem contradiz a faixa declarada no assistente.
-    Lead l = novoCandidato('Incoerente', '888.888.888-88');
+    Lead l = novoCandidato('Incoerente', '88888888888');
     l.STE_Data_Nascimento__c = Date.newInstance(2015, 1, 1);
     insert l;
 
