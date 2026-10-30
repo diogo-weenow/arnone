@@ -25,6 +25,18 @@
                 <default>false</default>
                 <label>República</label>
             </value>
+            <value>
+                <fullName>Santo Amaro</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Santo Amaro</label>
+            </value>
+            <value>
+                <fullName>Guarulhos</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Guarulhos</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>
