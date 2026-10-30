@@ -109,22 +109,27 @@ private class AcessoPorBUTest {
         AccountId = robson.Id,
         OwnerId = ids.get('advat')
       );
-      insert new Opportunity(
-        Name = PREFIXO + ' Robson US$2M',
-        AccountId = robson.Id,
-        OwnerId = ids.get('advat'),
-        RecordTypeId = rtOpp('ADV'),
-        StageName = 'Oportunidade Recebida',
-        CloseDate = Date.today().addDays(30),
-        Amount = 2000000
-      );
-
       Account contaOpps = new Account(Name = PREFIXO + ' Conta das Opps');
       insert contaOpps;
-      insert new List<Opportunity>{
-        novaOpp('SOL', 'Diagnóstico', ids.get('solat2'), contaOpps.Id),
-        novaOpp('STE_Telecom', 'Verificação de Antecedentes', ids.get('steat'), contaOpps.Id)
-      };
+
+      // As Opps sao criadas pelo Diretor Global, que tem os record types de
+      // todas as BUs. O usuario que roda o teste (o da CI, por exemplo) pode
+      // nao ter o RT Opp ADV.
+      System.runAs(new User(Id = ids.get('global'))) {
+        insert new Opportunity(
+          Name = PREFIXO + ' Robson US$2M',
+          AccountId = robson.Id,
+          OwnerId = ids.get('advat'),
+          RecordTypeId = rtOpp('ADV'),
+          StageName = 'Oportunidade Recebida',
+          CloseDate = Date.today().addDays(30),
+          Amount = 2000000
+        );
+        insert new List<Opportunity>{
+          novaOpp('SOL', 'Diagnóstico', ids.get('solat2'), contaOpps.Id),
+          novaOpp('STE_Telecom', 'Verificação de Antecedentes', ids.get('steat'), contaOpps.Id)
+        };
+      }
     }
 
     // Cada atendente cria o Lead da propria BU (o perfil do admin nao tem os

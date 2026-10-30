@@ -294,7 +294,11 @@ private class AcessoPorBUAtividadeTest {
       StageName = etapa,
       CloseDate = Date.today().addDays(30)
     );
-    insert o;
+    // Criada pelo Diretor Global, que tem os record types de todas as BUs; o
+    // usuario que roda o teste (o da CI, por exemplo) pode nao ter o RT Opp ADV.
+    System.runAs(usuario('global')) {
+      insert o;
+    }
     return o.Id;
   }
 
