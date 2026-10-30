@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ADV_Valor_Honorarios__c</fullName>
+    <description>BU Arnone Advogados: valor de honorários definido pelo Antônio com o advogado responsável na etapa Em Precificação (RN-A03). O valor da proposta fica no campo padrão Valor (Amount). Diferença entre os dois ainda em aberto com o cliente (P-A08).</description>
+    <inlineHelpText>Honorários definidos na precificação (Antônio + advogado). O valor total da proposta vai no campo Valor.</inlineHelpText>
+    <label>Valor de honorários</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>2</scale>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Currency</type>
+</CustomField>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathAssistant xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <entityName>Opportunity</entityName>
+    <fieldName>StageName</fieldName>
+    <masterLabel>Stech Telecom</masterLabel>
+    <pathAssistantSteps>
+        <fieldNames>STE_Turma__c</fieldNames>
+        <fieldNames>STE_Data_Inicio_Turma__c</fieldNames>
+        <fieldNames>STE_Comparecimento__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; equipe STech.&lt;/p&gt;&lt;p&gt;Registre o comparecimento do candidato à turma.&lt;/p&gt;</info>
+        <picklistValueName>Efetivação</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>STE_Comparecimento__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; equipe STech.&lt;/p&gt;&lt;p&gt;Candidato efetivado.&lt;/p&gt;</info>
+        <picklistValueName>Ganho</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>STE_Motivo_Perda__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; equipe STech.&lt;/p&gt;&lt;p&gt;O motivo da perda é obrigatório.&lt;/p&gt;</info>
+        <picklistValueName>Perdido</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>STE_Turma__c</fieldNames>
+        <fieldNames>STE_Data_Inicio_Turma__c</fieldNames>
+        <fieldNames>STE_VT_Tipo__c</fieldNames>
+        <fieldNames>STE_VT_Bilhete_Unico__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; equipe STech.&lt;/p&gt;&lt;p&gt;Preencha turma, início da turma, vale-transporte e os dados bancários e de endereço. Para sair desta etapa (exceto Perdido), turma e data de início são obrigatórias e a cadência pré-aula criada precisa estar concluída.&lt;/p&gt;</info>
+        <picklistValueName>Pré-Matrícula</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>STE_Form_Saude_Enviado__c</fieldNames>
+        <fieldNames>STE_Resultado_Exame_Saude__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; equipe STech.&lt;/p&gt;&lt;p&gt;Envie o formulário de saúde e registre o resultado do exame.&lt;/p&gt;</info>
+        <picklistValueName>Saúde Ocupacional</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>STE_Resultado_Antecedentes__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; equipe STech.&lt;/p&gt;&lt;p&gt;Registre o resultado dos antecedentes dentro do prazo exibido na seção Antecedentes.&lt;/p&gt;</info>
+        <picklistValueName>Verificação de Antecedentes</picklistValueName>
+    </pathAssistantSteps>
+    <recordTypeName>STE_Telecom</recordTypeName>
+</PathAssistant>

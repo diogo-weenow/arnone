@@ -4,21 +4,21 @@
     <standardValue>
         <fullName>Public</fullName>
         <default>false</default>
-        <label>Public</label>
+        <label>Capital aberto</label>
     </standardValue>
     <standardValue>
         <fullName>Private</fullName>
         <default>false</default>
-        <label>Private</label>
+        <label>Capital fechado</label>
     </standardValue>
     <standardValue>
         <fullName>Subsidiary</fullName>
         <default>false</default>
-        <label>Subsidiary</label>
+        <label>Subsidiária</label>
     </standardValue>
     <standardValue>
         <fullName>Other</fullName>
         <default>false</default>
-        <label>Other</label>
+        <label>Outros</label>
     </standardValue>
 </StandardValueSet>

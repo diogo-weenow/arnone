@@ -4,46 +4,46 @@
     <standardValue>
         <fullName>Event</fullName>
         <default>true</default>
-        <label>Event</label>
+        <label>Evento</label>
     </standardValue>
     <standardValue>
         <fullName>Demo Signup / Trial</fullName>
         <default>false</default>
-        <label>Demo Signup / Trial</label>
+        <label>Demonstração / avaliação</label>
     </standardValue>
     <standardValue>
         <fullName>Email</fullName>
         <default>false</default>
-        <label>Email</label>
+        <label>E-mail</label>
     </standardValue>
     <standardValue>
         <fullName>Referral Program</fullName>
         <default>false</default>
-        <label>Referral Program</label>
+        <label>Programa de indicação</label>
     </standardValue>
     <standardValue>
         <fullName>Search</fullName>
         <default>false</default>
-        <label>Search</label>
+        <label>Busca</label>
     </standardValue>
     <standardValue>
         <fullName>Social Media</fullName>
         <default>false</default>
-        <label>Social Media</label>
+        <label>Redes sociais</label>
     </standardValue>
     <standardValue>
         <fullName>Thought Leadership</fullName>
         <default>false</default>
-        <label>Thought Leadership</label>
+        <label>Conteúdo de autoridade</label>
     </standardValue>
     <standardValue>
         <fullName>Website Direct</fullName>
         <default>false</default>
-        <label>Website Direct</label>
+        <label>Acesso direto ao site</label>
     </standardValue>
     <standardValue>
         <fullName>Other</fullName>
         <default>false</default>
-        <label>Other</label>
+        <label>Outros</label>
     </standardValue>
 </StandardValueSet>

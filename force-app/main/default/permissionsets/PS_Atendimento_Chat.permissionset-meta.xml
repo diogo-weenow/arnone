@@ -1,9 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>Complemento do atendimento: agente de chat embutido (Messaging for In-App and Web) — licença Enhanced Chat User (F3).</description>
+    <description>Complemento do atendimento: agente de chat embutido (Messaging for In-App and Web), licenca Enhanced Chat User; campos de transbordo (ex-PS_STE_E2E_Tester; objetos de sessao ficam no PS_STE_Comercial, a PSL nao aceita).</description>
     <fieldPermissions>
         <editable>false</editable>
         <field>Contact.CPF_Mascarado__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.MotivoDaCNHNOValidada__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.STE_CNH_Validada__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Lead.STE_Regioes_De_SP__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>MessagingSession.STE_Classificacao_Fila__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>

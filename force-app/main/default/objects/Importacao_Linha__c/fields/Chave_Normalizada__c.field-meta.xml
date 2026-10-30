@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Chave_Normalizada__c</fullName>
+    <description>Chave normalizada derivada de Chave_Original__c: CNPJ com 14 caracteres alfanuméricos maiúsculos (casa com Lead.CNPJ_Normalizado__c) ou CPF com 11 dígitos (casa com Lead.CPF__c nos dois formatos). Chave inválida marca a linha como INVALIDO, com o motivo em Motivo_Invalido__c.</description>
+    <externalId>false</externalId>
+    <label>Chave normalizada</label>
+    <length>14</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

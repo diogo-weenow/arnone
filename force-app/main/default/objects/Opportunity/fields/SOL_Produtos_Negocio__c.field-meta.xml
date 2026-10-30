@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Produtos_Negocio__c</fullName>
+    <description>Produtos contratados (multi-seleção, Opção A). Substitui o campo single SOL_Produto_Negocio__c (DEPRECADO). Controla a jornada por união do mais exigente: inclui Recuperação Tributária -&gt; passa pelo Diagnóstico e-CAC; sem RT (só ART 360 e/ou Revisão trabalhista) -&gt; de Oportunidade Criada direto para a Negociação. Pricing: qualquer produto de catálogo (ART/Revisão) usa Amount pelo rollup do catálogo; só Opp RT PURA usa a fórmula de comissão + taxa.</description>
+    <label>Produtos de negócio</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>MultiselectPicklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Recuperação Tributária</fullName>
+                <default>false</default>
+                <label>Recuperação Tributária</label>
+            </value>
+            <value>
+                <fullName>ART 360</fullName>
+                <default>false</default>
+                <label>ART 360</label>
+            </value>
+            <value>
+                <fullName>Revisão trabalhista</fullName>
+                <default>false</default>
+                <label>Revisão trabalhista</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <visibleLines>3</visibleLines>
+</CustomField>

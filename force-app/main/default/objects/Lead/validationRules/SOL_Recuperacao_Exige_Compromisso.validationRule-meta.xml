@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SOL_Recuperacao_Exige_Compromisso</fullName>
-    <active>true</active>
-    <description>Recuperação Tributária: bloqueia sair de &quot;Recebido - MQL&quot; sem compromisso até hoje. Exceções, só com o sinal completo: opt-out (CLICKUP-9418) e perda, motivo &quot;Negócio perdido&quot; sem opt-out (CLICKUP-9425). Outra saída manual segue bloqueada.</description>
+    <active>false</active>
+    <description>INATIVA por decisão do PO em 2026-10-25 (VR-COMPROMISSO-INATIVA); não reativar por deploy. Recuperação Tributária: bloqueava sair de &quot;Recebido - MQL&quot; sem compromisso até hoje, exceto opt-out (CLICKUP-9418) e perda &quot;Negócio perdido&quot; (CLICKUP-9425).</description>
     <errorConditionFormula>AND(
   RecordType.DeveloperName = &quot;SOL&quot;,
-  ISPICKVAL(SOL_Produto_Interesse__c, &quot;Recuperação Tributária&quot;),
+  INCLUDES(SOL_Produtos_Interesse__c, &quot;Recuperação Tributária&quot;),
   ISCHANGED(Status),
   ISPICKVAL(PRIORVALUE(Status), &quot;Recebido - MQL&quot;),
   NOT(

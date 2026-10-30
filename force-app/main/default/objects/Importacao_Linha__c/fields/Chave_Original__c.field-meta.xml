@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Chave_Original__c</fullName>
+    <description>Chave (CNPJ ou CPF, conforme o perfil de importação) exatamente como veio na célula do arquivo, com a pontuação original. Preservada para auditoria e para detectar notação científica; o casamento usa Chave_Normalizada__c.</description>
+    <externalId>false</externalId>
+    <label>Chave original</label>
+    <length>30</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

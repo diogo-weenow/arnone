@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Discovery_Completed__c</fullName>
     <defaultValue>false</defaultValue>
-    <label>Discovery Completed</label>
+    <label>Diagnóstico concluído</label>
     <trackFeedHistory>false</trackFeedHistory>
     <trackHistory>false</trackHistory>
     <type>Checkbox</type>

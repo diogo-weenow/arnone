@@ -114,7 +114,7 @@ private class SOLOptOutTest {
       Company = 'C',
       Status = String.isBlank(status) ? statusLead() : status,
       CNPJ__c = CNPJ,
-      SOL_Produto_Interesse__c = produto
+      SOL_Produtos_Interesse__c = produto
     );
     insert l;
     return recarregar(l.Id);
@@ -273,8 +273,9 @@ private class SOLOptOutTest {
   @IsTest
   static void recuperacaoTributariaEmRecebidoMQLSemCompromisso() {
     Cenario c = montarCenario(2);
-    // Lead que dispararia a VR SOL_Recuperacao_Exige_Compromisso ao sair de
-    // "Recebido - MQL" sem compromisso — o opt-out precisa passar mesmo assim.
+    // Lead em "Recebido - MQL" sem compromisso — o opt-out precisa passar. A VR
+    // SOL_Recuperacao_Exige_Compromisso está inativa (decisão do PO,
+    // 2026-10-25); o cenário fica como regressão caso ela volte.
     Lead l = novoLeadSOLDistribuido('S4', 'Recuperação Tributária', 'Recebido - MQL');
     Task alvo = tarefaContatoAberta(l.Id, l.OwnerId);
 
@@ -296,15 +297,13 @@ private class SOLOptOutTest {
     Test.startTest();
     Boolean bloqueou = false;
     try {
-      // Perda manual, sem opt-out e sem compromisso: segue bloqueada. Desde o
-      // D2 da homologação E2E duas regras cobrem este mesmo desvio — a de
-      // compromisso (CLICKUP-9418) e a de coerência do motivo (D2) —, e a
-      // mensagem devolvida é a da primeira que a plataforma reportar.
+      // Desqualificação manual sem motivo: segue bloqueada pela VR de
+      // coerência do motivo (D2). A VR do compromisso (CLICKUP-9418) foi
+      // desativada por decisão do PO em 2026-10-25 e não participa mais.
       update new Lead(Id = l.Id, Status = 'Desqualificado');
     } catch (DmlException e) {
       bloqueou = true;
       System.assert(
-        e.getMessage().contains('compromisso registrado') ||
         e.getMessage().contains('Motivo da desqualificação incoerente'),
         'Mensagem inesperada: ' + e.getMessage()
       );
@@ -624,7 +623,7 @@ private class SOLOptOutTest {
     List<Profile> ps = [
       SELECT Id
       FROM Profile
-      WHERE UserType = 'Standard'
+      WHERE UserType = 'Standard' AND Name = 'Minimum Access - Salesforce'
       ORDER BY Name
       LIMIT 1
     ];
@@ -705,10 +704,12 @@ private class SOLOptOutTest {
   }
 
   private static User usuarioStandard(String sobrenome, String alias) {
+    // Perfil real do vendedor e do gestor (licenca Salesforce): aceita o
+    // EditTask do PS da BU e da a leitura que o gestor tem em producao.
     List<Profile> ps = [
       SELECT Id
       FROM Profile
-      WHERE UserType = 'Standard'
+      WHERE UserType = 'Standard' AND Name = 'Standard User'
       ORDER BY Name
       LIMIT 1
     ];
@@ -733,10 +734,19 @@ private class SOLOptOutTest {
 
   private static void assertVeSemEditar(String rotulo) {
     Map<String, Schema.SObjectField> f = Schema.SObjectType.Lead.fields.getMap();
+    // SOL_Motivo_Desqualificacao__c: o PS_SOL_Comercial sempre concedeu edicao
+    // (a desqualificacao manual exige o motivo). O "sem editar" so passava
+    // porque o perfil de teste nao tinha Edit em Lead; com o PS da BU trazendo
+    // a base comum (ACESSO-POR-BU) o campo e editavel, como para o vendedor real.
+    {
+      Assert.isTrue(
+        Schema.SObjectType.Lead.fields.getMap().get('SOL_Motivo_Desqualificacao__c').getDescribe().isAccessible(),
+        rotulo + ' deveria enxergar SOL_Motivo_Desqualificacao__c'
+      );
+    }
     for (String campo : new List<String>{
       'SOL_Opt_Out__c',
-      'SOL_Data_Opt_Out__c',
-      'SOL_Motivo_Desqualificacao__c'
+      'SOL_Data_Opt_Out__c'
     }) {
       Schema.DescribeFieldResult d = f.get(campo).getDescribe();
       System.assert(

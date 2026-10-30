@@ -118,7 +118,7 @@ private class SOLSolicitarCalculoTest {
       AccountId = a.Id,
       CloseDate = Date.today().addDays(60),
       StageName = 'Diagnóstico',
-      SOL_Produto_Negocio__c = cfg.prodOpp
+      SOL_Produtos_Negocio__c = cfg.prodOpp
     );
     if (cfg.oppSOL) {
       o.RecordTypeId = rtOppSOL();
@@ -142,7 +142,13 @@ private class SOLSolicitarCalculoTest {
     x.oppId = o.Id;
 
     if (cfg.comLead) {
-      Lead l = new Lead(LastName = 'Lead ' + rnd(), Company = 'C');
+      // O Lead convertido fica com o dono da Opp: o servico e with sharing e o
+      // vendedor so enxerga o Lead que e dele (ACESSO-POR-BU: sem View All).
+      Lead l = new Lead(
+        LastName = 'Lead ' + rnd(),
+        Company = 'C',
+        OwnerId = cfg.oppOwner != null ? cfg.oppOwner : UserInfo.getUserId()
+      );
       insert l;
       update new Lead(
         Id = l.Id,
@@ -692,7 +698,7 @@ private class SOLSolicitarCalculoTest {
     Id perfil = [
       SELECT Id
       FROM Profile
-      WHERE UserType = 'Standard'
+      WHERE UserType = 'Standard' AND Name = 'Minimum Access - Salesforce'
       ORDER BY Name
       LIMIT 1
     ]
@@ -759,7 +765,7 @@ private class SOLSolicitarCalculoTest {
       Company = 'C',
       CNPJ__c = CNPJ,
       Status = 'Captação - Contato',
-      SOL_Produto_Interesse__c = produto
+      SOL_Produtos_Interesse__c = produto
     );
     insert l;
     if (comReuniao) {
@@ -790,7 +796,7 @@ private class SOLSolicitarCalculoTest {
     update new Opportunity(
       Id = oppId,
       RecordTypeId = rtOppSOL(),
-      SOL_Produto_Negocio__c = produto,
+      SOL_Produtos_Negocio__c = produto,
       StageName = 'Diagnóstico'
     );
     return oppId;

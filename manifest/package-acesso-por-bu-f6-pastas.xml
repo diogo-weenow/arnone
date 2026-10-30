@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Arnone_Comercial</members>
+        <members>Gerencial_ADV</members>
+        <members>Gerencial_ESG</members>
+        <members>Gerencial_SCO</members>
+        <members>Gerencial_SOL</members>
+        <members>Gerencial_STE</members>
+        <members>Operacional_ADV</members>
+        <members>Operacional_ESG</members>
+        <members>Operacional_SCO</members>
+        <members>STech_Telecom</members>
+        <name>DashboardFolder</name>
+    </types>
+    <types>
+        <members>Arnone_Comercial</members>
+        <members>Gerencial_ADV</members>
+        <members>Gerencial_ESG</members>
+        <members>Gerencial_SCO</members>
+        <members>Gerencial_SOL</members>
+        <members>Gerencial_STE</members>
+        <members>Operacional_ADV</members>
+        <members>Operacional_ESG</members>
+        <members>Operacional_SCO</members>
+        <members>STech_Telecom</members>
+        <name>ReportFolder</name>
+    </types>
+    <version>67.0</version>
+</Package>

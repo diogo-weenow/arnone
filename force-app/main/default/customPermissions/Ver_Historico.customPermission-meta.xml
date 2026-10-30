@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>ACESSO-POR-BU. Mostra o componente de historico de campos nas paginas de Lead e Oportunidade (filtro de visibilidade da FlexiPage). Concedida pelos PSGs de diretor. Nao restringe relatorios de historico: a privacidade deles e por pasta.</description>
+    <isLicensed>false</isLicensed>
+    <label>Ver histórico de campos</label>
+</CustomPermission>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Chave_Casamento__c</fullName>
+    <description>Documento usado para casar a linha do arquivo com o lead. CNPJ: Lead.CNPJ_Normalizado__c. CPF: Lead.CPF__c, buscando os formatos com e sem máscara.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Chave de casamento</label>
+    <required>false</required>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>CNPJ</fullName>
+                <default>false</default>
+                <label>CNPJ</label>
+            </value>
+            <value>
+                <fullName>CPF</fullName>
+                <default>false</default>
+                <label>CPF</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+    <type>Picklist</type>
+</CustomField>

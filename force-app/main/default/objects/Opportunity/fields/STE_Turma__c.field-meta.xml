@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>STE_Turma__c</fullName>
-    <description>Turma escolhida para o candidato (US 09). Texto livre — formato a confirmar com o cliente; converter em picklist quando a lista de turmas estiver definida.</description>
+    <description>Polo em que a turma do candidato acontece. Usado na jornada Pré-Curso para personalizar o e-mail e derivar o horário da turma.</description>
     <label>Turma</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
@@ -19,6 +19,11 @@
                 <fullName>Itaim Paulista</fullName>
                 <default>false</default>
                 <label>Itaim Paulista</label>
+            </value>
+            <value>
+                <fullName>República</fullName>
+                <default>false</default>
+                <label>República</label>
             </value>
         </valueSetDefinition>
     </valueSet>

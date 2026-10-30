@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StandardValueSetTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <valueTranslation>
+        <masterLabel>Anúncio</masterLabel>
+        <translation>Advertisement</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Evento de cliente</masterLabel>
+        <translation>Customer Event</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Indicação de colaborador</masterLabel>
+        <translation>Employee Referral</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Indicação externa</masterLabel>
+        <translation>External Referral</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Google Ads</masterLabel>
+        <translation>Google AdWords</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Outros</masterLabel>
+        <translation>Other</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Parceiro</masterLabel>
+        <translation>Partner</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Lista comprada</masterLabel>
+        <translation>Purchased List</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Feira de negócios</masterLabel>
+        <translation>Trade Show</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Site</masterLabel>
+        <translation>Website</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Meta/Mídia Paga</masterLabel>
+        <translation>Meta/Midia Paga</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>WhatsApp</masterLabel>
+        <translation>Whatsapp</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>E-mail</masterLabel>
+        <translation>Email</translation>
+    </valueTranslation>
+</StandardValueSetTranslation>

@@ -173,7 +173,7 @@ private class SOLEventoJornadaTest {
       Company = 'C ' + rnd().left(6),
       Status = statusLead(),
       CNPJ__c = CNPJ,
-      SOL_Produto_Interesse__c = produto
+      SOL_Produtos_Interesse__c = produto
     );
     insert l;
     delete [SELECT Id FROM Task WHERE WhoId = :l.Id AND Subject = '1ª Ligação'];
@@ -191,7 +191,7 @@ private class SOLEventoJornadaTest {
   }
 
   /**
-   * `RecordType.DeveloperName` e `SOL_Produto_Interesse__c` fazem parte da
+   * `RecordType.DeveloperName` e `SOL_Produtos_Interesse__c` fazem parte da
    * projeção porque os construtores de `SOLEventoJornadaService` os leem
    * diretamente — e estouram `SObjectException` se faltarem, de propósito:
    * evento sem Record Type sairia do filtro travado do relatório em silêncio.
@@ -206,7 +206,7 @@ private class SOLEventoJornadaTest {
         SOL_Opt_Out__c,
         SOL_Quantidade_Reatribuicoes__c,
         SOL_Motivo_Desqualificacao__c,
-        SOL_Produto_Interesse__c
+        SOL_Produtos_Interesse__c
       FROM Lead
       WHERE Id = :id
     ];
@@ -266,7 +266,7 @@ private class SOLEventoJornadaTest {
       AccountId = a.Id,
       CloseDate = Date.today().addDays(60),
       StageName = 'Diagnóstico',
-      SOL_Produto_Negocio__c = produto,
+      SOL_Produtos_Negocio__c = produto,
       SOL_ECAC_Consulta_Realizada__c = true,
       SOL_ECAC_Data_Consulta__c = Date.today(),
       SOL_ECAC_Resultado__c = 'Valor a recuperar',
@@ -482,9 +482,78 @@ private class SOLEventoJornadaTest {
       'Proprietário do evento = vendedor responsável no instante da ocorrência.'
     );
     System.assertEquals(
-      'FC|' + String.valueOf(l.Id) + '|1',
+      'FC|' + String.valueOf(l.Id) + '|1|' + PRODUTO_RT,
       e.SOL_Chave_Idempotencia__c,
-      'Chave determinística da ocorrência.'
+      'Chave determinística da ocorrência, com o produto como último segmento.'
+    );
+  }
+
+  /**
+   * (1g) Produto multi-select: UMA reatribuição de um Lead com DOIS produtos gera
+   * DOIS eventos, um por produto, com chaves distintas (produto é o último
+   * segmento). Reprocessar não duplica nenhum dos dois.
+   * NOTA: depende do campo já convertido para Multi-Select (flip via Setup UI).
+   */
+  @IsTest
+  static void reatribuicaoDeLeadMultiProdutoGeraUmEventoPorProduto() {
+    montarFila(3);
+    Lead l = leadDistribuido(PRODUTO_RT + ';' + PRODUTO_ART);
+
+    Test.startTest();
+    tentativasNegativas(l.Id, 3);
+    SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
+    // Reprocessar a MESMA reatribuição não duplica.
+    SOLDistribuicaoService.reatribuirPorFaltaDeContato(new List<Id>{ l.Id });
+    Test.stopTest();
+
+    List<SOL_Evento_Jornada__c> evs = eventosDoLead(l.Id);
+    System.assertEquals(
+      2,
+      evs.size(),
+      'Dois produtos -> dois eventos, sem duplicata ao reprocessar.'
+    );
+    Set<String> produtos = new Set<String>();
+    Set<String> chaves = new Set<String>();
+    for (SOL_Evento_Jornada__c e : evs) {
+      produtos.add(e.SOL_Produto__c);
+      chaves.add(e.SOL_Chave_Idempotencia__c);
+    }
+    System.assertEquals(
+      new Set<String>{ PRODUTO_RT, PRODUTO_ART },
+      produtos,
+      'Um evento por produto selecionado.'
+    );
+    System.assertEquals(2, chaves.size(), 'Chaves distintas por produto.');
+    System.assert(
+      chaves.contains('FC|' + String.valueOf(l.Id) + '|1|' + PRODUTO_RT),
+      'O produto é o último segmento da chave.'
+    );
+  }
+
+  /**
+   * (1h) Lead SEM produto: a ocorrência NÃO é descartada — nasce UM evento com
+   * SOL_Produto__c nulo e chave sem o segmento de produto.
+   */
+  @IsTest
+  static void builderDeLeadSemProdutoGeraUmEventoComProdutoNulo() {
+    montarFila(2);
+    Lead l = leadDistribuido(null);
+
+    // Direto no builder: comportamento determinístico, independente da
+    // elegibilidade do serviço de reatribuição.
+    List<SOL_Evento_Jornada__c> evs = SOLEventoJornadaService.reatribuicaoPorFaltaDeContato(
+      l,
+      l.OwnerId,
+      UserInfo.getUserId(),
+      1,
+      System.now()
+    );
+    System.assertEquals(1, evs.size(), 'Sem produto ainda gera uma ocorrência.');
+    System.assertEquals(null, evs[0].SOL_Produto__c, 'Produto do evento é nulo.');
+    System.assertEquals(
+      'FC|' + String.valueOf(l.Id) + '|1',
+      evs[0].SOL_Chave_Idempotencia__c,
+      'Sem produto, a chave não leva o segmento de produto.'
     );
   }
 
@@ -531,7 +600,7 @@ private class SOLEventoJornadaTest {
       'Etapa anterior é exclusiva da perda de Oportunidade.'
     );
     System.assertEquals(
-      'PT|' + String.valueOf(oppId) + '|1',
+      'PT|' + String.valueOf(oppId) + '|1|' + PRODUTO_ART,
       e.SOL_Chave_Idempotencia__c
     );
   }
@@ -565,9 +634,9 @@ private class SOLEventoJornadaTest {
     System.assertEquals(PRODUTO_ART, e.SOL_Produto__c);
     System.assertEquals('SOL', e.SOL_Record_Type_Origem__c);
     System.assertEquals(
-      'OO|' + String.valueOf(l.Id),
+      'OO|' + String.valueOf(l.Id) + '|' + PRODUTO_ART,
       e.SOL_Chave_Idempotencia__c,
-      'Opt-out é único e definitivo por Lead: chave sem discriminador.'
+      'Opt-out é único e definitivo por Lead: chave sem discriminador de propósito, mas com o produto.'
     );
     System.assertEquals(true, lead(l.Id).SOL_Opt_Out__c);
   }
@@ -617,7 +686,7 @@ private class SOLEventoJornadaTest {
       'Primeira transição desta Oportunidade para "Perdido".'
     );
     System.assertEquals(
-      'OP|' + String.valueOf(oppId) + '|1',
+      'OP|' + String.valueOf(oppId) + '|1|' + PRODUTO_RT,
       e.SOL_Chave_Idempotencia__c,
       'A chave identifica a TRANSIÇÃO, não a etapa de origem.'
     );
@@ -719,11 +788,11 @@ private class SOLEventoJornadaTest {
     System.assertEquals(1, apos5[0].SOL_Sequencia__c);
     System.assertEquals(2, apos5[1].SOL_Sequencia__c);
     System.assertEquals(
-      'OP|' + String.valueOf(oppId) + '|1',
+      'OP|' + String.valueOf(oppId) + '|1|' + PRODUTO_RT,
       apos5[0].SOL_Chave_Idempotencia__c
     );
     System.assertEquals(
-      'OP|' + String.valueOf(oppId) + '|2',
+      'OP|' + String.valueOf(oppId) + '|2|' + PRODUTO_RT,
       apos5[1].SOL_Chave_Idempotencia__c,
       'Chaves distintas para transições distintas.'
     );
@@ -816,7 +885,7 @@ private class SOLEventoJornadaTest {
         SOL_Oportunidade__c = oppId,
         SOL_Etapa_Anterior__c = 'Negociação',
         SOL_Record_Type_Origem__c = 'SOL',
-        SOL_Chave_Idempotencia__c = 'OP|' + String.valueOf(oppId) + '|1'
+        SOL_Chave_Idempotencia__c = 'OP|' + String.valueOf(oppId) + '|1|' + PRODUTO_RT
       );
     } catch (DmlException e) {
       recusou = true;
@@ -959,47 +1028,46 @@ private class SOLEventoJornadaTest {
 
     Test.startTest();
     Integer primeiro = SOLEventoJornadaService.registrar(
-      new List<SOL_Evento_Jornada__c>{
-        SOLEventoJornadaService.reatribuicaoPorFaltaDeContato(
-          l,
-          l.OwnerId,
-          UserInfo.getUserId(),
-          1,
-          agora
-        )
-      }
+      SOLEventoJornadaService.reatribuicaoPorFaltaDeContato(
+        l,
+        l.OwnerId,
+        UserInfo.getUserId(),
+        1,
+        agora
+      )
     );
     // Mesma ocorrência, outra transação lógica.
     Integer segundo = SOLEventoJornadaService.registrar(
-      new List<SOL_Evento_Jornada__c>{
-        SOLEventoJornadaService.reatribuicaoPorFaltaDeContato(
-          l,
-          l.OwnerId,
-          UserInfo.getUserId(),
-          1,
-          agora.addHours(2)
-        )
-      }
+      SOLEventoJornadaService.reatribuicaoPorFaltaDeContato(
+        l,
+        l.OwnerId,
+        UserInfo.getUserId(),
+        1,
+        agora.addHours(2)
+      )
     );
-    // E a mesma chave DUAS vezes dentro do MESMO lote.
-    Integer terceiro = SOLEventoJornadaService.registrar(
-      new List<SOL_Evento_Jornada__c>{
-        SOLEventoJornadaService.reatribuicaoPorFaltaDeContato(
-          l,
-          l.OwnerId,
-          UserInfo.getUserId(),
-          2,
-          agora
-        ),
-        SOLEventoJornadaService.reatribuicaoPorFaltaDeContato(
-          l,
-          l.OwnerId,
-          UserInfo.getUserId(),
-          2,
-          agora
-        )
-      }
+    // E a mesma chave DUAS vezes dentro do MESMO lote (lead de produto único,
+    // cada builder devolve um evento; os dois têm a mesma chave).
+    List<SOL_Evento_Jornada__c> loteTerceiro = new List<SOL_Evento_Jornada__c>();
+    loteTerceiro.addAll(
+      SOLEventoJornadaService.reatribuicaoPorFaltaDeContato(
+        l,
+        l.OwnerId,
+        UserInfo.getUserId(),
+        2,
+        agora
+      )
     );
+    loteTerceiro.addAll(
+      SOLEventoJornadaService.reatribuicaoPorFaltaDeContato(
+        l,
+        l.OwnerId,
+        UserInfo.getUserId(),
+        2,
+        agora
+      )
+    );
+    Integer terceiro = SOLEventoJornadaService.registrar(loteTerceiro);
     Test.stopTest();
 
     System.assertEquals(1, primeiro, 'A 1ª gravação entra.');
@@ -1043,15 +1111,13 @@ private class SOLEventoJornadaTest {
     Lead l = leadDistribuido(PRODUTO_RT);
     Datetime agora = System.now();
     SOLEventoJornadaService.registrar(
-      new List<SOL_Evento_Jornada__c>{
-        SOLEventoJornadaService.reatribuicaoPorFaltaDeContato(
-          l,
-          l.OwnerId,
-          UserInfo.getUserId(),
-          1,
-          agora
-        )
-      }
+      SOLEventoJornadaService.reatribuicaoPorFaltaDeContato(
+        l,
+        l.OwnerId,
+        UserInfo.getUserId(),
+        1,
+        agora
+      )
     );
 
     Test.startTest();
@@ -1067,7 +1133,7 @@ private class SOLEventoJornadaTest {
         SOL_Sequencia__c = 1,
         SOL_Lead__c = l.Id,
         SOL_Record_Type_Origem__c = 'SOL',
-        SOL_Chave_Idempotencia__c = 'FC|' + String.valueOf(l.Id) + '|1'
+        SOL_Chave_Idempotencia__c = 'FC|' + String.valueOf(l.Id) + '|1|' + PRODUTO_RT
       );
     } catch (DmlException e) {
       recusou = true;
@@ -1105,7 +1171,7 @@ private class SOLEventoJornadaTest {
           Company = 'C ' + i,
           Status = statusLead(),
           CNPJ__c = CNPJ,
-          SOL_Produto_Interesse__c = Math.mod(i, 2) == 0
+          SOL_Produtos_Interesse__c = Math.mod(i, 2) == 0
             ? PRODUTO_RT
             : PRODUTO_ART
         )
@@ -1207,7 +1273,7 @@ private class SOLEventoJornadaTest {
     Datetime agora = System.now();
     List<SOL_Evento_Jornada__c> lote = new List<SOL_Evento_Jornada__c>();
     for (Integer i = 1; i <= 200; i++) {
-      lote.add(
+      lote.addAll(
         SOLEventoJornadaService.reatribuicaoPorFaltaDeContato(
           l,
           l.OwnerId,
@@ -1293,7 +1359,7 @@ private class SOLEventoJornadaTest {
       StageName = 'Pré-Matrícula',
       // O vetor: produto da Arnone Soluções preenchido num registro que não é
       // da Arnone Soluções.
-      SOL_Produto_Negocio__c = PRODUTO_RT
+      SOL_Produtos_Negocio__c = PRODUTO_RT
     );
     insert outraBU;
     Task t = new Task(
@@ -1314,7 +1380,7 @@ private class SOLEventoJornadaTest {
     Test.stopTest();
 
     Opportunity depois = [
-      SELECT StageName, RecordTypeId, SOL_Qtd_Perdas__c, SOL_Produto_Negocio__c
+      SELECT StageName, RecordTypeId, SOL_Qtd_Perdas__c, SOL_Produtos_Negocio__c
       FROM Opportunity
       WHERE Id = :outraBU.Id
     ];
@@ -1325,7 +1391,7 @@ private class SOLEventoJornadaTest {
     );
     System.assertEquals(
       PRODUTO_RT,
-      depois.SOL_Produto_Negocio__c,
+      depois.SOL_Produtos_Negocio__c,
       'E o produto SOL continua preenchido — o vetor está de fato armado.'
     );
     System.assertEquals(
@@ -1869,24 +1935,26 @@ private class SOLEventoJornadaTest {
     Datetime anoPassado = hoje.addDays(-400);
 
     Test.startTest();
-    SOLEventoJornadaService.registrar(
-      new List<SOL_Evento_Jornada__c>{
-        SOLEventoJornadaService.reatribuicaoPorFaltaDeContato(
-          l,
-          l.OwnerId,
-          UserInfo.getUserId(),
-          1,
-          anoPassado
-        ),
-        SOLEventoJornadaService.reatribuicaoPorFaltaDeContato(
-          l,
-          l.OwnerId,
-          UserInfo.getUserId(),
-          2,
-          hoje
-        )
-      }
+    List<SOL_Evento_Jornada__c> loteDatas = new List<SOL_Evento_Jornada__c>();
+    loteDatas.addAll(
+      SOLEventoJornadaService.reatribuicaoPorFaltaDeContato(
+        l,
+        l.OwnerId,
+        UserInfo.getUserId(),
+        1,
+        anoPassado
+      )
     );
+    loteDatas.addAll(
+      SOLEventoJornadaService.reatribuicaoPorFaltaDeContato(
+        l,
+        l.OwnerId,
+        UserInfo.getUserId(),
+        2,
+        hoje
+      )
+    );
+    SOLEventoJornadaService.registrar(loteDatas);
     Test.stopTest();
 
     Datetime corte = hoje.addDays(-30);

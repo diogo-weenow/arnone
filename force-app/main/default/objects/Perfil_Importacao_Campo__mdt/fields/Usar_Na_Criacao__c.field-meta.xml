@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Usar_Na_Criacao__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Quando marcado, o campo também é preenchido na criação de lead novo. Company e LastName são mapeados à parte, pelas colunas do perfil.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Usar na criação</label>
+    <type>Checkbox</type>
+</CustomField>

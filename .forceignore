@@ -45,7 +45,8 @@ node_modules/
 
 # Traducoes geradas pelo retrieve com genero invalido para pt_BR
 # ("Invalid gender 'Neuter' for language PORTUGUESE_BR").
-**/objectTranslations/**
+**/objectTranslations/*-pt_BR/**
+**/objectTranslations/In_App_Checklist_Settings__c-en_US/**
 
 # Blob binario do site que muda a cada retrieve, gerando delta falso.
 **/siteDotComSites/**
@@ -85,3 +86,22 @@ node_modules/
 **/mktDataConnections/**
 **/notificationTypeConfig/**
 **/appMenus/**
+
+# Filas: a membresia referencia usuarios reais, e o repo carrega usernames que
+# existem em uma org so -- omar.faruk@weenow.devarnone (sufixo do sandbox de
+# dev), gustavo.silva@grupoarnone.com.dev, os @grupoarnone.demo. Deploy de fila
+# SUBSTITUI a lista de membros, entao versionar isso quebra a promocao em
+# qualquer org que nao seja a de origem.
+#
+# As 13 filas ja existem identicas em dev, uat e producao. A membresia passa a
+# ser configuracao por org, no Setup. Nada e removido de org nenhuma.
+**/queues/**
+# SYNC-PROD-HOTFIXES: Marketing Cloud Next / Data Cloud, so existem em producao
+**/flows/flow_701*
+**/flows/STE_Registrar_Aceite_Comunicacoes.flow-meta.xml
+# SYNC-PROD-HOTFIXES: roteamento com Id de fila fixo por org (parametrizar em card proprio)
+**/flows/Route_to_Assistente_STE_Aprimorado.flow-meta.xml
+**/flows/Route_to_Assistente_STE_WhatsApp_Teste.flow-meta.xml
+**/flows/Route_to_Assistente_Arnone_Aprimorado.flow-meta.xml
+# SYNC-PROD-HOTFIXES: bot STE e versionado como retrato; versao ativa nao aceita deploy e o PO decidiu nao mexer no bot
+**/bots/Assistente_STE_Aprimorado/**

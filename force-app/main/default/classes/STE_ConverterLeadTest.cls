@@ -48,6 +48,8 @@ private class STE_ConverterLeadTest {
         .get('STE')
         .getRecordTypeId(),
       CPF__c = cpf,
+      STE_RG__c = '12.345.678-X',
+      STE_Data_Nascimento__c = Date.newInstance(1990, 5, 20),
       STE_CNH_Enviada__c = true,
       STE_Data_Envio_CNH__c = System.now(),
       STE_Genero__c = 'Feminino',
@@ -88,6 +90,8 @@ private class STE_ConverterLeadTest {
       SELECT
         AccountId,
         CPF__c,
+        STE_RG__c,
+        Birthdate,
         STE_WhatsApp__c,
         STE_Genero__c,
         STE_Classificacao_Fila__c
@@ -103,6 +107,17 @@ private class STE_ConverterLeadTest {
       '11988887777',
       contato.STE_WhatsApp__c,
       'Regra 4.2 — WhatsApp.'
+    );
+    Assert.areEqual('111.111.111-11', contato.CPF__c);
+    Assert.areEqual(
+      '12.345.678-X',
+      contato.STE_RG__c,
+      'O RG do candidato deveria ter sido copiado para o Contato.'
+    );
+    Assert.areEqual(
+      Date.newInstance(1990, 5, 20),
+      contato.Birthdate,
+      'A data de nascimento deveria ter sido copiada para o Contato.'
     );
     Assert.areEqual('Feminino', contato.STE_Genero__c);
     Assert.areEqual('Quente', contato.STE_Classificacao_Fila__c);
@@ -277,5 +292,139 @@ private class STE_ConverterLeadTest {
   static void entradaVaziaNaoQuebra() {
     Assert.areEqual(0, STE_ConverterLead.converter(new List<Id>()).size());
     Assert.areEqual(0, STE_ConverterLead.converter(null).size());
+  }
+
+  @IsTest
+  static void converteCandidatoSemRG() {
+    // RG é opcional: a conversão não pode ser bloqueada pela ausência dele.
+    Lead l = novoCandidato('Ribeiro', '333.333.333-33');
+    l.STE_RG__c = null;
+    insert l;
+
+    Test.startTest();
+    List<STE_ConverterLead.Resultado> r = STE_ConverterLead.converter(
+      new List<Id>{ l.Id }
+    );
+    Test.stopTest();
+
+    Assert.isTrue(r[0].convertido, r[0].mensagem);
+
+    Contact contato = [
+      SELECT STE_RG__c
+      FROM Contact
+      WHERE Id = :r[0].contatoId
+    ];
+    Assert.isNull(
+      contato.STE_RG__c,
+      'Sem RG no Lead, o Contato deveria ficar com o campo em branco.'
+    );
+  }
+
+  @IsTest
+  static void converteSemDataDeNascimento() {
+    // A data de nascimento é opcional: a conversão não pode depender dela.
+    Lead l = novoCandidato('Moraes', '444.444.444-44');
+    l.STE_Data_Nascimento__c = null;
+    insert l;
+
+    Test.startTest();
+    List<STE_ConverterLead.Resultado> r = STE_ConverterLead.converter(
+      new List<Id>{ l.Id }
+    );
+    Test.stopTest();
+
+    Assert.isTrue(r[0].convertido, r[0].mensagem);
+
+    Contact contato = [
+      SELECT Birthdate
+      FROM Contact
+      WHERE Id = :r[0].contatoId
+    ];
+    Assert.isNull(
+      contato.Birthdate,
+      'Sem data no Lead, o Contato deveria ficar com o campo em branco.'
+    );
+  }
+
+  @IsTest
+  static void bloqueiaDataDeNascimentoFutura() {
+    // Data no futuro é sempre erro de digitação, normalmente o ano trocado.
+    Lead l = novoCandidato('Futuro', '555.555.555-55');
+    l.STE_Data_Nascimento__c = Date.today().addDays(1);
+
+    try {
+      insert l;
+      Assert.fail('Data de nascimento no futuro deveria ter sido barrada.');
+    } catch (DmlException e) {
+      Assert.isTrue(
+        e.getMessage().contains('não pode estar no futuro'),
+        'A mensagem deveria apontar a data futura: ' + e.getMessage()
+      );
+    }
+  }
+
+  @IsTest
+  static void aceitaDataDeNascimentoDeHoje() {
+    // A regra barra apenas datas estritamente futuras.
+    Lead l = novoCandidato('Hoje', '666.666.666-66');
+    l.STE_Data_Nascimento__c = Date.today();
+    insert l;
+
+    Assert.areEqual(
+      Date.today(),
+      [SELECT STE_Data_Nascimento__c FROM Lead WHERE Id = :l.Id]
+        .STE_Data_Nascimento__c,
+      'A data de hoje deveria ser aceita.'
+    );
+  }
+
+  @IsTest
+  static void aceitaCandidatoMuitoIdoso() {
+    // Não existe limite de idade no cadastro: a seleção é do assistente.
+    Lead l = novoCandidato('Centenaria', '777.777.777-77');
+    l.STE_Data_Nascimento__c = Date.newInstance(1920, 1, 1);
+    insert l;
+
+    Assert.areEqual(
+      Date.newInstance(1920, 1, 1),
+      [SELECT STE_Data_Nascimento__c FROM Lead WHERE Id = :l.Id]
+        .STE_Data_Nascimento__c,
+      'Não deveria haver limite de idade máxima.'
+    );
+  }
+
+  @IsTest
+  static void dataNaoInterfereNaFaixaEtaria() {
+    // A data não recalcula nem contradiz a faixa declarada no assistente.
+    Lead l = novoCandidato('Incoerente', '888.888.888-88');
+    l.STE_Data_Nascimento__c = Date.newInstance(2015, 1, 1);
+    insert l;
+
+    Lead salvo = [
+      SELECT STE_Faixa_Etaria__c, STE_Motivo_Desqualificacao__c, Status
+      FROM Lead
+      WHERE Id = :l.Id
+    ];
+    Assert.areEqual(
+      'De 20 a 50 anos',
+      salvo.STE_Faixa_Etaria__c,
+      'A faixa declarada no assistente não pode mudar por causa da data.'
+    );
+    Assert.isNull(
+      salvo.STE_Motivo_Desqualificacao__c,
+      'A data não pode desqualificar o candidato.'
+    );
+
+    Test.startTest();
+    List<STE_ConverterLead.Resultado> r = STE_ConverterLead.converter(
+      new List<Id>{ l.Id }
+    );
+    Test.stopTest();
+
+    Assert.isTrue(
+      r[0].convertido,
+      'Data incoerente com a faixa não pode bloquear a conversão: ' +
+        r[0].mensagem
+    );
   }
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Diagnostico_Arquivo__c</fullName>
+    <description>Diagnóstico do arquivo feito no navegador antes do envio (JSON): encoding detectado, delimitador, quantidade de linhas, colunas reconhecidas e não reconhecidas e mapeamento aplicado. Auditoria; não altera o processamento.</description>
+    <externalId>false</externalId>
+    <label>Diagnóstico do arquivo</label>
+    <length>32768</length>
+    <trackHistory>false</trackHistory>
+    <type>LongTextArea</type>
+    <visibleLines>6</visibleLines>
+</CustomField>

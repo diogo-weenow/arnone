@@ -67,6 +67,13 @@
  *   OP|oppId|n   perda de Oportunidade, n = `Opportunity.SOL_Qtd_Perdas__c`, o
  *                contador de TRANSIÇÕES para "Perdido". Ver abaixo.
  *
+ * UM EVENTO POR PRODUTO (produto multi-select — Opção A): o produto é o ÚLTIMO
+ * segmento da chave (`...|produto`). A mesma ocorrência com dois produtos vira
+ * duas linhas de chaves distintas (`FC|leadId|n|Recuperação Tributária` e
+ * `FC|leadId|n|ART 360`), cada uma idempotente por si. Lead/Opp SEM produto gera
+ * UM evento com `SOL_Produto__c` null e chave sem o segmento de produto — a
+ * ocorrência nunca é descartada.
+ *
  * =====================================================================
  * A CHAVE DA PERDA IDENTIFICA A TRANSIÇÃO, NÃO O ESTADO
  * =====================================================================
@@ -183,7 +190,7 @@ public without sharing class SOLEventoJornadaService {
    * Reatribuição por falta de contato (CLICKUP-9400) — origem Lead.
    *
    * @param lead Lead JÁ carregado, com `RecordType.DeveloperName` e
-   *   `SOL_Produto_Interesse__c` na projeção. Se faltarem, a leitura estoura
+   *   `SOL_Produtos_Interesse__c` na projeção. Se faltarem, a leitura estoura
    *   `SObjectException` e a transação inteira cai — de propósito: evento sem
    *   Record Type sairia do filtro travado do relatório em silêncio.
    * @param vendedorAnterior proprietário ANTES da troca (capture antes de
@@ -192,33 +199,41 @@ public without sharing class SOLEventoJornadaService {
    * @param sequencia `SOL_Quantidade_Reatribuicoes__c` JÁ incrementado.
    * @param quando instante da reatribuição — o mesmo carimbado no Lead.
    */
-  public static SOL_Evento_Jornada__c reatribuicaoPorFaltaDeContato(
+  public static List<SOL_Evento_Jornada__c> reatribuicaoPorFaltaDeContato(
     Lead lead,
     Id vendedorAnterior,
     Id novoVendedor,
     Decimal sequencia,
     Datetime quando
   ) {
-    SOL_Evento_Jornada__c e = base(
-      TIPO_REATRIBUICAO,
-      MOTIVO_FALTA_CONTATO,
-      ORIGEM_LEAD,
-      quando,
-      sequencia
-    );
-    e.SOL_Lead__c = lead == null ? null : lead.Id;
-    e.SOL_Produto__c = lead == null ? null : lead.SOL_Produto_Interesse__c;
-    e.SOL_Record_Type_Origem__c = lead == null
-      ? null
-      : truncar(lead.RecordType.DeveloperName, MAX_TEXTO);
-    e.SOL_Vendedor__c = vendedorAnterior;
-    e.SOL_Novo_Vendedor__c = novoVendedor;
-    e.SOL_Chave_Idempotencia__c = chave(
-      PREFIXO_FALTA_CONTATO,
-      e.SOL_Lead__c,
-      formatarSequencia(sequencia)
-    );
-    return e;
+    List<SOL_Evento_Jornada__c> eventos = new List<SOL_Evento_Jornada__c>();
+    String multiProduto = lead == null ? null : lead.SOL_Produtos_Interesse__c;
+    // UM evento por produto selecionado (Lead sem produto -> um evento com
+    // SOL_Produto__c = null; a ocorrência não é descartada).
+    for (String produto : SOLProdutoHelper.paraEventos(multiProduto)) {
+      SOL_Evento_Jornada__c e = base(
+        TIPO_REATRIBUICAO,
+        MOTIVO_FALTA_CONTATO,
+        ORIGEM_LEAD,
+        quando,
+        sequencia
+      );
+      e.SOL_Lead__c = lead == null ? null : lead.Id;
+      e.SOL_Produto__c = produto;
+      e.SOL_Record_Type_Origem__c = lead == null
+        ? null
+        : truncar(lead.RecordType.DeveloperName, MAX_TEXTO);
+      e.SOL_Vendedor__c = vendedorAnterior;
+      e.SOL_Novo_Vendedor__c = novoVendedor;
+      e.SOL_Chave_Idempotencia__c = chave(
+        PREFIXO_FALTA_CONTATO,
+        e.SOL_Lead__c,
+        formatarSequencia(sequencia),
+        produto
+      );
+      eventos.add(e);
+    }
+    return eventos;
   }
 
   /**
@@ -226,41 +241,47 @@ public without sharing class SOLEventoJornadaService {
    * origem Oportunidade.
    *
    * @param oportunidade Oportunidade JÁ carregada, com
-   *   `RecordType.DeveloperName` e `SOL_Produto_Negocio__c` na projeção.
+   *   `RecordType.DeveloperName` e `SOL_Produtos_Negocio__c` na projeção.
    * @param vendedorAnterior proprietário ANTES da troca.
    * @param novoVendedor proprietário escolhido pelo round-robin.
    * @param sequencia `SOL_Qtd_Reatribuicoes_Prazo__c` JÁ incrementado.
    * @param quando instante da reatribuição — o mesmo carimbado na Oportunidade.
    */
-  public static SOL_Evento_Jornada__c reatribuicaoPorPrazoTotal(
+  public static List<SOL_Evento_Jornada__c> reatribuicaoPorPrazoTotal(
     Opportunity oportunidade,
     Id vendedorAnterior,
     Id novoVendedor,
     Decimal sequencia,
     Datetime quando
   ) {
-    SOL_Evento_Jornada__c e = base(
-      TIPO_REATRIBUICAO,
-      MOTIVO_PRAZO_TOTAL,
-      ORIGEM_OPORTUNIDADE,
-      quando,
-      sequencia
-    );
-    e.SOL_Oportunidade__c = oportunidade == null ? null : oportunidade.Id;
-    e.SOL_Produto__c = oportunidade == null
+    List<SOL_Evento_Jornada__c> eventos = new List<SOL_Evento_Jornada__c>();
+    String multiProduto = oportunidade == null
       ? null
-      : oportunidade.SOL_Produto_Negocio__c;
-    e.SOL_Record_Type_Origem__c = oportunidade == null
-      ? null
-      : truncar(oportunidade.RecordType.DeveloperName, MAX_TEXTO);
-    e.SOL_Vendedor__c = vendedorAnterior;
-    e.SOL_Novo_Vendedor__c = novoVendedor;
-    e.SOL_Chave_Idempotencia__c = chave(
-      PREFIXO_PRAZO_TOTAL,
-      e.SOL_Oportunidade__c,
-      formatarSequencia(sequencia)
-    );
-    return e;
+      : oportunidade.SOL_Produtos_Negocio__c;
+    for (String produto : SOLProdutoHelper.paraEventos(multiProduto)) {
+      SOL_Evento_Jornada__c e = base(
+        TIPO_REATRIBUICAO,
+        MOTIVO_PRAZO_TOTAL,
+        ORIGEM_OPORTUNIDADE,
+        quando,
+        sequencia
+      );
+      e.SOL_Oportunidade__c = oportunidade == null ? null : oportunidade.Id;
+      e.SOL_Produto__c = produto;
+      e.SOL_Record_Type_Origem__c = oportunidade == null
+        ? null
+        : truncar(oportunidade.RecordType.DeveloperName, MAX_TEXTO);
+      e.SOL_Vendedor__c = vendedorAnterior;
+      e.SOL_Novo_Vendedor__c = novoVendedor;
+      e.SOL_Chave_Idempotencia__c = chave(
+        PREFIXO_PRAZO_TOTAL,
+        e.SOL_Oportunidade__c,
+        formatarSequencia(sequencia),
+        produto
+      );
+      eventos.add(e);
+    }
+    return eventos;
   }
 
   /**
@@ -271,32 +292,38 @@ public without sharing class SOLEventoJornadaService {
    * por Lead. Um segundo disparo não chega até aqui.
    *
    * @param lead Lead JÁ carregado, com `OwnerId`, `RecordType.DeveloperName` e
-   *   `SOL_Produto_Interesse__c` na projeção.
+   *   `SOL_Produtos_Interesse__c` na projeção.
    * @param quando instante do opt-out — o mesmo carimbado no Lead.
    */
-  public static SOL_Evento_Jornada__c leadPerdidoPorOptOut(
+  public static List<SOL_Evento_Jornada__c> leadPerdidoPorOptOut(
     Lead lead,
     Datetime quando
   ) {
-    SOL_Evento_Jornada__c e = base(
-      TIPO_PERDA,
-      MOTIVO_OPT_OUT,
-      ORIGEM_LEAD,
-      quando,
-      1
-    );
-    e.SOL_Lead__c = lead == null ? null : lead.Id;
-    e.SOL_Produto__c = lead == null ? null : lead.SOL_Produto_Interesse__c;
-    e.SOL_Record_Type_Origem__c = lead == null
-      ? null
-      : truncar(lead.RecordType.DeveloperName, MAX_TEXTO);
-    e.SOL_Vendedor__c = lead == null ? null : lead.OwnerId;
-    e.SOL_Chave_Idempotencia__c = chave(
-      PREFIXO_OPT_OUT,
-      e.SOL_Lead__c,
-      null
-    );
-    return e;
+    List<SOL_Evento_Jornada__c> eventos = new List<SOL_Evento_Jornada__c>();
+    String multiProduto = lead == null ? null : lead.SOL_Produtos_Interesse__c;
+    for (String produto : SOLProdutoHelper.paraEventos(multiProduto)) {
+      SOL_Evento_Jornada__c e = base(
+        TIPO_PERDA,
+        MOTIVO_OPT_OUT,
+        ORIGEM_LEAD,
+        quando,
+        1
+      );
+      e.SOL_Lead__c = lead == null ? null : lead.Id;
+      e.SOL_Produto__c = produto;
+      e.SOL_Record_Type_Origem__c = lead == null
+        ? null
+        : truncar(lead.RecordType.DeveloperName, MAX_TEXTO);
+      e.SOL_Vendedor__c = lead == null ? null : lead.OwnerId;
+      e.SOL_Chave_Idempotencia__c = chave(
+        PREFIXO_OPT_OUT,
+        e.SOL_Lead__c,
+        null,
+        produto
+      );
+      eventos.add(e);
+    }
+    return eventos;
   }
 
   /**
@@ -311,7 +338,7 @@ public without sharing class SOLEventoJornadaService {
    * linha errada no relatório do gestor.
    *
    * @param oportunidade Oportunidade JÁ carregada, com `OwnerId`,
-   *   `RecordType.DeveloperName` e `SOL_Produto_Negocio__c` na projeção.
+   *   `RecordType.DeveloperName` e `SOL_Produtos_Negocio__c` na projeção.
    * @param etapaAnterior etapa imediatamente anterior à perda.
    * @param sequencia `Opportunity.SOL_Qtd_Perdas__c` — o número desta TRANSIÇÃO
    *   para "Perdido", já incrementado pelo Flow before-save no mesmo save. É o
@@ -319,34 +346,40 @@ public without sharing class SOLEventoJornadaService {
    *   reabrir", inclusive quando as duas partem da mesma etapa.
    * @param quando instante da perda.
    */
-  public static SOL_Evento_Jornada__c oportunidadePerdida(
+  public static List<SOL_Evento_Jornada__c> oportunidadePerdida(
     Opportunity oportunidade,
     String etapaAnterior,
     Decimal sequencia,
     Datetime quando
   ) {
-    SOL_Evento_Jornada__c e = base(
-      TIPO_PERDA,
-      MOTIVO_OPORTUNIDADE_PERDIDA,
-      ORIGEM_OPORTUNIDADE,
-      quando,
-      sequencia
-    );
-    e.SOL_Oportunidade__c = oportunidade == null ? null : oportunidade.Id;
-    e.SOL_Produto__c = oportunidade == null
+    List<SOL_Evento_Jornada__c> eventos = new List<SOL_Evento_Jornada__c>();
+    String multiProduto = oportunidade == null
       ? null
-      : oportunidade.SOL_Produto_Negocio__c;
-    e.SOL_Record_Type_Origem__c = oportunidade == null
-      ? null
-      : truncar(oportunidade.RecordType.DeveloperName, MAX_TEXTO);
-    e.SOL_Vendedor__c = oportunidade == null ? null : oportunidade.OwnerId;
-    e.SOL_Etapa_Anterior__c = truncar(etapaAnterior, MAX_TEXTO);
-    e.SOL_Chave_Idempotencia__c = chave(
-      PREFIXO_PERDA_OPORTUNIDADE,
-      e.SOL_Oportunidade__c,
-      formatarSequencia(sequencia)
-    );
-    return e;
+      : oportunidade.SOL_Produtos_Negocio__c;
+    for (String produto : SOLProdutoHelper.paraEventos(multiProduto)) {
+      SOL_Evento_Jornada__c e = base(
+        TIPO_PERDA,
+        MOTIVO_OPORTUNIDADE_PERDIDA,
+        ORIGEM_OPORTUNIDADE,
+        quando,
+        sequencia
+      );
+      e.SOL_Oportunidade__c = oportunidade == null ? null : oportunidade.Id;
+      e.SOL_Produto__c = produto;
+      e.SOL_Record_Type_Origem__c = oportunidade == null
+        ? null
+        : truncar(oportunidade.RecordType.DeveloperName, MAX_TEXTO);
+      e.SOL_Vendedor__c = oportunidade == null ? null : oportunidade.OwnerId;
+      e.SOL_Etapa_Anterior__c = truncar(etapaAnterior, MAX_TEXTO);
+      e.SOL_Chave_Idempotencia__c = chave(
+        PREFIXO_PERDA_OPORTUNIDADE,
+        e.SOL_Oportunidade__c,
+        formatarSequencia(sequencia),
+        produto
+      );
+      eventos.add(e);
+    }
+    return eventos;
   }
 
   // ------------------------------------------------------------- gravação
@@ -463,7 +496,8 @@ public without sharing class SOLEventoJornadaService {
   private static String chave(
     String prefixo,
     Id registro,
-    String discriminador
+    String discriminador,
+    String produto
   ) {
     if (registro == null) {
       return null;
@@ -471,6 +505,13 @@ public without sharing class SOLEventoJornadaService {
     String c = prefixo + '|' + String.valueOf(registro);
     if (String.isNotBlank(discriminador)) {
       c += '|' + discriminador;
+    }
+    // Produto é o ÚLTIMO discriminador: a mesma ocorrência com dois produtos
+    // gera duas chaves distintas (um evento por produto), e reprocessar
+    // reencontra as mesmas chaves. Ocorrência sem produto não leva o segmento —
+    // a chave fica idêntica à do registro de produto único/vazio.
+    if (String.isNotBlank(produto)) {
+      c += '|' + produto;
     }
     return truncar(c, MAX_CHAVE);
   }

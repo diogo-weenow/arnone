@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Responsavel_Legal__c</fullName>
+    <description>Arnone Soluções: nome do responsável legal do cliente (etapas E11/E12 do mapa da jornada SOL).</description>
+    <externalId>false</externalId>
+    <label>Responsável legal</label>
+    <length>255</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

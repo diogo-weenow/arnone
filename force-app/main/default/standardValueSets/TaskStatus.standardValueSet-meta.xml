@@ -4,13 +4,13 @@
     <standardValue>
         <fullName>Open</fullName>
         <default>true</default>
-        <label>Open</label>
+        <label>Aberta</label>
         <closed>false</closed>
     </standardValue>
     <standardValue>
         <fullName>Completed</fullName>
         <default>false</default>
-        <label>Completed</label>
+        <label>Concluída</label>
         <closed>true</closed>
     </standardValue>
     <standardValue>

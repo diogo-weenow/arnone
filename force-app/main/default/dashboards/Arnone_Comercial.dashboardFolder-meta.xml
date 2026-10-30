@@ -5,5 +5,10 @@
         <sharedTo>Coordenador_SOL</sharedTo>
         <sharedToType>RoleAndSubordinates</sharedToType>
     </folderShares>
+    <folderShares>
+        <accessLevel>View</accessLevel>
+        <sharedTo>Diretoria_SOL</sharedTo>
+        <sharedToType>RoleAndSubordinatesInternal</sharedToType>
+    </folderShares>
     <name>Arnone Comercial</name>
 </DashboardFolder>

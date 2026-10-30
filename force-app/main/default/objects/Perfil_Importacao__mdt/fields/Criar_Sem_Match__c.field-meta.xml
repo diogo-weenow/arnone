@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Criar_Sem_Match__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Quando marcado, a linha sem lead correspondente cria um lead novo. Desmarcado, a linha sem match é ignorada e o perfil nunca cria leads.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Criar sem match</label>
+    <type>Checkbox</type>
+</CustomField>

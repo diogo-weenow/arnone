@@ -82,7 +82,7 @@ private class SOLAcompanhamentoCalculoTest {
       AccountId = a.Id,
       CloseDate = Date.today().addDays(60),
       StageName = 'Diagnóstico',
-      SOL_Produto_Negocio__c = prodOpp
+      SOL_Produtos_Negocio__c = prodOpp
     );
     if (oppSOL) {
       o.RecordTypeId = rtOppSOL();
@@ -200,7 +200,7 @@ private class SOLAcompanhamentoCalculoTest {
       RecordTypeId = rtOppSOL(),
       CloseDate = Date.today().addDays(60),
       StageName = 'Diagnóstico',
-      SOL_Produto_Negocio__c = PRODUTO
+      SOL_Produtos_Negocio__c = PRODUTO
     );
     insert o;
     Lead l = new Lead(LastName = 'Lead ' + rnd(), Company = 'C');
@@ -393,7 +393,7 @@ private class SOLAcompanhamentoCalculoTest {
           RecordTypeId = rtOppSOL(),
           CloseDate = Date.today().addDays(60),
           StageName = 'Diagnóstico',
-          SOL_Produto_Negocio__c = PRODUTO
+          SOL_Produtos_Negocio__c = PRODUTO
         )
       );
     }
@@ -833,7 +833,7 @@ private class SOLAcompanhamentoCalculoTest {
 
   @IsTest
   static void vendedorComercialEnxergaCamposComFLSCorreta() {
-    Id perfil = [SELECT Id FROM Profile WHERE UserType = 'Standard' ORDER BY Name LIMIT 1].Id;
+    Id perfil = [SELECT Id FROM Profile WHERE UserType = 'Standard' AND Name = 'Minimum Access - Salesforce' ORDER BY Name LIMIT 1].Id;
     User v = new User(
       FirstName = 'SOL',
       LastName = 'Calc Acomp',

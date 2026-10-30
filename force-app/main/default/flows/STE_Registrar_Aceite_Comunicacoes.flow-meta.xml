@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <name>Registrar_opt_in_de_e_mail</name>
+        <label>Registrar opt-in de e-mail</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <actionName>MessagingConsentV2_00Das00000FfJKh.MessagingConsent</actionName>
+        <actionType>dataCloudIngestionApi</actionType>
+        <faultConnector>
+            <targetReference>Abrir_pendencia_de_opt_in</targetReference>
+        </faultConnector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>CommunicationSubscriptionChannelType</name>
+            <value>
+                <stringValue>0eBN500000005hFMAQ</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>ConsentCapturedDateTime</name>
+            <value>
+                <elementReference>$Flow.CurrentDateTime</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>ConsentCapturedSourceName</name>
+            <value>
+                <stringValue>Formulário de inscrição STE (web-to-lead)</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>ConsentCapturedSourceType</name>
+            <value>
+                <stringValue>Web</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>ConsentId</name>
+            <value>
+                <elementReference>fxConsentId</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>ConsentStatus</name>
+            <value>
+                <inputConfiguratorMode>Custom</inputConfiguratorMode>
+                <stringValue>OPT_IN</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>ContactPointValue</name>
+            <value>
+                <elementReference>$Record.Email</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>Name</name>
+            <value>
+                <stringValue>Marketing Emails</stringValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>PartyId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>UpdatedTime</name>
+            <value>
+                <elementReference>$Flow.CurrentDateTime</elementReference>
+            </value>
+        </inputParameters>
+        <nameSegment>MessagingConsentV2_00Das00000FfJKh.MessagingConsent</nameSegment>
+        <offset>0</offset>
+    </actionCalls>
+    <apiVersion>67.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>Grava no Marketing Cloud o opt-in de e-mail do candidato que aceitou receber comunicações no formulário de inscrição (campo STE_Aceite_Comunicacoes__c, que o web-to-lead envia marcado). O Marketing Cloud Next só envia e-mail promocional para quem tem opt-in na assinatura Marketing Emails; sem este registro, a jornada de retomada bloqueia o envio com &quot;recipient without opt-in&quot;. O aceite vai para a entrada de consentimento do próprio Marketing Cloud (MessagingConsentV2), que alimenta o Communication Subscription Consent do Data Cloud, consultado no envio. Roda depois do commit, para que uma falha aqui não impeça a criação do Lead. Dispara quando o Lead STE passa a ter o aceite marcado e um e-mail preenchido. Se a ingestão falhar, abre uma tarefa para o dono do Lead com o erro devolvido: rodando async, a falha não aparece em lugar nenhum, e o consentimento sumia em silêncio até alguém subir CSV à mão — que entra sem canal e sem vínculo, e não vale no envio.</description>
+    <environments>Default</environments>
+    <formulas>
+        <name>fxConsentId</name>
+        <dataType>String</dataType>
+        <expression>{!$Record.Id} &amp; &apos;-0eBN500000005hFMAQ&apos;</expression>
+    </formulas>
+    <formulas>
+        <name>fxDetalheFalha</name>
+        <dataType>String</dataType>
+        <expression>&apos;O aceite foi marcado no formulário, mas o opt-in não chegou ao Data Cloud. Enquanto isso não for resolvido, a jornada recusa o envio para esta pessoa.&apos;
+&amp; BR() &amp; BR() &amp;
+&apos;E-mail: &apos; &amp; {!$Record.Email} &amp; BR() &amp;
+&apos;Lead: &apos; &amp; {!$Record.Id} &amp; BR() &amp;
+&apos;Quando: &apos; &amp; TEXT({!$Flow.CurrentDateTime}) &amp; BR() &amp; BR() &amp;
+&apos;Erro devolvido: &apos; &amp; {!$Flow.FaultMessage} &amp; BR() &amp; BR() &amp;
+&apos;Não subir CSV de opt-in à mão: o arquivo entra sem o canal e sem o vínculo da pessoa, e por isso não vale no envio. O caminho é reabrir o Lead e salvar o aceite de novo, para o fluxo rodar outra vez.&apos;</expression>
+    </formulas>
+    <interviewLabel>STE Registrar Aceite de Comunicações {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>STE Registrar Aceite de Comunicações</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>OriginBuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <name>Abrir_pendencia_de_opt_in</name>
+        <label>Abrir pendência de opt-in</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <elementReference>fxDetalheFalha</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>OwnerId</field>
+            <value>
+                <elementReference>$Record.OwnerId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>High</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Status</field>
+            <value>
+                <stringValue>Open</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>Opt-in de marketing não registrado — verificar</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhoId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &apos;STE&apos;,
+  {!$Record.STE_Aceite_Comunicacoes__c},
+  NOT(ISBLANK({!$Record.Email}))
+)</filterFormula>
+        <object>Lead</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <scheduledPaths>
+            <connector>
+                <targetReference>Registrar_opt_in_de_e_mail</targetReference>
+            </connector>
+            <pathType>AsyncAfterCommit</pathType>
+        </scheduledPaths>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

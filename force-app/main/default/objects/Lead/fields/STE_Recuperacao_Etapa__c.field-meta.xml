@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Recuperacao_Etapa__c</fullName>
+    <description>Último e-mail da régua de recuperação que alcançou o candidato. Fica vazio para quem ainda não entrou na régua, e para no ponto em que o candidato respondeu — é por ele que se sabe até onde a campanha foi sem conversão.</description>
+    <label>Recuperação — última etapa</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>E01 — Lembrete da CNH</fullName>
+                <default>false</default>
+                <label>E01 — Lembrete da CNH</label>
+            </value>
+            <value>
+                <fullName>E02 — Depoimento</fullName>
+                <default>false</default>
+                <label>E02 — Depoimento</label>
+            </value>
+            <value>
+                <fullName>E03 — Benefícios da formação</fullName>
+                <default>false</default>
+                <label>E03 — Benefícios da formação</label>
+            </value>
+            <value>
+                <fullName>E04 — Depoimento em vídeo</fullName>
+                <default>false</default>
+                <label>E04 — Depoimento em vídeo</label>
+            </value>
+            <value>
+                <fullName>E05 — Última chamada</fullName>
+                <default>false</default>
+                <label>E05 — Última chamada</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

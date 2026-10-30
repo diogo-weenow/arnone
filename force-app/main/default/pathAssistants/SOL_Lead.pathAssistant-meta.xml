@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathAssistant xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <entityName>Lead</entityName>
+    <fieldName>Status</fieldName>
+    <masterLabel>Arnone Soluções</masterLabel>
+    <pathAssistantSteps>
+        <fieldNames>SOL_Status_Procuracao__c</fieldNames>
+        <fieldNames>SOL_Data_Recebimento_Procuracao__c</fieldNames>
+        <fieldNames>SOL_Apto_Conversao__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; comercial.&lt;/p&gt;&lt;p&gt;Recuperação Tributária e ART 360 só convertem com a procuração Recebida. Converta pela ação Converter Lead.&lt;/p&gt;</info>
+        <picklistValueName>Apto para Conversão</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>SOL_Data_Compromisso__c</fieldNames>
+        <fieldNames>SOL_Tentativas_Contato__c</fieldNames>
+        <fieldNames>SOL_Contato_Com_Decisor__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; comercial.&lt;/p&gt;&lt;p&gt;Em Recuperação Tributária, para sair de Recebido - MQL é obrigatória a data do compromisso, de hoje ou anterior (exceto desqualificação por opt-out ou negócio perdido).&lt;/p&gt;</info>
+        <picklistValueName>Captação - Contato</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>SOL_Motivo_Desqualificacao__c</fieldNames>
+        <fieldNames>SOL_Observacao_Desqualificacao__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; comercial.&lt;/p&gt;&lt;p&gt;O motivo é obrigatório; Outros exige a observação. Opt-out só com o opt-out registrado.&lt;/p&gt;</info>
+        <picklistValueName>Desqualificado</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>SOL_Status_Procuracao__c</fieldNames>
+        <fieldNames>SOL_Data_Solicitacao_Procuracao__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; comercial.&lt;/p&gt;&lt;p&gt;Solicite a procuração pela ação Procuração e acompanhe o status.&lt;/p&gt;</info>
+        <picklistValueName>Procuração Solicitada</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>CNPJ__c</fieldNames>
+        <fieldNames>SOL_Produtos_Interesse__c</fieldNames>
+        <fieldNames>SOL_Tipo_Captacao__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; comercial.&lt;/p&gt;&lt;p&gt;Confira CNPJ (14 dígitos, obrigatório) e os produtos de interesse.&lt;/p&gt;</info>
+        <picklistValueName>Recebido - MQL</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>SOL_Data_Compromisso__c</fieldNames>
+        <fieldNames>SOL_Contato_Com_Decisor__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; comercial.&lt;/p&gt;&lt;p&gt;Reunião agendada com o decisor.&lt;/p&gt;</info>
+        <picklistValueName>Reunião Agendada - SQL</picklistValueName>
+    </pathAssistantSteps>
+    <recordTypeName>SOL</recordTypeName>
+</PathAssistant>

@@ -103,7 +103,7 @@ public without sharing class SOLAcompanhamentoCalculoService {
           OwnerId,
           StageName,
           IsClosed,
-          SOL_Produto_Negocio__c,
+          SOL_Produtos_Negocio__c,
           SOL_Data_Solicitacao_Calculo__c,
           RecordType.DeveloperName
         FROM Opportunity
@@ -118,7 +118,7 @@ public without sharing class SOLAcompanhamentoCalculoService {
         encontradas.add(o.Id);
         Boolean elegivel =
           o.RecordType.DeveloperName == RECORD_TYPE_SOL &&
-          o.SOL_Produto_Negocio__c == PRODUTO_RECUPERACAO &&
+          SOLProdutoHelper.contem(o.SOL_Produtos_Negocio__c, PRODUTO_RECUPERACAO) &&
           o.IsClosed == false &&
           // (CLICKUP-9425) explícito: negócio perdido não avança mais.
           !SOLNegocioPerdidoService.oportunidadePerdida(o) &&
