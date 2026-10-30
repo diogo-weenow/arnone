@@ -301,7 +301,7 @@ public class ImportacaoLeadsTestFactory {
     return novoLeadCnpj('SOL', last, company, cnpj14);
   }
 
-  /** Lead STE com o CPF gravado exatamente como informado (mascarado ou não). */
+  /** Lead STE com o CPF gravado exatamente como informado (só dígitos: VR CPF_Somente_Numeros). */
   public static Lead novoLeadCpf(String rtDev, String last, String cpfGravado) {
     Lead l = new Lead(
       RecordTypeId = rt(rtDev),
