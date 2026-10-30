@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Socios__c</fullName>
+    <description>Sócios da empresa, vindos do Driva ou preenchidos manualmente, para a jornada da Arnone Soluções.</description>
+    <externalId>false</externalId>
+    <label>Sócios</label>
+    <length>255</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

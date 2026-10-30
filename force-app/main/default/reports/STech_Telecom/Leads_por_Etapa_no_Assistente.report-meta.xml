@@ -52,7 +52,6 @@
             <operator>equals</operator>
             <value>0</value>
         </criteriaItems>
-        <language>pt_BR</language>
     </filter>
     <format>Summary</format>
     <groupingsDown>
