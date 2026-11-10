@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Permissao_Customizada__c</fullName>
+    <description>DeveloperName da custom permission exigida para usar o perfil (ex.: SOL_Importar_Leads). Verificada por FeatureManagement.checkPermission no servidor.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Permissão customizada</label>
+    <length>80</length>
+    <required>false</required>
+    <unique>false</unique>
+    <type>Text</type>
+</CustomField>

@@ -5,6 +5,6 @@
     <description>Time comercial da Arnone Advogados — reporta à Coordenação.</description>
     <mayForecastManagerShare>false</mayForecastManagerShare>
     <name>Comercial Arnone Advogados</name>
-    <opportunityAccessLevel>Edit</opportunityAccessLevel>
+    <opportunityAccessLevel>None</opportunityAccessLevel>
     <parentRole>Coordenador_ADV</parentRole>
 </Role>

@@ -168,6 +168,23 @@ jobs:
                // .data.details.runTestResult.failures // [])[]
               | "\(.name).\(.methodName): \(.message)"
             ' "$RUNNER_TEMP/validacao.json" 2>/dev/null | head -n 40
+            # Gates que nao aparecem como falha de componente nem de teste: a
+            # validacao pode falhar so por cobertura. Sem imprimir isso o job
+            # falha calado.
+            echo "--- cobertura de codigo abaixo do minimo ---"
+            jq -r '
+              (.result.details.runTestResult.codeCoverageWarnings
+               // .data.details.runTestResult.codeCoverageWarnings // [])
+              | (if type == "object" then [.] else . end)[]
+              | "\(.name // "geral"): \(.message)"
+            ' "$RUNNER_TEMP/validacao.json" 2>/dev/null | head -n 20
+            echo "--- cobertura de flows abaixo do minimo ---"
+            jq -r '
+              (.result.details.runTestResult.flowCoverageWarnings
+               // .data.details.runTestResult.flowCoverageWarnings // [])
+              | (if type == "object" then [.] else . end)[]
+              | "\(.flowName // "geral"): \(.message)"
+            ' "$RUNNER_TEMP/validacao.json" 2>/dev/null | head -n 20
           fi
           exit $STATUS
 

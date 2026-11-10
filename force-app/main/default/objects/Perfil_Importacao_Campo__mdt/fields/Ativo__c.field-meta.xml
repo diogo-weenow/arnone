@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Ativo__c</fullName>
+    <defaultValue>true</defaultValue>
+    <description>Liga ou desliga o mapeamento sem removê-lo. Só mapeamentos ativos são carregados e aplicados.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Ativo</label>
+    <type>Checkbox</type>
+</CustomField>

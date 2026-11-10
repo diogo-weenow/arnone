@@ -45,7 +45,7 @@ private class SOLValidacaoAvancoTest {
       Company = 'C',
       Status = CAPTACAO,
       CNPJ__c = CNPJ,
-      SOL_Produto_Interesse__c = produto
+      SOL_Produtos_Interesse__c = produto
     );
     insert l;
     return l;
@@ -533,7 +533,7 @@ private class SOLValidacaoAvancoTest {
           Company = 'C',
           Status = CAPTACAO,
           CNPJ__c = CNPJ,
-          SOL_Produto_Interesse__c = (Math.mod(i, 2) == 0 ? 'Recuperação Tributária' : 'ART 360')
+          SOL_Produtos_Interesse__c = (Math.mod(i, 2) == 0 ? 'Recuperação Tributária' : 'ART 360')
         )
       );
     }

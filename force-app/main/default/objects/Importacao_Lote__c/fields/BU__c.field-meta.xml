@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>BU__c</fullName>
+    <description>Unidade de negócio escolhida pelo operador na Importação de leads. Define o perfil de importação e o Record Type dos leads casados e criados. Usa o global value set VS_Unidades.</description>
+    <externalId>false</externalId>
+    <label>BU</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetName>VS_Unidades</valueSetName>
+    </valueSet>
+</CustomField>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Dynamic Forms por BU — Fase 2. Exclusivo desta fase.
+    Nao inclui Apex, Profile, PermissionSet, CustomObject nem Flow.
+    Deploy por --metadata-dir com o .object reduzido aos filhos (RecordType/CompactLayout).
+    standard__* esta no .forceignore: a pipeline nao leva esses apps.
+-->
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Opportunity.SOL_Oportunidade</members>
+        <name>CompactLayout</name>
+    </types>
+    <types>
+        <members>Arnone</members>
+        <members>Arnone_Atendimento</members>
+        <members>standard__LightningSales</members>
+        <members>standard__LightningSalesConsole</members>
+        <name>CustomApplication</name>
+    </types>
+    <types>
+        <members>Opportunity_SOL</members>
+        <name>FlexiPage</name>
+    </types>
+    <types>
+        <members>Opportunity-Opportunity Layout</members>
+        <name>Layout</name>
+    </types>
+    <types>
+        <members>SOL_Opportunity</members>
+        <name>PathAssistant</name>
+    </types>
+    <types>
+        <members>Opportunity.SOL</members>
+        <name>RecordType</name>
+    </types>
+    <version>66.0</version>
+</Package>

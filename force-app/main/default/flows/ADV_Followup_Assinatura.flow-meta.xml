@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description>Defesa extra: o cancelamento do caminho agendado já acontece quando a Oportunidade sai da etapa (entrada &quot;somente quando atualizado para atender&quot;); esta checagem garante que nunca se cobre assinatura de uma Oportunidade que não está mais aguardando.</description>
+        <name>Decidir_Ainda_Aguardando</name>
+        <label>Ainda em Aguardando Assinatura?</label>
+        <locationX>308</locationX>
+        <locationY>396</locationY>
+        <defaultConnectorLabel>Não — encerra</defaultConnectorLabel>
+        <rules>
+            <name>Ainda_Aguardando</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.StageName</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Aguardando Assinatura</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Criar_Tarefa_Cobrar_Assinatura</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <description>BU Arnone Advogados (funil TO-BE v1, AUT-A02) — 5 dias depois de a Oportunidade ADV ENTRAR em &quot;Aguardando Assinatura&quot;, cria uma tarefa para o dono cobrar o retorno do cliente. Entrada &quot;somente quando atualizado para atender&quot;: se a Oportunidade sair da etapa antes dos 5 dias, a plataforma cancela o caminho agendado e a tarefa não é criada. REENTRADA: cada nova entrada na etapa agenda um novo lembrete de 5 dias contados da nova entrada (o anterior já foi cancelado ao sair), portanto no máximo uma tarefa por permanência na etapa; salvar a Oportunidade de novo sem mudar de etapa não reagenda nem duplica. Sem fault path de propósito: falha no caminho agendado não tem usuário para ver mensagem; a falha não tratada gera o e-mail de erro de flow da plataforma para o administrador e fica registrada nas entrevistas com falha.</description>
+    <environments>Default</environments>
+    <interviewLabel>ADV_Followup_Assinatura {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>ADV_Followup_Assinatura</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <description>Lembrete de follow-up para o dono da Oportunidade, vencendo no dia em que é criado.</description>
+        <name>Criar_Tarefa_Cobrar_Assinatura</name>
+        <label>Criar tarefa: cobrar retorno do cliente</label>
+        <locationX>176</locationX>
+        <locationY>516</locationY>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <stringValue>A proposta está há 5 dias em Aguardando Assinatura. Entre em contato com o cliente para saber da assinatura e mova a Oportunidade para Ganho (com a data de assinatura) ou Perdido (com o motivo).</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>OwnerId</field>
+            <value>
+                <elementReference>$Record.OwnerId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>Normal</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>Cobrar retorno do cliente — assinatura da proposta</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhatId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &apos;ADV&apos;,
+  ISPICKVAL({!$Record.StageName}, &apos;Aguardando Assinatura&apos;)
+)</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <scheduledPaths>
+            <name>Cinco_Dias_Apos_Entrada</name>
+            <connector>
+                <targetReference>Decidir_Ainda_Aguardando</targetReference>
+            </connector>
+            <label>5 dias após entrar em Aguardando Assinatura</label>
+            <offsetNumber>5</offsetNumber>
+            <offsetUnit>Days</offsetUnit>
+            <timeSource>RecordTriggerEvent</timeSource>
+        </scheduledPaths>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Tipo_de_CNH__c</fullName>
+    <inlineHelpText>Compreender o tipo da CNH, se for A, o lead já não se qualifica.</inlineHelpText>
+    <label>Tipo de CNH</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>true</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>CATEGORIA:  A</fullName>
+                <default>false</default>
+                <label>CATEGORIA:  A</label>
+            </value>
+            <value>
+                <fullName>(B+) DEFINITIVA</fullName>
+                <default>false</default>
+                <label>(B+) DEFINITIVA</label>
+            </value>
+            <value>
+                <fullName>(B+) PROVISÓRIA</fullName>
+                <default>false</default>
+                <label>(B+) PROVISÓRIA</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

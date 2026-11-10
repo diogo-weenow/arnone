@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>Budget_Confirmed__c</fullName>
     <defaultValue>false</defaultValue>
-    <label>Budget Confirmed</label>
+    <label>Orçamento confirmado</label>
     <trackFeedHistory>false</trackFeedHistory>
     <trackHistory>false</trackHistory>
     <type>Checkbox</type>

@@ -4,6 +4,6 @@
     <standardValue>
         <fullName>Each</fullName>
         <default>false</default>
-        <label>Each</label>
+        <label>Unidade</label>
     </standardValue>
 </StandardValueSet>

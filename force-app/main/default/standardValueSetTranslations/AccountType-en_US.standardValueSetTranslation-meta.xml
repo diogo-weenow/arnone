@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StandardValueSetTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <valueTranslation>
+        <masterLabel>Analista</masterLabel>
+        <translation>Analyst</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Concorrente</masterLabel>
+        <translation>Competitor</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Cliente</masterLabel>
+        <translation>Customer</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Integrador</masterLabel>
+        <translation>Integrator</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Investidor</masterLabel>
+        <translation>Investor</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Parceiro</masterLabel>
+        <translation>Partner</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Imprensa</masterLabel>
+        <translation>Press</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Cliente potencial</masterLabel>
+        <translation>Prospect</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Revendedor</masterLabel>
+        <translation>Reseller</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Outros</masterLabel>
+        <translation>Other</translation>
+    </valueTranslation>
+</StandardValueSetTranslation>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Progresso_Bot__c</fullName>
+    <description>Desenho do avanço do candidato na conversa com o Assistente Stech Telecom, a partir da etapa registrada. Campo apenas visual: quem manda no dado é o STE_Etapa_Bot__c.</description>
+    <externalId>false</externalId>
+    <formula>IF(ISBLANK(TEXT(STE_Etapa_Bot__c)), &quot;○○○○○○○○  Ainda não falou com o assistente&quot;,
+CASE(TEXT(STE_Etapa_Bot__c),
+  &quot;Aguardando e-mail&quot;, &quot;●○○○○○○○  Pergunta 1 de 8&quot;,
+  &quot;Aguardando nome&quot;, &quot;●●○○○○○○  Pergunta 2 de 8&quot;,
+  &quot;Aguardando pré-inscrição&quot;, &quot;●●●○○○○○  Pergunta 3 de 8&quot;,
+  &quot;Aguardando faixa etária&quot;, &quot;●●●●○○○○  Pergunta 4 de 8&quot;,
+  &quot;Aguardando experiência&quot;, &quot;●●●●●○○○  Pergunta 5 de 8&quot;,
+  &quot;Aguardando empresa anterior&quot;, &quot;●●●●●●○○  Pergunta 6 de 8&quot;,
+  &quot;Aguardando escolha da CNH&quot;, &quot;●●●●●●●○  Pergunta 7 de 8&quot;,
+  &quot;Aguardando arquivo da CNH&quot;, &quot;●●●●●●●●  Pergunta 8 de 8&quot;,
+  &quot;Concluído&quot;, &quot;●●●●●●●●  Respondeu tudo&quot;,
+  &quot;&quot;))</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>Progresso no assistente</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

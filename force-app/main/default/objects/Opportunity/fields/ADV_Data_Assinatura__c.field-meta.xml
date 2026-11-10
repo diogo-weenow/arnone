@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ADV_Data_Assinatura__c</fullName>
+    <description>BU Arnone Advogados: data em que o cliente assinou a proposta. Obrigatória para mover a Oportunidade para Ganho (VR ADV_Ganho_Exige_Data_Assinatura).</description>
+    <inlineHelpText>Data em que o cliente assinou a proposta. Obrigatória para marcar a Oportunidade como Ganho.</inlineHelpText>
+    <label>Data de assinatura</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

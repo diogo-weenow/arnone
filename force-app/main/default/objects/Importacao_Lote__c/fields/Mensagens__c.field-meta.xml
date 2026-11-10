@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Mensagens__c</fullName>
+    <description>Mensagens agregadas do processamento (resumo, avisos, mapeamento efetivo aplicado). Texto longo, sem detalhe técnico sensível.</description>
+    <externalId>false</externalId>
+    <label>Mensagens</label>
+    <length>131072</length>
+    <trackHistory>false</trackHistory>
+    <type>LongTextArea</type>
+    <visibleLines>6</visibleLines>
+</CustomField>

@@ -4,17 +4,17 @@
     <standardValue>
         <fullName>Mr.</fullName>
         <default>false</default>
-        <label>Mr.</label>
+        <label>Sr.</label>
     </standardValue>
     <standardValue>
         <fullName>Ms.</fullName>
         <default>false</default>
-        <label>Ms.</label>
+        <label>Srta.</label>
     </standardValue>
     <standardValue>
         <fullName>Mrs.</fullName>
         <default>false</default>
-        <label>Mrs.</label>
+        <label>Sra.</label>
     </standardValue>
     <standardValue>
         <fullName>Dr.</fullName>

@@ -216,6 +216,12 @@
                 <identifier>console_relatedRecord2</identifier>
             </componentInstance>
         </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentName>STE_AbrirLeadDaSessao</componentName>
+                <identifier>c_STE_AbrirLeadDaSessao</identifier>
+            </componentInstance>
+        </itemInstances>
         <mode>Replace</mode>
         <name>sidebar</name>
         <type>Region</type>

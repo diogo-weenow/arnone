@@ -4,11 +4,11 @@
     <standardValue>
         <fullName>Responded</fullName>
         <default>false</default>
-        <label>Responded</label>
+        <label>Respondeu</label>
     </standardValue>
     <standardValue>
         <fullName>Sent</fullName>
         <default>false</default>
-        <label>Sent</label>
+        <label>Enviado</label>
     </standardValue>
 </StandardValueSet>

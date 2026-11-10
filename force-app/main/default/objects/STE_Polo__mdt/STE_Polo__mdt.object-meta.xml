@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Configuração por polo do Instituto STech. O horário cadastrado aqui alimenta o campo Horário da turma na Oportunidade e a personalização dos e-mails da Jornada Pré-Curso.</description>
+    <label>Polo STech</label>
+    <pluralLabel>Polos STech</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionCalls>
+        <description>Um e-mail por Oportunidade que entra na etapa. Conta no limite diário de e-mails individuais (SingleEmail) da org. Falha de envio (ex.: entregabilidade desligada na sandbox) vai para o fault path e não afeta o save da Oportunidade, que já foi confirmado (caminho assíncrono).</description>
+        <name>Enviar_Aviso_Antonio</name>
+        <label>Enviar aviso de precificação</label>
+        <locationX>308</locationX>
+        <locationY>600</locationY>
+        <actionName>emailSimple</actionName>
+        <actionType>emailSimple</actionType>
+        <faultConnector>
+            <targetReference>Criar_Tarefa_Aviso_Nao_Enviado</targetReference>
+        </faultConnector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>emailAddresses</name>
+            <value>
+                <elementReference>Obter_Configuracao_ADV.Email_Precificacao__c</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailSubject</name>
+            <value>
+                <elementReference>textoAssunto</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>emailBody</name>
+            <value>
+                <elementReference>textoCorpo</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>sendRichBody</name>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>relatedRecordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>logEmailOnSend</name>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </inputParameters>
+        <nameSegment>emailSimple</nameSegment>
+        <offset>0</offset>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </actionCalls>
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <decisions>
+        <description>Sem destinatário configurado (vazio) ou ainda com o placeholder (domínio reservado .invalid): não envia e encerra sem erro.</description>
+        <name>Decidir_Destinatario_Configurado</name>
+        <label>Destinatário configurado?</label>
+        <locationX>176</locationX>
+        <locationY>480</locationY>
+        <defaultConnectorLabel>Não — não envia</defaultConnectorLabel>
+        <rules>
+            <name>Destinatario_Valido</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>formulaDestinatarioValido</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Enviar_Aviso_Antonio</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <description>BU Arnone Advogados (funil TO-BE v1, AUT-A01) — quando a Oportunidade ADV ENTRA em &quot;Em Precificação&quot;, avisa o Antônio por e-mail que há um caso para precificar (não é aprovação: o aval é a própria etapa, RN-A04). O Antônio não tem usuário: o endereço vem do Custom Metadata ADV_Configuracao__mdt, registro Padrao, campo Email_Precificacao__c (troca sem deploy). Vazio ou placeholder .invalid = não envia. Roda no caminho ASSÍNCRONO (após o commit) para que falha de e-mail nunca impeça o usuário de salvar a Oportunidade; se o envio falhar, cria uma tarefa para o dono avisar o Antônio manualmente. Entrada &quot;somente quando atualizado para atender&quot;: salvar de novo na mesma etapa não reenvia; sair e voltar para Em Precificação reenvia (é um novo caso para precificar).</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Link do registro no Lightning, montado a partir da URL da instância (sem domínio fixado no metadado).</description>
+        <name>formulaLinkRegistro</name>
+        <dataType>String</dataType>
+        <expression>LEFT({!$Api.Partner_Server_URL_590}, FIND(&apos;/services/&apos;, {!$Api.Partner_Server_URL_590})) &amp; &apos;lightning/r/Opportunity/&apos; &amp; {!$Record.Id} &amp; &apos;/view&apos;</expression>
+    </formulas>
+    <formulas>
+        <description>Valor da proposta (Amount) legível; vazio vira &quot;não informado&quot;.</description>
+        <name>formulaValorProposta</name>
+        <dataType>String</dataType>
+        <expression>IF(ISBLANK({!$Record.Amount}), &apos;não informado&apos;, &apos;R$ &apos; &amp; TEXT({!$Record.Amount}))</expression>
+    </formulas>
+    <formulas>
+        <description>Verdadeiro só com um e-mail preenchido que não seja o placeholder (.invalid é domínio reservado, nunca entregável).</description>
+        <name>formulaDestinatarioValido</name>
+        <dataType>Boolean</dataType>
+        <expression>AND(
+  NOT(ISBLANK({!Obter_Configuracao_ADV.Email_Precificacao__c})),
+  RIGHT(LOWER(TRIM({!Obter_Configuracao_ADV.Email_Precificacao__c})), 8) &lt;&gt; &apos;.invalid&apos;
+)</expression>
+    </formulas>
+    <interviewLabel>ADV_Aviso_Precificacao {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>ADV_Aviso_Precificacao</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <description>Fallback do fault path: o aviso não saiu, então o dono da Oportunidade recebe uma tarefa para avisar o Antônio manualmente, com o erro técnico na descrição.</description>
+        <name>Criar_Tarefa_Aviso_Nao_Enviado</name>
+        <label>Criar tarefa: aviso não enviado</label>
+        <locationX>572</locationX>
+        <locationY>720</locationY>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <elementReference>textoErroEnvio</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>OwnerId</field>
+            <value>
+                <elementReference>$Record.OwnerId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Priority</field>
+            <value>
+                <stringValue>Normal</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>Avisar o Antônio: caso para precificar (e-mail automático não enviado)</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhatId</field>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <recordLookups>
+        <description>Registro Padrao da configuração ADV. Custom Metadata: não consome o limite de consultas SOQL.</description>
+        <name>Obter_Configuracao_ADV</name>
+        <label>Obter a configuração ADV (Padrao)</label>
+        <locationX>176</locationX>
+        <locationY>360</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Decidir_Destinatario_Configurado</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Padrao</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>ADV_Configuracao__mdt</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &apos;ADV&apos;,
+  ISPICKVAL({!$Record.StageName}, &apos;Em Precificação&apos;)
+)</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <scheduledPaths>
+            <connector>
+                <targetReference>Obter_Configuracao_ADV</targetReference>
+            </connector>
+            <pathType>AsyncAfterCommit</pathType>
+        </scheduledPaths>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <textTemplates>
+        <name>textoAssunto</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Caso para precificar: {!$Record.Name}</text>
+    </textTemplates>
+    <textTemplates>
+        <name>textoCorpo</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>Olá, Antônio.
+
+Há um novo caso da Arnone Advogados aguardando a precificação (etapa Em Precificação).
+
+Oportunidade: {!$Record.Name}
+Conta: {!$Record.Account.Name}
+Área jurídica: {!$Record.ADV_Area_Juridica__c}
+Advogado responsável: {!$Record.ADV_Advogado_Responsavel__c}
+Valor da proposta (estimado): {!formulaValorProposta}
+Responsável comercial: {!$Record.Owner.Name}
+
+Abrir no Salesforce: {!formulaLinkRegistro}
+
+Defina os honorários e o valor da proposta com o advogado responsável. A proposta só segue para o cliente depois do seu aval.
+
+Mensagem automática do Salesforce — Grupo Arnone.</text>
+    </textTemplates>
+    <textTemplates>
+        <name>textoErroEnvio</name>
+        <isViewedAsPlainText>true</isViewedAsPlainText>
+        <text>O e-mail automático avisando o Antônio de que este caso entrou em Em Precificação não pôde ser enviado. Avise-o manualmente.
+
+Destinatário configurado: {!Obter_Configuracao_ADV.Email_Precificacao__c}
+Erro técnico: {!$Flow.FaultMessage}</text>
+    </textTemplates>
+</Flow>

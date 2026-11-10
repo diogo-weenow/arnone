@@ -84,7 +84,8 @@ public without sharing class SOLPrazoTotalService {
   @TestVisible
   private static final Set<String> PRODUTOS_NO_ESCOPO = new Set<String>{
     'Recuperação Tributária',
-    'ART 360'
+    'ART 360',
+    'Revisão trabalhista'
   };
   @TestVisible
   private static final String STATUS_REATRIBUIDO = 'Reatribuido';
@@ -181,7 +182,7 @@ public without sharing class SOLPrazoTotalService {
           OwnerId,
           StageName,
           IsClosed,
-          SOL_Produto_Negocio__c,
+          SOL_Produtos_Negocio__c,
           RecordType.DeveloperName,
           SOL_Data_Inicio_Ciclo_Comercial__c,
           SOL_Prazo_Total_Comercial__c,
@@ -198,7 +199,9 @@ public without sharing class SOLPrazoTotalService {
         encontradas.add(o.Id);
         Boolean noEscopo =
           o.RecordType.DeveloperName == RECORD_TYPE_SOL &&
-          PRODUTOS_NO_ESCOPO.contains(o.SOL_Produto_Negocio__c) &&
+          // Régua de 30 dias úteis vale se a Opp INCLUI qualquer um dos três
+          // produtos (multi-valor; não compare por igualdade de string).
+          SOLProdutoHelper.contemAlgum(o.SOL_Produtos_Negocio__c, PRODUTOS_NO_ESCOPO) &&
           // Ganho e Perdido têm IsClosed = true: nunca são reatribuídas.
           o.IsClosed == false &&
           // (CLICKUP-9425) explícito: negócio perdido não avança mais.
@@ -361,16 +364,15 @@ public without sharing class SOLPrazoTotalService {
         // SOLPrazoTotalScheduler.TAMANHO_LOTE = 1 — uma Oportunidade por
         // transação. Consolidar os eventos fora do laço economizaria consultas
         // e destruiria o isolamento.
+        // UM evento por produto da Opp (o builder já devolve a lista).
         SOLEventoJornadaService.registrar(
-          new List<SOL_Evento_Jornada__c>{
-            SOLEventoJornadaService.reatribuicaoPorPrazoTotal(
-              o,
-              vendedorAnterior,
-              escolhido,
-              sequencia,
-              agora
-            )
-          }
+          SOLEventoJornadaService.reatribuicaoPorPrazoTotal(
+            o,
+            vendedorAnterior,
+            escolhido,
+            sequencia,
+            agora
+          )
         );
 
         // PONTEIRO NO MESMO SAVEPOINT (revisão final do PR #15). Se o ponteiro

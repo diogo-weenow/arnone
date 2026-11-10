@@ -31,7 +31,7 @@
         </connector>
         <filterFormula>AND(
   {!$Record.RecordType.DeveloperName} = &apos;SOL&apos;,
-  ISPICKVAL({!$Record.SOL_Produto_Negocio__c}, &apos;Recuperação Tributária&apos;),
+  INCLUDES({!$Record.SOL_Produtos_Negocio__c}, &apos;Recuperação Tributária&apos;),
   ISPICKVAL({!$Record.StageName}, &apos;Diagnóstico&apos;),
   NOT({!$Record.IsClosed}),
   NOT(ISBLANK({!$Record.SOL_Data_Solicitacao_Calculo__c})),

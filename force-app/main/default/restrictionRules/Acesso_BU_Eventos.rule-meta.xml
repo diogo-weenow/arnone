@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RestrictionRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <description>ACESSO-POR-BU. Quem tem a custom permission Atividades_Restritas_Por_BU so ve eventos cuja BU_Atividade__c e igual ao seu Department. View All/Modify All fazem bypass. Nao vale para codigo em System Mode (classes without sharing).</description>
+    <enforcementType>Restrict</enforcementType>
+    <masterLabel>Acesso por BU — Eventos</masterLabel>
+    <recordFilter>BU_Atividade__c = $User.Department</recordFilter>
+    <targetEntity>Event</targetEntity>
+    <userCriteria>$Permission.Atividades_Restritas_Por_BU = true</userCriteria>
+    <version>1</version>
+</RestrictionRule>

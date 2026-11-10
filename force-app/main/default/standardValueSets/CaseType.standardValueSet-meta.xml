@@ -4,16 +4,16 @@
     <standardValue>
         <fullName>Problem</fullName>
         <default>false</default>
-        <label>Problem</label>
+        <label>Problema</label>
     </standardValue>
     <standardValue>
         <fullName>Feature Request</fullName>
         <default>false</default>
-        <label>Feature Request</label>
+        <label>Solicitação de melhoria</label>
     </standardValue>
     <standardValue>
         <fullName>Question</fullName>
         <default>false</default>
-        <label>Question</label>
+        <label>Dúvida</label>
     </standardValue>
 </StandardValueSet>

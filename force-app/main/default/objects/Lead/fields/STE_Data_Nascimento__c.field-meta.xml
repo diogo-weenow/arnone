@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Data_Nascimento__c</fullName>
+    <description>Data de nascimento do candidato do Instituto STech, registrada pelo atendente a partir do documento. Não participa da seleção por idade: a elegibilidade continua vindo da resposta Sim/Não coletada pelo assistente e gravada em STE_Faixa_Etaria__c. Copiada para Contact.Birthdate na conversão, pela classe STE_ConverterLead.</description>
+    <inlineHelpText>Data de nascimento conforme o documento do candidato. Não pode ser uma data futura. Este campo não aprova nem recusa o candidato por idade.</inlineHelpText>
+    <label>Data de nascimento</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

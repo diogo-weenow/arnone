@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Saude_Exige_Antecedentes</fullName>
+    <active>true</active>
+    <description>Impede a entrada na etapa Saúde Ocupacional enquanto os antecedentes não estiverem Aprovados. Só se aplica ao funil Stech Telecom (record type STE_Telecom).</description>
+    <errorConditionFormula>AND(
+  RecordType.DeveloperName = &quot;STE_Telecom&quot;,
+  ISCHANGED(StageName),
+  ISPICKVAL(StageName, &quot;Saúde Ocupacional&quot;),
+  NOT(ISPICKVAL(STE_Resultado_Antecedentes__c, &quot;Aprovado&quot;))
+)</errorConditionFormula>
+    <errorMessage>Para avançar é preciso que os Antecedentes estejam Aprovados. — Saúde Ocupacional</errorMessage>
+</ValidationRule>

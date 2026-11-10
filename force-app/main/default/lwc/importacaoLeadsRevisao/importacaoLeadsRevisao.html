@@ -1,0 +1,80 @@
+<template>
+    <div class="slds-grid slds-wrap" role="group" aria-label="Resultado por balde">
+        <template for:each={tiles} for:item="t">
+            <div key={t.k} class={classeTile}>
+                <button
+                    type="button"
+                    class={t.classe}
+                    data-balde={t.k}
+                    aria-pressed={t.pressionado}
+                    onclick={handleTile}
+                >
+                    <span class="slds-text-title slds-truncate tile-rotulo">{t.rotulo}</span>
+                    <span class="slds-text-heading_medium tile-valor">{t.valor}</span>
+                </button>
+            </div>
+        </template>
+    </div>
+
+    <h3 class="slds-text-heading_small slds-m-top_medium slds-m-bottom_x-small">{rotuloBaldeAtivo}</h3>
+
+    <template lwc:if={semLinhas}>
+        <p class="slds-text-body_small slds-text-color_weak sem-linhas">Nenhuma linha neste balde.</p>
+    </template>
+    <template lwc:else>
+        <template lwc:if={ehMultiplo}>
+            <p class="slds-text-body_small slds-m-bottom_x-small">Marque os leads que devem ser atualizados em cada linha.</p>
+            <template lwc:if={grande}>
+                <lightning-datatable
+                    class="tabela-multiplo"
+                    key-field="chaveTabela"
+                    data={linhasMultiplo}
+                    columns={colunasMultiplo}
+                    selected-rows={selecionadosMultiplo}
+                    onrowselection={handleSelecaoTabela}
+                ></lightning-datatable>
+            </template>
+            <template lwc:else>
+                <lightning-accordion class="acordeao-multiplo" allow-multiple-sections-open>
+                    <template for:each={secoesMultiplo} for:item="l">
+                        <lightning-accordion-section key={l.linhaId} name={l.linhaId} label={l.rotuloSecao}>
+                            <template for:each={l.leadsAlvo} for:item="a">
+                                <lightning-input
+                                    key={a.id}
+                                    type="checkbox"
+                                    label={a.rotulo}
+                                    checked={a.selecionado}
+                                    data-linha={l.linhaId}
+                                    data-lead={a.id}
+                                    onchange={handleCheckbox}
+                                ></lightning-input>
+                            </template>
+                        </lightning-accordion-section>
+                    </template>
+                </lightning-accordion>
+            </template>
+        </template>
+        <template lwc:else>
+            <template lwc:if={grande}>
+                <lightning-datatable
+                    class="tabela-linhas"
+                    key-field="linhaId"
+                    data={linhasBalde}
+                    columns={colunasLinha}
+                    hide-checkbox-column
+                ></lightning-datatable>
+            </template>
+            <template lwc:else>
+                <lightning-accordion class="acordeao-linhas" allow-multiple-sections-open>
+                    <template for:each={linhasBalde} for:item="l">
+                        <lightning-accordion-section key={l.linhaId} name={l.linhaId} label={l.rotuloSecao}>
+                            <p class="slds-text-body_small"><strong>Resultado:</strong> {l.rotuloBalde}</p>
+                            <p class="slds-text-body_small"><strong>Ação:</strong> {l.acao}</p>
+                            <p class="slds-text-body_small">{l.resumo}</p>
+                        </lightning-accordion-section>
+                    </template>
+                </lightning-accordion>
+            </template>
+        </template>
+    </template>
+</template>

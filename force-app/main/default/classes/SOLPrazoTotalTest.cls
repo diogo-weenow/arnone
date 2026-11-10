@@ -174,7 +174,7 @@ private class SOLPrazoTotalTest {
       AccountId = a.Id,
       CloseDate = Date.today().addDays(60),
       StageName = 'Diagnóstico',
-      SOL_Produto_Negocio__c = produto,
+      SOL_Produtos_Negocio__c = produto,
       SOL_ECAC_Consulta_Realizada__c = true,
       SOL_ECAC_Data_Consulta__c = Date.today(),
       SOL_ECAC_Resultado__c = 'Valor a recuperar',
@@ -315,7 +315,7 @@ private class SOLPrazoTotalTest {
       Email = 'lead.' + rnd().left(8) + '@exemplo.invalid',
       Status = 'Apto para Conversão',
       CNPJ__c = '11.222.333/0001-81',
-      SOL_Produto_Interesse__c = produto
+      SOL_Produtos_Interesse__c = produto
     );
     Database.DMLOptions opc = new Database.DMLOptions();
     opc.duplicateRuleHeader.allowSave = true;
@@ -353,7 +353,7 @@ private class SOLPrazoTotalTest {
     );
 
     return [
-      SELECT Id, SOL_Data_Contato_Efetivado__c, SOL_Produto_Interesse__c
+      SELECT Id, SOL_Data_Contato_Efetivado__c, SOL_Produtos_Interesse__c
       FROM Lead
       WHERE Id = :l.Id
     ];
@@ -369,7 +369,7 @@ private class SOLPrazoTotalTest {
     return [
       SELECT
         Id,
-        SOL_Produto_Negocio__c,
+        SOL_Produtos_Negocio__c,
         SOL_Data_Inicio_Ciclo_Comercial__c,
         SOL_Prazo_Total_Comercial__c
       FROM Opportunity
@@ -397,7 +397,7 @@ private class SOLPrazoTotalTest {
     Test.stopTest();
 
     Opportunity o = oppConvertida(l.Id);
-    System.assertEquals(PRODUTO_RT, o.SOL_Produto_Negocio__c);
+    System.assertEquals(PRODUTO_RT, o.SOL_Produtos_Negocio__c);
     System.assertEquals(
       l.SOL_Data_Contato_Efetivado__c,
       o.SOL_Data_Inicio_Ciclo_Comercial__c,
@@ -425,7 +425,7 @@ private class SOLPrazoTotalTest {
     Test.stopTest();
 
     Opportunity o = oppConvertida(l.Id);
-    System.assertEquals(PRODUTO_ART, o.SOL_Produto_Negocio__c);
+    System.assertEquals(PRODUTO_ART, o.SOL_Produtos_Negocio__c);
     System.assertEquals(
       l.SOL_Data_Contato_Efetivado__c,
       o.SOL_Data_Inicio_Ciclo_Comercial__c,
@@ -528,14 +528,14 @@ private class SOLPrazoTotalTest {
     Lead semProduto = new Lead(
       IsConverted = false,
       RecordType = new RecordType(DeveloperName = 'SOL'),
-      SOL_Produto_Interesse__c = null
+      SOL_Produtos_Interesse__c = null
     );
     System.assert(SOL_ConverterLead.impedimentoPara(semProduto, 1).startsWith('Informe o produto'));
 
     Lead semCnpj = new Lead(
       IsConverted = false,
       RecordType = new RecordType(DeveloperName = 'SOL'),
-      SOL_Produto_Interesse__c = PRODUTO_RT,
+      SOL_Produtos_Interesse__c = PRODUTO_RT,
       CNPJ__c = null
     );
     System.assert(SOL_ConverterLead.impedimentoPara(semCnpj, 1).startsWith('Informe o CNPJ'));
@@ -543,7 +543,7 @@ private class SOLPrazoTotalTest {
     Lead semProcuracao = new Lead(
       IsConverted = false,
       RecordType = new RecordType(DeveloperName = 'SOL'),
-      SOL_Produto_Interesse__c = PRODUTO_RT,
+      SOL_Produtos_Interesse__c = PRODUTO_RT,
       CNPJ__c = CNPJ,
       SOL_Status_Procuracao__c = 'Solicitada'
     );
@@ -554,7 +554,7 @@ private class SOLPrazoTotalTest {
     Lead semArquivo = new Lead(
       IsConverted = false,
       RecordType = new RecordType(DeveloperName = 'SOL'),
-      SOL_Produto_Interesse__c = PRODUTO_RT,
+      SOL_Produtos_Interesse__c = PRODUTO_RT,
       CNPJ__c = CNPJ,
       SOL_Status_Procuracao__c = 'Recebida'
     );
@@ -565,7 +565,7 @@ private class SOLPrazoTotalTest {
     Lead apto = new Lead(
       IsConverted = false,
       RecordType = new RecordType(DeveloperName = 'SOL'),
-      SOL_Produto_Interesse__c = PRODUTO_RT,
+      SOL_Produtos_Interesse__c = PRODUTO_RT,
       CNPJ__c = CNPJ,
       SOL_Status_Procuracao__c = 'Recebida',
       SOL_Data_Recebimento_Procuracao__c = Date.today()
@@ -1921,7 +1921,7 @@ private class SOLPrazoTotalTest {
       Company = 'C',
       CNPJ__c = CNPJ,
       Status = 'Captação - Contato',
-      SOL_Produto_Interesse__c = PRODUTO_ART
+      SOL_Produtos_Interesse__c = PRODUTO_ART
     );
     insert l;
     Lead depois = [

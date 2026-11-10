@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Carimba a data do dia no próprio save. Assignment puro: sem DML nem consulta extra.</description>
+        <name>Carimbar_Data_Envio</name>
+        <label>Carimbar a data de envio da proposta</label>
+        <locationX>176</locationX>
+        <locationY>516</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.ADV_Data_Envio_Proposta__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <description>Só a Arnone Advogados carimba. Fecha por padrão: Record Type ausente ou diferente não altera nada.</description>
+        <name>Decidir_Record_Type_ADV</name>
+        <label>É Record Type ADV?</label>
+        <locationX>176</locationX>
+        <locationY>396</locationY>
+        <defaultConnectorLabel>Não — outra BU</defaultConnectorLabel>
+        <rules>
+            <name>E_Record_Type_ADV</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.RecordTypeId</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <elementReference>Obter_Record_Type_ADV.Id</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Carimbar_Data_Envio</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <description>BU Arnone Advogados (funil TO-BE v1) — quando a Oportunidade ENTRA em &quot;Proposta Enviada&quot; (criação já nessa etapa ou mudança de etapa) e a Data de envio da proposta está vazia, preenche com a data do dia. Uma data já informada nunca é sobrescrita, e limpar a data com a Oportunidade parada na etapa não recarimba (o filtro exige mudança de etapa). O campo continua editável. BEFORE-SAVE: atualiza o próprio registro sem DML extra. O Record Type é conferido por Get Records + Decision porque o critério de entrada de flow before-save não alcança campo de registro relacionado; sem Id fixado no metadado.</description>
+    <environments>Default</environments>
+    <interviewLabel>ADV_Carimbo_Envio_Proposta {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>ADV_Carimbo_Envio_Proposta</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Record Type ADV de Oportunidade, pelo DeveloperName. Filtro constante: a plataforma bulkifica (uma consulta por transação).</description>
+        <name>Obter_Record_Type_ADV</name>
+        <label>Obter o Record Type ADV de Oportunidade</label>
+        <locationX>176</locationX>
+        <locationY>276</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Decidir_Record_Type_ADV</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>SobjectType</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Opportunity</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>ADV</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>RecordType</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Obter_Record_Type_ADV</targetReference>
+        </connector>
+        <filterFormula>AND(
+  ISPICKVAL({!$Record.StageName}, &apos;Proposta Enviada&apos;),
+  ISBLANK({!$Record.ADV_Data_Envio_Proposta__c}),
+  OR(ISNEW(), ISCHANGED({!$Record.StageName}))
+)</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

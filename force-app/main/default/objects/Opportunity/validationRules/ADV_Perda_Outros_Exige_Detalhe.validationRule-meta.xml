@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ADV_Perda_Outros_Exige_Detalhe</fullName>
+    <active>true</active>
+    <description>Motivo Outros sem explicação não diz nada no relatório: exige o detalhe da perda.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;ADV&apos;,
+  ISPICKVAL(ADV_Motivo_Perda__c, &apos;Outros&apos;),
+  ISBLANK(ADV_Detalhe_Perda__c)
+)</errorConditionFormula>
+    <errorDisplayField>ADV_Detalhe_Perda__c</errorDisplayField>
+    <errorMessage>Descreva o motivo no campo Detalhe da perda quando o motivo for Outros.</errorMessage>
+</ValidationRule>

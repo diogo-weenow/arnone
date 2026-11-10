@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>62.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Definir_Title</name>
+        <label>Definir Title com o nome</label>
+        <locationX>176</locationX>
+        <locationY>288</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Title</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Nome_Completo</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <description>Preenche o Title do Lead STE com o nome do candidato na criação. O Name ainda não existe antes de salvar, por isso o valor é montado a partir de FirstName e LastName. Só age quando o Title chega vazio, para não sobrescrever um cargo vindo de formulário ou importação. Roda apenas na criação: correções posteriores do nome não são refletidas no Title.</description>
+    <environments>Default</environments>
+    <formulas>
+        <name>Nome_Completo</name>
+        <dataType>String</dataType>
+        <expression>TRIM({!$Record.FirstName} &amp; &apos; &apos; &amp; {!$Record.LastName})</expression>
+    </formulas>
+    <interviewLabel>STE Preencher Title Com Nome {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>STE Preencher Title Com Nome</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Definir_Title</targetReference>
+        </connector>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &apos;STE&apos;,
+  ISBLANK({!$Record.Title})
+)</filterFormula>
+        <object>Lead</object>
+        <recordTriggerType>Create</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

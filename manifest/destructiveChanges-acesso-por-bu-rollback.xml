@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ROLLBACK ACESSO-POR-BU (destrutivo). NAO usar sozinho. Ordem obrigatoria:
+  1) desativar Acesso_BU_Tarefas e Acesso_BU_Eventos (active=false) e os dois flows Acesso_BU_*;
+  2) redeploy do baseline 608583c: SharingRules/Lead (SOL_Leitura_Comercial), PSG_SOL_Comercial, roles Coordenador_ADV/SOL e Comercial_ESG/STE/SCO,
+     Lead_STE, pastas Arnone_Comercial e STech_Telecom;
+  3) remover usuarios dos PSGs novos e esvaziar as pastas novas;
+  Para voltar so a regra antiga (atendente ve a BU inteira): pre-destructive de Lead/Opp_<BU>_BU e _Coordenacao (ADV, SOL, ESG, SCO)
+     e redeploy de sharingRules do commit 2c6f617 (sharedTo roleAndSubordinatesInternal), espelhando o deploy 0Afbe00000BlzGFCAZ.
+  4) so entao este destrutivo. Contact NAO volta para ReadWrite: ja era ControlledByParent antes do card.
+-->
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Lead.Lead_ADV_BU</members>
+        <members>Lead.Lead_SOL_BU</members>
+        <members>Lead.Lead_STE_BU</members>
+        <members>Lead.Lead_ESG_BU</members>
+        <members>Lead.Lead_SCO_BU</members>
+        <members>Opportunity.Opp_ADV_BU</members>
+        <members>Opportunity.Opp_SOL_BU</members>
+        <members>Opportunity.Opp_STE_BU</members>
+        <members>Opportunity.Opp_ESG_BU</members>
+        <members>Opportunity.Opp_SCO_BU</members>
+        <members>Lead.Lead_ADV_Coordenacao</members>
+        <members>Lead.Lead_SOL_Coordenacao</members>
+        <members>Opportunity.Opp_ADV_Coordenacao</members>
+        <members>Opportunity.Opp_SOL_Coordenacao</members>
+        <name>SharingCriteriaRule</name>
+    </types>
+    <types>
+        <members>Acesso_BU_Tarefas</members>
+        <members>Acesso_BU_Eventos</members>
+        <name>RestrictionRule</name>
+    </types>
+    <types>
+        <members>Acesso_BU_Tarefa_Carimbar</members>
+        <members>Acesso_BU_Evento_Carimbar</members>
+        <name>Flow</name>
+    </types>
+    <types>
+        <members>AcessoPorBUTest</members>
+        <members>AcessoPorBUAtividadeTest</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>PSG_ADV_Atendente</members>
+        <members>PSG_ADV_Diretor</members>
+        <members>PSG_SOL_Diretor</members>
+        <members>PSG_STE_Atendente</members>
+        <members>PSG_STE_Diretor</members>
+        <members>PSG_ESG_Atendente</members>
+        <members>PSG_ESG_Diretor</members>
+        <members>PSG_SCO_Atendente</members>
+        <members>PSG_SCO_Diretor</members>
+        <members>PSG_Diretor_Global</members>
+        <name>PermissionSetGroup</name>
+    </types>
+    <types>
+        <members>PSG_SOL_Diretor_Muting</members>
+        <name>MutingPermissionSet</name>
+    </types>
+    <types>
+        <members>PS_Ver_Historico</members>
+        <members>PS_Atividades_Por_BU</members>
+        <members>PS_Diretor_Global</members>
+        <members>PS_Acesso_BU_Campos</members>
+        <name>PermissionSet</name>
+    </types>
+    <types>
+        <members>Ver_Historico</members>
+        <members>Atividades_Restritas_Por_BU</members>
+        <name>CustomPermission</name>
+    </types>
+    <types>
+        <members>Activity.BU_Atividade__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>Gerencial_ADV</members>
+        <members>Gerencial_SOL</members>
+        <members>Gerencial_STE</members>
+        <members>Gerencial_ESG</members>
+        <members>Gerencial_SCO</members>
+        <members>Operacional_ADV</members>
+        <members>Operacional_ESG</members>
+        <members>Operacional_SCO</members>
+        <name>ReportFolder</name>
+    </types>
+    <types>
+        <members>Gerencial_ADV</members>
+        <members>Gerencial_SOL</members>
+        <members>Gerencial_STE</members>
+        <members>Gerencial_ESG</members>
+        <members>Gerencial_SCO</members>
+        <members>Operacional_ADV</members>
+        <members>Operacional_ESG</members>
+        <members>Operacional_SCO</members>
+        <name>DashboardFolder</name>
+    </types>
+    <types>
+        <members>Diretoria_ADV</members>
+        <members>Diretoria_SOL</members>
+        <members>Diretoria_STE</members>
+        <members>Diretoria_ESG</members>
+        <members>Diretoria_SCO</members>
+        <name>Role</name>
+    </types>
+    <version>67.0</version>
+</Package>

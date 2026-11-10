@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label>Loss Reason</label>
+    <name>Loss_Reason__c</name>
+    <picklistValues>
+        <masterLabel>Perdido para concorrente</masterLabel>
+        <translation>Lost to Competitor</translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Sem orçamento</masterLabel>
+        <translation>No Budget / Lost Funding</translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Sem decisão / sem resposta</masterLabel>
+        <translation>No Decision / Non-Responsive</translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Preço</masterLabel>
+        <translation>Price</translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Outros</masterLabel>
+        <translation>Other</translation>
+    </picklistValues>
+</CustomFieldTranslation>

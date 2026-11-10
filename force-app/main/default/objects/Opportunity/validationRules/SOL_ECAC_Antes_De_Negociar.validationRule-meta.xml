@@ -5,7 +5,7 @@
     <description>É a regra central do card: só avança para Negociação quem tem valor real a recuperar. Sem ela a etapa de Diagnóstico vira formalidade e o consultor pode apresentar proposta sem ter consultado nada.</description>
     <errorConditionFormula>AND(
   $RecordType.DeveloperName = &apos;SOL&apos;,
-  ISPICKVAL(SOL_Produto_Negocio__c, &apos;Recuperação Tributária&apos;),
+  INCLUDES(SOL_Produtos_Negocio__c, &apos;Recuperação Tributária&apos;),
   OR(
     ISPICKVAL(StageName, &apos;Negociação&apos;),
     ISPICKVAL(StageName, &apos;Fechamento&apos;),
