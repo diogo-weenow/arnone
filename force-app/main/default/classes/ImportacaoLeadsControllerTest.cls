@@ -388,7 +388,8 @@ private class ImportacaoLeadsControllerTest {
   @IsTest
   static void steCasaCpfNosDoisFormatosEAtualiza() {
     System.runAs(operador()) {
-      Lead mascarado = ImportacaoLeadsTestFactory.novoLeadCpf('STE', 'Ste Masc', '123.456.789-09');
+      // O CPF gravado é só dígitos (VR CPF_Somente_Numeros); a máscara vem do arquivo.
+      Lead mascarado = ImportacaoLeadsTestFactory.novoLeadCpf('STE', 'Ste Masc', '12345678909');
       Lead digitos = ImportacaoLeadsTestFactory.novoLeadCpf('STE', 'Ste Dig', ImportacaoLeadsTestFactory.CPF_B);
       update new Lead(Id = mascarado.Id, Email = 'original@arnone.invalid', MobilePhone = null);
       Lead antes = [SELECT OwnerId, RecordTypeId FROM Lead WHERE Id = :mascarado.Id];
@@ -396,7 +397,7 @@ private class ImportacaoLeadsControllerTest {
       ImportacaoLeadsController.PreviewDTO pv = carregar(
         'STE_Atualizacao_CPF',
         new List<ImportacaoLeadsController.LinhaDTO>{
-          dto(1, '12345678909', new Map<String, String>{
+          dto(1, '123.456.789-09', new Map<String, String>{
             'Email' => 'novo@arnone.invalid',
             'MobilePhone' => '11999998888'
           }),
@@ -421,7 +422,7 @@ private class ImportacaoLeadsControllerTest {
   @IsTest
   static void steSemMatchJaContatoELeadSolNaoCriam() {
     System.runAs(operador()) {
-      insert new Contact(LastName = 'Aluno', CPF__c = '111.444.777-35');
+      insert new Contact(LastName = 'Aluno', CPF__c = ImportacaoLeadsTestFactory.CPF_C);
       Lead sol = new Lead(
         RecordTypeId = ImportacaoLeadsTestFactory.rt('SOL'),
         LastName = 'Sol Cpf',
