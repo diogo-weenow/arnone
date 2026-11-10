@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Telefones_Socios__c</fullName>
+    <description>Telefone dos sócios da empresa, vindo do Driva ou preenchido manualmente, para a jornada da Arnone Soluções.</description>
+    <label>Telefones dos Sócios</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Phone</type>
+</CustomField>

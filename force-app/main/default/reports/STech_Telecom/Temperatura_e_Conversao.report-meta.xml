@@ -42,7 +42,6 @@
             <operator>notEqual</operator>
             <value></value>
         </criteriaItems>
-        <language>pt_BR</language>
     </filter>
     <format>Summary</format>
     <groupingsDown>

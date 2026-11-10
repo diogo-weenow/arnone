@@ -55,7 +55,6 @@
             <operator>notEqual</operator>
             <value>Desqualificado</value>
         </criteriaItems>
-        <language>pt_BR</language>
     </filter>
     <format>Tabular</format>
     <name>Candidatos parados há mais tempo</name>

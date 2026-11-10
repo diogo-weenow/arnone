@@ -4,6 +4,10 @@
     <description>Funil comercial da Arnone Soluções, único para os dois produtos. Recuperação Tributária passa pelo Diagnóstico e-CAC; ART 360 vai de Oportunidade Criada direto para a Negociação.</description>
     <isActive>true</isActive>
     <values>
+        <fullName>Aguardando Resposta</fullName>
+        <default>false</default>
+    </values>
+    <values>
         <fullName>Diagnóstico</fullName>
         <default>false</default>
     </values>
@@ -21,6 +25,10 @@
     </values>
     <values>
         <fullName>Perdido</fullName>
+        <default>false</default>
+    </values>
+    <values>
+        <fullName>Reunião Realizada</fullName>
         <default>false</default>
     </values>
 </BusinessProcess>
