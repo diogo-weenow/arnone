@@ -11,6 +11,9 @@
                             <value>Edit</value>
                         </valueListItems>
                         <valueListItems>
+                            <value>Lead.STE_Enviar_WhatsApp</value>
+                        </valueListItems>
+                        <valueListItems>
                             <value>Delete</value>
                         </valueListItems>
                         <valueListItems>
@@ -39,9 +42,6 @@
                         </valueListItems>
                         <valueListItems>
                             <value>FeedItem.ContentPost</value>
-                        </valueListItems>
-                        <valueListItems>
-                            <value>Global.SendEmail</value>
                         </valueListItems>
                         <valueListItems>
                             <value>EmailHighlightAction</value>
