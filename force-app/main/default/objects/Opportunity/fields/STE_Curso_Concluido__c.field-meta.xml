@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Curso_Concluido__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Marcado quando o aluno conclui a formação.</description>
+    <label>Curso concluído</label>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Checkbox</type>
+</CustomField>

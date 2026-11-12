@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Lead.Lead_ADV_BU</members>
+        <members>Lead.Lead_SOL_BU</members>
+        <members>Lead.Lead_ESG_BU</members>
+        <members>Lead.Lead_SCO_BU</members>
+        <members>Opportunity.Opp_ADV_BU</members>
+        <members>Opportunity.Opp_SOL_BU</members>
+        <members>Opportunity.Opp_ESG_BU</members>
+        <members>Opportunity.Opp_SCO_BU</members>
+        <name>SharingCriteriaRule</name>
+    </types>
+    <version>67.0</version>
+</Package>

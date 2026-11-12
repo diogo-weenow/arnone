@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Status__c</fullName>
+    <description>Estado do lote. "Em preview": linhas carregadas e classificadas, aguardando confirmação. "Processando": batch enfileirado/em execução. "Concluído": batch terminou sem erros de linha. "Concluído com erros": terminou com uma ou mais linhas em erro. "Erro": falha geral do processamento.</description>
+    <externalId>false</externalId>
+    <label>Status</label>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Em preview</fullName>
+                <default>true</default>
+                <label>Em preview</label>
+            </value>
+            <value>
+                <fullName>Processando</fullName>
+                <default>false</default>
+                <label>Processando</label>
+            </value>
+            <value>
+                <fullName>Concluído</fullName>
+                <default>false</default>
+                <label>Concluído</label>
+            </value>
+            <value>
+                <fullName>Concluído com erros</fullName>
+                <default>false</default>
+                <label>Concluído com erros</label>
+            </value>
+            <value>
+                <fullName>Erro</fullName>
+                <default>false</default>
+                <label>Erro</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

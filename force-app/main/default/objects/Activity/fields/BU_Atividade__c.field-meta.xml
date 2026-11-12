@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>BU_Atividade__c</fullName>
+    <description>ACESSO-POR-BU. Codigo da unidade de negocio da atividade (ADV, SOL, STE, ESG, SCO), carimbado pelos flows before-save Acesso_BU_Tarefa_Carimbar e Acesso_BU_Evento_Carimbar. Regra: (1) WhatId e Oportunidade, BU do record type da Oportunidade; (2) WhatId ou WhoId e Lead, BU do record type do Lead; (3) senao, Department do proprietario. Sem BU, fica vazio. Usado pelas Restriction Rules Acesso_BU_Tarefas e Acesso_BU_Eventos contra $User.Department.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Preenchido automaticamente; define quem vê a atividade</inlineHelpText>
+    <label>BU da atividade</label>
+    <length>3</length>
+    <required>false</required>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

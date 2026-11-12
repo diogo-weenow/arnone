@@ -4,16 +4,16 @@
     <standardValue>
         <fullName>Call</fullName>
         <default>false</default>
-        <label>Call</label>
+        <label>Ligação</label>
     </standardValue>
     <standardValue>
         <fullName>Meeting</fullName>
         <default>false</default>
-        <label>Meeting</label>
+        <label>Reunião</label>
     </standardValue>
     <standardValue>
         <fullName>Other</fullName>
         <default>false</default>
-        <label>Other</label>
+        <label>Outros</label>
     </standardValue>
 </StandardValueSet>

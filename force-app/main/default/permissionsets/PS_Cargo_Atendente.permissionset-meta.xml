@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customPermissions>
+        <enabled>true</enabled>
+        <name>Atividades_Restritas_Por_BU</name>
+    </customPermissions>
+    <description>ACESSO-POR-BU. Cargo atendente (Comercial STE): ve as atividades da propria BU (Atividades_Restritas_Por_BU).</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Cargo — Atendente</label>
+</PermissionSet>

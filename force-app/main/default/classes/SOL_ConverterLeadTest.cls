@@ -26,7 +26,7 @@ private class SOL_ConverterLeadTest {
       Status = 'Apto para Conversão',
       Unidade_Origem__c = 'SOL',
       CNPJ__c = cnpj,
-      SOL_Produto_Interesse__c = produto
+      SOL_Produtos_Interesse__c = produto
     );
     // As regras de duplicidade da org só alertam na interface, mas em Apex o
     // alerta vira exceção. Nos cenários de reaproveitamento existe de propósito
@@ -243,7 +243,7 @@ private class SOL_ConverterLeadTest {
         StageName,
         RecordType.DeveloperName,
         AccountId,
-        SOL_Produto_Negocio__c
+        SOL_Produtos_Negocio__c
       FROM Opportunity
       WHERE Id = :r.oportunidadeId
     ];
@@ -259,7 +259,7 @@ private class SOL_ConverterLeadTest {
     );
     Assert.areEqual(
       'Recuperação Tributária',
-      o.SOL_Produto_Negocio__c,
+      o.SOL_Produtos_Negocio__c,
       'O produto de interesse vira produto de negócio.'
     );
     Assert.areEqual(a.Id, o.AccountId, 'Oportunidade ligada à conta.');
@@ -485,7 +485,7 @@ private class SOL_ConverterLeadTest {
     Assert.isTrue(r.convertido, 'Deveria converter: ' + r.mensagem);
 
     Opportunity o = [
-      SELECT StageName, SOL_Produto_Negocio__c
+      SELECT StageName, SOL_Produtos_Negocio__c
       FROM Opportunity
       WHERE Id = :r.oportunidadeId
     ];
@@ -494,7 +494,122 @@ private class SOL_ConverterLeadTest {
       o.StageName,
       'ART 360 não tem diagnóstico e-CAC: vai direto para a Negociação.'
     );
-    Assert.areEqual('ART 360', o.SOL_Produto_Negocio__c, 'Produto mapeado.');
+    Assert.areEqual('ART 360', o.SOL_Produtos_Negocio__c, 'Produto mapeado.');
+  }
+
+  // ------------------------------- Revisão trabalhista — produto multi-select
+  //
+  // NOTA: estes testes dependem do campo SOL_Produtos_Interesse__c já convertido
+  // para Multi-Select Picklist com o valor "Revisão trabalhista" (flip via Setup
+  // UI, passo manual do runbook). Antes do flip o campo é Picklist restrita e os
+  // inserts com valor múltiplo/Revisão falham — por isso só rodam depois do flip.
+
+  private static Lead leadComProcuracaoProduto(String produto) {
+    Lead l = novoLead(produto, CNPJ_MASCARADO);
+    l.SOL_Status_Procuracao__c = 'Recebida';
+    l.SOL_Data_Recebimento_Procuracao__c = Date.today();
+    update l;
+    anexar(l.Id);
+    return l;
+  }
+
+  /**
+   * Lead só "Revisão trabalhista": fluxo simples. Converte SEM procuração (o
+   * portão é exclusivo de RT/ART) e a Oportunidade nasce direto na Negociação.
+   */
+  @IsTest
+  static void revisaoSozinhaConverteSemProcuracaoEVaiANegociacao() {
+    Lead l = novoLead('Revisão trabalhista', CNPJ_MASCARADO);
+
+    Test.startTest();
+    SOL_ConverterLead.Resultado r = SOL_ConverterLead.converter(
+      new List<SOL_ConverterLead.Pedido>{ pedidoDe(l.Id, null) }
+    )[0];
+    Test.stopTest();
+
+    Assert.isTrue(r.convertido, 'Revisão sozinha dispensa procuração: ' + r.mensagem);
+    Opportunity o = [
+      SELECT StageName, SOL_Produtos_Negocio__c
+      FROM Opportunity
+      WHERE Id = :r.oportunidadeId
+    ];
+    Assert.areEqual(
+      'Negociação',
+      o.StageName,
+      'Sem RT no conjunto não há Diagnóstico e-CAC.'
+    );
+    Assert.areEqual(
+      'Revisão trabalhista',
+      o.SOL_Produtos_Negocio__c,
+      'Produto de interesse copiado para o de negócio.'
+    );
+  }
+
+  /**
+   * Mix "Recuperação Tributária;Revisão trabalhista": união do mais exigente —
+   * exige procuração e entra no Diagnóstico, carregando os dois produtos.
+   */
+  @IsTest
+  static void mixRecuperacaoRevisaoExigeProcuracaoEVaiAoDiagnostico() {
+    Lead l = leadComProcuracaoProduto('Recuperação Tributária;Revisão trabalhista');
+
+    Test.startTest();
+    SOL_ConverterLead.Resultado r = SOL_ConverterLead.converter(
+      new List<SOL_ConverterLead.Pedido>{ pedidoDe(l.Id, null) }
+    )[0];
+    Test.stopTest();
+
+    Assert.isTrue(r.convertido, 'Mix com procuração converte: ' + r.mensagem);
+    Opportunity o = [
+      SELECT Name, StageName, SOL_Produtos_Negocio__c
+      FROM Opportunity
+      WHERE Id = :r.oportunidadeId
+    ];
+    Assert.areEqual(
+      'Diagnóstico',
+      o.StageName,
+      'RT no conjunto leva ao Diagnóstico e-CAC.'
+    );
+    Assert.areEqual(
+      'Recuperação Tributária;Revisão trabalhista',
+      o.SOL_Produtos_Negocio__c,
+      'Os dois produtos viajam inteiros para a Oportunidade.'
+    );
+    Assert.isTrue(
+      o.Name.contains('Recuperação Tributária, Revisão trabalhista'),
+      'O nome usa vírgula e espaço, não ponto e vírgula: ' + o.Name
+    );
+  }
+
+  /**
+   * Mix "ART 360;Revisão trabalhista": exige procuração (ART no conjunto) e, sem
+   * RT, vai direto para a Negociação.
+   */
+  @IsTest
+  static void mixArtRevisaoExigeProcuracaoEVaiANegociacao() {
+    Lead l = leadComProcuracaoProduto('ART 360;Revisão trabalhista');
+
+    Test.startTest();
+    SOL_ConverterLead.Resultado r = SOL_ConverterLead.converter(
+      new List<SOL_ConverterLead.Pedido>{ pedidoDe(l.Id, null) }
+    )[0];
+    Test.stopTest();
+
+    Assert.isTrue(r.convertido, 'Mix ART+Revisão converte com procuração: ' + r.mensagem);
+    Opportunity o = [
+      SELECT StageName, SOL_Produtos_Negocio__c
+      FROM Opportunity
+      WHERE Id = :r.oportunidadeId
+    ];
+    Assert.areEqual(
+      'Negociação',
+      o.StageName,
+      'Sem RT no conjunto não há Diagnóstico.'
+    );
+    Assert.areEqual(
+      'ART 360;Revisão trabalhista',
+      o.SOL_Produtos_Negocio__c
+    );
   }
 
   // ------------------------------------------------------------- permissões

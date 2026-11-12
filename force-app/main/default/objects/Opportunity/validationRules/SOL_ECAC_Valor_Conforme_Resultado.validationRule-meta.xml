@@ -5,7 +5,7 @@
     <description>O resultado e o valor precisam contar a mesma história: valor a recuperar sem valor apurado, ou débito sem quantia, não dá para levar ao cliente.</description>
     <errorConditionFormula>AND(
   $RecordType.DeveloperName = &apos;SOL&apos;,
-  ISPICKVAL(SOL_Produto_Negocio__c, &apos;Recuperação Tributária&apos;),
+  INCLUDES(SOL_Produtos_Negocio__c, &apos;Recuperação Tributária&apos;),
   OR(
     AND(
       ISPICKVAL(SOL_ECAC_Resultado__c, &apos;Valor a recuperar&apos;),

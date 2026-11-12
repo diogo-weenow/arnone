@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StandardValueSetTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <valueTranslation>
+        <masterLabel>Problema</masterLabel>
+        <translation>Problem</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Solicitação de melhoria</masterLabel>
+        <translation>Feature Request</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Dúvida</masterLabel>
+        <translation>Question</translation>
+    </valueTranslation>
+</StandardValueSetTranslation>

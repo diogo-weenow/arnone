@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CompactLayout xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SOL_Lead</fullName>
+    <fields>Name</fields>
+    <fields>Company</fields>
+    <fields>CNPJ__c</fields>
+    <fields>Status</fields>
+    <fields>Phone</fields>
+    <fields>OwnerId</fields>
+    <label>Lead — Arnone Soluções</label>
+</CompactLayout>

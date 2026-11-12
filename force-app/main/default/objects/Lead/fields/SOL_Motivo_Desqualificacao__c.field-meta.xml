@@ -21,6 +21,11 @@
                 <default>false</default>
                 <label>Negócio perdido</label>
             </value>
+            <value>
+                <fullName>Outros</fullName>
+                <default>false</default>
+                <label>Outros</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

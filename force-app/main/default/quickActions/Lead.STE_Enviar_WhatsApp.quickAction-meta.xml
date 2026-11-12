@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Abre o envio de mensagem no WhatsApp para o candidato, a partir do lead. Roda o flow STE_Enviar_WhatsApp.</description>
+    <flowDefinition>STE_Enviar_WhatsApp</flowDefinition>
+    <label>Enviar WhatsApp</label>
+    <optionsCreateFeedItem>false</optionsCreateFeedItem>
+    <type>Flow</type>
+</QuickAction>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ADV_Data_Envio_Proposta__c</fullName>
+    <description>BU Arnone Advogados: data em que a proposta foi enviada ao cliente. Preenchida automaticamente com a data do dia, se vazia, quando a Oportunidade entra em Proposta Enviada (flow ADV_Carimbo_Envio_Proposta). Editável para corrigir a data real.</description>
+    <inlineHelpText>Preenchida automaticamente ao mover para Proposta Enviada. Corrija se a proposta saiu em outro dia.</inlineHelpText>
+    <label>Data de envio da proposta</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

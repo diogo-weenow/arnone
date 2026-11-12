@@ -218,7 +218,7 @@
             <targetReference>Buscar_Tipo_Registro_STE</targetReference>
         </connector>
     </start>
-    <status>Draft</status>
+    <status>Active</status>
     <variables>
         <description>Id da Oportunidade, preenchido pela ação rápida na tela do registro.</description>
         <name>recordId</name>

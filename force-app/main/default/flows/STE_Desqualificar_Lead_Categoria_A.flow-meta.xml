@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>62.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Desqualificar_Por_Categoria_A</name>
+        <label>Desqualificar por Categoria A</label>
+        <locationX>314</locationX>
+        <locationY>396</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.Status</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Desqualificado</stringValue>
+            </value>
+        </assignmentItems>
+        <assignmentItems>
+            <assignToReference>$Record.STE_Motivo_Desqualificacao__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <stringValue>Categoria A/ sem CNH</stringValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <name>Ja_Desqualificado</name>
+        <label>Já está Desqualificado?</label>
+        <locationX>182</locationX>
+        <locationY>288</locationY>
+        <defaultConnector>
+            <targetReference>Desqualificar_Por_Categoria_A</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Não</defaultConnectorLabel>
+        <rules>
+            <name>Sim_Ja_Desqualificado</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Status</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>Desqualificado</stringValue>
+                </rightValue>
+            </conditions>
+            <label>Sim, preserva o motivo</label>
+        </rules>
+    </decisions>
+    <description>Desqualifica o candidato do Instituto STech quando o Tipo de CNH é Categoria A (valor com dois espaços). Não sobrescreve quem já está Desqualificado; não age em Lead convertido.</description>
+    <environments>Default</environments>
+    <interviewLabel>STE Desqualificar Lead Categoria A {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>STE - Desqualificar Lead Categoria A</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>56</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Ja_Desqualificado</targetReference>
+        </connector>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND({!$Record.RecordType.DeveloperName} = &quot;STE&quot;, TEXT({!$Record.Tipo_de_CNH__c}) = &quot;CATEGORIA:  A&quot;, NOT({!$Record.IsConverted}))</filterFormula>
+        <object>Lead</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ADV_Area_Juridica__c</fullName>
+    <description>Área do Direito do caso da BU Arnone Advogados. Exigida para sair de Oportunidade Recebida (VR ADV_Classificacao_Exige_Preenchimento).</description>
+    <label>Área jurídica</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Trabalhista</fullName>
+                <default>false</default>
+                <label>Trabalhista</label>
+            </value>
+            <value>
+                <fullName>Cível</fullName>
+                <default>false</default>
+                <label>Cível</label>
+            </value>
+            <value>
+                <fullName>Empresarial</fullName>
+                <default>false</default>
+                <label>Empresarial</label>
+            </value>
+            <value>
+                <fullName>Tributário</fullName>
+                <default>false</default>
+                <label>Tributário</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

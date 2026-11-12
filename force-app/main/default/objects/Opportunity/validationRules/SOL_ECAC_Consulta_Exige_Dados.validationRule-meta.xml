@@ -5,7 +5,7 @@
     <description>Marcar a consulta como realizada sem dizer quando e o que ela achou deixa a etapa parecendo cumprida sem nenhuma informação aproveitável.</description>
     <errorConditionFormula>AND(
   $RecordType.DeveloperName = &apos;SOL&apos;,
-  ISPICKVAL(SOL_Produto_Negocio__c, &apos;Recuperação Tributária&apos;),
+  INCLUDES(SOL_Produtos_Negocio__c, &apos;Recuperação Tributária&apos;),
   SOL_ECAC_Consulta_Realizada__c,
   OR(
     ISBLANK(SOL_ECAC_Data_Consulta__c),

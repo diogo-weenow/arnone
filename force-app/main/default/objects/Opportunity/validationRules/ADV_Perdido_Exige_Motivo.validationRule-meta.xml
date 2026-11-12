@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ADV_Perdido_Exige_Motivo</fullName>
+    <active>true</active>
+    <description>Oportunidade ADV só fecha como Perdido com o motivo da perda informado.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;ADV&apos;,
+  ISPICKVAL(StageName, &apos;Perdido&apos;),
+  ISPICKVAL(ADV_Motivo_Perda__c, &apos;&apos;)
+)</errorConditionFormula>
+    <errorDisplayField>ADV_Motivo_Perda__c</errorDisplayField>
+    <errorMessage>Informe o motivo da perda antes de fechar a Oportunidade como Perdido.</errorMessage>
+</ValidationRule>

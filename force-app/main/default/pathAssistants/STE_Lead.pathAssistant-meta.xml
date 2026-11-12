@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathAssistant xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <entityName>Lead</entityName>
+    <fieldName>Status</fieldName>
+    <masterLabel>Instituto STech</masterLabel>
+    <pathAssistantSteps>
+        <fieldNames>STE_Motivo_Desqualificacao__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; equipe STech.&lt;/p&gt;&lt;p&gt;Informe o motivo da desqualificação.&lt;/p&gt;</info>
+        <picklistValueName>Desqualificado</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>STE_Ja_Trabalhou_Telecom__c</fieldNames>
+        <fieldNames>STE_Empresa_Telecom_Anterior__c</fieldNames>
+        <fieldNames>STE_Interesse_Pre_Inscricao__c</fieldNames>
+        <fieldNames>STE_Classificacao_Fila__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; assistente virtual e equipe STech.&lt;/p&gt;&lt;p&gt;Perfil do candidato em levantamento.&lt;/p&gt;</info>
+        <picklistValueName>Em Qualificação</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>STE_Faixa_Etaria__c</fieldNames>
+        <fieldNames>STE_Genero__c</fieldNames>
+        <fieldNames>STE_Possui_CNH__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; assistente virtual e equipe STech.&lt;/p&gt;&lt;p&gt;Lead criado pelo assistente do WhatsApp. Confira os dados do candidato.&lt;/p&gt;</info>
+        <picklistValueName>Novo</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>STE_Interesse_Pre_Inscricao__c</fieldNames>
+        <fieldNames>STE_Classificacao_Fila__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; equipe STech.&lt;/p&gt;&lt;p&gt;Candidato em espera para a próxima turma.&lt;/p&gt;</info>
+        <picklistValueName>Nutrição</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>CPF__c</fieldNames>
+        <fieldNames>STE_CPF_Confirmado__c</fieldNames>
+        <fieldNames>STE_CNH_Enviada__c</fieldNames>
+        <fieldNames>STE_Data_Envio_CNH__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; equipe STech.&lt;/p&gt;&lt;p&gt;Valide a CNH enviada e confirme o CPF.&lt;/p&gt;</info>
+        <picklistValueName>Validação</picklistValueName>
+    </pathAssistantSteps>
+    <recordTypeName>STE</recordTypeName>
+</PathAssistant>

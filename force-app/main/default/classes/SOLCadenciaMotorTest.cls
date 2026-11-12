@@ -1576,8 +1576,8 @@ private class SOLCadenciaMotorTest {
     Lead rt = leadNoCiclo(emSaoPaulo(TERCA, 9, 0));
     Lead art = leadNoCiclo(emSaoPaulo(TERCA, 9, 0));
     update new List<Lead>{
-      new Lead(Id = rt.Id, SOL_Produto_Interesse__c = PRODUTO_RT),
-      new Lead(Id = art.Id, SOL_Produto_Interesse__c = PRODUTO_ART)
+      new Lead(Id = rt.Id, SOL_Produtos_Interesse__c = PRODUTO_RT),
+      new Lead(Id = art.Id, SOL_Produtos_Interesse__c = PRODUTO_ART)
     };
     agoraEm(QUARTA);
 

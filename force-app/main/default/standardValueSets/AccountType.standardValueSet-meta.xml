@@ -4,51 +4,51 @@
     <standardValue>
         <fullName>Analyst</fullName>
         <default>false</default>
-        <label>Analyst</label>
+        <label>Analista</label>
     </standardValue>
     <standardValue>
         <fullName>Competitor</fullName>
         <default>false</default>
-        <label>Competitor</label>
+        <label>Concorrente</label>
     </standardValue>
     <standardValue>
         <fullName>Customer</fullName>
         <default>false</default>
-        <label>Customer</label>
+        <label>Cliente</label>
     </standardValue>
     <standardValue>
         <fullName>Integrator</fullName>
         <default>false</default>
-        <label>Integrator</label>
+        <label>Integrador</label>
     </standardValue>
     <standardValue>
         <fullName>Investor</fullName>
         <default>false</default>
-        <label>Investor</label>
+        <label>Investidor</label>
     </standardValue>
     <standardValue>
         <fullName>Partner</fullName>
         <default>false</default>
-        <label>Partner</label>
+        <label>Parceiro</label>
     </standardValue>
     <standardValue>
         <fullName>Press</fullName>
         <default>false</default>
-        <label>Press</label>
+        <label>Imprensa</label>
     </standardValue>
     <standardValue>
         <fullName>Prospect</fullName>
         <default>false</default>
-        <label>Prospect</label>
+        <label>Cliente potencial</label>
     </standardValue>
     <standardValue>
         <fullName>Reseller</fullName>
         <default>false</default>
-        <label>Reseller</label>
+        <label>Revendedor</label>
     </standardValue>
     <standardValue>
         <fullName>Other</fullName>
         <default>false</default>
-        <label>Other</label>
+        <label>Outros</label>
     </standardValue>
 </StandardValueSet>

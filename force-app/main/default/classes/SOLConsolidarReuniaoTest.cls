@@ -25,7 +25,7 @@ private class SOLConsolidarReuniaoTest {
       Company = 'C',
       Status = 'Captação - Contato',
       CNPJ__c = CNPJ,
-      SOL_Produto_Interesse__c = produto
+      SOL_Produtos_Interesse__c = produto
     );
     insert l;
     return l;
@@ -208,7 +208,7 @@ private class SOLConsolidarReuniaoTest {
           Company = 'C',
           Status = 'Captação - Contato',
           CNPJ__c = CNPJ,
-          SOL_Produto_Interesse__c = (Math.mod(i, 2) == 0 ? 'ART 360' : 'Recuperação Tributária')
+          SOL_Produtos_Interesse__c = (Math.mod(i, 2) == 0 ? 'ART 360' : 'Recuperação Tributária')
         )
       );
     }

@@ -33,6 +33,78 @@
     <label>STech — Faixa etária</label>
     <language>pt_BR</language>
     <messageLayouts>
+        <formatType>Buttons</formatType>
+        <layoutItems>
+            <collectionType>DynamicList</collectionType>
+            <compositeValues>
+                <compositeTypeName>TitleOptionItem</compositeTypeName>
+                <layoutItems>
+                    <collectionType>None</collectionType>
+                    <compositeValues>
+                        <compositeTypeName>TitleItem</compositeTypeName>
+                        <layoutItems>
+                            <collectionType>None</collectionType>
+                            <name>title</name>
+                            <primitiveValues>
+                                <type>SourcePrimitiveValue</type>
+                                <valueSourceReference>Constants.Options.ListItem.Title</valueSourceReference>
+                            </primitiveValues>
+                        </layoutItems>
+                    </compositeValues>
+                    <name>titleItem</name>
+                </layoutItems>
+                <valueSourceReference>Constants.Options</valueSourceReference>
+            </compositeValues>
+            <name>optionItems</name>
+        </layoutItems>
+        <layoutItems>
+            <collectionType>None</collectionType>
+            <name>text</name>
+            <primitiveValues>
+                <type>SourcePrimitiveValue</type>
+                <valueSourceReference>Constants.Title</valueSourceReference>
+            </primitiveValues>
+        </layoutItems>
+        <layoutVariant xsi:nil="true"/>
+        <messageType>Choices</messageType>
+    </messageLayouts>
+    <messageLayouts>
+        <formatType>QuickReplies</formatType>
+        <layoutItems>
+            <collectionType>DynamicList</collectionType>
+            <compositeValues>
+                <compositeTypeName>TitleOptionItem</compositeTypeName>
+                <layoutItems>
+                    <collectionType>None</collectionType>
+                    <compositeValues>
+                        <compositeTypeName>TitleItem</compositeTypeName>
+                        <layoutItems>
+                            <collectionType>None</collectionType>
+                            <name>title</name>
+                            <primitiveValues>
+                                <type>SourcePrimitiveValue</type>
+                                <valueSourceReference>Constants.Options.ListItem.Title</valueSourceReference>
+                            </primitiveValues>
+                        </layoutItems>
+                    </compositeValues>
+                    <name>titleItem</name>
+                </layoutItems>
+                <valueSourceReference>Constants.Options</valueSourceReference>
+            </compositeValues>
+            <name>optionItems</name>
+        </layoutItems>
+        <layoutItems>
+            <collectionType>None</collectionType>
+            <name>text</name>
+            <primitiveValues>
+                <type>SourcePrimitiveValue</type>
+                <valueSourceReference>Constants.Title</valueSourceReference>
+            </primitiveValues>
+        </layoutItems>
+        <layoutVariant xsi:nil="true"/>
+        <messageType>Choices</messageType>
+    </messageLayouts>
+    <messageLayouts>
         <formatType>Text</formatType>
         <layoutItems>
             <collectionType>None</collectionType>

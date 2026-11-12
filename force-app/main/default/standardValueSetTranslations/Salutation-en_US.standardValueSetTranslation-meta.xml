@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StandardValueSetTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <valueTranslation>
+        <masterLabel>Sr.</masterLabel>
+        <translation>Mr.</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Srta.</masterLabel>
+        <translation>Ms.</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Sra.</masterLabel>
+        <translation>Mrs.</translation>
+    </valueTranslation>
+</StandardValueSetTranslation>

@@ -4,11 +4,11 @@
     <standardValue>
         <fullName>Existing Business</fullName>
         <default>false</default>
-        <label>Existing Business</label>
+        <label>Negócio existente</label>
     </standardValue>
     <standardValue>
         <fullName>New Business</fullName>
         <default>false</default>
-        <label>New Business</label>
+        <label>Novo negócio</label>
     </standardValue>
 </StandardValueSet>

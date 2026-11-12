@@ -97,7 +97,7 @@ private class SOLDuracaoEtapaTest {
       Company = 'Empresa ' + rnd(),
       Email = 'dur.' + rnd().left(8) + '@exemplo.invalid',
       CNPJ__c = CNPJ,
-      SOL_Produto_Interesse__c = produto
+      SOL_Produtos_Interesse__c = produto
     );
     Database.DMLOptions opc = new Database.DMLOptions();
     opc.duplicateRuleHeader.allowSave = true;
@@ -143,7 +143,7 @@ private class SOLDuracaoEtapaTest {
       SELECT
         Id,
         StageName,
-        SOL_Produto_Negocio__c,
+        SOL_Produtos_Negocio__c,
         SOL_Data_Distribuicao__c,
         SOL_Data_Primeira_Ligacao__c,
         SOL_Data_Inicio_Ciclo_Comercial__c,
@@ -176,7 +176,7 @@ private class SOLDuracaoEtapaTest {
       RecordTypeId = rtOpp(),
       CloseDate = Date.today().addDays(60),
       StageName = 'Diagnóstico',
-      SOL_Produto_Negocio__c = produto,
+      SOL_Produtos_Negocio__c = produto,
       SOL_ECAC_Consulta_Realizada__c = true,
       SOL_ECAC_Data_Consulta__c = Date.today(),
       SOL_ECAC_Resultado__c = 'Valor a recuperar',
@@ -1196,7 +1196,7 @@ private class SOLDuracaoEtapaTest {
           LastName = 'Lead ' + i,
           Company = 'Empresa ' + i,
           CNPJ__c = CNPJ,
-          SOL_Produto_Interesse__c = PRODUTO_RT
+          SOL_Produtos_Interesse__c = PRODUTO_RT
         )
       );
     }
@@ -1285,7 +1285,7 @@ private class SOLDuracaoEtapaTest {
           RecordTypeId = rt,
           CloseDate = Date.today().addDays(60),
           StageName = 'Diagnóstico',
-          SOL_Produto_Negocio__c = PRODUTO_RT,
+          SOL_Produtos_Negocio__c = PRODUTO_RT,
           SOL_Data_Solicitacao_Calculo__c = SEGUNDA,
           SOL_Data_Recebimento_Calculo__c = Math.mod(i, 2) == 0 ? QUARTA : SEXTA
         )

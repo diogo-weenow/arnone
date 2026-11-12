@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <name>Adicionar_Id_Documento</name>
+        <label>Adicionar Id do documento</label>
+        <locationX>620</locationX>
+        <locationY>500</locationY>
+        <assignmentItems>
+            <assignToReference>IdsDocumentos</assignToReference>
+            <operator>Add</operator>
+            <value>
+                <elementReference>Loop_Links.ContentDocumentId</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Loop_Links</targetReference>
+        </connector>
+    </assignments>
+    <customErrors>
+        <name>Erro_Contrato</name>
+        <label>Contrato assinado ausente</label>
+        <locationX>176</locationX>
+        <locationY>700</locationY>
+        <customErrorMessages>
+            <errorMessage>Anexe o contrato assinado em Arquivos, na própria Oportunidade, antes de marcar como Ganho.</errorMessage>
+            <isFieldError>false</isFieldError>
+        </customErrorMessages>
+    </customErrors>
+    <decisions>
+        <name>E_Criacao</name>
+        <label>É criação?</label>
+        <locationX>440</locationX>
+        <locationY>150</locationY>
+        <defaultConnector>
+            <targetReference>Get_Links</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Não — registro já existe</defaultConnectorLabel>
+        <rules>
+            <name>Criacao_Ja_Em_Ganho</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.Id</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Erro_Contrato</targetReference>
+            </connector>
+            <label>Criação já em Ganho</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Tem_Arquivo</name>
+        <label>Tem arquivo (não nota)?</label>
+        <locationX>440</locationX>
+        <locationY>820</locationY>
+        <defaultConnectorLabel>Sim — pode marcar Ganho</defaultConnectorLabel>
+        <rules>
+            <name>Sem_Arquivo</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Arquivos</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Erro_Contrato</targetReference>
+            </connector>
+            <label>Sem arquivo</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <name>Tem_Links</name>
+        <label>Tem algo vinculado?</label>
+        <locationX>440</locationX>
+        <locationY>380</locationY>
+        <defaultConnector>
+            <targetReference>Loop_Links</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Sim</defaultConnectorLabel>
+        <rules>
+            <name>Sem_Links</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Get_Links</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Erro_Contrato</targetReference>
+            </connector>
+            <label>Nada vinculado</label>
+        </rules>
+    </decisions>
+    <description>CLICKUP-9462 — BU Advogados. Bloqueia Ganho sem arquivo vinculado (notas não contam). Não afeta Perdido nem outras BUs.</description>
+    <environments>Default</environments>
+    <interviewLabel>ADV_Validar_Ganho_Com_Contrato {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>ADV_Validar_Ganho_Com_Contrato</label>
+    <loops>
+        <name>Loop_Links</name>
+        <label>Percorrer vínculos</label>
+        <locationX>440</locationX>
+        <locationY>500</locationY>
+        <collectionReference>Get_Links</collectionReference>
+        <iterationOrder>Asc</iterationOrder>
+        <nextValueConnector>
+            <targetReference>Adicionar_Id_Documento</targetReference>
+        </nextValueConnector>
+        <noMoreValuesConnector>
+            <targetReference>Get_Arquivos</targetReference>
+        </noMoreValuesConnector>
+    </loops>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <name>Get_Arquivos</name>
+        <label>Buscar arquivo que não seja nota</label>
+        <locationX>440</locationX>
+        <locationY>700</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Tem_Arquivo</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>In</operator>
+            <value>
+                <elementReference>IdsDocumentos</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>FileType</field>
+            <operator>NotEqualTo</operator>
+            <value>
+                <stringValue>SNOTE</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>ContentDocument</object>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <name>Get_Links</name>
+        <label>Buscar vínculos de arquivos da Oportunidade</label>
+        <locationX>440</locationX>
+        <locationY>260</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Tem_Links</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>LinkedEntityId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>false</getFirstRecordOnly>
+        <object>ContentDocumentLink</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>ContentDocumentId</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>50</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>E_Criacao</targetReference>
+        </connector>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &apos;ADV&apos;,
+  ISPICKVAL({!$Record.StageName}, &apos;Ganho&apos;),
+  OR(ISNEW(), ISCHANGED({!$Record.StageName}))
+)</filterFormula>
+        <object>Opportunity</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+    <variables>
+        <name>IdsDocumentos</name>
+        <dataType>String</dataType>
+        <isCollection>true</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

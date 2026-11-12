@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ACESSO-POR-BU (modelo BU + cargo): PSGs substituidos por atribuicao direta BU + cargo. Rodar antes da exclusao dos PS. -->
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>PSG_ADV_Atendente</members>
+        <members>PSG_ADV_Diretor</members>
+        <members>PSG_ESG_Atendente</members>
+        <members>PSG_ESG_Diretor</members>
+        <members>PSG_SCO_Atendente</members>
+        <members>PSG_SCO_Diretor</members>
+        <members>PSG_SOL_Comercial</members>
+        <members>PSG_SOL_Diretor</members>
+        <members>PSG_STE_Atendente</members>
+        <members>PSG_STE_Diretor</members>
+        <name>PermissionSetGroup</name>
+    </types>
+    <version>64.0</version>
+</Package>

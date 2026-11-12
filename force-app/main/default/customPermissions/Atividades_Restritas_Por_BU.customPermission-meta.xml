@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>ACESSO-POR-BU. Ativa as Restriction Rules Acesso_BU_Tarefas e Acesso_BU_Eventos: o usuario so ve atividades com BU_Atividade__c igual ao seu Department. Nao combinar com SOL_Restringir_Tarefas_Ao_Proprietario.</description>
+    <isLicensed>false</isLicensed>
+    <label>Atividades restritas à BU</label>
+</CustomPermission>

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Jornada_PreCurso_Etapa__c</fullName>
+    <description>Último disparo da jornada de pré-curso que atingiu esta oportunidade.</description>
+    <label>Pré-curso — última etapa</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Boas-vindas</fullName>
+                <default>false</default>
+                <label>Boas-vindas</label>
+            </value>
+            <value>
+                <fullName>D-15 Inspiração</fullName>
+                <default>false</default>
+                <label>D-15 Inspiração</label>
+            </value>
+            <value>
+                <fullName>D-12 Conquistas</fullName>
+                <default>false</default>
+                <label>D-12 Conquistas</label>
+            </value>
+            <value>
+                <fullName>D-9 Conteúdo</fullName>
+                <default>false</default>
+                <label>D-9 Conteúdo</label>
+            </value>
+            <value>
+                <fullName>D-7 Uma semana</fullName>
+                <default>false</default>
+                <label>D-7 Uma semana</label>
+            </value>
+            <value>
+                <fullName>D-3 Três dias</fullName>
+                <default>false</default>
+                <label>D-3 Três dias</label>
+            </value>
+            <value>
+                <fullName>D-2 Tarefa de confirmação</fullName>
+                <default>false</default>
+                <label>D-2 Tarefa de confirmação</label>
+            </value>
+            <value>
+                <fullName>D-1 É amanhã</fullName>
+                <default>false</default>
+                <label>D-1 É amanhã</label>
+            </value>
+            <value>
+                <fullName>Dia D Bom dia</fullName>
+                <default>false</default>
+                <label>Dia D Bom dia</label>
+            </value>
+            <value>
+                <fullName>No-show</fullName>
+                <default>false</default>
+                <label>No-show — aguardando definição</label>
+            </value>
+            <value>
+                <fullName>Durante o curso</fullName>
+                <default>false</default>
+                <label>Durante o curso</label>
+            </value>
+            <value>
+                <fullName>Reta final</fullName>
+                <default>false</default>
+                <label>Reta final</label>
+            </value>
+            <value>
+                <fullName>Conclusão</fullName>
+                <default>false</default>
+                <label>Conclusão</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

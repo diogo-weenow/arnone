@@ -4,25 +4,25 @@
     <standardValue>
         <fullName>On Hold</fullName>
         <default>false</default>
-        <label>On Hold</label>
+        <label>Em espera</label>
         <closed>false</closed>
     </standardValue>
     <standardValue>
         <fullName>Escalated</fullName>
         <default>false</default>
-        <label>Escalated</label>
+        <label>Escalado</label>
         <closed>false</closed>
     </standardValue>
     <standardValue>
         <fullName>Closed</fullName>
         <default>false</default>
-        <label>Closed</label>
+        <label>Fechado</label>
         <closed>true</closed>
     </standardValue>
     <standardValue>
         <fullName>New</fullName>
         <default>true</default>
-        <label>New</label>
+        <label>Novo</label>
         <closed>false</closed>
     </standardValue>
 </StandardValueSet>

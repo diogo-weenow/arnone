@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Funil TO-BE v1 da BU Arnone Advogados. Depende da branch do multi-select SOL (o layout compartilhado
+     referencia SOL_Produtos_Negocio__c). Profiles: deployar SO os layoutAssignments de Opportunity.ADV. -->
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>ADV_Configuracao.Padrao</members>
+        <name>CustomMetadata</name>
+    </types>
+    <types>
+        <members>ADV_Configuracao__mdt.Email_Precificacao__c</members>
+        <members>Opportunity.ADV_Advogado_Responsavel__c</members>
+        <members>Opportunity.ADV_Area_Juridica__c</members>
+        <members>Opportunity.ADV_Data_Assinatura__c</members>
+        <members>Opportunity.ADV_Data_Envio_Proposta__c</members>
+        <members>Opportunity.ADV_Detalhe_Perda__c</members>
+        <members>Opportunity.ADV_Motivo_Perda__c</members>
+        <members>Opportunity.ADV_Origem_Proposta__c</members>
+        <members>Opportunity.ADV_Valor_Honorarios__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>ADV_Configuracao__mdt</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
+        <members>Opportunity.Funil_ADV</members>
+        <name>BusinessProcess</name>
+    </types>
+    <types>
+        <members>ADV_Aviso_Precificacao</members>
+        <members>ADV_Carimbo_Envio_Proposta</members>
+        <members>ADV_Followup_Assinatura</members>
+        <members>ADV_Validar_Ganho_Com_Contrato</members>
+        <name>Flow</name>
+    </types>
+    <types>
+        <members>Opportunity-Opportunity Layout</members>
+        <name>Layout</name>
+    </types>
+    <types>
+        <members>ADV_Opportunity</members>
+        <name>PathAssistant</name>
+    </types>
+    <types>
+        <members>PS_ADV_Comercial</members>
+        <name>PermissionSet</name>
+    </types>
+    <types>
+        <members>Opportunity.ADV</members>
+        <name>RecordType</name>
+    </types>
+    <types>
+        <members>OpportunityStage</members>
+        <name>StandardValueSet</name>
+    </types>
+    <types>
+        <members>Opportunity.ADV_Classificacao_Exige_Preenchimento</members>
+        <members>Opportunity.ADV_Ganho_Exige_Data_Assinatura</members>
+        <members>Opportunity.ADV_Ganho_Sem_Motivo_De_Perda</members>
+        <members>Opportunity.ADV_Perda_Outros_Exige_Detalhe</members>
+        <members>Opportunity.ADV_Perdido_Exige_Motivo</members>
+        <name>ValidationRule</name>
+    </types>
+    <version>66.0</version>
+</Package>

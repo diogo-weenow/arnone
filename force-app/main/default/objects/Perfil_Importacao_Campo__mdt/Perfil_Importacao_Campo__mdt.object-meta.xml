@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Importação de leads — matriz de campos de um perfil de importação. Liga uma coluna sugerida do arquivo a um campo do Lead e diz como gravar: OVERWRITE sobrescreve quando a célula tem valor; FILL_BLANK só preenche campo vazio; célula vazia nunca apaga. Usar_Na_Criacao__c marca os campos levados para a criação de lead novo. Campos de propriedade, status, identidade e estado de bot ficam numa blocklist no código e nunca são gravados. Consumida por ImportacaoLeadsController e ImportacaoLeadsBatch.</description>
+    <label>Campo do Perfil de Importação</label>
+    <pluralLabel>Campos do Perfil de Importação</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

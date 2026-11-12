@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DashboardFolder xmlns="http://soap.sforce.com/2006/04/metadata">
+    <folderShares>
+        <accessLevel>View</accessLevel>
+        <sharedTo>Diretoria_STE</sharedTo>
+        <sharedToType>Role</sharedToType>
+    </folderShares>
+    <folderShares>
+        <accessLevel>View</accessLevel>
+        <sharedTo>Diretoria_Grupo</sharedTo>
+        <sharedToType>Role</sharedToType>
+    </folderShares>
+    <name>Gerencial Instituto STech</name>
+</DashboardFolder>

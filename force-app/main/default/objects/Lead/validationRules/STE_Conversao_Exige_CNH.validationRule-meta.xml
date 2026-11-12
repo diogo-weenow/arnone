@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_Conversao_Exige_CNH</fullName>
+    <active>true</active>
+    <description>Bloqueia a conversão do candidato do Instituto STech enquanto a CNH não tiver sido enviada. STE_CNH_Enviada__c é marcado pelo flow STE_Vincular_Arquivo_CNH ao anexar o arquivo, e é a prova de que existe documento — fórmula não conta anexos.</description>
+    <errorConditionFormula>AND(
+RecordType.DeveloperName = &quot;STE&quot;,
+ISCHANGED(IsConverted),
+IsConverted = TRUE,
+NOT(STE_CNH_Enviada__c)
+)</errorConditionFormula>
+    <errorMessage>Não é possível converter: é preciso a foto da CNH anexada ao candidato.</errorMessage>
+</ValidationRule>

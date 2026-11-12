@@ -4,16 +4,16 @@
     <standardValue>
         <fullName>Hot</fullName>
         <default>false</default>
-        <label>Hot</label>
+        <label>Quente</label>
     </standardValue>
     <standardValue>
         <fullName>Warm</fullName>
         <default>false</default>
-        <label>Warm</label>
+        <label>Morna</label>
     </standardValue>
     <standardValue>
         <fullName>Cold</fullName>
         <default>false</default>
-        <label>Cold</label>
+        <label>Fria</label>
     </standardValue>
 </StandardValueSet>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>STE_PreMatricula_Exige_Exame</fullName>
+    <active>true</active>
+    <description>Impede a entrada na etapa Pré-Matrícula enquanto o exame de saúde ocupacional não estiver Aprovado. Só se aplica ao funil Stech Telecom (record type STE_Telecom).</description>
+    <errorConditionFormula>AND(
+  RecordType.DeveloperName = &quot;STE_Telecom&quot;,
+  ISCHANGED(StageName),
+  ISPICKVAL(StageName, &quot;Pré-Matrícula&quot;),
+  NOT(ISPICKVAL(STE_Resultado_Exame_Saude__c, &quot;Aprovado&quot;))
+)</errorConditionFormula>
+    <errorDisplayField>STE_Resultado_Exame_Saude__c</errorDisplayField>
+    <errorMessage>Para avançar é preciso que o Resultado do exame de saúde esteja Aprovado. — Pré-Matrícula</errorMessage>
+</ValidationRule>
