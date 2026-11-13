@@ -2,10 +2,11 @@
 <Queue xmlns="http://soap.sforce.com/2006/04/metadata">
     <doesIncludeBosses>false</doesIncludeBosses>
     <doesSendEmailToMembers>false</doesSendEmailToMembers>
-    <name>Fila Leads S.Company</name>
+    <name>S Company — Inbound</name>
     <queueMembers>
         <users>
             <user>amoreira@grupoarnone.demo</user>
+            <user>p.rodrigues@grupoarnone.com</user>
         </users>
     </queueMembers>
     <queueSobject>
