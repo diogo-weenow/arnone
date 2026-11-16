@@ -94,7 +94,13 @@ private class SCOFunilLeadTest {
     Test.startTest();
     update new Lead(Id = l.Id, SCO_BDR_Responsavel__c = us[1].Id);
     update new Lead(Id = l.Id, OwnerId = us[2].Id);
-    update new Lead(Id = l.Id, Status = 'Em nutrição');
+    // CLICKUP-11813: "Em nutrição" exige motivo e data de retomada futura.
+    update new Lead(
+      Id = l.Id,
+      Status = 'Em nutrição',
+      SCO_Motivo_Nutricao__c = 'Sem retorno',
+      SCO_Data_Retomada__c = Date.today().addDays(30)
+    );
     update new Lead(Id = l.Id, Status = 'Em contato');
     Test.stopTest();
 
@@ -176,7 +182,13 @@ private class SCOFunilLeadTest {
     );
 
     Test.startTest();
-    update new Lead(Id = l.Id, Status = 'Desqualificado');
+    // CLICKUP-11813: desqualificar exige motivo e, com reunião realizada, o motivo da reunião sem avanço.
+    update new Lead(
+      Id = l.Id,
+      Status = 'Desqualificado',
+      SCO_Motivo_Desqualificacao__c = 'Fora do perfil',
+      SCO_Motivo_Reuniao_Sem_Avanco__c = 'Sem fit após a reunião.'
+    );
     Test.stopTest();
 
     Lead depois = recarregar(l.Id);

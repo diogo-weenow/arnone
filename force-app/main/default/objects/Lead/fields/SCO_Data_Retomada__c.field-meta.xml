@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SCO_Data_Retomada__c</fullName>
+    <description>Data em que o Lead da S Company em nutrição deve ser retomado. Obrigatória e futura ao estar em &quot;Em nutrição&quot; (VR SCO_Nutricao_Exige_Data_Retomada_Futura). Nenhuma automação limpa o valor quando o Lead sai da nutrição. CLICKUP-11813.</description>
+    <inlineHelpText>Quando retomar o contato. Obrigatória no status &quot;Em nutrição&quot; e precisa ser uma data futura.</inlineHelpText>
+    <label>Data de retomada</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

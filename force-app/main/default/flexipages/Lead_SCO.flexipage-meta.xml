@@ -99,6 +99,16 @@
                 <identifier>RecordSCO_Data_Reuniao_Realizada_cField</identifier>
             </fieldInstance>
         </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SCO_Motivo_Reuniao_Sem_Avanco__c</fieldItem>
+                <identifier>RecordSCO_Motivo_Reuniao_Sem_Avanco_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
         <name>Facet-sco-resp-reuniao-col2</name>
         <type>Facet</type>
     </flexiPageRegions>
@@ -128,6 +138,110 @@
     </flexiPageRegions>
     <flexiPageRegions>
         <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SCO_Motivo_Nutricao__c</fieldItem>
+                <identifier>RecordSCO_Motivo_Nutricao_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <name>Facet-sco-nutricao-col1</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SCO_Data_Retomada__c</fieldItem>
+                <identifier>RecordSCO_Data_Retomada_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <name>Facet-sco-nutricao-col2</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-sco-nutricao-col1</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:column</componentName>
+                <identifier>lsco_secao_nutricao_coluna1</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-sco-nutricao-col2</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:column</componentName>
+                <identifier>lsco_secao_nutricao_coluna2</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-sco-nutricao</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SCO_Motivo_Desqualificacao__c</fieldItem>
+                <identifier>RecordSCO_Motivo_Desqualificacao_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <name>Facet-sco-desqualificacao-col1</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SCO_Observacao_Desqualificacao__c</fieldItem>
+                <identifier>RecordSCO_Observacao_Desqualificacao_cField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <name>Facet-sco-desqualificacao-col2</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-sco-desqualificacao-col1</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:column</componentName>
+                <identifier>lsco_secao_desqualificacao_coluna1</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-sco-desqualificacao-col2</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:column</componentName>
+                <identifier>lsco_secao_desqualificacao_coluna2</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-sco-desqualificacao</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
                     <name>columns</name>
@@ -148,6 +262,98 @@
                         <leftValue>{!Record.Status}</leftValue>
                         <operator>NE</operator>
                         <rightValue>Novo</rightValue>
+                    </criteria>
+                </visibilityRule>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>columns</name>
+                    <value>Facet-sco-nutricao</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>horizontalAlignment</name>
+                    <value>false</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>label</name>
+                    <value>Nutrição — S Company</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:fieldSection</componentName>
+                <identifier>lsco_secao_nutricao</identifier>
+                <visibilityRule>
+                    <booleanFilter>1 OR 2 OR 3 OR 4 OR 5</booleanFilter>
+                    <criteria>
+                        <leftValue>{!Record.Status}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Em nutrição</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.SCO_Motivo_Nutricao__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Sem retorno</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.SCO_Motivo_Nutricao__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Sem timing</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.SCO_Motivo_Nutricao__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Sem interesse no momento</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.SCO_Motivo_Nutricao__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Decisor não identificado</rightValue>
+                    </criteria>
+                </visibilityRule>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>columns</name>
+                    <value>Facet-sco-desqualificacao</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>horizontalAlignment</name>
+                    <value>false</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>label</name>
+                    <value>Desqualificação — S Company</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:fieldSection</componentName>
+                <identifier>lsco_secao_desqualificacao</identifier>
+                <visibilityRule>
+                    <booleanFilter>1 OR 2 OR 3 OR 4 OR 5</booleanFilter>
+                    <criteria>
+                        <leftValue>{!Record.Status}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Desqualificado</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.SCO_Motivo_Desqualificacao__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Fora do perfil</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.SCO_Motivo_Desqualificacao__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Concorrente ou fornecedor</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.SCO_Motivo_Desqualificacao__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Empresa inexistente ou fechada</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.SCO_Motivo_Desqualificacao__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Outros</rightValue>
                     </criteria>
                 </visibilityRule>
             </componentInstance>
