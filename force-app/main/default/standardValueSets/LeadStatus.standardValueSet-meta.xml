@@ -62,9 +62,33 @@
         <converted>false</converted>
     </standardValue>
     <standardValue>
+        <fullName>Em contato</fullName>
+        <default>false</default>
+        <label>Em contato</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Reunião agendada</fullName>
+        <default>false</default>
+        <label>Reunião agendada</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Em nutrição</fullName>
+        <default>false</default>
+        <label>Em nutrição</label>
+        <converted>false</converted>
+    </standardValue>
+    <standardValue>
         <fullName>Desqualificado</fullName>
         <default>false</default>
         <label>Desqualificado</label>
         <converted>false</converted>
+    </standardValue>
+    <standardValue>
+        <fullName>Convertido</fullName>
+        <default>false</default>
+        <label>Convertido</label>
+        <converted>true</converted>
     </standardValue>
 </StandardValueSet>

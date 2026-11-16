@@ -2,7 +2,7 @@
 <RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SCO</fullName>
     <active>true</active>
-    <businessProcess>Captacao_Padrao</businessProcess>
+    <businessProcess>Captacao_SCO</businessProcess>
     <description>Leads captados para a unidade S.Company.</description>
     <label>S.Company</label>
     <picklistValues>

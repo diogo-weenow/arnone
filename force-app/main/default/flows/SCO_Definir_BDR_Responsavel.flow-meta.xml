@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Grava o dono do Lead como BDR responsável no próprio save. Assignment puro: sem DML extra.</description>
+        <name>Definir_BDR_Responsavel</name>
+        <label>Definir o BDR responsável com o dono do Lead</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.SCO_BDR_Responsavel__c</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Record.OwnerId</elementReference>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <description>Só a S Company grava. Fecha por padrão: Record Type ausente ou diferente não altera nada.</description>
+        <name>Decidir_Record_Type_SCO</name>
+        <label>É Record Type SCO?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Não — outra BU</defaultConnectorLabel>
+        <rules>
+            <name>E_Record_Type_SCO</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.RecordTypeId</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <elementReference>Obter_Record_Type_SCO.Id</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Definir_BDR_Responsavel</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <description>CLICKUP-11812. BU S Company: quando o Lead ENTRA em &quot;Em contato&quot; (criação já nessa etapa, mudança de etapa ou definição do Record Type SCO depois da criação) e o BDR responsável está vazio, grava o dono do Lead. Só grava se o dono for um usuário (OwnerId 005): Lead ainda em fila fica com o campo vazio. Um valor já informado nunca é sobrescrito, mesmo que o dono mude depois. BEFORE-SAVE: atualiza o próprio registro sem DML extra. O Record Type é conferido por Get Records + Decision porque o critério de entrada de flow before-save não alcança campo de registro relacionado; sem Id fixado no metadado.</description>
+    <environments>Default</environments>
+    <interviewLabel>SCO_Definir_BDR_Responsavel {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SCO_Definir_BDR_Responsavel</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Record Type SCO de Lead, pelo DeveloperName. Filtro constante: a plataforma bulkifica (uma consulta por transação).</description>
+        <name>Obter_Record_Type_SCO</name>
+        <label>Obter o Record Type SCO de Lead</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Decidir_Record_Type_SCO</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>SobjectType</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Lead</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>SCO</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>RecordType</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Obter_Record_Type_SCO</targetReference>
+        </connector>
+        <filterFormula>AND(
+  ISPICKVAL({!$Record.Status}, &apos;Em contato&apos;),
+  ISBLANK({!$Record.SCO_BDR_Responsavel__c}),
+  LEFT({!$Record.OwnerId}, 3) = &apos;005&apos;,
+  OR(ISNEW(), ISCHANGED({!$Record.Status}), ISCHANGED({!$Record.RecordTypeId}))
+)</filterFormula>
+        <object>Lead</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>
