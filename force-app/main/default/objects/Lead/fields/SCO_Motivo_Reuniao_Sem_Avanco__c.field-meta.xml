@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SCO_Motivo_Reuniao_Sem_Avanco__c</fullName>
+    <description>Campo de texto livre; será convertido em lista de opções fechada em desenvolvimento futuro. Obrigatório quando o Lead da S Company tem reunião realizada e vai para &quot;Em nutrição&quot; ou &quot;Desqualificado&quot; (VR SCO_Reuniao_Sem_Avanco_Exige_Motivo). CLICKUP-11813.</description>
+    <inlineHelpText>Por que a reunião realizada não gerou avanço. Obrigatório para ir a &quot;Em nutrição&quot; ou &quot;Desqualificado&quot; depois de uma reunião realizada.</inlineHelpText>
+    <label>Motivo da reunião sem avanço</label>
+    <length>500</length>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>
