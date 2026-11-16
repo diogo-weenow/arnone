@@ -3,6 +3,7 @@
     <fullName>SCO</fullName>
     <active>true</active>
     <businessProcess>Captacao_SCO</businessProcess>
+    <compactLayoutAssignment>Leads_Custom_Compact_Layout</compactLayoutAssignment>
     <description>Leads captados para a unidade S.Company.</description>
     <label>S.Company</label>
     <picklistValues>
