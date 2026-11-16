@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SCO_Executivo_Responsavel__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Executivo da S Company que vai conduzir a reunião. Obrigatório para o Status &quot;Reunião agendada&quot; (VR SCO_Reuniao_Agendada_Exige_Dados). CLICKUP-11812.</description>
+    <inlineHelpText>Quem vai conduzir a reunião. Obrigatório em &quot;Reunião agendada&quot;.</inlineHelpText>
+    <label>Executivo responsável</label>
+    <referenceTo>User</referenceTo>
+    <relationshipName>SCO_Leads_Executivo</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Lookup</type>
+</CustomField>

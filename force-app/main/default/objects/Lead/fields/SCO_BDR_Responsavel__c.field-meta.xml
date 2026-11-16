@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SCO_BDR_Responsavel__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>BDR que prospectou o Lead da S Company. Preenchido pelo Flow SCO_Definir_BDR_Responsavel com o dono do Lead na primeira vez que o Status entra em &quot;Em contato&quot;, só quando o campo ainda está vazio e o dono é um usuário (Lead em fila fica vazio). Depois disso é editável manualmente e nunca mais sobrescrito pela automação. CLICKUP-11812.</description>
+    <inlineHelpText>Quem prospectou o Lead. Preenchido automaticamente com o dono ao entrar em &quot;Em contato&quot;; pode ser ajustado manualmente.</inlineHelpText>
+    <label>BDR responsável</label>
+    <referenceTo>User</referenceTo>
+    <relationshipName>SCO_Leads_BDR</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Lookup</type>
+</CustomField>

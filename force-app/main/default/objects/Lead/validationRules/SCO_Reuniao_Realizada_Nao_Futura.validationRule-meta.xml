@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SCO_Reuniao_Realizada_Nao_Futura</fullName>
+    <active>true</active>
+    <description>CLICKUP-11812. Lead da S Company não aceita Data da reunião realizada no futuro.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SCO&apos;,
+  NOT(ISBLANK(SCO_Data_Reuniao_Realizada__c)),
+  SCO_Data_Reuniao_Realizada__c &gt; TODAY()
+)</errorConditionFormula>
+    <errorDisplayField>SCO_Data_Reuniao_Realizada__c</errorDisplayField>
+    <errorMessage>A data da reunião realizada não pode ser futura.</errorMessage>
+</ValidationRule>
