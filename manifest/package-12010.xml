@@ -8,5 +8,14 @@
         <members>Opportunity-Opportunity Layout</members>
         <name>Layout</name>
     </types>
+    <types>
+        <members>Opportunity.ADV</members>
+        <members>Opportunity.ESG</members>
+        <members>Opportunity.SCO</members>
+        <members>Opportunity.SOL</members>
+        <members>Opportunity.STE</members>
+        <members>Opportunity.STE_Telecom</members>
+        <name>RecordType</name>
+    </types>
     <version>67.0</version>
 </Package>

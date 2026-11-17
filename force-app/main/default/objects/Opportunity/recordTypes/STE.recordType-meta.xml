@@ -8,7 +8,15 @@
     <picklistValues>
         <picklist>ADV_Advogado_Responsavel__c</picklist>
         <values>
+            <fullName>Amanda Ramalho</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Ana Luiza</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ana Machado</fullName>
             <default>false</default>
         </values>
         <values>
@@ -16,7 +24,7 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Caroline Dagostino</fullName>
+            <fullName>Eugenio Filho</fullName>
             <default>false</default>
         </values>
         <values>
@@ -24,19 +32,11 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Filipe Gonzaga</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Gabriela Medeiros</fullName>
+            <fullName>Filipe Almeida</fullName>
             <default>false</default>
         </values>
         <values>
             <fullName>Glaucia Uliana</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Jose Evangelista</fullName>
             <default>false</default>
         </values>
         <values>
@@ -45,14 +45,6 @@
         </values>
         <values>
             <fullName>Lucas Hygino</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Marcelo Lervonino</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Renato Chiappim</fullName>
             <default>false</default>
         </values>
     </picklistValues>
