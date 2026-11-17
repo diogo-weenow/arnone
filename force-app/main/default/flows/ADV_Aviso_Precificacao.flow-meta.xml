@@ -4,8 +4,8 @@
         <description>Um e-mail por Oportunidade que entra na etapa. Conta no limite diário de e-mails individuais (SingleEmail) da org. Falha de envio (ex.: entregabilidade desligada na sandbox) vai para o fault path e não afeta o save da Oportunidade, que já foi confirmado (caminho assíncrono).</description>
         <name>Enviar_Aviso_Antonio</name>
         <label>Enviar aviso de precificação</label>
-        <locationX>308</locationX>
-        <locationY>600</locationY>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
         <actionName>emailSimple</actionName>
         <actionType>emailSimple</actionType>
         <faultConnector>
@@ -58,8 +58,8 @@
         <description>Sem destinatário configurado (vazio) ou ainda com o placeholder (domínio reservado .invalid): não envia e encerra sem erro.</description>
         <name>Decidir_Destinatario_Configurado</name>
         <label>Destinatário configurado?</label>
-        <locationX>176</locationX>
-        <locationY>480</locationY>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
         <defaultConnectorLabel>Não — não envia</defaultConnectorLabel>
         <rules>
             <name>Destinatario_Valido</name>
@@ -80,6 +80,15 @@
     <description>BU Arnone Advogados (funil TO-BE v1, AUT-A01) — quando a Oportunidade ADV ENTRA em &quot;Em Precificação&quot;, avisa o Antônio por e-mail que há um caso para precificar (não é aprovação: o aval é a própria etapa, RN-A04). O Antônio não tem usuário: o endereço vem do Custom Metadata ADV_Configuracao__mdt, registro Padrao, campo Email_Precificacao__c (troca sem deploy). Vazio ou placeholder .invalid = não envia. Roda no caminho ASSÍNCRONO (após o commit) para que falha de e-mail nunca impeça o usuário de salvar a Oportunidade; se o envio falhar, cria uma tarefa para o dono avisar o Antônio manualmente. Entrada &quot;somente quando atualizado para atender&quot;: salvar de novo na mesma etapa não reenvia; sair e voltar para Em Precificação reenvia (é um novo caso para precificar).</description>
     <environments>Default</environments>
     <formulas>
+        <description>Verdadeiro só com um e-mail preenchido que não seja o placeholder (.invalid é domínio reservado, nunca entregável).</description>
+        <name>formulaDestinatarioValido</name>
+        <dataType>Boolean</dataType>
+        <expression>AND(
+  NOT(ISBLANK({!Obter_Configuracao_ADV.Email_Precificacao__c})),
+  RIGHT(LOWER(TRIM({!Obter_Configuracao_ADV.Email_Precificacao__c})), 8) &lt;&gt; &apos;.invalid&apos;
+)</expression>
+    </formulas>
+    <formulas>
         <description>Link do registro no Lightning, montado a partir da URL da instância (sem domínio fixado no metadado).</description>
         <name>formulaLinkRegistro</name>
         <dataType>String</dataType>
@@ -90,15 +99,6 @@
         <name>formulaValorProposta</name>
         <dataType>String</dataType>
         <expression>IF(ISBLANK({!$Record.Amount}), &apos;não informado&apos;, &apos;R$ &apos; &amp; TEXT({!$Record.Amount}))</expression>
-    </formulas>
-    <formulas>
-        <description>Verdadeiro só com um e-mail preenchido que não seja o placeholder (.invalid é domínio reservado, nunca entregável).</description>
-        <name>formulaDestinatarioValido</name>
-        <dataType>Boolean</dataType>
-        <expression>AND(
-  NOT(ISBLANK({!Obter_Configuracao_ADV.Email_Precificacao__c})),
-  RIGHT(LOWER(TRIM({!Obter_Configuracao_ADV.Email_Precificacao__c})), 8) &lt;&gt; &apos;.invalid&apos;
-)</expression>
     </formulas>
     <interviewLabel>ADV_Aviso_Precificacao {!$Flow.CurrentDateTime}</interviewLabel>
     <label>ADV_Aviso_Precificacao</label>
@@ -119,8 +119,8 @@
         <description>Fallback do fault path: o aviso não saiu, então o dono da Oportunidade recebe uma tarefa para avisar o Antônio manualmente, com o erro técnico na descrição.</description>
         <name>Criar_Tarefa_Aviso_Nao_Enviado</name>
         <label>Criar tarefa: aviso não enviado</label>
-        <locationX>572</locationX>
-        <locationY>720</locationY>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
         <inputAssignments>
             <field>ActivityDate</field>
             <value>
@@ -164,8 +164,8 @@
         <description>Registro Padrao da configuração ADV. Custom Metadata: não consome o limite de consultas SOQL.</description>
         <name>Obter_Configuracao_ADV</name>
         <label>Obter a configuração ADV (Padrao)</label>
-        <locationX>176</locationX>
-        <locationY>360</locationY>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>Decidir_Destinatario_Configurado</targetReference>
@@ -183,7 +183,7 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <start>
-        <locationX>50</locationX>
+        <locationX>0</locationX>
         <locationY>0</locationY>
         <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
         <filterFormula>AND(

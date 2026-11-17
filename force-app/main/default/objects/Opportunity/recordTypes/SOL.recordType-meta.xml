@@ -9,7 +9,15 @@
     <picklistValues>
         <picklist>ADV_Advogado_Responsavel__c</picklist>
         <values>
+            <fullName>Amanda Ramalho</fullName>
+            <default>false</default>
+        </values>
+        <values>
             <fullName>Ana Luiza</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Ana Machado</fullName>
             <default>false</default>
         </values>
         <values>
@@ -17,7 +25,7 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Caroline Dagostino</fullName>
+            <fullName>Eugenio Filho</fullName>
             <default>false</default>
         </values>
         <values>
@@ -25,19 +33,11 @@
             <default>false</default>
         </values>
         <values>
-            <fullName>Filipe Gonzaga</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Gabriela Medeiros</fullName>
+            <fullName>Filipe Almeida</fullName>
             <default>false</default>
         </values>
         <values>
             <fullName>Glaucia Uliana</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Jose Evangelista</fullName>
             <default>false</default>
         </values>
         <values>
@@ -46,14 +46,6 @@
         </values>
         <values>
             <fullName>Lucas Hygino</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Marcelo Lervonino</fullName>
-            <default>false</default>
-        </values>
-        <values>
-            <fullName>Renato Chiappim</fullName>
             <default>false</default>
         </values>
     </picklistValues>
@@ -369,6 +361,17 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>STE_CNH_Status__c</picklist>
+        <values>
+            <fullName>Apto</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Não Apto</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>STE_Classificacao_Fila__c</picklist>
         <values>
             <fullName>Fria</fullName>
@@ -536,6 +539,72 @@
         </values>
         <values>
             <fullName>Prefiro não informar</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>STE_Ja_Trabalhou_Telecom__c</picklist>
+        <values>
+            <fullName>Não</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sim</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>STE_Jornada_PreCurso_Etapa__c</picklist>
+        <values>
+            <fullName>Boas-vindas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Conclusão</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>D-1 É amanhã</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>D-12 Conquistas</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>D-15 Inspiração</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>D-2 Tarefa de confirmação</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>D-3 Três dias</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>D-7 Uma semana</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>D-9 Conteúdo</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Dia D Bom dia</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Durante o curso</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>No-show</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Reta final</fullName>
             <default>false</default>
         </values>
     </picklistValues>

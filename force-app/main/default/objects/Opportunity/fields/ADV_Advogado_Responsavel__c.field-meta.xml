@@ -12,14 +12,19 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>Caroline Dagostino</fullName>
+                <fullName>Amanda Ramalho</fullName>
                 <default>false</default>
-                <label>Caroline Dagostino</label>
+                <label>Amanda Ramalho</label>
             </value>
             <value>
-                <fullName>Renato Chiappim</fullName>
+                <fullName>Ana Luiza</fullName>
                 <default>false</default>
-                <label>Renato Chiappim</label>
+                <label>Ana Luiza</label>
+            </value>
+            <value>
+                <fullName>Ana Machado</fullName>
+                <default>false</default>
+                <label>Ana Machado</label>
             </value>
             <value>
                 <fullName>Bruno Junqueira</fullName>
@@ -27,9 +32,19 @@
                 <label>Bruno Junqueira</label>
             </value>
             <value>
+                <fullName>Eugenio Filho</fullName>
+                <default>false</default>
+                <label>Eugenio Filho</label>
+            </value>
+            <value>
                 <fullName>Fernando Pauli</fullName>
                 <default>false</default>
                 <label>Fernando Pauli</label>
+            </value>
+            <value>
+                <fullName>Filipe Almeida</fullName>
+                <default>false</default>
+                <label>Filipe Almeida</label>
             </value>
             <value>
                 <fullName>Glaucia Uliana</fullName>
@@ -42,33 +57,44 @@
                 <label>Larissa Billa</label>
             </value>
             <value>
-                <fullName>Filipe Gonzaga</fullName>
-                <default>false</default>
-                <label>Filipe Gonzaga</label>
-            </value>
-            <value>
                 <fullName>Lucas Hygino</fullName>
                 <default>false</default>
                 <label>Lucas Hygino</label>
             </value>
             <value>
+                <fullName>Caroline Dagostino</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Caroline Dagostino</label>
+            </value>
+            <value>
+                <fullName>Renato Chiappim</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Renato Chiappim</label>
+            </value>
+            <value>
+                <fullName>Filipe Gonzaga</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Filipe Gonzaga</label>
+            </value>
+            <value>
                 <fullName>Gabriela Medeiros</fullName>
                 <default>false</default>
+                <isActive>false</isActive>
                 <label>Gabriela Medeiros</label>
             </value>
             <value>
                 <fullName>Jose Evangelista</fullName>
                 <default>false</default>
+                <isActive>false</isActive>
                 <label>Jose Evangelista</label>
-            </value>
-            <value>
-                <fullName>Ana Luiza</fullName>
-                <default>false</default>
-                <label>Ana Luiza</label>
             </value>
             <value>
                 <fullName>Marcelo Lervonino</fullName>
                 <default>false</default>
+                <isActive>false</isActive>
                 <label>Marcelo Lervonino</label>
             </value>
         </valueSetDefinition>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Opportunity.ADV_Advogado_Responsavel__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>Opportunity-Opportunity Layout</members>
+        <name>Layout</name>
+    </types>
+    <types>
+        <members>Opportunity.ADV</members>
+        <members>Opportunity.ESG</members>
+        <members>Opportunity.SCO</members>
+        <members>Opportunity.SOL</members>
+        <members>Opportunity.STE</members>
+        <members>Opportunity.STE_Telecom</members>
+        <name>RecordType</name>
+    </types>
+    <version>67.0</version>
+</Package>
