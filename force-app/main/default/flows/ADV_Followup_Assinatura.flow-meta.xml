@@ -6,8 +6,8 @@
         <description>Defesa extra: o cancelamento do caminho agendado já acontece quando a Oportunidade sai da etapa (entrada &quot;somente quando atualizado para atender&quot;); esta checagem garante que nunca se cobre assinatura de uma Oportunidade que não está mais aguardando.</description>
         <name>Decidir_Ainda_Aguardando</name>
         <label>Ainda em Aguardando Assinatura?</label>
-        <locationX>308</locationX>
-        <locationY>396</locationY>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
         <defaultConnectorLabel>Não — encerra</defaultConnectorLabel>
         <rules>
             <name>Ainda_Aguardando</name>
@@ -46,8 +46,8 @@
         <description>Lembrete de follow-up para o dono da Oportunidade, vencendo no dia em que é criado.</description>
         <name>Criar_Tarefa_Cobrar_Assinatura</name>
         <label>Criar tarefa: cobrar retorno do cliente</label>
-        <locationX>176</locationX>
-        <locationY>516</locationY>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
         <inputAssignments>
             <field>ActivityDate</field>
             <value>
@@ -88,7 +88,7 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordCreates>
     <start>
-        <locationX>50</locationX>
+        <locationX>0</locationX>
         <locationY>0</locationY>
         <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
         <filterFormula>AND(

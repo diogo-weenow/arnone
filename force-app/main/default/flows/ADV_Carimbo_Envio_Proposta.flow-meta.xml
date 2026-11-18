@@ -6,8 +6,8 @@
         <description>Carimba a data do dia no próprio save. Assignment puro: sem DML nem consulta extra.</description>
         <name>Carimbar_Data_Envio</name>
         <label>Carimbar a data de envio da proposta</label>
-        <locationX>176</locationX>
-        <locationY>516</locationY>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
         <assignmentItems>
             <assignToReference>$Record.ADV_Data_Envio_Proposta__c</assignToReference>
             <operator>Assign</operator>
@@ -20,8 +20,8 @@
         <description>Só a Arnone Advogados carimba. Fecha por padrão: Record Type ausente ou diferente não altera nada.</description>
         <name>Decidir_Record_Type_ADV</name>
         <label>É Record Type ADV?</label>
-        <locationX>176</locationX>
-        <locationY>396</locationY>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
         <defaultConnectorLabel>Não — outra BU</defaultConnectorLabel>
         <rules>
             <name>E_Record_Type_ADV</name>
@@ -60,8 +60,8 @@
         <description>Record Type ADV de Oportunidade, pelo DeveloperName. Filtro constante: a plataforma bulkifica (uma consulta por transação).</description>
         <name>Obter_Record_Type_ADV</name>
         <label>Obter o Record Type ADV de Oportunidade</label>
-        <locationX>176</locationX>
-        <locationY>276</locationY>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>Decidir_Record_Type_ADV</targetReference>
@@ -86,7 +86,7 @@
         <storeOutputAutomatically>true</storeOutputAutomatically>
     </recordLookups>
     <start>
-        <locationX>50</locationX>
+        <locationX>0</locationX>
         <locationY>0</locationY>
         <connector>
             <targetReference>Obter_Record_Type_ADV</targetReference>
