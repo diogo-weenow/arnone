@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>UTM_Campaign_Name__c</fullName>
+    <description>Nome legível da campanha na plataforma de anúncios (campaign_name), gravado pelo formulário Web-to-Lead da landing page. Complementa o UTM Campaign, que traz o ID. Preenchido só quando o parâmetro chega na URL.</description>
+    <externalId>false</externalId>
+    <label>UTM Campaign Name</label>
+    <length>255</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
