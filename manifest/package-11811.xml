@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Lead</members>
+        <name>AssignmentRules</name>
+    </types>
+    <types>
+        <members>Lead.SCO_Lead_CNPJ_Duplicate_Rule</members>
+        <name>DuplicateRule</name>
+    </types>
+    <types>
+        <members>Lead.SCO_CNPJ_Match_Rule</members>
+        <name>MatchingRule</name>
+    </types>
+    <types>
+        <members>PS_SCO_Importar_Leads</members>
+        <name>PermissionSet</name>
+    </types>
+    <types>
+        <members>Lead.SCO</members>
+        <name>RecordType</name>
+    </types>
+    <types>
+        <members>LeadSource</members>
+        <name>StandardValueSet</name>
+    </types>
+    <types>
+        <members>Lead.SCO_Lead_Exige_Origem</members>
+        <name>ValidationRule</name>
+    </types>
+    <version>67.0</version>
+</Package>

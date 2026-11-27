@@ -86,4 +86,39 @@
         <default>false</default>
         <label>Parcerias</label>
     </standardValue>
+    <standardValue>
+        <fullName>Pago</fullName>
+        <default>false</default>
+        <label>Pago</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Organico_Site</fullName>
+        <default>false</default>
+        <label>Orgânico/site</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Indicacao</fullName>
+        <default>false</default>
+        <label>Indicação</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Evento_Webinar</fullName>
+        <default>false</default>
+        <label>Evento/Webinar</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Parceiro</fullName>
+        <default>false</default>
+        <label>Parceiro (S Company)</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Lista_Outbound</fullName>
+        <default>false</default>
+        <label>Lista outbound</label>
+    </standardValue>
+    <standardValue>
+        <fullName>Carteira_Vendedor</fullName>
+        <default>false</default>
+        <label>Carteira do vendedor</label>
+    </standardValue>
 </StandardValueSet>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>CLICKUP-11811. S Company: Importar Leads (Assistente de Importacao). Lead Ler/Criar/Editar so por exigencia da plataforma (o PS da BU ja concede). Atribuicao manual aos BDR/SDR/Executivos SCO.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>S Company - Importar Leads</label>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Lead</object>
+        <viewAllFields>false</viewAllFields>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>ImportLeads</name>
+    </userPermissions>
+</PermissionSet>
