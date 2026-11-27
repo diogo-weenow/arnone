@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SCO_Motivo_Nutricao__c</fullName>
+    <description>Por que o Lead da S Company foi para &quot;Em nutrição&quot; (agora não, com retomada futura). Obrigatório ao estar em &quot;Em nutrição&quot; (VR SCO_Nutricao_Exige_Motivo_E_Retomada). Nenhuma automação limpa o valor quando o Lead sai da nutrição: fica como histórico. CLICKUP-11813.</description>
+    <inlineHelpText>Por que o Lead foi para nutrição. Obrigatório no status &quot;Em nutrição&quot;.</inlineHelpText>
+    <label>Motivo da nutrição</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Sem retorno</fullName>
+                <default>false</default>
+                <label>Sem retorno</label>
+            </value>
+            <value>
+                <fullName>Sem timing</fullName>
+                <default>false</default>
+                <label>Sem timing</label>
+            </value>
+            <value>
+                <fullName>Sem interesse no momento</fullName>
+                <default>false</default>
+                <label>Sem interesse no momento</label>
+            </value>
+            <value>
+                <fullName>Decisor não identificado</fullName>
+                <default>false</default>
+                <label>Decisor não identificado</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

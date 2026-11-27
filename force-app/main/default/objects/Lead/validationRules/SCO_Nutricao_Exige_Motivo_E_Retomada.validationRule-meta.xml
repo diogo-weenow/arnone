@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SCO_Nutricao_Exige_Motivo_E_Retomada</fullName>
+    <active>true</active>
+    <description>CLICKUP-11813. Lead da S Company em &quot;Em nutrição&quot; exige o Motivo da nutrição. A data de retomada é tratada na VR SCO_Nutricao_Exige_Data_Retomada_Futura. Sair da nutrição não limpa nem trava o motivo.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SCO&apos;,
+  ISPICKVAL(Status, &apos;Em nutrição&apos;),
+  ISBLANK(TEXT(SCO_Motivo_Nutricao__c))
+)</errorConditionFormula>
+    <errorDisplayField>SCO_Motivo_Nutricao__c</errorDisplayField>
+    <errorMessage>Informe o motivo da nutrição.</errorMessage>
+</ValidationRule>

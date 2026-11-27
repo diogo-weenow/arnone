@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SCO_Desqualificado_Exige_Motivo</fullName>
+    <active>true</active>
+    <description>CLICKUP-11813. Lead da S Company em &quot;Desqualificado&quot; exige o Motivo da desqualificação. A Observação da desqualificação é sempre opcional, inclusive com motivo &quot;Outros&quot;.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SCO&apos;,
+  ISPICKVAL(Status, &apos;Desqualificado&apos;),
+  ISBLANK(TEXT(SCO_Motivo_Desqualificacao__c))
+)</errorConditionFormula>
+    <errorDisplayField>SCO_Motivo_Desqualificacao__c</errorDisplayField>
+    <errorMessage>Informe o motivo da desqualificação.</errorMessage>
+</ValidationRule>
