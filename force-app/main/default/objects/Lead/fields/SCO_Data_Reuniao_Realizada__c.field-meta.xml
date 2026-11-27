@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SCO_Data_Reuniao_Realizada__c</fullName>
+    <description>Data em que a reunião com o Lead da S Company foi efetivamente realizada. Preenchimento manual; não aceita data futura (VR SCO_Reuniao_Realizada_Nao_Futura). Nenhuma automação limpa este campo, nem em caso de desqualificação. CLICKUP-11812.</description>
+    <inlineHelpText>Data em que a reunião aconteceu. Não pode ser futura.</inlineHelpText>
+    <label>Data da reunião realizada</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

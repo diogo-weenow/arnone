@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SCO_Nutricao_Exige_Data_Retomada_Futura</fullName>
+    <active>true</active>
+    <description>CLICKUP-11813. SCO em &quot;Em nutrição&quot; exige Data de retomada. Data futura é cobrada ao entrar no status ou mudar a data: vencida a retomada, o Lead segue editável.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SCO&apos;,
+  ISPICKVAL(Status, &apos;Em nutrição&apos;),
+  OR(
+    ISBLANK(SCO_Data_Retomada__c),
+    AND(
+      SCO_Data_Retomada__c &lt;= TODAY(),
+      OR(ISNEW(), ISCHANGED(Status), ISCHANGED(SCO_Data_Retomada__c))
+    )
+  )
+)</errorConditionFormula>
+    <errorDisplayField>SCO_Data_Retomada__c</errorDisplayField>
+    <errorMessage>Informe a data de retomada.</errorMessage>
+</ValidationRule>

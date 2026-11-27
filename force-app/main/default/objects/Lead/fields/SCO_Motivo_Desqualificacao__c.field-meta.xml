@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SCO_Motivo_Desqualificacao__c</fullName>
+    <description>Motivo da desqualificação definitiva (nunca) do Lead da S Company. Obrigatório ao estar em &quot;Desqualificado&quot; (VR SCO_Desqualificado_Exige_Motivo). Cadastro duplicado não é desqualificação: unifique pelo merge nativo de Leads. Não confundir com SOL_Motivo_Desqualificacao__c (Arnone Soluções). CLICKUP-11813.</description>
+    <inlineHelpText>Use &apos;Fora do perfil&apos; quando a empresa tiver menos de 50 colaboradores (critério NR-1) ou não se encaixar no público-alvo. Cadastro duplicado não se desqualifica: unifique os Leads.</inlineHelpText>
+    <label>Motivo da desqualificação</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Fora do perfil</fullName>
+                <default>false</default>
+                <label>Fora do perfil</label>
+            </value>
+            <value>
+                <fullName>Concorrente ou fornecedor</fullName>
+                <default>false</default>
+                <label>Concorrente ou fornecedor</label>
+            </value>
+            <value>
+                <fullName>Empresa inexistente ou fechada</fullName>
+                <default>false</default>
+                <label>Empresa inexistente ou fechada</label>
+            </value>
+            <value>
+                <fullName>Outros</fullName>
+                <default>false</default>
+                <label>Outros</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

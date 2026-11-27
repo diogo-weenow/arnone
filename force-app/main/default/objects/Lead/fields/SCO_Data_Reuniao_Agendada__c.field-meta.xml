@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SCO_Data_Reuniao_Agendada__c</fullName>
+    <description>Data e hora da reunião agendada com o Lead da S Company. Obrigatória para o Status &quot;Reunião agendada&quot; (VR SCO_Reuniao_Agendada_Exige_Dados). CLICKUP-11812.</description>
+    <inlineHelpText>Data e hora da reunião. Obrigatória em &quot;Reunião agendada&quot;.</inlineHelpText>
+    <label>Data da reunião agendada</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>DateTime</type>
+</CustomField>

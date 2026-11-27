@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PathAssistant xmlns="http://soap.sforce.com/2006/04/metadata">
+    <active>true</active>
+    <entityName>Lead</entityName>
+    <fieldName>Status</fieldName>
+    <masterLabel>S Company</masterLabel>
+    <pathAssistantSteps>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; executivo.&lt;/p&gt;&lt;p&gt;Converta pela ação Converter Lead.&lt;/p&gt;</info>
+        <picklistValueName>Convertido</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>SCO_Motivo_Desqualificacao__c</fieldNames>
+        <fieldNames>SCO_Motivo_Reuniao_Sem_Avanco__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; BDR.&lt;/p&gt;&lt;p&gt;Desqualificação é definitiva e exige o motivo. Se a reunião já foi realizada, informe também o motivo da reunião sem avanço. A data da reunião realizada, se preenchida, continua no registro.&lt;/p&gt;&lt;p&gt;Cadastro duplicado não se desqualifica: unifique os Leads pela ação Mesclar.&lt;/p&gt;</info>
+        <picklistValueName>Desqualificado</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>Phone</fieldNames>
+        <fieldNames>Email</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; BDR.&lt;/p&gt;&lt;p&gt;Ao entrar nesta etapa, o BDR responsável é preenchido com o dono do Lead (se ainda estiver vazio).&lt;/p&gt;</info>
+        <picklistValueName>Em contato</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>SCO_Motivo_Nutricao__c</fieldNames>
+        <fieldNames>SCO_Data_Retomada__c</fieldNames>
+        <fieldNames>SCO_Motivo_Reuniao_Sem_Avanco__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; BDR.&lt;/p&gt;&lt;p&gt;Agora não: informe o motivo da nutrição e uma data de retomada futura. Se a reunião já foi realizada, informe também o motivo da reunião sem avanço.&lt;/p&gt;&lt;p&gt;Quando o cliente retornar, volte para Em contato; motivo e data ficam no registro.&lt;/p&gt;</info>
+        <picklistValueName>Em nutrição</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>LeadSource</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; BDR.&lt;/p&gt;&lt;p&gt;Confira a Origem do Lead (obrigatória).&lt;/p&gt;</info>
+        <picklistValueName>Novo</picklistValueName>
+    </pathAssistantSteps>
+    <pathAssistantSteps>
+        <fieldNames>SCO_Executivo_Responsavel__c</fieldNames>
+        <fieldNames>SCO_Data_Reuniao_Agendada__c</fieldNames>
+        <fieldNames>SCO_Data_Reuniao_Realizada__c</fieldNames>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; BDR e executivo.&lt;/p&gt;&lt;p&gt;Executivo responsável e data da reunião são obrigatórios. A data da reunião realizada não pode ser futura.&lt;/p&gt;</info>
+        <picklistValueName>Reunião agendada</picklistValueName>
+    </pathAssistantSteps>
+    <recordTypeName>SCO</recordTypeName>
+</PathAssistant>
