@@ -42,6 +42,31 @@
                 <identifier>force_detailPanel</identifier>
             </componentInstance>
         </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>columns</name>
+                    <value>Facet-a2cf7786-c089-46c5-af21-833fe7c1aa6e</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>horizontalAlignment</name>
+                    <value>false</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>label</name>
+                    <value>Dados da Conta — S Company</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:fieldSection</componentName>
+                <identifier>sco_secao_dados_conta</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!$Permission.CustomPermission.SCO_Comercial}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                </visibilityRule>
+            </componentInstance>
+        </itemInstances>
         <mode>Replace</mode>
         <name>detailTabContent</name>
         <type>Facet</type>
@@ -220,6 +245,58 @@
         <mode>Replace</mode>
         <name>sidebar</name>
         <type>Region</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SCO_Executivo__c</fieldItem>
+                <identifier>RecordSCOExecutivocField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <name>Facet-5765cbec-29b5-444c-8ae2-5f3d86355fa5</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SCO_Cliente_Desde__c</fieldItem>
+                <identifier>RecordSCOClienteDesdecField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <name>Facet-0d04eae0-241c-4d3f-8c29-0d7fceaf9785</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-5765cbec-29b5-444c-8ae2-5f3d86355fa5</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:column</componentName>
+                <identifier>sco_secao_dados_conta_coluna1</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-0d04eae0-241c-4d3f-8c29-0d7fceaf9785</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:column</componentName>
+                <identifier>sco_secao_dados_conta_coluna2</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-a2cf7786-c089-46c5-af21-833fe7c1aa6e</name>
+        <type>Facet</type>
     </flexiPageRegions>
     <masterLabel>Account Record Page</masterLabel>
     <parentFlexiPage>sfa__Account_rec_L</parentFlexiPage>

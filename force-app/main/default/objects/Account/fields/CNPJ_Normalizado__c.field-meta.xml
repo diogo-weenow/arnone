@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CNPJ_Normalizado__c</fullName>
+    <caseSensitive>false</caseSensitive>
+    <description>Chave única de Conta no Grupo. CNPJ sem pontuação, em maiúsculas; preenchido pelo flow Account_BeforeSave_Normalizar_CNPJ. CLICKUP-12115.</description>
+    <externalId>true</externalId>
+    <inlineHelpText>Preenchido automaticamente a partir do CNPJ.</inlineHelpText>
+    <label>CNPJ (normalizado)</label>
+    <length>18</length>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>
