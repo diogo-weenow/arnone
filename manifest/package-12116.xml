@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>SCOEntradaLeadTest</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>Lead.SCO_Lead_CNPJ_Duplicate_Rule</members>
+        <members>Lead.SCO_Lead_Email_Duplicate_Rule</members>
+        <name>DuplicateRule</name>
+    </types>
+    <types>
+        <members>Lead.SCO_Lead_Email_Match_Rule</members>
+        <name>MatchingRule</name>
+    </types>
+    <version>66.0</version>
+</Package>

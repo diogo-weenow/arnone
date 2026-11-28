@@ -3,7 +3,7 @@
     <actionOnInsert>Allow</actionOnInsert>
     <actionOnUpdate>Allow</actionOnUpdate>
     <alertText>Já existe um Lead com este CNPJ. Confira o registro existente antes de seguir.</alertText>
-    <description>CLICKUP-11811. Avisa (sem bloquear) quando um Lead da S Company tem o mesmo CNPJ de outro Lead. Filtrada pelo record type S.Company para nao alterar as outras unidades.</description>
+    <description>CLICKUP-11811. Avisa (sem bloquear) quando um Lead da S Company tem o mesmo CNPJ de outro Lead. Filtrada pelo record type S.Company para nao alterar as outras unidades. Desativada no CLICKUP-12116: v4 permite Leads com o mesmo CNPJ.</description>
     <duplicateRuleFilter>
         <booleanFilter xsi:nil="true"/>
         <duplicateRuleFilterItems>
@@ -19,7 +19,7 @@
         <matchingRule>SCO_CNPJ_Match_Rule</matchingRule>
         <objectMapping xsi:nil="true"/>
     </duplicateRuleMatchRules>
-    <isActive>true</isActive>
+    <isActive>false</isActive>
     <masterLabel>S Company - Duplicidade por CNPJ</masterLabel>
     <operationsOnInsert>Alert</operationsOnInsert>
     <operationsOnInsert>Report</operationsOnInsert>

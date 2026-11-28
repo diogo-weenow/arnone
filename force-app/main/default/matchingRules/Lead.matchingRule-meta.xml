@@ -11,4 +11,15 @@
         </matchingRuleItems>
         <ruleStatus>Active</ruleStatus>
     </matchingRules>
+    <matchingRules>
+        <fullName>SCO_Lead_Email_Match_Rule</fullName>
+        <description>CLICKUP-12116. Lead x Lead pelo Email, correspondencia exata. E-mail em branco nao conta. Usada pela SCO_Lead_Email_Duplicate_Rule.</description>
+        <label>S Company - E-mail</label>
+        <matchingRuleItems>
+            <blankValueBehavior>NullNotAllowed</blankValueBehavior>
+            <fieldName>Email</fieldName>
+            <matchingMethod>Exact</matchingMethod>
+        </matchingRuleItems>
+        <ruleStatus>Active</ruleStatus>
+    </matchingRules>
 </MatchingRules>

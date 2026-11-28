@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DuplicateRule xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <actionOnInsert>Allow</actionOnInsert>
+    <actionOnUpdate>Allow</actionOnUpdate>
+    <alertText>Já existe um Lead com este e-mail. Confira o registro existente antes de seguir.</alertText>
+    <description>CLICKUP-12116. Avisa (sem bloquear) quando um Lead da S Company tem o mesmo e-mail de outro Lead aberto. Substitui a regra por CNPJ da v3.</description>
+    <duplicateRuleFilter>
+        <booleanFilter>1 OR 2</booleanFilter>
+        <duplicateRuleFilterItems>
+            <field>RecordType</field>
+            <operation>equals</operation>
+            <value>S.Company</value>
+            <sortOrder>1</sortOrder>
+            <table>Lead</table>
+        </duplicateRuleFilterItems>
+        <duplicateRuleFilterItems>
+            <field>Unidade_Origem__c</field>
+            <operation>equals</operation>
+            <value>S.Company</value>
+            <sortOrder>2</sortOrder>
+            <table>Lead</table>
+        </duplicateRuleFilterItems>
+    </duplicateRuleFilter>
+    <duplicateRuleMatchRules>
+        <matchRuleSObjectType>Lead</matchRuleSObjectType>
+        <matchingRule>SCO_Lead_Email_Match_Rule</matchingRule>
+        <objectMapping xsi:nil="true"/>
+    </duplicateRuleMatchRules>
+    <isActive>true</isActive>
+    <masterLabel>S Company - Duplicidade por E-mail</masterLabel>
+    <operationsOnInsert>Alert</operationsOnInsert>
+    <operationsOnInsert>Report</operationsOnInsert>
+    <operationsOnUpdate>Alert</operationsOnUpdate>
+    <operationsOnUpdate>Report</operationsOnUpdate>
+    <securityOption>EnforceSharingRules</securityOption>
+    <sortOrder>4</sortOrder>
+</DuplicateRule>
