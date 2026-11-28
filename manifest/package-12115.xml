@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <types>
+        <members>AcessoPorBUTest</members>
+        <members>SOLDuracaoEtapaTest</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
         <members>Account.CNPJ_Normalizado__c</members>
         <members>Account.SCO_Cliente_Desde__c</members>
         <members>Account.SCO_Executivo__c</members>

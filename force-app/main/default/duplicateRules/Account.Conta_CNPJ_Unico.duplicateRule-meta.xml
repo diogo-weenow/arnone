@@ -3,7 +3,7 @@
     <actionOnInsert>Block</actionOnInsert>
     <actionOnUpdate>Block</actionOnUpdate>
     <alertText>Já existe uma Conta com este CNPJ. Use a Conta existente.</alertText>
-    <description>CLICKUP-12115. A Conta é única no Grupo: bloqueia criar ou alterar Conta com CNPJ (normalizado) já existente, para todas as BUs e todos os registros, mesmo os que o usuário não vê.</description>
+    <description>CLICKUP-12115. A Conta é única no Grupo: bloqueia criar ou alterar Conta com CNPJ (normalizado) já existente, para todas as BUs. Respeita compartilhamento (Conta é pública no Grupo); a unicidade absoluta é garantida pelo campo único CNPJ_Normalizado__c.</description>
     <duplicateRuleFilter xsi:nil="true"/>
     <duplicateRuleMatchRules>
         <matchRuleSObjectType>Account</matchRuleSObjectType>
@@ -12,6 +12,6 @@
     </duplicateRuleMatchRules>
     <isActive>true</isActive>
     <masterLabel>Conta - CNPJ único</masterLabel>
-    <securityOption>BypassSharingRules</securityOption>
+    <securityOption>EnforceSharingRules</securityOption>
     <sortOrder>2</sortOrder>
 </DuplicateRule>

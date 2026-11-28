@@ -11,13 +11,12 @@
  * anterior em 28/08. Sem grade fixa, o resultado dependeria do dia em que a
  * suíte roda — um teste que passa na terça e falha no sábado não prova nada.
  *
- * SOBRE FERIADO: a org NÃO tem nenhum registro de Holiday, e a associação
- * Holiday-BusinessHours não é gravável por API — logo o cenário de feriado não
- * é sintetizável em teste. O método `feriadoSegueAMesmaReguaDoFimDeSemana`
- * VERIFICA essa condição em vez de presumi-la, e explica por que a cobertura do
- * fim de semana é a mesma cobertura do feriado: `ehDiaUtil` decide por
- * `aberturaDoDia`, que é uma única chamada a `BusinessHours.nextStartDate` —
- * não existe ramo separado para feriado. A limitação está declarada no PR.
+ * SOBRE FERIADO: desde o CLICKUP-12115 a org tem feriados, associados somente
+ * ao "S Company - Horário Comercial"; o horário de Soluções não os adota
+ * (decisão de 28/11/2026). O método `feriadoSegueAMesmaReguaDoFimDeSemana`
+ * exercita o feriado no calendário S Company e trava que SOL segue contando o
+ * dia como útil. `ehDiaUtil` decide por `aberturaDoDia` (uma chamada a
+ * `BusinessHours.nextStartDate`) — não existe ramo separado para feriado.
  */
 @IsTest
 private class SOLDuracaoEtapaTest {
@@ -322,6 +321,17 @@ private class SOLDuracaoEtapaTest {
    */
   @IsTest
   static void feriadoSegueAMesmaReguaDoFimDeSemana() {
+    // CLICKUP-12115: os feriados do Grupo existem desde a fundação S Company e
+    // estão associados SOMENTE ao "S Company - Horário Comercial". Decisão do PO
+    // (28/11/2026): o horário de Soluções NÃO segue esses feriados por ora.
+    // O mecanismo (`ehDiaUtil` -> `aberturaDoDia`) recebe o Business Hours por
+    // parâmetro, então o feriado é exercitado de verdade no calendário S Company.
+    List<BusinessHours> sco = [
+      SELECT Id
+      FROM BusinessHours
+      WHERE Name = 'S Company - Horário Comercial' AND IsActive = TRUE
+      LIMIT 1
+    ];
     List<Holiday> feriados = [
       SELECT Id, ActivityDate
       FROM Holiday
@@ -341,21 +351,20 @@ private class SOLDuracaoEtapaTest {
       }
     }
 
-    if (feriadoEmDiaDeSemana != null) {
+    if (feriadoEmDiaDeSemana != null && !sco.isEmpty()) {
       Assert.isFalse(
-        SOLBusinessHoursHelper.ehDiaUtil(bh(), feriadoEmDiaDeSemana),
-        'Feriado do calendário em dia de semana não pode contar como dia útil: ' +
+        SOLBusinessHoursHelper.ehDiaUtil(sco[0].Id, feriadoEmDiaDeSemana),
+        'Feriado em dia de semana não pode contar como dia útil no calendário que o adota: ' +
         feriadoEmDiaDeSemana
+      );
+      Assert.isTrue(
+        SOLBusinessHoursHelper.ehDiaUtil(bh(), feriadoEmDiaDeSemana),
+        'O horário de Soluções não adota os feriados (decisão de 28/11/2026): ' +
+        feriadoEmDiaDeSemana + ' segue dia útil para SOL.'
       );
       return;
     }
 
-    Assert.areEqual(
-      0,
-      feriados.size(),
-      'A org não tem feriado cadastrado — o cenário não é sintetizável e a limitação está declarada no PR. ' +
-      'Se esta asserção falhar, é porque passou a existir feriado e o ramo de cima deveria tê-lo exercitado.'
-    );
     Assert.isFalse(
       SOLBusinessHoursHelper.ehDiaUtil(bh(), SABADO_ANTERIOR),
       'O mecanismo que excluiria o feriado é o mesmo que exclui o sábado: aberturaDoDia devolve null.'
