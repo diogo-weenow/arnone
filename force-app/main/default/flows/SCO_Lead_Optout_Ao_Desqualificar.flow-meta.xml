@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>Marca o Email Opt Out no próprio save. Assignment puro: sem DML extra. Nunca desmarca.</description>
+        <name>Marcar_Email_Opt_Out</name>
+        <label>Marcar Email Opt Out</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>$Record.HasOptedOutOfEmail</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </assignmentItems>
+    </assignments>
+    <decisions>
+        <description>Só a S Company marca. Fecha por padrão: Record Type ausente ou diferente não altera nada.</description>
+        <name>Decidir_Record_Type_SCO</name>
+        <label>É Record Type SCO?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Não — outra BU</defaultConnectorLabel>
+        <rules>
+            <name>E_Record_Type_SCO</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>$Record.RecordTypeId</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <elementReference>Obter_Record_Type_SCO.Id</elementReference>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Marcar_Email_Opt_Out</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <description>CLICKUP-12121. BU S Company: quando o Lead passa a &quot;Desqualificado&quot; com motivo &quot;Solicitou não ser contatado&quot; (criação, mudança de status ou mudança de motivo), marca Email Opt Out (HasOptedOutOfEmail = true). Nunca desmarca: o usuário pode desmarcar manualmente e o flow não remarca sem nova transição de status ou motivo. Na conversão, o mapeamento nativo leva a marcação ao Contato. BEFORE-SAVE: atualiza o próprio registro sem DML extra. O Record Type é conferido por Get Records + Decision (mesmo padrão do SCO_Definir_BDR_Responsavel); sem Id fixado no metadado.</description>
+    <environments>Default</environments>
+    <interviewLabel>SCO_Lead_Optout_Ao_Desqualificar {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SCO_Lead_Optout_Ao_Desqualificar</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordLookups>
+        <description>Record Type SCO de Lead, pelo DeveloperName. Filtro constante: a plataforma bulkifica (uma consulta por transação).</description>
+        <name>Obter_Record_Type_SCO</name>
+        <label>Obter o Record Type SCO de Lead</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Decidir_Record_Type_SCO</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>SobjectType</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Lead</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>SCO</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>RecordType</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Obter_Record_Type_SCO</targetReference>
+        </connector>
+        <filterFormula>AND(
+  ISPICKVAL({!$Record.Status}, &apos;Desqualificado&apos;),
+  ISPICKVAL({!$Record.SCO_Motivo_Desqualificacao__c}, &apos;Solicitou não ser contatado&apos;),
+  NOT({!$Record.HasOptedOutOfEmail}),
+  OR(ISNEW(), ISCHANGED({!$Record.Status}), ISCHANGED({!$Record.SCO_Motivo_Desqualificacao__c}))
+)</filterFormula>
+        <object>Lead</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <triggerType>RecordBeforeSave</triggerType>
+    </start>
+    <status>Active</status>
+</Flow>

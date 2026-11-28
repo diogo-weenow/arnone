@@ -257,6 +257,80 @@
         </values>
     </picklistValues>
     <picklistValues>
+        <picklist>SCO_Motivo_Desqualificacao__c</picklist>
+        <values>
+            <fullName>Abaixo do mínimo do ECOA %28menos de 50 colaboradores%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Concorrente ou fornecedor</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Contato sem relação com a empresa</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Dados inválidos %28sem nenhum canal válido de contato%29</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Empresa inexistente ou fechada</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Fora do perfil</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Lead de teste ou spam</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Necessidade fora do portfólio</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Outros</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Perda por preço do pré-orçamento</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Solicitou não ser contatado</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
+        <picklist>SCO_Motivo_Nutricao__c</picklist>
+        <values>
+            <fullName>Decisor não identificado</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Já tem fornecedor com contrato vigente</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Não compareceu à reunião</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sem orçamento no momento</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sem retorno</fullName>
+            <default>false</default>
+        </values>
+        <values>
+            <fullName>Sem timing</fullName>
+            <default>false</default>
+        </values>
+    </picklistValues>
+    <picklistValues>
         <picklist>SOL_Contato_Com_Decisor__c</picklist>
         <values>
             <fullName>Não</fullName>

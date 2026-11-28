@@ -1,0 +1,534 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <assignments>
+        <description>BDR responsável ativo vira o dono da tarefa.</description>
+        <name>Dono_E_O_BDR</name>
+        <label>Dono da tarefa é o BDR responsável</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varDonoTarefaId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Obter_BDR_Ativo.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Criar_Tarefa_Retomada</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Sem BDR ativo, o dono do Lead (usuário ativo) vira o dono da tarefa.</description>
+        <name>Dono_E_O_Dono_Do_Lead</name>
+        <label>Dono da tarefa é o dono do Lead</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varDonoTarefaId</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>Obter_Dono_Ativo.Id</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Criar_Tarefa_Retomada</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Sem dataReferencia (chamada pelo scheduled path), a data de referência é a de hoje.</description>
+        <name>Usar_Data_De_Hoje</name>
+        <label>Usar a data de hoje</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varDataEfetiva</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>$Flow.CurrentDate</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Obter_Record_Type_SCO</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <description>Usa a dataReferencia recebida (testes).</description>
+        <name>Usar_Data_Recebida</name>
+        <label>Usar a data recebida</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignmentItems>
+            <assignToReference>varDataEfetiva</assignToReference>
+            <operator>Assign</operator>
+            <value>
+                <elementReference>dataReferencia</elementReference>
+            </value>
+        </assignmentItems>
+        <connector>
+            <targetReference>Obter_Record_Type_SCO</targetReference>
+        </connector>
+    </assignments>
+    <decisions>
+        <description>BDR responsável é usuário ativo?</description>
+        <name>Decidir_BDR_Ativo</name>
+        <label>BDR está ativo?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Decidir_Dono_E_Usuario</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Não</defaultConnectorLabel>
+        <rules>
+            <name>BDR_Ativo</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Obter_BDR_Ativo</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Dono_E_O_BDR</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>dataReferencia é opcional: o scheduled path não passa; o teste passa.</description>
+        <name>Decidir_Data_Referencia</name>
+        <label>Recebeu dataReferencia?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Usar_Data_De_Hoje</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Não — usar hoje</defaultConnectorLabel>
+        <rules>
+            <name>Recebeu_Data</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>dataReferencia</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Usar_Data_Recebida</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Dono do Lead é usuário ativo?</description>
+        <name>Decidir_Dono_Ativo</name>
+        <label>Dono está ativo?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Não — sem tarefa</defaultConnectorLabel>
+        <rules>
+            <name>Dono_Ativo</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Obter_Dono_Ativo</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Dono_E_O_Dono_Do_Lead</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Dono do Lead é usuário (005)? Fila (00G) não serve como dono de tarefa.</description>
+        <name>Decidir_Dono_E_Usuario</name>
+        <label>Dono do Lead é usuário?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Não — sem tarefa</defaultConnectorLabel>
+        <rules>
+            <name>Dono_E_Usuario</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Obter_Lead.OwnerId</leftValueReference>
+                <operator>StartsWith</operator>
+                <rightValue>
+                    <stringValue>005</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Obter_Dono_Ativo</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Só segue se o Lead é SCO, está em Em nutrição e a data de retomada é a data de referência.</description>
+        <name>Decidir_Lead_Elegivel</name>
+        <label>Lead elegível?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnectorLabel>Não — termina</defaultConnectorLabel>
+        <rules>
+            <name>Lead_Elegivel</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Obter_Lead</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Obter_Tarefa_Aberta</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>Idempotência: nunca duas tarefas abertas &quot;Retomar contato&quot; para o mesmo Lead na mesma data.</description>
+        <name>Decidir_Tarefa_Existente</name>
+        <label>Já existe tarefa aberta?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Decidir_Tem_BDR</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Não</defaultConnectorLabel>
+        <rules>
+            <name>Tarefa_Existe</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Obter_Tarefa_Aberta</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <label>Sim — termina</label>
+        </rules>
+    </decisions>
+    <decisions>
+        <description>BDR responsável preenchido?</description>
+        <name>Decidir_Tem_BDR</name>
+        <label>Tem BDR responsável?</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <defaultConnector>
+            <targetReference>Decidir_Dono_E_Usuario</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Não</defaultConnectorLabel>
+        <rules>
+            <name>Tem_BDR</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>Obter_Lead.SCO_BDR_Responsavel__c</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>false</booleanValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Obter_BDR_Ativo</targetReference>
+            </connector>
+            <label>Sim</label>
+        </rules>
+    </decisions>
+    <description>CLICKUP-12121. BU S Company: cria a tarefa &quot;Retomar contato&quot; do Lead em nutrição no dia da data de retomada. Chamado pelo scheduled path &quot;Retomada&quot; do SCO_Lead_Agendar_Retomada (sem dataReferencia: usa a data de hoje); dataReferencia existe só para teste. Só cria se o Lead é SCO, está em &quot;Em nutrição&quot; e a data de retomada é a data de referência; não cria se já houver tarefa aberta &quot;Retomar contato&quot; do Lead na mesma data. Dono: BDR responsável se ativo; senão o dono do Lead se for usuário ativo; senão nenhuma tarefa. A BU da tarefa é carimbada pelo Acesso_BU_Tarefa_Carimbar. Sem fault path de propósito (mesmo padrão do ADV_Followup_Assinatura): no caminho agendado não há usuário para ver mensagem; a falha não tratada gera o e-mail de erro de flow da plataforma para o administrador e fica registrada nas entrevistas com falha.</description>
+    <environments>Default</environments>
+    <formulas>
+        <description>Descrição da tarefa.</description>
+        <name>fxDescricaoTarefa</name>
+        <dataType>String</dataType>
+        <expression>&apos;Lead em nutrição. Motivo: &apos; &amp; {!fxRotuloMotivo}</expression>
+    </formulas>
+    <formulas>
+        <description>Rótulo do Motivo da nutrição (TEXT devolve o API name; os rótulos v4 diferem em 3 valores).</description>
+        <name>fxRotuloMotivo</name>
+        <dataType>String</dataType>
+        <expression>CASE(TEXT({!Obter_Lead.SCO_Motivo_Nutricao__c}),
+  &apos;Sem timing&apos;, &apos;Sem timing / não é prioridade agora&apos;,
+  &apos;Sem retorno&apos;, &apos;Sem retorno após as tentativas de contato&apos;,
+  &apos;Decisor não identificado&apos;, &apos;Decisor não identificado ou sem acesso ao decisor&apos;,
+  TEXT({!Obter_Lead.SCO_Motivo_Nutricao__c}))</expression>
+    </formulas>
+    <interviewLabel>SCO_Lead_Criar_Tarefa_Retomada {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SCO_Lead_Criar_Tarefa_Retomada</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <recordCreates>
+        <description>Cria a tarefa &quot;Retomar contato&quot; ligada ao Lead, vencendo na data de retomada.</description>
+        <name>Criar_Tarefa_Retomada</name>
+        <label>Criar a tarefa Retomar contato</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <inputAssignments>
+            <field>ActivityDate</field>
+            <value>
+                <elementReference>Obter_Lead.SCO_Data_Retomada__c</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Description</field>
+            <value>
+                <elementReference>fxDescricaoTarefa</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>OwnerId</field>
+            <value>
+                <elementReference>varDonoTarefaId</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>Subject</field>
+            <value>
+                <stringValue>Retomar contato</stringValue>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
+            <field>WhoId</field>
+            <value>
+                <elementReference>Obter_Lead.Id</elementReference>
+            </value>
+        </inputAssignments>
+        <object>Task</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordCreates>
+    <recordLookups>
+        <description>BDR responsável, só se ativo.</description>
+        <name>Obter_BDR_Ativo</name>
+        <label>Obter o BDR responsável ativo</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Decidir_BDR_Ativo</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Obter_Lead.SCO_BDR_Responsavel__c</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>IsActive</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>User</object>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Dono do Lead, só se usuário ativo.</description>
+        <name>Obter_Dono_Ativo</name>
+        <label>Obter o dono do Lead ativo</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Decidir_Dono_Ativo</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Obter_Lead.OwnerId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>IsActive</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>true</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>User</object>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>O Lead só volta se for SCO, estiver em Em nutrição e a data de retomada for a data de referência.</description>
+        <name>Obter_Lead</name>
+        <label>Obter o Lead elegível</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Decidir_Lead_Elegivel</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>Id</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>recordId</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>RecordTypeId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Obter_Record_Type_SCO.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Status</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Em nutrição</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>SCO_Data_Retomada__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>varDataEfetiva</elementReference>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Lead</object>
+        <queriedFields>Id</queriedFields>
+        <queriedFields>OwnerId</queriedFields>
+        <queriedFields>SCO_BDR_Responsavel__c</queriedFields>
+        <queriedFields>SCO_Data_Retomada__c</queriedFields>
+        <queriedFields>SCO_Motivo_Nutricao__c</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Record Type SCO de Lead, pelo DeveloperName.</description>
+        <name>Obter_Record_Type_SCO</name>
+        <label>Obter o Record Type SCO de Lead</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Obter_Lead</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>SobjectType</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Lead</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>DeveloperName</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>SCO</stringValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>RecordType</object>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <recordLookups>
+        <description>Tarefa aberta &quot;Retomar contato&quot; do Lead na mesma data.</description>
+        <name>Obter_Tarefa_Aberta</name>
+        <label>Obter tarefa aberta Retomar contato</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
+        <connector>
+            <targetReference>Decidir_Tarefa_Existente</targetReference>
+        </connector>
+        <filterLogic>and</filterLogic>
+        <filters>
+            <field>WhoId</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Obter_Lead.Id</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>Subject</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Retomar contato</stringValue>
+            </value>
+        </filters>
+        <filters>
+            <field>ActivityDate</field>
+            <operator>EqualTo</operator>
+            <value>
+                <elementReference>Obter_Lead.SCO_Data_Retomada__c</elementReference>
+            </value>
+        </filters>
+        <filters>
+            <field>IsClosed</field>
+            <operator>EqualTo</operator>
+            <value>
+                <booleanValue>false</booleanValue>
+            </value>
+        </filters>
+        <getFirstRecordOnly>true</getFirstRecordOnly>
+        <object>Task</object>
+        <queriedFields>Id</queriedFields>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </recordLookups>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <connector>
+            <targetReference>Decidir_Data_Referencia</targetReference>
+        </connector>
+    </start>
+    <status>Active</status>
+    <variables>
+        <description>Data de referência opcional (só teste). Vazia: a data de hoje.</description>
+        <name>dataReferencia</name>
+        <dataType>Date</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <description>Id do Lead.</description>
+        <name>recordId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>true</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>varDataEfetiva</name>
+        <dataType>Date</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+    <variables>
+        <name>varDonoTarefaId</name>
+        <dataType>String</dataType>
+        <isCollection>false</isCollection>
+        <isInput>false</isInput>
+        <isOutput>false</isOutput>
+    </variables>
+</Flow>

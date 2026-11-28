@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SCO_Desqualif_Outros_Exige_Observacao</fullName>
+    <active>true</active>
+    <description>CLICKUP-12121. Lead da S Company em &quot;Desqualificado&quot; com motivo &quot;Outros&quot; exige a Observação da desqualificação. Nos demais motivos a observação é opcional.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SCO&apos;,
+  ISPICKVAL(Status, &apos;Desqualificado&apos;),
+  ISPICKVAL(SCO_Motivo_Desqualificacao__c, &apos;Outros&apos;),
+  ISBLANK(SCO_Observacao_Desqualificacao__c)
+)</errorConditionFormula>
+    <errorDisplayField>SCO_Observacao_Desqualificacao__c</errorDisplayField>
+    <errorMessage>Descreva o motivo na observação.</errorMessage>
+</ValidationRule>

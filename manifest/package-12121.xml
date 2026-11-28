@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  CLICKUP-12121 — US-04 Nutrição, desqualificação e reunião sem avanço (delta v4) — S Company.
+  O RecordType Lead.SCO NÃO vai neste manifesto: é implantado à parte por metadata-dir
+  (objeto reduzido ao filho), para não tocar no CustomObject Lead.
+  PS_SCO_Comercial também não: o FLS de HasOptedOutOfEmail foi aplicado por DML cirúrgico em FieldPermissions.
+-->
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>SCONutricaoDesqualificacaoLeadTest</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>Lead.SCO_Motivo_Nutricao__c</members>
+        <members>Lead.SCO_Motivo_Desqualificacao__c</members>
+        <members>Lead.SCO_Observacao_Desqualificacao__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>Lead_SCO</members>
+        <name>FlexiPage</name>
+    </types>
+    <types>
+        <members>SCO_Lead_Optout_Ao_Desqualificar</members>
+        <members>SCO_Lead_Criar_Tarefa_Retomada</members>
+        <members>SCO_Lead_Agendar_Retomada</members>
+        <name>Flow</name>
+    </types>
+    <types>
+        <members>Contact-Contact Layout</members>
+        <name>Layout</name>
+    </types>
+    <types>
+        <members>SCO_Lead</members>
+        <name>PathAssistant</name>
+    </types>
+    <types>
+        <members>Lead.SCO_Desqualif_Outros_Exige_Observacao</members>
+        <members>Lead.SCO_Motivo_Nutricao_So_Em_Nutricao</members>
+        <members>Lead.SCO_Motivo_Desqualif_So_Desqualificado</members>
+        <members>Lead.SCO_Desqualificado_Exige_Motivo</members>
+        <name>ValidationRule</name>
+    </types>
+    <version>66.0</version>
+</Package>

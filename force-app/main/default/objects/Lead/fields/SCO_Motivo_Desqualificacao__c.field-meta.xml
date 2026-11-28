@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SCO_Motivo_Desqualificacao__c</fullName>
-    <description>Motivo da desqualificação definitiva (nunca) do Lead da S Company. Obrigatório ao estar em &quot;Desqualificado&quot; (VR SCO_Desqualificado_Exige_Motivo). Cadastro duplicado não é desqualificação: unifique pelo merge nativo de Leads. Não confundir com SOL_Motivo_Desqualificacao__c (Arnone Soluções). CLICKUP-11813.</description>
-    <inlineHelpText>Use &apos;Fora do perfil&apos; quando a empresa tiver menos de 50 colaboradores (critério NR-1) ou não se encaixar no público-alvo. Cadastro duplicado não se desqualifica: unifique os Leads.</inlineHelpText>
+    <description>Motivo da desqualificação definitiva (nunca) do Lead da S Company. Obrigatório ao estar em &quot;Desqualificado&quot; (VR SCO_Desqualificado_Exige_Motivo). Cadastro duplicado não é desqualificação: unifique pelo merge nativo de Leads. Não confundir com SOL_Motivo_Desqualificacao__c (Arnone Soluções). CLICKUP-11813. Valores v4 (CLICKUP-12121). Só pode ser preenchido em Desqualificado.</description>
+    <inlineHelpText>Motivo definitivo. Use &apos;Abaixo do mínimo do ECOA&apos; para empresas com menos de 50 colaboradores. Com &apos;Outros&apos;, descreva na observação. Cadastro duplicado não se desqualifica: unifique os Leads.</inlineHelpText>
     <label>Motivo da desqualificação</label>
     <required>false</required>
     <trackFeedHistory>false</trackFeedHistory>
@@ -15,7 +15,12 @@
             <value>
                 <fullName>Fora do perfil</fullName>
                 <default>false</default>
-                <label>Fora do perfil</label>
+                <label>Fora do perfil de cliente (ICP)</label>
+            </value>
+            <value>
+                <fullName>Abaixo do mínimo do ECOA (menos de 50 colaboradores)</fullName>
+                <default>false</default>
+                <label>Abaixo do mínimo do ECOA (menos de 50 colaboradores)</label>
             </value>
             <value>
                 <fullName>Concorrente ou fornecedor</fullName>
@@ -25,7 +30,37 @@
             <value>
                 <fullName>Empresa inexistente ou fechada</fullName>
                 <default>false</default>
-                <label>Empresa inexistente ou fechada</label>
+                <label>Empresa inexistente ou encerrada (CNPJ baixado, empresa fechada ou sem atividade)</label>
+            </value>
+            <value>
+                <fullName>Dados inválidos (sem nenhum canal válido de contato)</fullName>
+                <default>false</default>
+                <label>Dados inválidos (sem nenhum canal válido de contato)</label>
+            </value>
+            <value>
+                <fullName>Contato sem relação com a empresa</fullName>
+                <default>false</default>
+                <label>Contato sem relação com a empresa</label>
+            </value>
+            <value>
+                <fullName>Solicitou não ser contatado</fullName>
+                <default>false</default>
+                <label>Solicitou não ser contatado</label>
+            </value>
+            <value>
+                <fullName>Necessidade fora do portfólio</fullName>
+                <default>false</default>
+                <label>Necessidade fora do portfólio</label>
+            </value>
+            <value>
+                <fullName>Perda por preço do pré-orçamento</fullName>
+                <default>false</default>
+                <label>Perda por preço do pré-orçamento</label>
+            </value>
+            <value>
+                <fullName>Lead de teste ou spam</fullName>
+                <default>false</default>
+                <label>Lead de teste ou spam</label>
             </value>
             <value>
                 <fullName>Outros</fullName>

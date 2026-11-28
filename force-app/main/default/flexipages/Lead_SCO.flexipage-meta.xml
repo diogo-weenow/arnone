@@ -242,6 +242,34 @@
     </flexiPageRegions>
     <flexiPageRegions>
         <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.HasOptedOutOfEmail</fieldItem>
+                <identifier>RecordHasOptedOutOfEmailField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <name>Facet-sco-comunicacao-col1</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-sco-comunicacao-col1</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:column</componentName>
+                <identifier>lsco_secao_comunicacao_coluna1</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-sco-comunicacao</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
             <componentInstance>
                 <componentInstanceProperties>
                     <name>columns</name>
@@ -283,7 +311,7 @@
                 <componentName>flexipage:fieldSection</componentName>
                 <identifier>lsco_secao_nutricao</identifier>
                 <visibilityRule>
-                    <booleanFilter>1 OR 2 OR 3 OR 4 OR 5</booleanFilter>
+                    <booleanFilter>1 OR 2 OR 3 OR 4 OR 5 OR 6 OR 7</booleanFilter>
                     <criteria>
                         <leftValue>{!Record.Status}</leftValue>
                         <operator>EQUAL</operator>
@@ -292,7 +320,7 @@
                     <criteria>
                         <leftValue>{!Record.SCO_Motivo_Nutricao__c}</leftValue>
                         <operator>EQUAL</operator>
-                        <rightValue>Sem retorno</rightValue>
+                        <rightValue>Sem orçamento no momento</rightValue>
                     </criteria>
                     <criteria>
                         <leftValue>{!Record.SCO_Motivo_Nutricao__c}</leftValue>
@@ -302,12 +330,22 @@
                     <criteria>
                         <leftValue>{!Record.SCO_Motivo_Nutricao__c}</leftValue>
                         <operator>EQUAL</operator>
-                        <rightValue>Sem interesse no momento</rightValue>
+                        <rightValue>Sem retorno</rightValue>
                     </criteria>
                     <criteria>
                         <leftValue>{!Record.SCO_Motivo_Nutricao__c}</leftValue>
                         <operator>EQUAL</operator>
                         <rightValue>Decisor não identificado</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.SCO_Motivo_Nutricao__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Já tem fornecedor com contrato vigente</rightValue>
+                    </criteria>
+                    <criteria>
+                        <leftValue>{!Record.SCO_Motivo_Nutricao__c}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>Não compareceu à reunião</rightValue>
                     </criteria>
                 </visibilityRule>
             </componentInstance>
@@ -329,33 +367,30 @@
                 <componentName>flexipage:fieldSection</componentName>
                 <identifier>lsco_secao_desqualificacao</identifier>
                 <visibilityRule>
-                    <booleanFilter>1 OR 2 OR 3 OR 4 OR 5</booleanFilter>
                     <criteria>
                         <leftValue>{!Record.Status}</leftValue>
                         <operator>EQUAL</operator>
                         <rightValue>Desqualificado</rightValue>
                     </criteria>
-                    <criteria>
-                        <leftValue>{!Record.SCO_Motivo_Desqualificacao__c}</leftValue>
-                        <operator>EQUAL</operator>
-                        <rightValue>Fora do perfil</rightValue>
-                    </criteria>
-                    <criteria>
-                        <leftValue>{!Record.SCO_Motivo_Desqualificacao__c}</leftValue>
-                        <operator>EQUAL</operator>
-                        <rightValue>Concorrente ou fornecedor</rightValue>
-                    </criteria>
-                    <criteria>
-                        <leftValue>{!Record.SCO_Motivo_Desqualificacao__c}</leftValue>
-                        <operator>EQUAL</operator>
-                        <rightValue>Empresa inexistente ou fechada</rightValue>
-                    </criteria>
-                    <criteria>
-                        <leftValue>{!Record.SCO_Motivo_Desqualificacao__c}</leftValue>
-                        <operator>EQUAL</operator>
-                        <rightValue>Outros</rightValue>
-                    </criteria>
                 </visibilityRule>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>columns</name>
+                    <value>Facet-sco-comunicacao</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>horizontalAlignment</name>
+                    <value>false</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>label</name>
+                    <value>Comunicação — S Company</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:fieldSection</componentName>
+                <identifier>lsco_secao_comunicacao</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>

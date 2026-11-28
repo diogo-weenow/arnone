@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SCO_Motivo_Nutricao_So_Em_Nutricao</fullName>
+    <active>true</active>
+    <description>CLICKUP-12121. O Motivo da nutrição do Lead da S Company só pode ser preenchido ou trocado com o Lead em &quot;Em nutrição&quot;. Apagar o valor é permitido; o valor já gravado continua no registro quando o status muda (nada limpa automaticamente).</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SCO&apos;,
+  NOT(ISBLANK(TEXT(SCO_Motivo_Nutricao__c))),
+  OR(ISNEW(), ISCHANGED(SCO_Motivo_Nutricao__c)),
+  NOT(ISPICKVAL(Status, &apos;Em nutrição&apos;))
+)</errorConditionFormula>
+    <errorDisplayField>SCO_Motivo_Nutricao__c</errorDisplayField>
+    <errorMessage>O motivo da nutrição só pode ser informado no status Em nutrição.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Flow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>66.0</apiVersion>
+    <areMetricsLoggedToDataCloud>false</areMetricsLoggedToDataCloud>
+    <description>CLICKUP-12121. BU S Company: quando o Lead PASSA a atender &quot;Em nutrição&quot; com Data de retomada preenchida, agenda o caminho &quot;Retomada&quot; para o dia da data de retomada (offset 0 dias), que chama o subflow SCO_Lead_Criar_Tarefa_Retomada. Caminho imediato vazio. Entrada &quot;somente quando atualizado para atender&quot;: se o Lead sair de &quot;Em nutrição&quot; antes da data, a plataforma cancela o caminho agendado; se a data de retomada mudar, o agendamento acompanha o campo de origem. O subflow confere de novo status, Record Type e data no momento da execução e não duplica tarefa aberta.</description>
+    <environments>Default</environments>
+    <interviewLabel>SCO_Lead_Agendar_Retomada {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>SCO_Lead_Agendar_Retomada</label>
+    <processMetadataValues>
+        <name>BuilderType</name>
+        <value>
+            <stringValue>LightningFlowBuilder</stringValue>
+        </value>
+    </processMetadataValues>
+    <processMetadataValues>
+        <name>CanvasMode</name>
+        <value>
+            <stringValue>AUTO_LAYOUT_CANVAS</stringValue>
+        </value>
+    </processMetadataValues>
+    <processType>AutoLaunchedFlow</processType>
+    <start>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <doesRequireRecordChangedToMeetCriteria>true</doesRequireRecordChangedToMeetCriteria>
+        <filterFormula>AND(
+  {!$Record.RecordType.DeveloperName} = &apos;SCO&apos;,
+  ISPICKVAL({!$Record.Status}, &apos;Em nutrição&apos;),
+  NOT(ISBLANK({!$Record.SCO_Data_Retomada__c}))
+)</filterFormula>
+        <object>Lead</object>
+        <recordTriggerType>CreateAndUpdate</recordTriggerType>
+        <scheduledPaths>
+            <name>Retomada</name>
+            <connector>
+                <targetReference>Criar_Tarefa_Retomada</targetReference>
+            </connector>
+            <label>Retomada</label>
+            <offsetNumber>0</offsetNumber>
+            <offsetUnit>Days</offsetUnit>
+            <recordField>SCO_Data_Retomada__c</recordField>
+            <timeSource>RecordField</timeSource>
+        </scheduledPaths>
+        <triggerType>RecordAfterSave</triggerType>
+    </start>
+    <status>Active</status>
+    <subflows>
+        <description>Cria a tarefa &quot;Retomar contato&quot; se o Lead ainda estiver elegível.</description>
+        <name>Criar_Tarefa_Retomada</name>
+        <label>Criar a tarefa Retomar contato</label>
+        <locationX>0</locationX>
+        <locationY>0</locationY>
+        <flowName>SCO_Lead_Criar_Tarefa_Retomada</flowName>
+        <inputAssignments>
+            <name>recordId</name>
+            <value>
+                <elementReference>$Record.Id</elementReference>
+            </value>
+        </inputAssignments>
+    </subflows>
+</Flow>

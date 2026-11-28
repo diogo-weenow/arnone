@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SCO_Motivo_Nutricao__c</fullName>
-    <description>Por que o Lead da S Company foi para &quot;Em nutrição&quot; (agora não, com retomada futura). Obrigatório ao estar em &quot;Em nutrição&quot; (VR SCO_Nutricao_Exige_Motivo_E_Retomada). Nenhuma automação limpa o valor quando o Lead sai da nutrição: fica como histórico. CLICKUP-11813.</description>
+    <description>Por que o Lead da S Company foi para &quot;Em nutrição&quot; (agora não, com retomada futura). Obrigatório ao estar em &quot;Em nutrição&quot; (VR SCO_Nutricao_Exige_Motivo_E_Retomada). Nenhuma automação limpa o valor quando o Lead sai da nutrição: fica como histórico. CLICKUP-11813. Valores v4 (CLICKUP-12121). Só pode ser preenchido em Em nutrição (VR SCO_Motivo_Nutricao_So_Em_Nutricao).</description>
     <inlineHelpText>Por que o Lead foi para nutrição. Obrigatório no status &quot;Em nutrição&quot;.</inlineHelpText>
     <label>Motivo da nutrição</label>
     <required>false</required>
@@ -13,24 +13,40 @@
         <valueSetDefinition>
             <sorted>false</sorted>
             <value>
-                <fullName>Sem retorno</fullName>
+                <fullName>Sem orçamento no momento</fullName>
                 <default>false</default>
-                <label>Sem retorno</label>
+                <label>Sem orçamento no momento</label>
             </value>
             <value>
                 <fullName>Sem timing</fullName>
                 <default>false</default>
-                <label>Sem timing</label>
+                <label>Sem timing / não é prioridade agora</label>
             </value>
             <value>
-                <fullName>Sem interesse no momento</fullName>
+                <fullName>Sem retorno</fullName>
                 <default>false</default>
-                <label>Sem interesse no momento</label>
+                <label>Sem retorno após as tentativas de contato</label>
             </value>
             <value>
                 <fullName>Decisor não identificado</fullName>
                 <default>false</default>
-                <label>Decisor não identificado</label>
+                <label>Decisor não identificado ou sem acesso ao decisor</label>
+            </value>
+            <value>
+                <fullName>Já tem fornecedor com contrato vigente</fullName>
+                <default>false</default>
+                <label>Já tem fornecedor com contrato vigente</label>
+            </value>
+            <value>
+                <fullName>Não compareceu à reunião</fullName>
+                <default>false</default>
+                <label>Não compareceu à reunião</label>
+            </value>
+            <value>
+                <fullName>Sem interesse no momento</fullName>
+                <default>false</default>
+                <isActive>false</isActive>
+                <label>Sem interesse no momento</label>
             </value>
         </valueSetDefinition>
     </valueSet>
