@@ -18,6 +18,11 @@
     </customPermissions>
     <description>ACESSO-POR-BU. PS da BU. Base comum (Conta/Contato/Lead/Opp sem delete, FLS comum) + RTs, campos (ex-PS_STE_Campos_Lead) e classes STE, app Atendimento, presenca Omni e sessoes, STE_Importar_Leads. Sem restricao de visibilidade (vem do cargo).</description>
     <fieldPermissions>
+        <editable>false</editable>
+        <field>Account.CNPJ_Normalizado__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>true</editable>
         <field>Account.CNPJ__c</field>
         <readable>true</readable>

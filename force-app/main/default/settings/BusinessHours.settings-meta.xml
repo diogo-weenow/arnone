@@ -56,4 +56,144 @@
         <wednesdayEndTime>18:00:00.000Z</wednesdayEndTime>
         <wednesdayStartTime>08:00:00.000Z</wednesdayStartTime>
     </businessHours>
+    <businessHours>
+        <active>true</active>
+        <default>false</default>
+        <fridayEndTime>17:00:00.000Z</fridayEndTime>
+        <fridayStartTime>08:00:00.000Z</fridayStartTime>
+        <mondayEndTime>17:00:00.000Z</mondayEndTime>
+        <mondayStartTime>08:00:00.000Z</mondayStartTime>
+        <name>S Company - Horário Comercial</name>
+        <thursdayEndTime>17:00:00.000Z</thursdayEndTime>
+        <thursdayStartTime>08:00:00.000Z</thursdayStartTime>
+        <timeZoneId>America/Sao_Paulo</timeZoneId>
+        <tuesdayEndTime>17:00:00.000Z</tuesdayEndTime>
+        <tuesdayStartTime>08:00:00.000Z</tuesdayStartTime>
+        <wednesdayEndTime>17:00:00.000Z</wednesdayEndTime>
+        <wednesdayStartTime>08:00:00.000Z</wednesdayStartTime>
+    </businessHours>
+    <holidays>
+        <businessHours>S Company - Horário Comercial</businessHours>
+        <description>Feriado recorrente anual (CLICKUP-12115).</description>
+        <isRecurring>true</isRecurring>
+        <name>Aniversário de São Paulo</name>
+        <recurrenceDayOfMonth>25</recurrenceDayOfMonth>
+        <recurrenceMonthOfYear>January</recurrenceMonthOfYear>
+        <recurrenceStartDate>2026-01-25</recurrenceStartDate>
+        <recurrenceType>RecursYearly</recurrenceType>
+    </holidays>
+    <holidays>
+        <businessHours>S Company - Horário Comercial</businessHours>
+        <description>Feriado recorrente anual (CLICKUP-12115).</description>
+        <isRecurring>true</isRecurring>
+        <name>Confraternização Universal</name>
+        <recurrenceDayOfMonth>1</recurrenceDayOfMonth>
+        <recurrenceMonthOfYear>January</recurrenceMonthOfYear>
+        <recurrenceStartDate>2026-01-01</recurrenceStartDate>
+        <recurrenceType>RecursYearly</recurrenceType>
+    </holidays>
+    <holidays>
+        <businessHours>S Company - Horário Comercial</businessHours>
+        <description>Feriado recorrente anual (CLICKUP-12115).</description>
+        <isRecurring>true</isRecurring>
+        <name>Consciência Negra</name>
+        <recurrenceDayOfMonth>20</recurrenceDayOfMonth>
+        <recurrenceMonthOfYear>November</recurrenceMonthOfYear>
+        <recurrenceStartDate>2026-11-20</recurrenceStartDate>
+        <recurrenceType>RecursYearly</recurrenceType>
+    </holidays>
+    <holidays>
+        <activityDate>2027-05-27</activityDate>
+        <businessHours>S Company - Horário Comercial</businessHours>
+        <description>Feriado móvel; cadastrar a data de cada ano (CLICKUP-12115).</description>
+        <isRecurring>false</isRecurring>
+        <name>Corpus Christi 2027</name>
+    </holidays>
+    <holidays>
+        <businessHours>S Company - Horário Comercial</businessHours>
+        <description>Feriado recorrente anual (CLICKUP-12115).</description>
+        <isRecurring>true</isRecurring>
+        <name>Dia do Trabalho</name>
+        <recurrenceDayOfMonth>1</recurrenceDayOfMonth>
+        <recurrenceMonthOfYear>May</recurrenceMonthOfYear>
+        <recurrenceStartDate>2026-05-01</recurrenceStartDate>
+        <recurrenceType>RecursYearly</recurrenceType>
+    </holidays>
+    <holidays>
+        <businessHours>S Company - Horário Comercial</businessHours>
+        <description>Feriado recorrente anual (CLICKUP-12115).</description>
+        <isRecurring>true</isRecurring>
+        <name>Finados</name>
+        <recurrenceDayOfMonth>2</recurrenceDayOfMonth>
+        <recurrenceMonthOfYear>November</recurrenceMonthOfYear>
+        <recurrenceStartDate>2026-11-02</recurrenceStartDate>
+        <recurrenceType>RecursYearly</recurrenceType>
+    </holidays>
+    <holidays>
+        <businessHours>S Company - Horário Comercial</businessHours>
+        <description>Feriado recorrente anual (CLICKUP-12115).</description>
+        <isRecurring>true</isRecurring>
+        <name>Independência do Brasil</name>
+        <recurrenceDayOfMonth>7</recurrenceDayOfMonth>
+        <recurrenceMonthOfYear>September</recurrenceMonthOfYear>
+        <recurrenceStartDate>2026-09-07</recurrenceStartDate>
+        <recurrenceType>RecursYearly</recurrenceType>
+    </holidays>
+    <holidays>
+        <businessHours>S Company - Horário Comercial</businessHours>
+        <description>Feriado recorrente anual (CLICKUP-12115).</description>
+        <isRecurring>true</isRecurring>
+        <name>Natal</name>
+        <recurrenceDayOfMonth>25</recurrenceDayOfMonth>
+        <recurrenceMonthOfYear>December</recurrenceMonthOfYear>
+        <recurrenceStartDate>2026-12-25</recurrenceStartDate>
+        <recurrenceType>RecursYearly</recurrenceType>
+    </holidays>
+    <holidays>
+        <businessHours>S Company - Horário Comercial</businessHours>
+        <description>Feriado recorrente anual (CLICKUP-12115).</description>
+        <isRecurring>true</isRecurring>
+        <name>Nossa Senhora Aparecida</name>
+        <recurrenceDayOfMonth>12</recurrenceDayOfMonth>
+        <recurrenceMonthOfYear>October</recurrenceMonthOfYear>
+        <recurrenceStartDate>2026-10-12</recurrenceStartDate>
+        <recurrenceType>RecursYearly</recurrenceType>
+    </holidays>
+    <holidays>
+        <businessHours>S Company - Horário Comercial</businessHours>
+        <description>Feriado recorrente anual (CLICKUP-12115).</description>
+        <isRecurring>true</isRecurring>
+        <name>Proclamação da República</name>
+        <recurrenceDayOfMonth>15</recurrenceDayOfMonth>
+        <recurrenceMonthOfYear>November</recurrenceMonthOfYear>
+        <recurrenceStartDate>2026-11-15</recurrenceStartDate>
+        <recurrenceType>RecursYearly</recurrenceType>
+    </holidays>
+    <holidays>
+        <businessHours>S Company - Horário Comercial</businessHours>
+        <description>Feriado recorrente anual (CLICKUP-12115).</description>
+        <isRecurring>true</isRecurring>
+        <name>Revolução Constitucionalista</name>
+        <recurrenceDayOfMonth>9</recurrenceDayOfMonth>
+        <recurrenceMonthOfYear>July</recurrenceMonthOfYear>
+        <recurrenceStartDate>2026-07-09</recurrenceStartDate>
+        <recurrenceType>RecursYearly</recurrenceType>
+    </holidays>
+    <holidays>
+        <activityDate>2027-03-26</activityDate>
+        <businessHours>S Company - Horário Comercial</businessHours>
+        <description>Feriado móvel; cadastrar a data de cada ano (CLICKUP-12115).</description>
+        <isRecurring>false</isRecurring>
+        <name>Sexta-feira Santa 2027</name>
+    </holidays>
+    <holidays>
+        <businessHours>S Company - Horário Comercial</businessHours>
+        <description>Feriado recorrente anual (CLICKUP-12115).</description>
+        <isRecurring>true</isRecurring>
+        <name>Tiradentes</name>
+        <recurrenceDayOfMonth>21</recurrenceDayOfMonth>
+        <recurrenceMonthOfYear>April</recurrenceMonthOfYear>
+        <recurrenceStartDate>2026-04-21</recurrenceStartDate>
+        <recurrenceType>RecursYearly</recurrenceType>
+    </holidays>
 </BusinessHoursSettings>

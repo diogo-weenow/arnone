@@ -38,6 +38,10 @@ node_modules/
 # Analytics vem com elemento duplicado do proprio retrieve; Security exige
 # direitos que a org nao concede (MFA) (3 falhas).
 **/settings/**
+# Excecao (CLICKUP-12115): horario comercial e feriados por BU sao promovidos
+# pelo pipeline. O arquivo grava TODOS os horarios listados: antes de PR para
+# uat/production, compare com a versao da org de destino.
+!**/settings/BusinessHours.settings-meta.xml
 
 # Policy rules: deploy retorna erro interno da Salesforce (2 falhas).
 **/policyRuleDefinitions/**

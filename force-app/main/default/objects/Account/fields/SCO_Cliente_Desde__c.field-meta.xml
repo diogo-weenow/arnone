@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SCO_Cliente_Desde__c</fullName>
+    <description>Data do primeiro ganho de Oportunidade da S Company na Conta. Somente leitura para usuários; preenchida por automação da US-19. CLICKUP-12115.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Data do primeiro ganho da S Company. Preenchida automaticamente.</inlineHelpText>
+    <label>Cliente S Company desde</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Date</type>
+</CustomField>

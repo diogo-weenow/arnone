@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SCO_Executivo__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Executivo da S Company responsável pela Conta. Editável por quem tem o PS_SCO_Comercial. CLICKUP-12115.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Executivo que cuida da Conta na S Company.</inlineHelpText>
+    <label>Executivo S Company</label>
+    <referenceTo>User</referenceTo>
+    <relationshipName>SCO_Contas_Executivo</relationshipName>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Lookup</type>
+</CustomField>

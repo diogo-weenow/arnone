@@ -1,3 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<MatchingRules xmlns="http://soap.sforce.com/2006/04/metadata"/>
-
+<MatchingRules xmlns="http://soap.sforce.com/2006/04/metadata">
+    <matchingRules>
+        <fullName>Conta_CNPJ_Normalizado</fullName>
+        <description>CLICKUP-12115. Conta x Conta pelo CNPJ_Normalizado__c, correspondência exata. CNPJ em branco não conta como correspondência. Usada pela duplicate rule Conta_CNPJ_Unico.</description>
+        <label>Conta - CNPJ normalizado</label>
+        <matchingRuleItems>
+            <blankValueBehavior>NullNotAllowed</blankValueBehavior>
+            <fieldName>CNPJ_Normalizado__c</fieldName>
+            <matchingMethod>Exact</matchingMethod>
+        </matchingRuleItems>
+        <ruleStatus>Active</ruleStatus>
+    </matchingRules>
+</MatchingRules>

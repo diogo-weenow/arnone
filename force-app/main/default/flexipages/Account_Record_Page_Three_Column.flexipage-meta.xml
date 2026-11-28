@@ -72,6 +72,32 @@
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>relatedListApiName</name>
+                    <value>AccountContactRelations</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>relatedListComponentOverride</name>
+                    <value>NONE</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>rowsToDisplay</name>
+                    <value>10</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>showActionBar</name>
+                    <value>true</value>
+                </componentInstanceProperties>
+                <componentName>force:relatedListSingleContainer</componentName>
+                <identifier>force_relatedListSingleContainerACR</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>parentFieldApiName</name>
+                    <value>Account.Id</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>relatedListApiName</name>
                     <value>Opportunities</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
@@ -270,6 +296,31 @@
                 </componentInstanceProperties>
                 <componentName>flexipage:fieldSection</componentName>
                 <identifier>flexipage_fieldSection5</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>columns</name>
+                    <value>Facet-774ebd4f-85cf-4360-8f5d-19dce4360f01</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>horizontalAlignment</name>
+                    <value>false</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>label</name>
+                    <value>Dados da Conta — S Company</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:fieldSection</componentName>
+                <identifier>sco_secao_dados_conta</identifier>
+                <visibilityRule>
+                    <criteria>
+                        <leftValue>{!$Permission.CustomPermission.SCO_Comercial}</leftValue>
+                        <operator>EQUAL</operator>
+                        <rightValue>true</rightValue>
+                    </criteria>
+                </visibilityRule>
             </componentInstance>
         </itemInstances>
         <itemInstances>
@@ -690,6 +741,58 @@
             </fieldInstance>
         </itemInstances>
         <name>Facet-743447be-abea-4741-a67e-3b7a274cf2a4</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>none</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SCO_Executivo__c</fieldItem>
+                <identifier>RecordSCOExecutivocField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <name>Facet-a7b16a01-535a-4d9c-bc10-47cbb64e02ee</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.SCO_Cliente_Desde__c</fieldItem>
+                <identifier>RecordSCOClienteDesdecField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <name>Facet-5032eb55-632a-472b-a1c4-f80dd671ca2a</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-a7b16a01-535a-4d9c-bc10-47cbb64e02ee</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:column</componentName>
+                <identifier>sco_secao_dados_conta_coluna1</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-5032eb55-632a-472b-a1c4-f80dd671ca2a</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:column</componentName>
+                <identifier>sco_secao_dados_conta_coluna2</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-774ebd4f-85cf-4360-8f5d-19dce4360f01</name>
         <type>Facet</type>
     </flexiPageRegions>
     <masterLabel>Account Record Page - Three Column</masterLabel>

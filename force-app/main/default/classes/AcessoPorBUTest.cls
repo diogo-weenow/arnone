@@ -224,6 +224,10 @@ private class AcessoPorBUTest {
     if (rt == 'SOL') {
       l.put('CNPJ__c', CNPJ_LEMIT);
     }
+    if (rt == 'SCO') {
+      // SCO_Lead_Exige_Origem (CLICKUP-11811): Lead S Company exige origem.
+      l.LeadSource = 'Indicacao';
+    }
     return l;
   }
 

@@ -3,6 +3,7 @@
     <fullName>SCO</fullName>
     <active>true</active>
     <businessProcess>Funil_SCO</businessProcess>
+    <compactLayoutAssignment>SCO_Oportunidade</compactLayoutAssignment>
     <description>Oportunidades da unidade S.Company.</description>
     <label>S.Company</label>
     <picklistValues>
