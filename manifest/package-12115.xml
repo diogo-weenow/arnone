@@ -48,8 +48,6 @@
         <members>ESG</members>
         <members>SCO</members>
         <members>SOL</members>
-        <members>standard__LightningSales</members>
-        <members>standard__LightningSalesConsole</members>
         <name>CustomApplication</name>
     </types>
     <types>
