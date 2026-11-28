@@ -16,7 +16,7 @@
         <duplicateRuleFilterItems>
             <field>Unidade_Origem__c</field>
             <operation>equals</operation>
-            <value>S.Company</value>
+            <value>SCO</value>
             <sortOrder>2</sortOrder>
             <table>Lead</table>
         </duplicateRuleFilterItems>
