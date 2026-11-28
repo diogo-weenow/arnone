@@ -17,9 +17,6 @@
                             <value>Clone</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>Convert</value>
-                        </valueListItems>
-                        <valueListItems>
                             <value>Lead.SOL_Converter_Lead</value>
                         </valueListItems>
                         <valueListItems>
@@ -232,6 +229,24 @@
                         <rightValue>Outros</rightValue>
                     </criteria>
                 </visibilityRule>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>columns</name>
+                    <value>Facet-8c19268b-8063-5cd9-8ff9-db6ef435e17f</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>horizontalAlignment</name>
+                    <value>true</value>
+                </componentInstanceProperties>
+                <componentInstanceProperties>
+                    <name>label</name>
+                    <value>Origem da Campanha</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:fieldSection</componentName>
+                <identifier>lsol_secao_utm</identifier>
             </componentInstance>
         </itemInstances>
         <itemInstances>
@@ -1253,6 +1268,98 @@
             </componentInstance>
         </itemInstances>
         <name>Facet-b6b386eb-a992-5872-8a28-741772348125</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-a356ddc3-6117-5cd3-89f2-54f759dd1591</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:column</componentName>
+                <identifier>lsol_secao_utm_coluna1</identifier>
+            </componentInstance>
+        </itemInstances>
+        <itemInstances>
+            <componentInstance>
+                <componentInstanceProperties>
+                    <name>body</name>
+                    <value>Facet-a1823152-99c6-5b60-a03e-2157c98b060e</value>
+                </componentInstanceProperties>
+                <componentName>flexipage:column</componentName>
+                <identifier>lsol_secao_utm_coluna2</identifier>
+            </componentInstance>
+        </itemInstances>
+        <name>Facet-8c19268b-8063-5cd9-8ff9-db6ef435e17f</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.UTM_Source__c</fieldItem>
+                <identifier>RecordUTMSourcecField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.UTM_Medium__c</fieldItem>
+                <identifier>RecordUTMMediumcField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.UTM_Campaign__c</fieldItem>
+                <identifier>RecordUTMCampaigncField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <name>Facet-a356ddc3-6117-5cd3-89f2-54f759dd1591</name>
+        <type>Facet</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.UTM_Campaign_Name__c</fieldItem>
+                <identifier>RecordUTMCampaignNamecField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.UTM_Content__c</fieldItem>
+                <identifier>RecordUTMContentcField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldInstanceProperties>
+                    <name>uiBehavior</name>
+                    <value>readonly</value>
+                </fieldInstanceProperties>
+                <fieldItem>Record.UTM_Term__c</fieldItem>
+                <identifier>RecordUTMTermcField</identifier>
+            </fieldInstance>
+        </itemInstances>
+        <name>Facet-a1823152-99c6-5b60-a03e-2157c98b060e</name>
         <type>Facet</type>
     </flexiPageRegions>
     <masterLabel>Lead — Arnone Soluções</masterLabel>
