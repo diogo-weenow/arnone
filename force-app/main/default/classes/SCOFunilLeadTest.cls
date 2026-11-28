@@ -2,10 +2,14 @@
  * CLICKUP-11812 — Funil de status do Lead da S Company (Captacao_SCO).
  * Cobre o Flow SCO_Definir_BDR_Responsavel e as VRs SCO_Reuniao_Agendada_Exige_Dados
  * e SCO_Reuniao_Realizada_Nao_Futura, além do isolamento das outras unidades.
+ * CLICKUP-12117 — "Reunião agendada" exige só a data; o Executivo responsável já
+ * preenchido só é trocado ou apagado pelo papel Diretoria_SCO (VR SCO_Executivo_Troca_So_Diretoria).
+ * Os cenários T1..T10 rodam com personas reais (Standard User + PS_SCO_Comercial + papel).
  */
 @IsTest
 private class SCOFunilLeadTest {
-  private static final String MSG_REUNIAO = 'Informe o Executivo responsável e a data da reunião.';
+  private static final String MSG_REUNIAO = 'Informe a data da reunião agendada.';
+  private static final String MSG_EXECUTIVO = 'Só a Diretora Comercial pode trocar o Executivo responsável.';
   private static final String MSG_FUTURA = 'A data da reunião realizada não pode ser futura.';
 
   private static Id rt(String devName) {
@@ -127,7 +131,7 @@ private class SCOFunilLeadTest {
     System.assertEquals(null, recarregar(l.Id).SCO_BDR_Responsavel__c);
   }
 
-  // 3. "Reunião agendada" exige Executivo responsável e data da reunião.
+  // 3. "Reunião agendada" exige só a data da reunião (CLICKUP-12117: o Executivo não é exigido).
   @IsTest
   static void reuniaoAgendadaExigeDados() {
     User u = usuarios(1)[0];
@@ -138,20 +142,17 @@ private class SCOFunilLeadTest {
     String semData = erroAoAtualizar(
       new Lead(Id = l.Id, Status = 'Reunião agendada', SCO_Executivo_Responsavel__c = u.Id)
     );
-    String completo = erroAoAtualizar(
-      new Lead(
-        Id = l.Id,
-        Status = 'Reunião agendada',
-        SCO_Executivo_Responsavel__c = u.Id,
-        SCO_Data_Reuniao_Agendada__c = System.now().addDays(2)
-      )
+    String soData = erroAoAtualizar(
+      new Lead(Id = l.Id, Status = 'Reunião agendada', SCO_Data_Reuniao_Agendada__c = System.now().addDays(2))
     );
     Test.stopTest();
 
     System.assert(semNada != null && semNada.contains(MSG_REUNIAO), semNada);
     System.assert(semData != null && semData.contains(MSG_REUNIAO), semData);
-    System.assertEquals(null, completo, 'Com os dois campos o save passa.');
-    System.assertEquals('Reunião agendada', recarregar(l.Id).Status);
+    System.assertEquals(null, soData, 'Só com a data o save passa, sem Executivo.');
+    Lead depois = [SELECT Status, SCO_Executivo_Responsavel__c FROM Lead WHERE Id = :l.Id];
+    System.assertEquals('Reunião agendada', depois.Status);
+    System.assertEquals(null, depois.SCO_Executivo_Responsavel__c);
   }
 
   // 4. Data da reunião realizada não aceita data futura; hoje é aceita.
@@ -256,5 +257,286 @@ private class SCOFunilLeadTest {
     System.assert(conv.get(sco.Id).IsConverted);
     System.assertEquals('Qualificado', conv.get(adv.Id).Status);
     System.assert(conv.get(adv.Id).IsConverted);
+  }
+
+  // ---------------------------------------------------------------------------
+  // CLICKUP-12117 — cenários por persona (T1..T10).
+  // ---------------------------------------------------------------------------
+
+  /** Standard User + PS_SCO_Comercial no papel informado. Inserido como setup para evitar MIXED_DML. */
+  private static User persona(String papelDevName, String sufixo) {
+    Id perfilId = [SELECT Id FROM Profile WHERE Name = 'Standard User' LIMIT 1].Id;
+    Id papelId = [SELECT Id FROM UserRole WHERE DeveloperName = :papelDevName LIMIT 1].Id;
+    Id psId = [SELECT Id FROM PermissionSet WHERE Name = 'PS_SCO_Comercial' LIMIT 1].Id;
+    String unico = String.valueOf(Math.abs(Crypto.getRandomInteger()));
+    User u = new User(
+      FirstName = 'SCO',
+      LastName = 'Persona ' + sufixo,
+      Alias = ('sp' + sufixo).left(8),
+      Email = 'sco.persona.' + sufixo + '@arnone.invalid',
+      Username = 'sco.persona.' + sufixo + '.' + unico + '@arnone.funil.test.invalid',
+      ProfileId = perfilId,
+      UserRoleId = papelId,
+      TimeZoneSidKey = 'America/Sao_Paulo',
+      LocaleSidKey = 'pt_BR',
+      EmailEncodingKey = 'UTF-8',
+      LanguageLocaleKey = 'pt_BR'
+    );
+    System.runAs(new User(Id = UserInfo.getUserId())) {
+      insert u;
+      insert new PermissionSetAssignment(AssigneeId = u.Id, PermissionSetId = psId);
+    }
+    return u;
+  }
+
+  private static User bdr() {
+    return persona('Comercial_SCO', 'bdr');
+  }
+
+  private static User diretora() {
+    return persona('Diretoria_SCO', 'dir');
+  }
+
+  /** Lead SCO criado pelo próprio BDR (dono), com nome único para não acionar regras de duplicidade. */
+  private static Lead leadScoDoBdr(User b, String marca) {
+    Lead l = new Lead(
+      RecordTypeId = rt('SCO'),
+      LastName = 'Lead 12117 ' + marca,
+      Company = 'Empresa 12117 ' + marca,
+      LeadSource = 'Indicacao',
+      Status = 'Novo'
+    );
+    System.runAs(b) {
+      insert l;
+    }
+    return l;
+  }
+
+  private static Boolean contem(String erro, String msg) {
+    return erro != null && erro.contains(msg);
+  }
+
+  private static Id executivoAtual(Id leadId) {
+    return [SELECT SCO_Executivo_Responsavel__c FROM Lead WHERE Id = :leadId].SCO_Executivo_Responsavel__c;
+  }
+
+  // T1. BDR: "Reunião agendada" sem data é recusado com a mensagem nova.
+  @IsTest
+  static void t1BdrReuniaoSemDataRecusa() {
+    User b = bdr();
+    Lead l = leadScoDoBdr(b, 'T1');
+    String erro;
+    Test.startTest();
+    System.runAs(b) {
+      erro = erroAoAtualizar(new Lead(Id = l.Id, Status = 'Reunião agendada'));
+    }
+    Test.stopTest();
+    Assert.isTrue(contem(erro, MSG_REUNIAO), 'Sem data deve recusar com a mensagem nova. Obtido: ' + erro);
+    Assert.areEqual('Novo', recarregar(l.Id).Status, 'O Status não pode mudar quando a VR recusa.');
+  }
+
+  // T2. BDR: com data e sem Executivo, salva.
+  @IsTest
+  static void t2BdrReuniaoComDataSemExecutivoSalva() {
+    User b = bdr();
+    Lead l = leadScoDoBdr(b, 'T2');
+    String erro;
+    Test.startTest();
+    System.runAs(b) {
+      erro = erroAoAtualizar(
+        new Lead(Id = l.Id, Status = 'Reunião agendada', SCO_Data_Reuniao_Agendada__c = System.now().addDays(3))
+      );
+    }
+    Test.stopTest();
+    Assert.isNull(erro, 'Com a data, o save deve passar sem Executivo. Obtido: ' + erro);
+    Assert.areEqual('Reunião agendada', recarregar(l.Id).Status, 'Status deve ficar em Reunião agendada.');
+    Assert.isNull(executivoAtual(l.Id), 'Este card não preenche o Executivo (é do CLICKUP-12161).');
+  }
+
+  // T3. BDR: Executivo vazio recebe valor (primeiro preenchimento é livre).
+  @IsTest
+  static void t3BdrPrimeiroPreenchimentoDoExecutivoSalva() {
+    User b = bdr();
+    User exec = usuarios(1)[0];
+    Lead l = leadScoDoBdr(b, 'T3');
+    String erro;
+    Test.startTest();
+    System.runAs(b) {
+      erro = erroAoAtualizar(new Lead(Id = l.Id, SCO_Executivo_Responsavel__c = exec.Id));
+    }
+    Test.stopTest();
+    Assert.isNull(erro, 'Primeiro preenchimento do Executivo deve ser livre. Obtido: ' + erro);
+    Assert.areEqual(exec.Id, executivoAtual(l.Id), 'O Executivo deve ficar gravado.');
+  }
+
+  // T4. BDR: trocar um Executivo já preenchido é recusado.
+  @IsTest
+  static void t4BdrTrocaExecutivoRecusa() {
+    User b = bdr();
+    List<User> execs = usuarios(2);
+    Lead l = leadScoDoBdr(b, 'T4');
+    String erro;
+    Test.startTest();
+    System.runAs(b) {
+      update new Lead(Id = l.Id, SCO_Executivo_Responsavel__c = execs[0].Id);
+      erro = erroAoAtualizar(new Lead(Id = l.Id, SCO_Executivo_Responsavel__c = execs[1].Id));
+    }
+    Test.stopTest();
+    Assert.isTrue(contem(erro, MSG_EXECUTIVO), 'Troca pelo BDR deve recusar. Obtido: ' + erro);
+    Assert.areEqual(execs[0].Id, executivoAtual(l.Id), 'O Executivo original deve permanecer.');
+  }
+
+  // T5. BDR: apagar um Executivo já preenchido é recusado.
+  @IsTest
+  static void t5BdrApagaExecutivoRecusa() {
+    User b = bdr();
+    User exec = usuarios(1)[0];
+    Lead l = leadScoDoBdr(b, 'T5');
+    String erro;
+    Test.startTest();
+    System.runAs(b) {
+      update new Lead(Id = l.Id, SCO_Executivo_Responsavel__c = exec.Id);
+      erro = erroAoAtualizar(new Lead(Id = l.Id, SCO_Executivo_Responsavel__c = null));
+    }
+    Test.stopTest();
+    Assert.isTrue(contem(erro, MSG_EXECUTIVO), 'Apagar pelo BDR deve recusar. Obtido: ' + erro);
+    Assert.areEqual(exec.Id, executivoAtual(l.Id), 'O Executivo original deve permanecer.');
+  }
+
+  // T5b. Usuário sem papel (administrador; $UserRole vazio) também não troca o Executivo de Lead SCO.
+  // Substitui a E2E pela CLI, que não pôde rodar porque o perfil do admin não tem o RT SCO.
+  @IsTest
+  static void t5bUsuarioSemPapelTrocaExecutivoRecusa() {
+    User semPapel = usuarios(1)[0]; // mesmo perfil do executor (administrador), sem UserRoleId
+    Assert.isNull([SELECT UserRoleId FROM User WHERE Id = :semPapel.Id].UserRoleId, 'Pré-condição: usuário sem papel.');
+    List<User> execs = usuarios(2);
+    Lead l = leadSco(semPapel.Id);
+    update new Lead(Id = l.Id, SCO_Executivo_Responsavel__c = execs[0].Id);
+    String erro;
+    Test.startTest();
+    System.runAs(semPapel) {
+      erro = erroAoAtualizar(new Lead(Id = l.Id, SCO_Executivo_Responsavel__c = execs[1].Id));
+    }
+    Test.stopTest();
+    Assert.isTrue(contem(erro, MSG_EXECUTIVO), 'Usuário sem papel deve ser recusado. Obtido: ' + erro);
+    Assert.areEqual(execs[0].Id, executivoAtual(l.Id), 'O Executivo original deve permanecer.');
+  }
+
+  // T6. Diretora (papel Diretoria_SCO): troca e apaga o Executivo, salva.
+  @IsTest
+  static void t6DiretoraTrocaExecutivoSalva() {
+    User b = bdr();
+    User dir = diretora();
+    List<User> execs = usuarios(2);
+    Lead l = leadScoDoBdr(b, 'T6');
+    System.runAs(b) {
+      update new Lead(Id = l.Id, SCO_Executivo_Responsavel__c = execs[0].Id);
+    }
+    String erroTroca;
+    String erroApaga;
+    Id depoisDaTroca;
+    Test.startTest();
+    System.runAs(dir) {
+      erroTroca = erroAoAtualizar(new Lead(Id = l.Id, SCO_Executivo_Responsavel__c = execs[1].Id));
+      depoisDaTroca = executivoAtual(l.Id);
+      erroApaga = erroAoAtualizar(new Lead(Id = l.Id, SCO_Executivo_Responsavel__c = null));
+    }
+    Test.stopTest();
+    Assert.isNull(erroTroca, 'A Diretora deve conseguir trocar. Obtido: ' + erroTroca);
+    Assert.areEqual(execs[1].Id, depoisDaTroca, 'O novo Executivo deve ficar gravado.');
+    Assert.isNull(erroApaga, 'A Diretora deve conseguir apagar. Obtido: ' + erroApaga);
+    Assert.isNull(executivoAtual(l.Id), 'O Executivo deve ficar vazio.');
+  }
+
+  // T7. Regressão: "Novo" -> "Em contato" pelo BDR grava o dono como BDR responsável.
+  @IsTest
+  static void t7BdrEmContatoGravaBdrResponsavel() {
+    User b = bdr();
+    Lead l = leadScoDoBdr(b, 'T7');
+    Test.startTest();
+    System.runAs(b) {
+      update new Lead(Id = l.Id, Status = 'Em contato');
+    }
+    Test.stopTest();
+    Assert.areEqual(b.Id, recarregar(l.Id).SCO_BDR_Responsavel__c, 'O dono deve virar BDR responsável.');
+  }
+
+  // T8. Regressão: data da reunião realizada futura é recusada para o BDR.
+  @IsTest
+  static void t8BdrReuniaoRealizadaFuturaRecusa() {
+    User b = bdr();
+    Lead l = leadScoDoBdr(b, 'T8');
+    String erro;
+    Test.startTest();
+    System.runAs(b) {
+      erro = erroAoAtualizar(new Lead(Id = l.Id, SCO_Data_Reuniao_Realizada__c = Date.today().addDays(1)));
+    }
+    Test.stopTest();
+    Assert.isTrue(contem(erro, MSG_FUTURA), 'Data futura deve recusar. Obtido: ' + erro);
+  }
+
+  // T9. Isolamento: Lead RT SOL com Executivo trocado/apagado por usuário sem Diretoria_SCO não é bloqueado.
+  // Roda como o usuário do teste (sem papel Diretoria_SCO); no RT SCO a mesma troca seria recusada.
+  @IsTest
+  static void t9LeadSolTrocaExecutivoSemErro() {
+    User eu = [SELECT UserRole.DeveloperName FROM User WHERE Id = :UserInfo.getUserId()];
+    Assert.areNotEqual(
+      'Diretoria_SCO',
+      eu.UserRole?.DeveloperName,
+      'Pré-condição: o usuário do teste não pode ter o papel Diretoria_SCO.'
+    );
+    List<User> execs = usuarios(2);
+    Lead l = new Lead(
+      RecordTypeId = rt('SOL'),
+      LastName = 'Lead 12117 T9',
+      Company = 'Empresa 12117 T9',
+      LeadSource = 'Indicacao',
+      CNPJ__c = '11222333000181',
+      Status = 'Novo',
+      SCO_Executivo_Responsavel__c = execs[0].Id
+    );
+    insert l;
+    Test.startTest();
+    String erroTroca = erroAoAtualizar(new Lead(Id = l.Id, SCO_Executivo_Responsavel__c = execs[1].Id));
+    String erroApaga = erroAoAtualizar(new Lead(Id = l.Id, SCO_Executivo_Responsavel__c = null));
+    Test.stopTest();
+    Assert.isNull(erroTroca, 'A VR SCO não pode disparar no RT SOL (troca). Obtido: ' + erroTroca);
+    Assert.isNull(erroApaga, 'A VR SCO não pode disparar no RT SOL (apagar). Obtido: ' + erroApaga);
+  }
+
+  // T10. Volume: 200 Leads SCO do BDR para "Reunião agendada" com data, sem erro.
+  @IsTest
+  static void t10VolumeReuniaoAgendadaComData() {
+    User b = bdr();
+    List<Lead> leads = new List<Lead>();
+    for (Integer i = 0; i < 200; i++) {
+      leads.add(
+        new Lead(
+          RecordTypeId = rt('SCO'),
+          LastName = 'Lead 12117 Vol ' + i,
+          Company = 'Empresa 12117 Vol ' + i,
+          LeadSource = 'Indicacao',
+          Status = 'Novo'
+        )
+      );
+    }
+    System.runAs(b) {
+      insert leads;
+    }
+    Datetime quando = System.now().addDays(5);
+    for (Lead l : leads) {
+      l.Status = 'Reunião agendada';
+      l.SCO_Data_Reuniao_Agendada__c = quando;
+    }
+    Test.startTest();
+    System.runAs(b) {
+      update leads;
+    }
+    Test.stopTest();
+    Assert.areEqual(
+      200,
+      [SELECT COUNT() FROM Lead WHERE Id IN :leads AND Status = 'Reunião agendada' AND SCO_Data_Reuniao_Agendada__c != NULL],
+      'Os 200 Leads devem estar em Reunião agendada com data.'
+    );
   }
 }

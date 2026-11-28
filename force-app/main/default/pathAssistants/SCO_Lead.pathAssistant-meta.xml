@@ -36,7 +36,7 @@
         <fieldNames>SCO_Executivo_Responsavel__c</fieldNames>
         <fieldNames>SCO_Data_Reuniao_Agendada__c</fieldNames>
         <fieldNames>SCO_Data_Reuniao_Realizada__c</fieldNames>
-        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; BDR e executivo.&lt;/p&gt;&lt;p&gt;Executivo responsável e data da reunião são obrigatórios. A data da reunião realizada não pode ser futura.&lt;/p&gt;</info>
+        <info>&lt;p&gt;&lt;b&gt;Responsável:&lt;/b&gt; BDR e executivo.&lt;/p&gt;&lt;p&gt;Informe a data da reunião agendada. O executivo responsável é definido automaticamente; só a Diretora Comercial pode trocá-lo. A data da reunião realizada não pode ser futura.&lt;/p&gt;</info>
         <picklistValueName>Reunião agendada</picklistValueName>
     </pathAssistantSteps>
     <recordTypeName>SCO</recordTypeName>

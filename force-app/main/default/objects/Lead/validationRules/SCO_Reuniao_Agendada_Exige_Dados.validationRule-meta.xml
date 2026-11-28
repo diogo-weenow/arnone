@@ -2,14 +2,12 @@
 <ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>SCO_Reuniao_Agendada_Exige_Dados</fullName>
     <active>true</active>
-    <description>CLICKUP-11812. Lead da S Company em &quot;Reunião agendada&quot; exige o Executivo responsável e a Data da reunião agendada.</description>
+    <description>CLICKUP-11812/12117. Lead da S Company em Reunião agendada exige a Data da reunião agendada. O Executivo responsável é preenchido pela automação (CLICKUP-12161) após o salvamento e por isso não é exigido aqui.</description>
     <errorConditionFormula>AND(
   $RecordType.DeveloperName = &apos;SCO&apos;,
   ISPICKVAL(Status, &apos;Reunião agendada&apos;),
-  OR(
-    ISBLANK(SCO_Executivo_Responsavel__c),
-    ISBLANK(SCO_Data_Reuniao_Agendada__c)
-  )
+  ISBLANK(SCO_Data_Reuniao_Agendada__c)
 )</errorConditionFormula>
-    <errorMessage>Informe o Executivo responsável e a data da reunião.</errorMessage>
+    <errorDisplayField>SCO_Data_Reuniao_Agendada__c</errorDisplayField>
+    <errorMessage>Informe a data da reunião agendada.</errorMessage>
 </ValidationRule>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SCO_Executivo_Troca_So_Diretoria</fullName>
+    <active>true</active>
+    <description>CLICKUP-12117. Só a Diretoria S.Company troca ou apaga o Executivo responsável já preenchido. O primeiro preenchimento é livre para a automação do CLICKUP-12161.</description>
+    <errorConditionFormula>AND(
+  $RecordType.DeveloperName = &apos;SCO&apos;,
+  NOT(ISNEW()),
+  ISCHANGED(SCO_Executivo_Responsavel__c),
+  NOT(ISBLANK(PRIORVALUE(SCO_Executivo_Responsavel__c))),
+  $UserRole.DeveloperName &lt;&gt; &apos;Diretoria_SCO&apos;
+)</errorConditionFormula>
+    <errorDisplayField>SCO_Executivo_Responsavel__c</errorDisplayField>
+    <errorMessage>Só a Diretora Comercial pode trocar o Executivo responsável.</errorMessage>
+</ValidationRule>
